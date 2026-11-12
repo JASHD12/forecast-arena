@@ -19,7 +19,7 @@ from arena.sources.smard import (
     SmardClient,
     actuals_available_at,
     berlin_day_bounds,
-    complete_day,
+    berlin_day_hours,
     price_available_at,
 )
 
@@ -49,12 +49,16 @@ def to_observations(key: str, points: Iterable[Point]) -> list[Observation]:
 
 def daily_series(points: Sequence[Point]) -> dict[date, list[float]]:
     """Complete Berlin days only: date -> hourly values (23, 24 or 25 of them)."""
-    days = sorted({berlin_date(p.start) for p in points})
+    by_day: dict[date, dict[datetime, float | None]] = {}
+    for p in points:
+        by_day.setdefault(berlin_date(p.start), {})[p.start] = p.value
     out: dict[date, list[float]] = {}
-    for d in days:
-        values = complete_day(points, d)
-        if values is not None:
-            out[d] = values
+    for d in sorted(by_day):
+        hours = berlin_day_hours(d)
+        vals = by_day[d]
+        row = [vals.get(h) for h in hours]
+        if all(v is not None for v in row):
+            out[d] = [v for v in row if v is not None]
     return out
 
 

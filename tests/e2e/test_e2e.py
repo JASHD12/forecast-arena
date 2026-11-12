@@ -1,0 +1,67 @@
+"""Offline end-to-end run: five simulated days through the real job code (SPEC 13).
+
+Data: recorded SMARD fixtures. Time: a fixed clock moved through the daily schedule of
+SPEC 4 (two morning runs, four resolve runs). Ends with ledger verification.
+"""
+
+from datetime import UTC, date, datetime, time, timedelta
+
+from power_fixtures import fixture_domain
+
+from arena.clock import FixedClock
+from arena.ledger import Ledger, layout
+from arena.ledger.verify import verify
+from arena.models import Forecast, Question, Resolution
+from arena.ops.jobs import morning, resolve
+from arena.ops.wiring import build_forecasters
+
+FIRST = date(2026, 10, 21)
+DAYS = 5
+MORNINGS = (time(5, 30), time(7, 0))
+RESOLVES = (time(3, 30), time(12, 30), time(16, 30), time(20, 30))
+
+
+def run_schedule(root) -> Ledger:
+    led = Ledger(root)
+    clock = FixedClock(datetime.combine(FIRST, time(0), tzinfo=UTC))
+    domains = [fixture_domain()]
+    forecasters = build_forecasters(led, domains)
+    for i in range(DAYS + 1):
+        day = FIRST + timedelta(days=i)
+        events = [(t, "resolve") for t in RESOLVES]
+        if i < DAYS:
+            events += [(t, "morning") for t in MORNINGS]
+        for t, job in sorted(events):
+            clock.set(datetime.combine(day, t, tzinfo=UTC))
+            if job == "morning":
+                morning(led, day, clock, domains, forecasters)
+            else:
+                resolve(led, clock, domains)
+    return led
+
+
+def test_five_days_offline(tmp_path) -> None:
+    led = run_schedule(tmp_path / "ledger")
+    qs = [r for _, r in led.iter_family("questions") if isinstance(r, Question)]
+    fs = [r for _, r in led.iter_family("forecasts") if isinstance(r, Forecast)]
+    rs = [r for _, r in led.iter_family("resolutions") if isinstance(r, Resolution)]
+    assert len({q.batch_date for q in qs}) == DAYS
+    assert len(qs) >= 5 * DAYS
+    assert len(fs) == 2 * len(qs)  # base_rate and persistence answer everything
+    assert {r.question_id for r in rs} == {q.question_id for q in qs}
+    for d in range(DAYS):
+        assert led.exists(layout.batch_seal_path(FIRST + timedelta(days=d)))
+        assert led.exists(layout.day_seal_path(FIRST + timedelta(days=d)))
+    assert any(r.evidence.values_used["hours"] == 25 for r in rs)  # 25 Oct 2026
+    rep = verify(led)
+    assert rep.ok, rep.summary()
+
+
+def test_rerunning_the_schedule_changes_nothing(tmp_path) -> None:
+    a = run_schedule(tmp_path / "a")
+    b = run_schedule(tmp_path / "b")
+    files = [f for f in a.list_files() if not f.startswith("runs/")]
+    assert files == [f for f in b.list_files() if not f.startswith("runs/")]
+    for f in files:
+        if not f.startswith("chain/"):  # seals embed sealed_at, also deterministic here
+            assert a.read_bytes(f) == b.read_bytes(f), f

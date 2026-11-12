@@ -96,7 +96,7 @@ Keep the first line of each task in exactly this shape; the status script parses
   - Do: `Forecaster` protocol; `base_rate` (8.1) and `persistence` (8.2), using history
     replayed through the real question and resolver code.
   - Done when: tests cover smoothing, the under-10-instances rule and the fallback.
-- [ ] T027 · Daily jobs and offline end-to-end test (deps: T015, T025, T026)
+- [x] T027 · Daily jobs and offline end-to-end test (deps: T015, T025, T026)
   - Do: `arena daily morning` and `arena daily resolve`: idempotent, lock-time enforced
     (late runs record a miss and write no forecasts), a failed forecaster never aborts the
     batch. `make e2e` simulates five days offline; add it to `make check`.

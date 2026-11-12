@@ -19,11 +19,12 @@ from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from datetime import UTC, date, datetime, time, timedelta
 from decimal import ROUND_HALF_UP, Decimal
+from functools import lru_cache
 from itertools import pairwise
 from typing import Any
 
 from arena.domains.base import AsOfStore, is_degenerate, trailing_frequency
-from arena.domains.power_history import PRICE_KEY, berlin_date, daily_from_store, daily_series
+from arena.domains.power_history import PRICE_KEY, daily_from_store, daily_series
 from arena.models import Evidence, Question, Resolution, Void, question_id_for
 from arena.sources.smard import ATTRIBUTION, BERLIN, Point, berlin_day_hours
 
@@ -71,14 +72,19 @@ def evening_values(day: date, values: Sequence[float]) -> list[float]:
 
 def day_stats(day: date, values: Sequence[float]) -> dict[str, float]:
     """Daily statistics used by the templates, rounded to published precision."""
+    return dict(_day_stats(day, tuple(values)))
+
+
+@lru_cache(maxsize=16384)
+def _day_stats(day: date, values: tuple[float, ...]) -> tuple[tuple[str, float], ...]:
     ev = evening_values(day, values)
-    return {
-        "mean": r2(sum(values) / len(values)),
-        "max": r2(max(values)),
-        "min": r2(min(values)),
-        "spread": r2(max(values) - min(values)),
-        "evening": r2(sum(ev) / len(ev)),
-    }
+    return (
+        ("mean", r2(sum(values) / len(values))),
+        ("max", r2(max(values))),
+        ("min", r2(min(values))),
+        ("spread", r2(max(values) - min(values))),
+        ("evening", r2(sum(ev) / len(ev))),
+    )
 
 
 @dataclass(frozen=True)
@@ -170,11 +176,18 @@ class PowerDomain:
         self.store = store
         self.evidence = evidence
         self.on_skip = on_skip or (lambda msg: None)
+        self._known: dict[tuple[datetime, int, int], dict[date, list[float]]] = {}
+        self._all: tuple[int, dict[date, list[float]]] | None = None
 
     # ----- generation --------------------------------------------------------------
     def known_days(self, asof: datetime, days: int) -> dict[date, list[float]]:
-        """Complete Berlin days of prices available at `asof`."""
-        return daily_from_store(self.store, PRICE_KEY, asof, days)
+        """Complete Berlin days of prices available at `asof` (cached per store version)."""
+        key = (asof, days, self.store.version)
+        if key not in self._known:
+            if len(self._known) > 512:
+                self._known.clear()
+            self._known[key] = daily_from_store(self.store, PRICE_KEY, asof, days)
+        return self._known[key]
 
     def generate_questions(self, batch_date: date, asof: datetime) -> list[Question]:
         """Up to six questions about D = B+1; deterministic given B and the as-of data."""
@@ -290,11 +303,11 @@ class PowerDomain:
         Resolution uses every value the store holds (they were fetched live, so they
         exist), not the conservative availability stamps used for forecasting.
         """
-        start = datetime.combine(day - timedelta(days=1), time(0), tzinfo=UTC)
-        far = datetime.max.replace(tzinfo=UTC)
-        pts = [Point(o.observed_at, o.value) for o in self.store.series(PRICE_KEY, far)
-               if start <= o.observed_at and berlin_date(o.observed_at) == day]  # fmt: skip
-        return daily_series(pts).get(day)
+        if self._all is None or self._all[0] != self.store.version:
+            far = datetime.max.replace(tzinfo=UTC)
+            pts = [Point(o.observed_at, o.value) for o in self.store.series(PRICE_KEY, far)]
+            self._all = (self.store.version, daily_series(pts))
+        return self._all[1].get(day)
 
     def resolve(self, question: Question, now: datetime) -> Resolution | Void | None:
         """None before resolve_after or while hours are missing; Void after grace."""

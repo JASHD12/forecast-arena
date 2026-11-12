@@ -17,6 +17,7 @@ import json
 from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
 from datetime import UTC, date, datetime, time, timedelta
+from functools import lru_cache
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -188,11 +189,12 @@ def berlin_day_bounds(day: date) -> tuple[datetime, datetime]:
     return start, end
 
 
-def berlin_day_hours(day: date) -> list[datetime]:
+@lru_cache(maxsize=8192)
+def berlin_day_hours(day: date) -> tuple[datetime, ...]:
     """UTC start of every hour of a Europe/Berlin day, in order."""
     start, end = berlin_day_bounds(day)
     n = int((end - start) / timedelta(hours=1))
-    return [start + timedelta(hours=i) for i in range(n)]
+    return tuple(start + timedelta(hours=i) for i in range(n))
 
 
 def day_values(points: Iterable[Point], day: date) -> list[float | None]:

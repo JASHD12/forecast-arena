@@ -26,6 +26,7 @@ class Settings(BaseModel):
     contact: str | None = Field(None, description="Contact for the HTTP User-Agent")
     repo_url: str = DEFAULT_REPO_URL
     ledger_dir: Path = Path("_ledger")
+    ledger_remote: str | None = Field(None, description="Git remote of the ledger branch")
     cache_dir: Path = Path("data_cache")
     lock_time_utc: time = time(9, 30)
 
@@ -51,7 +52,13 @@ class Settings(BaseModel):
         return value
 
     @field_validator(
-        "contact", "llm_provider", "llm_model", "llm_base_url", "panel_csv_url", mode="before"
+        "contact",
+        "ledger_remote",
+        "llm_provider",
+        "llm_model",
+        "llm_base_url",
+        "panel_csv_url",
+        mode="before",
     )
     @classmethod
     def _empty_is_none(cls, value: Any) -> Any:

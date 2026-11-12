@@ -197,16 +197,62 @@ def daily() -> None:
     """The scheduled jobs."""
 
 
+def _sync(obj: Ctx, push: bool) -> str | None:
+    """Check out the ledger branch when pushing; returns the remote used."""
+    if not push or obj.dry_run:
+        return None
+    from arena.ledger.gitsync import ensure_checkout
+
+    remote = obj.settings.ledger_remote
+    if not remote:
+        raise click.UsageError("--push needs ARENA_LEDGER_REMOTE")
+    click.echo(f"ledger checkout: {ensure_checkout(remote, obj.ledger.root)}")
+    return remote
+
+
+def _push(obj: Ctx, remote: str | None, job: str, day: date) -> None:
+    if remote is None:
+        return
+    from arena.ledger.gitsync import commit_and_push
+
+    sha = commit_and_push(obj.ledger.root, job, day)
+    click.echo(f"ledger pushed: {sha}" if sha else "ledger: nothing to push")
+
+
 @daily.command("morning")
-def daily_morning() -> None:
-    """Questions, forecasts, seal, push (built in T027)."""
-    _not_yet("T027")
+@click.option("--push", is_flag=True, help="Sync with and push to the ledger branch.")
+@click.pass_obj
+def daily_morning(obj: Ctx, push: bool) -> None:
+    """Questions, forecasts, snapshot and batch seal for --date (idempotent)."""
+    from arena.ops.jobs import morning
+    from arena.ops.wiring import build_domains, build_forecasters
+
+    remote = _sync(obj, push)
+    domains = build_domains(obj.settings, obj.clock.now())
+    result = morning(obj.ledger, obj.day, obj.clock, domains,
+                     build_forecasters(obj.ledger, domains), dry_run=obj.dry_run)  # fmt: skip
+    click.echo(result.line())
+    for w in result.warnings:
+        click.echo(f"warning: {w}")
+    _push(obj, remote, "morning", obj.day)
 
 
 @daily.command("resolve")
-def daily_resolve() -> None:
-    """Resolve, seal finished days, rescore (built in T027)."""
-    _not_yet("T027")
+@click.option("--push", is_flag=True, help="Sync with and push to the ledger branch.")
+@click.pass_obj
+def daily_resolve(obj: Ctx, push: bool) -> None:
+    """Resolve what is resolvable now, record revisions, seal finished days."""
+    from arena.ops.jobs import resolve
+    from arena.ops.wiring import build_domains
+
+    remote = _sync(obj, push)
+    now = obj.clock.now()
+    result = resolve(obj.ledger, obj.clock, build_domains(obj.settings, now),
+                     dry_run=obj.dry_run)  # fmt: skip
+    click.echo(result.line())
+    for w in result.warnings:
+        click.echo(f"warning: {w}")
+    _push(obj, remote, "resolve", now.date())
 
 
 @main.group()

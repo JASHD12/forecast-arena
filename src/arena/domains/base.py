@@ -48,6 +48,8 @@ class AsOfStore:
 
     def __init__(self, observations: Iterable[Observation] = ()) -> None:
         self._by_key: dict[str, list[Observation]] = {}
+        self._avail: dict[str, list[datetime]] = {}
+        self.version = 0  # bumped on every add; lets callers cache derived values
         for obs in observations:
             self.add(obs)
 
@@ -55,7 +57,11 @@ class AsOfStore:
         """Insert an observation (times must be timezone-aware)."""
         ensure_utc(obs.available_at)
         ensure_utc(obs.observed_at)
-        bisect.insort(self._by_key.setdefault(obs.key, []), obs)
+        rows = self._by_key.setdefault(obs.key, [])
+        i = bisect.bisect_right(rows, obs)
+        rows.insert(i, obs)
+        self._avail.setdefault(obs.key, []).insert(i, obs.available_at)
+        self.version += 1
 
     def keys(self) -> list[str]:
         """Known series keys."""
@@ -71,7 +77,7 @@ class AsOfStore:
         """
         asof = ensure_utc(asof)
         rows = self._by_key.get(key, [])
-        cut = bisect.bisect_right([o.available_at for o in rows], asof)
+        cut = bisect.bisect_right(self._avail.get(key, []), asof)
         latest: dict[datetime, Observation] = {}
         for obs in rows[:cut]:
             latest[obs.observed_at] = obs  # later availability overwrites earlier versions

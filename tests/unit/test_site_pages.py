@@ -163,3 +163,18 @@ def test_home_race_spotlight_and_honest_ml_status(tmp_path) -> None:
     assert abs(r["series"]["ml"][0][1] - 0.01) < 1e-12
     svg = race_svg(r["series"], {"ml": "ML model"}, r["days"])
     assert "<title>ML model: 0.010 after 2026-11-01</title>" in svg and "coin flip" in svg
+
+
+def test_unfinished_legal_draft_is_never_published(tmp_path) -> None:
+    from pathlib import Path
+
+    content = tmp_path / "content"
+    content.mkdir()
+    repo = Path(__file__).parents[2]
+    for name in ("imprint.md", "privacy.md"):
+        draft = (repo / "docs" / "legal" / name).read_text()
+        assert "[FILL IN" in draft
+        (content / name).write_text(draft)
+    _, res = _site(tmp_path / "x", content)
+    assert "Pending" in (res.out_dir / "imprint.html").read_text()
+    assert "FILL IN" not in (res.out_dir / "privacy.html").read_text()

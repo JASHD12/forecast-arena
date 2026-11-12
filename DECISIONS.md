@@ -434,6 +434,15 @@ Made by: agent
   host or vector database (cost), SHAP (heavier dependency; permutation importance is
   model-agnostic and enough here).
 
+## 2026-11-12 · Legal text drafts (owner request)
+
+- Context: AGENTS.md says the agent must not invent legal text; the owner then asked the
+  agent to write the Imprint and Privacy text.
+- Decision: drafts in `docs/legal/` that state only facts about this site (no cookies,
+  no trackers, GitHub Pages IP logging, GDPR rights) and leave every personal detail as a
+  `[FILL IN: ...]` placeholder. The site never publishes a file containing a placeholder
+  (tested). The owner checks and completes them; they are not legal advice.
+
 ## Proposals for the human
 
 Ideas outside the specification. The agent lists them here and does not build them.

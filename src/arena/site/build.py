@@ -65,6 +65,8 @@ ATTRIBUTIONS = (
     f"news headlines for the agent: {GDELT_ATTRIBUTION}",
 )
 FEED_BATCHES = 7
+#: Marker of an unfinished owner-written draft (docs/legal/*.md); such files stay unpublished.
+PLACEHOLDER = "[FILL IN"
 SKIP_HELP = {
     "not_sampled": "the AI forecasters answer a fixed daily sample per topic, to cap cost",
     "budget_exhausted": "the daily AI token or request cap was reached",
@@ -367,7 +369,12 @@ def build_site(
 
     def read_content(name: str) -> Markup | None:
         path = content / name
-        return simple_markdown(path.read_text(encoding="utf-8")) if path.is_file() else None
+        if not path.is_file():
+            return None
+        text = path.read_text(encoding="utf-8")
+        if PLACEHOLDER in text:  # an unfinished draft is never published
+            return None
+        return simple_markdown(text)
 
     start_s = official_start(ledger)
     start = date.fromisoformat(start_s) if start_s else None

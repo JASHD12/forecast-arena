@@ -30,15 +30,16 @@ Keep the first line of each item in exactly this shape; the status script parses
     `openai_compatible`, `ARENA_LLM_BASE_URL`.
   - Never paste the key into a chat, a file, or a commit.
   - Needed for tasks T064, T065, T068.
-- [ ] H05 · Write the About, Imprint and Privacy text
-  - `site_content/about.md`: who you are, a link to your profile, how the project was built.
-  - `site_content/imprint.md`: the provider identification a website run from Germany
-    usually needs (DDG section 5): your name, postal address and e-mail.
-  - `site_content/privacy.md`: who is responsible and how to reach them, plus the points
-    listed in `docs/COMPLIANCE.md` ("What the owner should do"). The site already shows
-    the technical facts (no cookies, no trackers, GitHub Pages logs IP addresses).
-  - This is your responsibility to confirm; the agent must not invent legal text. Until
-    then the Imprint and Privacy pages say "Pending".
+- [ ] H05 · Finish the Imprint and Privacy text (drafts are ready)
+  - The agent drafted both at your request: `docs/legal/imprint.md` and
+    `docs/legal/privacy.md`. Replace every `[FILL IN: ...]` (your name, postal address,
+    e-mail, your state's data protection authority, the date).
+  - Then copy them to `site_content/imprint.md` and `site_content/privacy.md` and push
+    (or tell the agent the details and it does this). A file that still contains
+    `[FILL IN` is never published; the page keeps saying "Pending".
+  - Optional: `site_content/about.md` (who you are, a link to your profile).
+  - Not legal advice: check the result, e.g. with a generator from a German data
+    protection authority or a lawyer. Your address will be public on the site.
 - [ ] H06 · Recruit the human panel
   - Ask 10 to 15 classmates to forecast once a week. Follow `docs/PANEL_SETUP.md` (the
     agent writes it in task T091): create the form, hand out tokens, publish the sheet as

@@ -402,15 +402,22 @@ Made by: agent
 - `stack.html` describes only what exists; library versions are read from the build
   environment and the live models from the ledger, so the page cannot overstate.
 
+## 2026-11-12 · Cost ceiling: Haiku 5.5, about $1 a month at most (owner decision)
+
+- Context: the owner does not want the project to cost money; asked, they chose to keep
+  Claude Haiku 5.5 with tighter caps rather than switch the AI forecasters off.
+- Decision: the workflows default `ARENA_LLM_MAX_TOKENS_PER_DAY` to 150000 (SPEC 9.4's
+  400000 stays the code default and can be restored with the Actions variable). With 100
+  requests x 400 output tokens and Haiku 5.5's prices ($0.10 / $0.50 per million), the
+  worst case is about $0.03 a day. When the cap is reached, remaining LLM forecasts are
+  `budget_exhausted` skips (I6), shown on the Status page. Frontier models (H13) and the
+  model-size comparison proposal are withdrawn. Everything else stays free: public-repo
+  GitHub Actions and Pages, free data sources, CoinGecko's free Demo plan.
+
 ## Proposals for the human
 
 Ideas outside the specification. The agent lists them here and does not build them.
 
-- **Model-size comparison (research upgrade).** Run two LLM tiers side by side (e.g.
-  Claude Haiku 5.5 and Claude Opus 5.5) as separate forecasters on the same daily
-  sample. That turns "does a bigger model forecast better, and is it worth the cost?" into
-  a measured result, which is a stronger story than using one large model. Doubles LLM
-  cost; needs a decision on the forecaster list (SPEC 8).
 - **Human panel published only as an aggregate (GDPR).** The ledger is append-only and
   public, so a panel member's pseudonymous entries could never be erased (GDPR Art. 17).
   Safer: write only the panel median per question (the `human_panel` forecast) to the

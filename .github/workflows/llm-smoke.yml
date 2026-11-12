@@ -18,7 +18,7 @@ jobs:
       ARENA_LLM_MODEL: ${{ vars.ARENA_LLM_MODEL }}
       ARENA_LLM_EFFORT: ${{ vars.ARENA_LLM_EFFORT }}
       ARENA_LLM_MAX_OUTPUT_TOKENS: ${{ vars.ARENA_LLM_MAX_OUTPUT_TOKENS || '400' }}
-      ARENA_LLM_MAX_TOKENS_PER_DAY: ${{ vars.ARENA_LLM_MAX_TOKENS_PER_DAY || '400000' }}
+      ARENA_LLM_MAX_TOKENS_PER_DAY: ${{ vars.ARENA_LLM_MAX_TOKENS_PER_DAY || '150000' }}  # owner: keep cost under ~$1/month on Haiku 5.5
       ARENA_LLM_BASE_URL: ${{ vars.ARENA_LLM_BASE_URL }}
       ARENA_LLM_API_KEY: ${{ secrets.ARENA_LLM_API_KEY }}
     steps:

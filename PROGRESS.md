@@ -43,6 +43,7 @@ move older "Done log" lines to `docs/progress-archive.md`.
 
 ## Done log
 
+- 2026-11-12 owner decision: zero-ish cost; stay on Haiku 5.5, daily token cap 150000 in workflows (~$1/month max); H13 declined
 - 2026-11-12 T045h (owner request): tech stack page, LLM effort setting, H13 (optional frontier model)
 - 2026-11-12 T045f/T045g (owner request): guide, imprint/privacy, question verdicts, archive filters, leaderboard bars, feed, 404; docs/COMPLIANCE.md; a11y 0 serious
 - 2026-11-12 T045d (owner request): crypto domain (CoinGecko, 5 coins, up/bigmove), off until H12; terms page read refused by permission system (recorded in H12)

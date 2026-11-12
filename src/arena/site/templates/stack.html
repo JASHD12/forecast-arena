@@ -3,13 +3,13 @@
 <section class="hero hero-small" aria-labelledby="stack-title">
 <p class="kicker">How it is built</p>
 <h1 id="stack-title">Tech stack</h1>
-<p>A production-style forecasting system: live data pipelines, classical ML and frontier LLMs side by side, proper scoring and uncertainty, MLOps, and a tamper-evident public record. Everything below is in the <a href="{{ repo_url }}">open-source repository</a>.</p>
+<p>A production-style forecasting system: live data pipelines, classical ML and LLMs side by side, proper scoring and uncertainty, MLOps, and a tamper-evident public record. Everything below is in the <a href="{{ repo_url }}">open-source repository</a>.</p>
 </section>
 
 <h2>Forecasters and models</h2>
 <p class="note">Status: baselines and the LLM forecasters run live; the classical ML models are trained and backtested (and retrained weekly) and join the live record together with the remaining topics. The table "Running right now" below shows exactly what is live.</p>
 <div class="grid-cards">
-<div class="card"><h3>Frontier LLMs (Anthropic Claude)</h3><p>Three designs on the same questions: zero-shot (question only), data-grounded (as-of data in the prompt), and a <strong>tool-using agent</strong> (news-headline search via GDELT, Wikipedia summaries; at most 4 tool calls, 90 s). Strict JSON output contract with one repair attempt, prompt-injection hygiene, versioned prompts, and a hard daily token and request budget enforced in code.</p></div>
+<div class="card"><h3>LLM forecasters (Anthropic Claude)</h3><p>Three designs on the same questions: zero-shot (question only), data-grounded (as-of data in the prompt), and a <strong>tool-using agent</strong> (news-headline search via GDELT, Wikipedia summaries; at most 4 tool calls, 90 s). Strict JSON output contract with one repair attempt, prompt-injection hygiene, versioned prompts, and a hard daily token and request budget enforced in code.</p></div>
 <div class="card"><h3>Electricity: quantile gradient boosting</h3><p>scikit-learn <code>HistGradientBoostingRegressor</code> with quantile loss predicts the full distribution of tomorrow's price statistics; probabilities are read off the predicted CDF and <strong>Platt-calibrated</strong> on out-of-fold predictions from expanding windows with a gap (no shuffling, no leakage).</p></div>
 <div class="card"><h3>Wikipedia attention: boosted classifier</h3><p><code>HistGradientBoostingClassifier</code> on 7-day attention trajectories (growth, volatility, rank, presence), with time-series cross-validation and Platt calibration.</p></div>
 <div class="card"><h3>Exchange rates and crypto: volatility models</h3><p>EWMA variance (RiskMetrics, &lambda; = 0.94) with fat-tailed <strong>Student-t</strong> returns for "big move" questions; direction is held at 50% unless a backtest proves skill.</p></div>

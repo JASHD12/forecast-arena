@@ -100,13 +100,8 @@ Keep the first line of each item in exactly this shape; the status script parses
     repository secret `ARENA_COINGECKO_API_KEY` to api.coingecko.com to fetch crypto
     prices." (Approval 2 covers only the LLM key.)
   - Tick this item. Needed for T045e.
-- [ ] H13 · Optional: switch the AI forecasters to a frontier model
-  - In Settings > Secrets and variables > Actions > Variables, set:
-    `ARENA_LLM_MODEL` = `claude-opus-5-5` (most capable Opus; $4 / $20 per million input /
-    output tokens) or `claude-sonnet-5-5` (half the price);
-    `ARENA_LLM_EFFORT` = `low` (keeps the model's hidden reasoning short);
-    `ARENA_LLM_MAX_OUTPUT_TOKENS` = `2000` (room for reasoning plus the answer).
-  - Raise the monthly spending limit in the Anthropic console first. Rough worst case at
-    the daily caps with Opus 5.5: about $3-5 a day; typical use is well below that.
-  - Then run Actions > llm-smoke > Run workflow (from `main`) to check it, and tell the
-    agent. Tick this item when done (or leave it if you keep Haiku).
+- [x] H13 · Optional: switch the AI forecasters to a frontier model
+  - Declined by the owner on 2026-11-12: the project must stay (almost) free. The AI
+    forecasters stay on `claude-haiku-5-5`, and the daily token cap in the workflows is
+    150000 (worst case about $1 a month). Recommended: set the monthly spending limit in
+    the Anthropic console to $1-2 as a second safety net.

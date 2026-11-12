@@ -137,6 +137,7 @@ decision logged in `DECISIONS.md` and the agent's state in `PROGRESS.md`. The ex
 - [Model cards](docs/models/)
 - [Explainers](docs/explainers/README.md)
 - [Human panel setup](docs/PANEL_SETUP.md)
+- [Demo script](docs/DEMO.md)
 - [Design decisions](DECISIONS.md)
 
 ## Licence

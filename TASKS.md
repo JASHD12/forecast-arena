@@ -319,7 +319,7 @@ Keep the first line of each task in exactly this shape; the status script parses
 
 ## Phase 9 - Finish
 
-- [ ] T100 · README (deps: T072)
+- [x] T100 · README (deps: T072)
   - Do: what it is, live link, architecture diagram, how it works, how to reproduce, data
     attribution, limitations, how it was built.
   - Done when: a newcomer can run `make setup && make check` from the README alone.
@@ -331,7 +331,7 @@ Keep the first line of each task in exactly this shape; the status script parses
 - [x] T102 · Methods and limitations (deps: T072)
   - Do: complete `docs/METHODS.md` and the Methods page, including every known limitation.
   - Done when: each principle of section 2 is explained with where it is enforced in code.
-- [ ] T103 · Demo outline (deps: T100)
+- [x] T103 · Demo outline (deps: T100)
   - Do: `docs/DEMO.md`: a 90-second screen-recording script for the human to record.
   - Done when: the file exists.
 - [ ] T104 · Final audit (deps: T100, T101, T102, T103, T085, T075, T069, T058, T047, T036)

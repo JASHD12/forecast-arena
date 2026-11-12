@@ -33,7 +33,9 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
-          ref: stable  # scheduled jobs run the last commit of main that passed CI
+          # Scheduled runs use stable (the last commit of main that passed CI); a manual
+          # dispatch runs the ref it was started from.
+          ref: ${{ github.event_name == 'workflow_dispatch' && github.ref || 'stable' }}
       - uses: actions/setup-python@v7
         with:
           python-version: "3.12"

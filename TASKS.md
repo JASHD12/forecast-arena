@@ -16,7 +16,7 @@ Keep the first line of each task in exactly this shape; the status script parses
     and test config, `Makefile` with `setup`, `lint`, `test`, `e2e` (no-op for now),
     `check`, `status`, `smoke-sources`; MIT `LICENSE`; `README.md` stub; extend `.gitignore`.
   - Done when: `make setup && make check` exit 0; `python -c "import arena"` works.
-- [!] T002 · CI workflow (deps: T001) BLOCKED(needs H10)
+- [x] T002 · CI workflow (deps: T001)
   - Do: `.github/workflows/ci.yml` running `make check` on push and pull request to `main`.
     Look up current action versions and record them in `docs/SOURCES.md`.
   - Done when: `gh run list --branch main --limit 1` shows a successful run of this commit.
@@ -267,7 +267,7 @@ Keep the first line of each task in exactly this shape; the status script parses
   - Do: templated factual statements about H1-H4 from the scores, plus the human block
     from `site_content/findings.md` (placeholder if absent).
   - Done when: tests show no statement claims support unless the interval excludes zero.
-- [!] T074 · Accessibility and performance pass (deps: T072) BLOCKED(needs H10)
+- [x] T074 · Accessibility and performance pass (deps: T072)
   - Do: semantic HTML, contrast, keyboard use, charts readable without colour alone,
     small page weight; link check in CI.
   - Done when: an automated accessibility lint run in CI reports no serious issues.
@@ -288,7 +288,7 @@ Keep the first line of each task in exactly this shape; the status script parses
   - Do: export MLflow run summaries to a page linked from Status; record in `DECISIONS.md`
     whether a remote tracking server is worth a human item (default: no).
   - Done when: the page lists at least the fixture runs.
-- [!] T083 · Dockerfile (deps: T027) BLOCKED(needs H10)
+- [x] T083 · Dockerfile (deps: T027)
   - Do: image that runs `make e2e`; CI builds it (no registry push).
   - Done when: `docker build` and the containerised e2e succeed in CI.
 - [ ] T084 · Dependency hygiene (deps: T002)

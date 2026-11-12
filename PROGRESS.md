@@ -42,6 +42,10 @@ move older "Done log" lines to `docs/progress-archive.md`.
 
 ## Done log
 
+- 2026-11-12 H10 fixed by the owner (Actions budget + billing lock); CI run 43256050346 attempt 4 green: check, a11y, docker
+- 2026-11-12 T083: Docker build + containerised e2e green in CI
+- 2026-11-12 T074: axe-core lint green in CI (0 serious)
+- 2026-11-12 T002: CI green on main (def6c21)
 - 2026-11-12 T053: attention ml (top-list trajectory GBM); backtest 24 days: Brier 0.110 vs 0.250 (YES rate 0.50), interval excludes 0
 - 2026-11-12 T056 (work done, blocked on H10): weekly job + weekly.yml; live dry run: power candidate Brier 0.1418 on 168 questions, would promote
 - 2026-11-12 T083 (work done, blocked on H10): Dockerfile + CI build/run job; install+check verified on Python 3.12 (no Docker daemon here)

@@ -62,7 +62,7 @@ Keep the first line of each item in exactly this shape; the status script parses
 
 ## Added by the agent
 
-- [ ] H10 · Make GitHub Actions jobs start
+- [x] H10 · Make GitHub Actions jobs start
   - Every `ci` run on `main` fails within about 5 seconds and never gets a runner
     (run https://github.com/JASHD12/forecast-arena/actions/runs/43195868006, attempts 1
     and 2). The workflow file and action versions are valid; this pattern usually means an

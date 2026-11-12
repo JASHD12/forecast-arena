@@ -41,7 +41,7 @@ Keep the first line of each task in exactly this shape; the status script parses
     atomic writes, schema validation on write and read, duplicate-id rejection.
   - Done when: tests prove appends never change earlier bytes, a simulated crash leaves no
     partial file, and duplicates are refused.
-- [ ] T011 · Seals and hash chain (deps: T010)
+- [x] T011 · Seals and hash chain (deps: T010)
   - Do: batch seal, day seal, chain, and `arena ledger verify` as in section 6.
   - Done when: tamper tests (edit, delete, reorder, forecast after lock) each make `verify`
     fail with a clear message; an untouched ledger passes.

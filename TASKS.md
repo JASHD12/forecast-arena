@@ -258,7 +258,7 @@ Keep the first line of each task in exactly this shape; the status script parses
 - [x] T071 · Leaderboards (deps: T070)
   - Do: common-set and all-question boards, per domain, with the wording rules.
   - Done when: tests cover the "too early to tell" label and common-set selection.
-- [ ] T072 · Site v2 (deps: T071)
+- [x] T072 · Site v2 (deps: T071)
   - Do: all pages of section 11 except Findings; question archive and per-question pages;
     version changelog; About from `site_content/` with a placeholder if absent.
   - Done when: the site builds from the e2e ledger; link check passes; pages render at

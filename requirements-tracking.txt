@@ -1,0 +1,37 @@
+# Extra pins for the weekly job's MLflow tracking (SQLite file store, no server).
+# Installed only by .github/workflows/weekly.yml, on top of requirements-lock.txt.
+# Regenerate with: uv pip compile -c requirements-lock.txt tracking.in (see DECISIONS.md).
+alembic==1.20.1
+annotated-doc==0.0.6
+cachetools==7.3.0
+certifi==2026.10.23
+cffi==2.1.1
+charset-normalizer==3.5.2
+cryptography==50.0.2
+databricks-sdk==0.166.0
+fastapi==0.162.5
+gitdb==4.0.12
+gitpython==3.2.1
+google-auth==2.62.2
+importlib-metadata==10.2.0
+lazy-importer==0.1.0
+mako==1.4.3
+mlflow-skinny==3.18.0
+opentelemetry-proto==1.45.2
+opentelemetry-sdk==1.45.2
+opentelemetry-semantic-conventions==0.66b2
+protobuf==7.36.2
+pyasn1-modules==0.4.2
+pyasn1==0.6.5
+pycparser==3.12
+python-dotenv==1.2.4
+python-multipart==0.0.33
+pyyaml==6.0.3
+requests==2.34.2
+smmap==5.0.3
+sqlalchemy==2.1.8
+sqlparse==0.6.1
+starlette==1.10.0
+urllib3==2.8.0
+uvicorn==0.54.0
+zipp==4.1.2

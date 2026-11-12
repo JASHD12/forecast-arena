@@ -74,7 +74,8 @@ def save_model(
     d = _dir(domain, version)
     ledger.write_raw(f"{d}/{ARTEFACT}", blob)
     ledger.write_raw(
-        f"{d}/metadata.json", (json.dumps(info, sort_keys=True, indent=1) + "\n").encode()
+        f"{d}/metadata.json",
+        (json.dumps(info, sort_keys=True, indent=1, default=str) + "\n").encode(),
     )
     if card:
         ledger.write_raw(f"{d}/model_card.md", card.encode())

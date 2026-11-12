@@ -199,7 +199,7 @@ Keep the first line of each task in exactly this shape; the status script parses
   - Do: versioned artefacts with metadata under `models/` on the ledger; loading by
     version; `model_missing` skip when absent.
   - Done when: tests cover load, missing model and version reporting.
-- [ ] T056 · Weekly retraining workflow (live) (deps: T055, T052, T053, T054)
+- [!] T056 · Weekly retraining workflow (live) (deps: T055, T052, T053, T054) BLOCKED(needs H10)
   - Do: `weekly.yml` per section 12: retrain, compare, promote by rule, model card, MLflow
     file-backed run with a published summary.
   - Done when: a `dry_run=true` dispatch succeeds and prints the promotion decision.

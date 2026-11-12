@@ -1,0 +1,65 @@
+name: weekly
+
+# Retrain the models, compare them with the current ones on the last 28 days, promote by
+# the documented rule (src/arena/ops/weekly.py), log the run with MLflow (SQLite file)
+# and publish a summary to the ledger branch.
+
+on:
+  schedule:
+    - cron: "0 2 * * 0"  # Sunday 02:00 UTC (SPEC 4)
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Do everything on a throwaway copy of the ledger; push nothing"
+        type: boolean
+        default: true
+
+permissions:
+  contents: write  # push to the ledger branch only (built-in token)
+
+concurrency:
+  group: arena-ledger  # shared with morning and resolve: never two ledger writers
+  cancel-in-progress: false
+
+jobs:
+  weekly:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      ARENA_CONTACT: ${{ vars.ARENA_CONTACT }}
+      ARENA_LEDGER_REMOTE: https://github.com/${{ github.repository }}.git
+      MLFLOW_DISABLE_AGENT_HINT: "1"
+      OMP_NUM_THREADS: "2"
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: stable  # scheduled jobs run the last commit of main that passed CI
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Install pinned dependencies and the tracking extras
+        run: |
+          make setup
+          .venv/bin/pip install -r requirements-tracking.txt
+      - name: Restore cached source data (SMARD history, Wikimedia top lists)
+        uses: actions/cache@v6
+        with:
+          path: data_cache
+          key: data-cache-${{ github.run_id }}
+          restore-keys: data-cache-
+      - name: Let git push the ledger branch with the built-in token
+        env:
+          TOKEN: ${{ github.token }}
+        run: |
+          header=$(printf 'x-access-token:%s' "$TOKEN" | base64 -w0)
+          echo "::add-mask::$header"
+          git config --global http.https://github.com/.extraheader "AUTHORIZATION: basic $header"
+          git config --global user.name forecast-arena-bot
+          git config --global user.email forecast-arena-bot@users.noreply.github.com
+      - name: Weekly run
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.dry_run }}" = "true" ]; then
+            .venv/bin/arena --dry-run weekly run
+          else
+            .venv/bin/arena weekly run --push
+          fi

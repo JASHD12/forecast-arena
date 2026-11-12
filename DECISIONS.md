@@ -251,6 +251,21 @@ in `tools/a11y/package-lock.json`; CI installs them and Chromium in a separate j
 Alternatives: pa11y (wraps the same engine, more dependencies); a hand-written linter.
 Made by: agent
 
+## 2026-11-12 - Weekly job: promotion rule, MLflow on a SQLite file, public summaries
+Context: SPEC 12 asks to promote a model only if it is not worse than the current one on
+the most recent 28 days by a documented rule, and to log runs with MLflow (file-backed).
+Decision: the rule is in `src/arena/ops/weekly.py`: a candidate trained before the 28-day
+window (ending 3 days ago) is scored on that window's real questions next to the current
+model; if not worse, the same recipe is refitted with the latest outcomes and promoted
+(the current model may have seen part of the window, which favours keeping it). MLflow
+3.18's plain file store is in maintenance mode and refuses to start without an opt-out,
+so runs are logged to a SQLite file (`mlruns/mlflow.db`, still file-backed, no server).
+The database is mutable and therefore not on the append-only ledger; each run's JSON
+summary is written to `models/weekly/` on the ledger instead. MLflow (`mlflow-skinny`
+with SQLAlchemy and Alembic) is pinned in `requirements-tracking.txt`, installed by the
+weekly workflow and CI, not by `make setup`.
+Made by: agent
+
 ## Proposals for the human
 
 Ideas outside the specification. The agent lists them here and does not build them.

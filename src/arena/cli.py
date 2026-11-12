@@ -285,6 +285,36 @@ def daily_resolve(obj: Ctx, push: bool) -> None:
 
 
 @main.group()
+def weekly() -> None:
+    """The weekly job: retrain, compare, promote by rule."""
+
+
+@weekly.command("run")
+@click.option("--push", is_flag=True, help="Sync with and push to the ledger branch.")
+@click.option("--domain", "only", multiple=True, help="Limit to these domains.")
+@click.pass_obj
+def weekly_run(obj: Ctx, push: bool, only: tuple[str, ...]) -> None:
+    """Retrain the power and attention models and promote them by the documented rule."""
+    from arena.ops.weekly import weekly as run_weekly
+    from arena.ops.wiring import weekly_setup
+
+    remote = _sync(obj, push)
+    domains, trainers, cards = weekly_setup(obj.settings, obj.clock.now(), only)
+    res = run_weekly(
+        obj.ledger,
+        obj.clock,
+        domains,
+        trainers,
+        cards=cards,
+        dry_run=obj.dry_run,
+        mlruns=Path("mlruns"),
+    )
+    for line in res.lines():
+        click.echo(line)
+    _push(obj, remote, "weekly", obj.clock.now().date())
+
+
+@main.group()
 def report() -> None:
     """Reports computed from the public record."""
 

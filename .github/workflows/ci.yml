@@ -23,7 +23,9 @@ jobs:
         with:
           python-version: "3.12"
       - name: Install pinned dependencies
-        run: make setup
+        run: |
+          make setup
+          .venv/bin/pip install -r requirements-tracking.txt
       - name: make check
         run: make check
 

@@ -71,5 +71,5 @@ Keep the first line of each item in exactly this shape; the status script parses
   - Open the run in the browser: the annotation at the top of the job says the exact cause.
     Fix it there (the agent must not change repository or account settings).
   - Check: re-run the job; it should reach the "make check" step and go green.
-  - Needed for T002, T074 (CI accessibility job), T083 (CI Docker job) and every live
-    task (T030 onwards).
+  - Needed for T002, T074 (CI accessibility job), T083 (CI Docker job), T056 (weekly
+    dry-run dispatch) and every live task (T030 onwards).

@@ -251,7 +251,7 @@ Keep the first line of each task in exactly this shape; the status script parses
 
 ## Phase 6 - Statistics and the full site
 
-- [ ] T070 · Statistics (deps: T028)
+- [x] T070 · Statistics (deps: T028)
   - Do: calibration bins, calibration error, Murphy decomposition, day-block bootstrap,
     paired differences (section 10).
   - Done when: tests on synthetic data with known answers pass; results are seed-stable.

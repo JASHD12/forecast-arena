@@ -263,7 +263,7 @@ Keep the first line of each task in exactly this shape; the status script parses
     version changelog; About from `site_content/` with a placeholder if absent.
   - Done when: the site builds from the e2e ledger; link check passes; pages render at
     phone width.
-- [ ] T073 · Findings page (deps: T072)
+- [x] T073 · Findings page (deps: T072)
   - Do: templated factual statements about H1-H4 from the scores, plus the human block
     from `site_content/findings.md` (placeholder if absent).
   - Done when: tests show no statement claims support unless the interval excludes zero.

@@ -29,6 +29,7 @@ move older "Done log" lines to `docs/progress-archive.md`.
 
 ## Done log
 
+- 2026-11-12 T073: Findings page: H1-H4 statements from official scores (supported only if interval excludes 0) + owner block
 - 2026-11-12 T072: site v2 (leaderboards, SVG calibration, question archive and pages, changelog), phone-checked
 - 2026-11-12 T071: leaderboards (common set, all questions, per domain), too-early label, supported-only wording
 - 2026-11-12 T070: calibration bins (sparse merged), ECE, Murphy decomposition, day-block bootstrap, paired diffs

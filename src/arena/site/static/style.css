@@ -25,6 +25,7 @@ main { padding: 1rem 0 2rem; }
 h1 { font-size: 1.6rem; margin: .5rem 0 1rem; }
 h2 { font-size: 1.25rem; margin: 2rem 0 .5rem; }
 .muted, .note { color: var(--muted); font-size: .9rem; }
+.exact { color: var(--muted); font-size: .95rem; margin-top: -.25rem; }
 .table-scroll { overflow-x: auto; }
 table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
 th, td { text-align: left; padding: .4rem .5rem; border-bottom: 1px solid var(--line);

@@ -47,6 +47,7 @@ class WxRecord:
     temperature: float | None
     precipitation: float | None
     fallback: frozenset[str]
+    wind_gust_speed: float | None = None  # km/h (units=dwd), maximum of the previous hour
 
 
 @dataclass(frozen=True)
@@ -85,7 +86,8 @@ def parse_weather(payload: object) -> tuple[WxRecord, ...]:
         fb = r.get("fallback_source_ids") or {}
         out.append(WxRecord(ts.astimezone(UTC), kinds.get(r["source_id"], "unknown"),
                             _num(r.get("temperature")), _num(r.get("precipitation")),
-                            frozenset(fb) if isinstance(fb, dict) else frozenset()))  # fmt: skip
+                            frozenset(fb) if isinstance(fb, dict) else frozenset(),
+                            _num(r.get("wind_gust_speed"))))  # fmt: skip
     return tuple(sorted(out, key=lambda x: x.ts))
 
 

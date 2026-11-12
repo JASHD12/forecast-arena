@@ -167,6 +167,20 @@ Keep the first line of each task in exactly this shape; the status script parses
 - [x] T045 · Markets questions and resolver (deps: T044, T022)
   - Do: templates and resolver of section 7.4.
   - Done when: tests cover a Friday batch, a weekend (no questions) and a holiday.
+- [x] T045a · Plain-language question titles (deps: T041, T043, T045) (owner request 2026-11-12)
+  - Do: short display titles for every template, shown on Home, Questions and question
+    pages, with the exact text and rule kept on every question page; never stored in the
+    ledger or shown to forecasters.
+  - Done when: tests cover every template and the fallback to the exact text.
+- [x] T045b · Weather city duels `warmer_than`, `wetter_than` (deps: T041) (owner request 2026-11-12)
+  - Do: fixed pairs Berlin vs Munich, Hamburg vs Frankfurt; generation, resolver (ties NO),
+    void on missing data, context with both cities, `ml` rule.
+  - Done when: golden and unit tests pass and the v1 weather questions are byte-identical
+    to the frozen goldens.
+- [x] T045c · Weather events `frost_day`, `gust_gt` (deps: T041) (owner request 2026-11-12)
+  - Do: verify the gust field in the source docs; gust-only fixture recorded from the real
+    API; generation, resolver, context, `ml` rules (`weather-rules-r2`).
+  - Done when: golden and unit tests pass; stations without gust data get no gust question.
 - [ ] T046 · Enable the new domains (live) (deps: T041, T043, T045, T034)
   - Do: extend the e2e test to all four domains, then enable them in the live config.
   - Done when: the next real morning run writes questions for all applicable domains and

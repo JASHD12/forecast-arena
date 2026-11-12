@@ -1,7 +1,8 @@
 {% extends "base.html" %}
 {% block content %}
 <p><a href="{{ root }}questions/index.html">All questions</a></p>
-<h1>{{ q.text }}</h1>
+<h1>{{ plain_title(q) }}</h1>
+<p class="exact"><strong>Exact question:</strong> {{ q.text }}</p>
 <div class="table-scroll" tabindex="0" role="region" aria-label="Table (scrolls sideways on small screens)"><table class="kv"><tbody>
 <tr><th scope="row">Id</th><td><code>{{ q.question_id }}</code></td></tr>
 <tr><th scope="row">Batch / target</th><td>{{ q.batch_date }} / {{ q.target_date }}</td></tr>

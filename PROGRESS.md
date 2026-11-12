@@ -43,6 +43,8 @@ move older "Done log" lines to `docs/progress-archive.md`.
 
 ## Done log
 
+- 2026-11-12 T045a-c (owner request): plain question titles; weather duels warmer_than/wetter_than; frost_day, gust_gt; weather-rules-r2; v1 weather questions byte-identical (frozen goldens)
+- 2026-11-12 stock data research (H08): US/India(NSE)/Germany(DAX) index data all need a licence or written permission; nothing built
 - 2026-11-12 site live: real resolve run 43295826086 created the ledger branch, verify PASS, Pages deployed to https://jashd12.github.io/forecast-arena/ (T032 still waits for the first morning batch)
 - 2026-11-12 T064: llm-smoke run 43294520796 green: anthropic/claude-haiku-5-5, contract ok, tool round-trip ok, 2 requests, 762 in / 215 out tokens
 - 2026-11-12 T032 waiting: first real morning run is the scheduled 05:30 UTC run on 2026-11-13 (from stable); RUNBOOK written

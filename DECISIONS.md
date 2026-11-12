@@ -298,6 +298,42 @@ Made by: agent
 - Alternative: hide the LLM forecasters until T065 (rejected: no integrity gain, and the
   rehearsal is exactly where cost and failure modes should show up).
 
+## 2026-11-12 · More interesting weather questions (owner approved ideas 1, 3, 4)
+
+- Context: the owner asked for questions people would enjoy voting on and approved, from
+  the proposal below, (1) plain-language titles, (3) city duels and (4) event-style
+  weather questions.
+- Decision:
+  - (1) `arena.site.titles.plain_title` builds a short headline from template and
+    parameters at site-build time. Display only: not stored in the ledger, not shown to
+    forecasters; the exact text and rule stay on every question page. Titles always name
+    the date (never "tomorrow", which would be wrong on archived pages).
+  - (3) `warmer_than` and `wetter_than` for two fixed duels, Berlin vs Munich and Hamburg
+    vs Frankfurt (fixed pairs keep the daily count small and the series comparable).
+    Strictly greater; ties are NO. Two dry days are therefore NO.
+  - (4) `frost_day` (DWD "Frosttag", daily minimum below 0.0 C) and `gust_gt` (adaptive
+    threshold like `tmax_gt`; Bright Sky `wind_gust_speed`, km/h, maximum of the previous
+    hour, verified in the OpenAPI document 2026-11-12). Berlin-Dahlem reports no gusts, so
+    it has no gust question. The degeneracy rule (SPEC 7.0) skips a template when it is
+    almost always YES or NO, so frost questions appear only in the cold season.
+  - Not built: snow (no hourly snow observation at these stations through Bright Sky; the
+    `condition` field is derived, not measured) and "tropical night" (a full-day minimum
+    >= 20 C is so rare in Germany that it would always be skipped; DWD's own definition
+    uses an 18-06 UTC window, which would need its own day boundary).
+  - The v1 templates are byte-for-byte unchanged (frozen goldens
+    `tests/fixtures/golden/weather/*_v1_frozen.jsonl`), and so is their forecaster
+    context. The new templates get a richer context (minimum temperature, gusts, both
+    cities).
+  - `ml` for weather becomes `weather-rules-r2`: the r1 rules are unchanged, and fixed
+    rules are added for the new templates before any of them resolved (I8). Documented in
+    `src/arena/forecasters/ml_weather.py`.
+  - Weather can now produce up to 19 questions a day (8 + 4 frost + 3 gust + 4 duels),
+    so a full day is above SPEC 1's "about 25". The LLM sample per domain is unchanged (3),
+    so LLM cost does not grow.
+- Alternatives: all six city pairs (rejected: 12 duel questions a day, mostly
+  redundant); a fixed storm threshold for gusts (rejected: almost always NO, so skipped as
+  degenerate).
+
 ## Proposals for the human
 
 Ideas outside the specification. The agent lists them here and does not build them.

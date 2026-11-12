@@ -43,7 +43,14 @@ def test_home_shows_questions_and_forecasts(tmp_path) -> None:
     led.append(layout.forecasts_path(q.batch_date), [forecast(q, "base_rate", 0.61)])
     res = build_site(led, tmp_path / "site", CLOCK, tmp_path / "none")
     home = (res.out_dir / "index.html").read_text()
-    assert "0.61" in home and "base_rate" in home and q.text in home
+    import html as _html
+
+    from arena.site.titles import plain_title
+
+    assert "0.61" in home and "base_rate" in home and _html.escape(plain_title(q)) in home
+    text = (res.out_dir / "questions" / f"{q.question_id}.html").read_text()
+    assert "Exact question:" in text
+    assert _html.escape(q.text) in text and _html.escape(q.resolution_rule) in text
 
 
 def test_about_from_site_content_is_escaped(tmp_path) -> None:

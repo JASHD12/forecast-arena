@@ -31,6 +31,7 @@ from arena.scoring.findings import findings
 from arena.scoring.stats import calibration_bins, expected_calibration_error, murphy
 from arena.site.charts import reliability_svg
 from arena.site.methods_content import LIMITATIONS, PRINCIPLES
+from arena.site.titles import plain_title
 from arena.sources.brightsky import ATTRIBUTION as WX_ATTRIBUTION
 from arena.sources.brightsky import LICENCE as WX_LICENCE
 from arena.sources.ecb import ATTRIBUTION as ECB_ATTRIBUTION
@@ -128,6 +129,7 @@ def _rows(questions: Sequence[Question], rec: Any) -> tuple[list[dict[str, Any]]
             {
                 "qid": q.question_id,
                 "text": q.text,
+                "title": plain_title(q),
                 "lock": q.lock_time.strftime("%Y-%m-%d %H:%M UTC"),
                 "p": by_q.get(q.question_id, {}),
                 "outcome": None if r is None else r.outcome,
@@ -241,6 +243,7 @@ def build_site(
         "built_at": clock.now().strftime("%Y-%m-%d %H:%M UTC"),
         "official_start": start_s,
         "qhref": question_href,
+        "plain_title": plain_title,
     }
     archive = sorted(
         rec.questions.values(), key=lambda q: (q.batch_date, q.question_id), reverse=True

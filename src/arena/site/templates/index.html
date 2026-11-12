@@ -16,7 +16,7 @@
 <caption class="muted">Probability of YES published before the lock time. A dash means no forecast (see Status for skips).</caption>
 <thead><tr><th scope="col">Question</th>{% for f in forecasters %}<th scope="col" class="num">{{ f }}</th>{% endfor %}<th scope="col">Outcome</th></tr></thead>
 <tbody>
-{% for row in latest %}<tr><td><a href="{{ qhref(row.qid) }}">{{ row.text }}</a><br><span class="note">locks {{ row.lock }}</span></td>
+{% for row in latest %}<tr><td><a href="{{ qhref(row.qid) }}">{{ row.title }}</a><br><span class="note">locks {{ row.lock }}</span></td>
 {% for f in forecasters %}<td class="num">{{ row.p.get(f, "-") }}</td>{% endfor %}
 <td>{% if row.outcome is none %}<span class="muted">{{ row.state }}</span>{% elif row.outcome == 1 %}<span class="yes">YES</span>{% else %}<span class="no">NO</span>{% endif %}</td></tr>
 {% endfor %}</tbody></table></div>
@@ -26,7 +26,7 @@
 {% if previous %}
 <div class="table-scroll" tabindex="0" role="region" aria-label="Table (scrolls sideways on small screens)"><table class="qtable">
 <thead><tr><th scope="col">Question</th><th scope="col">Outcome</th><th scope="col" class="num">Observed</th></tr></thead>
-<tbody>{% for row in previous %}<tr><td><a href="{{ qhref(row.qid) }}">{{ row.text }}</a></td>
+<tbody>{% for row in previous %}<tr><td><a href="{{ qhref(row.qid) }}">{{ row.title }}</a></td>
 <td>{% if row.outcome is none %}<span class="muted">{{ row.state }}</span>{% elif row.outcome == 1 %}<span class="yes">YES</span>{% else %}<span class="no">NO</span>{% endif %}</td>
 <td class="num">{{ row.observed if row.observed is not none else "-" }}</td></tr>{% endfor %}</tbody></table></div>
 {% else %}<p class="muted">Nothing resolved yet.</p>{% endif %}

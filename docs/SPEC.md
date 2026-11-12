@@ -271,6 +271,14 @@ Grace: 72 hours.
 |---|---|---|---|
 | `tmax_gt` | Maximum temperature on D at {station} > T C? | median of observed daily maxima, rounded to 0.5 C | 14 days |
 | `wet_day` | Precipitation on D at {station} >= 1.0 mm? | fixed 1.0 mm | 90 days for the degeneracy check |
+| `frost_day` | Minimum temperature on D at {station} < 0.0 C? | fixed 0.0 C (a DWD frost day) | 30 days for the degeneracy check |
+| `gust_gt` | Highest hourly maximum gust on D at {station} > G km/h? | median of observed daily maximum gusts, rounded to 5 km/h; only stations that report gusts | 14 days |
+| `warmer_than` | Maximum temperature on D at {A} > at {B}? | none (ties are NO) | 30 common days for the degeneracy check |
+| `wetter_than` | Precipitation on D at {A} > at {B}? | none (ties, including two dry days, are NO) | 30 common days for the degeneracy check |
+
+The last four rows were added on 2026-11-12 at the owner's request, before the official
+record (DECISIONS.md, "More interesting weather questions"). City duels are fixed pairs:
+Berlin vs Munich and Hamburg vs Frankfurt.
 
 Void when more than 2 hourly observations of D are missing for the variable.
 

@@ -236,7 +236,7 @@ Keep the first line of each task in exactly this shape; the status script parses
 - [x] T066 · Agent tools (deps: T063)
   - Do: section 9.3 tools; verify terms and choose news backends; compact trace logging.
   - Done when: tests cover each tool, the call limit and the time limit.
-- [ ] T067 · Agent forecaster (deps: T066, T055)
+- [x] T067 · Agent forecaster (deps: T066, T055)
   - Do: tool-use loop with `FakeLLM`-scripted tests; injection hygiene in the prompt;
     headline-only storage.
   - Done when: a test with a tool result containing instructions shows they are ignored

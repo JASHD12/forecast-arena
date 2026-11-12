@@ -63,6 +63,7 @@ class LLMForecaster:
 
     forecaster_id = "llm"
     max_output_tokens = 400
+    prompt_files: tuple[str, ...] = ("system", "repair")
 
     def __init__(
         self,
@@ -82,7 +83,8 @@ class LLMForecaster:
     def version(self) -> str:
         """Model id and prompt version (SPEC 8.5)."""
         model = self.client.model if self.client is not None else "none"
-        return f"{model}|prompt-{self.prompt_version}-{prompts.fingerprint(self.prompt_version)}"
+        fp = prompts.fingerprint(self.prompt_files, self.prompt_version)
+        return f"{model}|prompt-{self.prompt_version}-{fp}"
 
     def user_prompt(self, q: Question, ctx: dict[str, Any], asof: datetime) -> str:
         """The first user message."""
@@ -154,6 +156,7 @@ class LLMPlain(LLMForecaster):
     """Question text, resolution rule and the current date only. No data, no tools."""
 
     forecaster_id = "llm_plain"
+    prompt_files = ("system", "repair", "plain_user")
 
     def user_prompt(self, q: Question, ctx: dict[str, Any], asof: datetime) -> str:
         """See `LLMForecaster.user_prompt`."""
@@ -170,6 +173,7 @@ class LLMContext(LLMForecaster):
     """As `llm_plain`, plus a compact rendering of the as-of context."""
 
     forecaster_id = "llm_context"
+    prompt_files = ("system", "repair", "context_user")
 
     def user_prompt(self, q: Question, ctx: dict[str, Any], asof: datetime) -> str:
         """See `LLMForecaster.user_prompt`."""

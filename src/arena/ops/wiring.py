@@ -4,7 +4,10 @@ from __future__ import annotations
 
 from collections.abc import Callable, Sequence
 from datetime import date, datetime, timedelta
+from functools import partial
 
+from arena.agent.forecaster import AgentForecaster
+from arena.agent.tools import GdeltBackend, wikipedia_summary
 from arena.config import WEATHER_STATIONS, Settings
 from arena.domains.attention import AttentionDomain, titles_from_questions
 from arena.domains.base import AsOfStore, Domain
@@ -144,5 +147,14 @@ def build_forecasters(
         guard = BudgetGuard(Caps.from_settings(settings), usage_from_manifests(ledger, day))
         client = GuardedLLM(client, guard)
     n = settings.llm_questions_per_domain
-    out += [LLMPlain(client, n), LLMContext(client, n)]
+    http = HttpClient(settings.user_agent())
+    agent = AgentForecaster(
+        client,
+        per_domain=n,
+        max_tool_calls=settings.agent_max_tool_calls,
+        peers={"base_rate": out[0]},
+        news=None if llm is not None else GdeltBackend(http),
+        wiki=None if llm is not None else partial(wikipedia_summary, http),
+    )
+    out += [LLMPlain(client, n), LLMContext(client, n), agent]
     return out, guard

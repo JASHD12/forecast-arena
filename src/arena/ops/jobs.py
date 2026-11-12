@@ -181,6 +181,15 @@ def morning(
             res.written["forecasts"] = led.append(fpath, records)
             for r in records:
                 rec.count("forecasts" if isinstance(r, Forecast) else f"skips_{r.reason_code}")
+        traces = []
+        for f in forecasters:
+            lines = getattr(f, "trace_lines", None)
+            if callable(lines):
+                traces += [{"forecaster_id": f.forecaster_id, **x} for x in lines()]
+        tpath = layout.agent_traces_path(batch)
+        if traces and not led.exists(tpath):
+            body = "".join(json.dumps(x, sort_keys=True, default=str) + "\n" for x in traces)
+            led.write_raw(tpath, body.encode("utf-8"))
         for dom in domains:
             ctxs = {qid: c for qid, c in contexts.items() if qid.startswith(f"{dom.name}-")}
             if ctxs:

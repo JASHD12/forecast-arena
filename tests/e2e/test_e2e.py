@@ -62,9 +62,10 @@ def test_five_days_offline(tmp_path) -> None:
     assert len(base) == 2 * len(qs)  # base_rate and persistence answer everything
     llm = {
         fid: {f.question_id for f in fs if f.forecaster_id == fid}
-        for fid in ("llm_plain", "llm_context")
+        for fid in ("llm_plain", "llm_context", "agent")
     }
-    assert llm["llm_plain"] == llm["llm_context"]  # paired: the same daily sample
+    assert llm["llm_plain"] == llm["llm_context"] == llm["agent"]  # paired daily sample
+    assert led.exists(layout.agent_traces_path(FIRST))
     assert len(llm["llm_plain"]) == 3 * DAYS
     skips = [r for _, r in led.iter_family("forecasts") if isinstance(r, Skip)]
     assert {s.reason_code for s in skips} == {"not_sampled"}
@@ -79,7 +80,7 @@ def test_five_days_offline(tmp_path) -> None:
 
     rec = load(led)
     board = {r.forecaster_id: r for r in leaderboard(rec.scored)}
-    assert set(board) == {"base_rate", "persistence", "llm_plain", "llm_context"}
+    assert set(board) == {"base_rate", "persistence", "llm_plain", "llm_context", "agent"}
     assert board["base_rate"].n == len(qs) and board["base_rate"].skill == 0
     assert counts(rec).open == 0
 

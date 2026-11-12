@@ -17,10 +17,9 @@ def load(name: str, version: str = PROMPT_VERSION) -> str:
     )
 
 
-def fingerprint(version: str = PROMPT_VERSION) -> str:
-    """Short hash of every prompt file of a version (recorded in forecast meta)."""
+def fingerprint(names: tuple[str, ...], version: str = PROMPT_VERSION) -> str:
+    """Short hash of the named prompt files of a version (part of forecaster versions)."""
     h = hashlib.sha256()
-    for f in sorted(resources.files("arena.llm.prompts").iterdir(), key=lambda p: p.name):
-        if f.name.endswith(f"_{version}.md"):
-            h.update(f.name.encode() + b"\n" + f.read_bytes())
+    for name in sorted(names):
+        h.update(name.encode() + b"\n" + load(name, version).encode())
     return h.hexdigest()[:12]

@@ -1,0 +1,42 @@
+name: promote
+
+# After CI succeeds on main, fast-forward the stable branch to that commit. Scheduled jobs
+# run code from stable. Never forces: if stable is not an ancestor of the commit, the push
+# is rejected and the run fails (a signal to investigate, not to overwrite).
+
+on:
+  workflow_run:
+    workflows: [ci]
+    types: [completed]
+    branches: [main]
+
+permissions:
+  contents: write  # push to the stable branch only (built-in token)
+
+concurrency:
+  group: promote-stable
+  cancel-in-progress: false
+
+jobs:
+  promote:
+    if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          fetch-depth: 0
+      - name: Fast-forward stable to the commit that passed CI
+        env:
+          SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          if git ls-remote --exit-code --heads origin stable >/dev/null; then
+            git fetch origin stable
+            if ! git merge-base --is-ancestor origin/stable "$SHA"; then
+              echo "stable is not an ancestor of $SHA; refusing (no force-push)" >&2
+              exit 1
+            fi
+          fi
+          git push origin "$SHA:refs/heads/stable"
+          echo "stable -> $SHA" >> "$GITHUB_STEP_SUMMARY"

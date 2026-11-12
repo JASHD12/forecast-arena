@@ -30,6 +30,7 @@ move older "Done log" lines to `docs/progress-archive.md`.
 
 ## Done log
 
+- 2026-11-12 T062: versioned prompt files, strict parser, one repair retry, parse_failure skips
 - 2026-11-12 T061: budget guard: daily caps across manifests, budget_exhausted skips
 - 2026-11-12 T060: LLM client protocol, FakeLLM, Anthropic (SDK) and OpenAI-compatible adapters, mocked tests
 - 2026-11-12 T050: walk-forward backtest harness, labelled store outside the ledger, refusal test

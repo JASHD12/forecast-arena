@@ -220,7 +220,7 @@ Keep the first line of each task in exactly this shape; the status script parses
 - [x] T061 · Budget guard (deps: T060, T014)
   - Do: section 9.4 caps counted across all runs of a UTC day.
   - Done when: tests show the cap stops calls and produces `budget_exhausted` skips.
-- [ ] T062 · Prompts and strict parsing (deps: T060)
+- [x] T062 · Prompts and strict parsing (deps: T060)
   - Do: section 9.2: versioned prompt files, strict parser, one repair retry.
   - Done when: tests with malformed outputs produce `parse_failure` skips, never a number.
 - [ ] T063 · Plain and context LLM forecasters (deps: T061, T062, T027)

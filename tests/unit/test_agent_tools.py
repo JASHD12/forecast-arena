@@ -128,3 +128,7 @@ def test_wikipedia_summary_from_recorded_response() -> None:
     s = wikipedia_summary(http, "SS Edmund Fitzgerald", "en.wikipedia")
     assert s["title"] == "SS Edmund Fitzgerald" and "Lake Superior" in s["extract"]
     assert s["url"].endswith("/SS_Edmund_Fitzgerald")
+
+
+def test_recorded_gdelt_feed_parses() -> None:
+    assert parse_rss((FIX / "gdelt_artlist.rss").read_bytes()) == []

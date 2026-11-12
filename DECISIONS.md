@@ -202,6 +202,16 @@ agent sees, never a reason to guess.
 Alternatives: individual outlet RSS feeds (terms differ per outlet; no time filter).
 Made by: agent
 
+## 2026-11-12 - Model artefacts on the ledger: promoted models only, xz-compressed
+Context: SPEC 6 puts model artefacts under `models/` on the ledger; SPEC 15 says keep the
+ledger small. A power model is ~10 MB raw, ~4 MB with default compression, ~1.3 MB with xz.
+Decision: store xz-compressed joblib artefacts, with metadata (artefact SHA-256, training
+cut-off, code SHA, package versions), and only for models that the weekly job promotes;
+promotions are new files (`models/<domain>/promotions/`), never overwrites. `ledger
+verify` treats `models/` and `meta/` as non-record files (only `runs/` and `chain/` hold
+single-record JSON). Loading checks the artefact hash.
+Made by: agent
+
 ## Proposals for the human
 
 Ideas outside the specification. The agent lists them here and does not build them.

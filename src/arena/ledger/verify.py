@@ -54,7 +54,7 @@ def verify(ledger: Ledger) -> VerifyReport:
         try:
             if fam is not None:
                 records = ledger.read(rel)
-            elif rel.endswith(".json") and not rel.startswith("snapshots/"):
+            elif rel.endswith(".json") and rel.startswith(("runs/", "chain/")):
                 records = [ledger.read_json(rel)]
             else:
                 continue

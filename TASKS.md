@@ -56,7 +56,7 @@ Keep the first line of each task in exactly this shape; the status script parses
     landed before its lock time. Write the honest limits of this evidence into
     `docs/METHODS.md`.
   - Done when: tests with a fabricated late commit fail verification.
-- [ ] T014 · Run manifests (deps: T010)
+- [x] T014 · Run manifests (deps: T010)
   - Do: a context manager that records job, date, code SHA, package versions, timings,
     counts, warnings and LLM usage to `runs/`.
   - Done when: tests show a manifest is written on success and on failure.

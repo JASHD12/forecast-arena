@@ -255,7 +255,7 @@ Keep the first line of each task in exactly this shape; the status script parses
   - Do: calibration bins, calibration error, Murphy decomposition, day-block bootstrap,
     paired differences (section 10).
   - Done when: tests on synthetic data with known answers pass; results are seed-stable.
-- [ ] T071 · Leaderboards (deps: T070)
+- [x] T071 · Leaderboards (deps: T070)
   - Do: common-set and all-question boards, per domain, with the wording rules.
   - Done when: tests cover the "too early to tell" label and common-set selection.
 - [ ] T072 · Site v2 (deps: T071)

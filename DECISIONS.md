@@ -233,6 +233,16 @@ outcome (the previous day's fixing) is published at 16:00 CET, after the 09:30 U
 so it is never known at forecast time; the fallback is the rule of SPEC 8.2.
 Made by: agent
 
+## 2026-11-12 - Common set uses the active members of the comparison group
+Context: SPEC 10's common set is "questions answered by every forecaster in the comparison
+group". Before `ml` or the LLM forecasters are enabled, a strict reading gives an empty
+headline board.
+Decision: the common set is the intersection over the group members that have at least
+one scored forecast in the board's scope; the board lists which forecasters it covers.
+The 300-forecast threshold counts questions x covered forecasters. Without an official
+start date, headline boards are empty and labelled "too early to tell".
+Made by: agent
+
 ## Proposals for the human
 
 Ideas outside the specification. The agent lists them here and does not build them.

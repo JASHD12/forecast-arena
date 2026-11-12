@@ -15,7 +15,7 @@ Keep the first line of each item in exactly this shape; the status script parses
   - `git`, Python 3.12 or newer, the GitHub CLI (`gh auth login`), and your coding agent.
   - Optional: `uv` for faster Python installs. The agent falls back to `pip` without it.
   - Check: `gh repo view` works inside the repository folder.
-- [ ] H03 · Turn on GitHub Pages
+- [x] H03 · Turn on GitHub Pages
   - Repository settings, Pages section: set the source to **GitHub Actions**.
   - Needed before the first live run (task T030).
 

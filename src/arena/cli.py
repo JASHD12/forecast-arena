@@ -219,8 +219,11 @@ def daily() -> None:
 
 
 def _sync(obj: Ctx, push: bool) -> str | None:
-    """Check out the ledger branch when pushing; returns the remote used."""
-    if not push or obj.dry_run:
+    """Check out the ledger branch when pushing; returns the remote to push to.
+
+    A dry run with --push still checks the branch out (so it sees the real state) but
+    returns None: nothing is pushed, and the job itself works on a throwaway copy."""
+    if not push:
         return None
     from arena.ledger.gitsync import ensure_checkout
 
@@ -228,7 +231,7 @@ def _sync(obj: Ctx, push: bool) -> str | None:
     if not remote:
         raise click.UsageError("--push needs ARENA_LEDGER_REMOTE")
     click.echo(f"ledger checkout: {ensure_checkout(remote, obj.ledger.root)}")
-    return remote
+    return None if obj.dry_run else remote
 
 
 def _push(obj: Ctx, remote: str | None, job: str, day: date) -> None:

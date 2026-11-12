@@ -16,6 +16,12 @@
 <ul class="bars bars-wide imp" aria-label="Feature importance">
 {% for f in imp %}<li><span class="who"><code>{{ f.feature }}</code></span><span class="track" aria-hidden="true"><span class="fill" style="width: {{ '%.1f'|format([[f.mae_increase / top, 0]|max, 1]|min * 100) }}%"></span></span><span class="val">{{ "%+.2f"|format(f.mae_increase) }}</span><span class="score">± {{ "%.2f"|format(f.std) }}</span></li>
 {% endfor %}</ul>{% endif %}
+{% set qd = (r.quantile_diagnostics or {}).get("power") if r.quantile_diagnostics is defined else none %}
+{% if qd %}<h3>Probabilistic accuracy of the electricity model ({{ r.day }})</h3>
+<p class="note">The model predicts a full distribution (13 quantiles) for each daily price statistic. Pinball loss scores that distribution (EUR/MWh, lower is better; about half the CRPS). Coverage shows how often the real value fell inside the central 80% and 90% bands: a well-calibrated model is close to 0.80 and 0.90.</p>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Quantile diagnostics"><table>
+<thead><tr><th scope="col">Statistic</th><th scope="col" class="num">Days</th><th scope="col" class="num">Pinball loss</th><th scope="col" class="num">80% band coverage</th><th scope="col" class="num">90% band coverage</th></tr></thead>
+<tbody>{% for d in qd %}<tr><th scope="row">{{ d.stat }}</th><td class="num">{{ d.n }}</td><td class="num">{{ "%.2f"|format(d.pinball) }}</td><td class="num">{{ "%.2f"|format(d.coverage80) }}</td><td class="num">{{ "%.2f"|format(d.coverage90) }}</td></tr>{% endfor %}</tbody></table></div>{% endif %}
 {% if r.drift %}<h3>Drift ({{ r.day }})</h3>
 <p class="note">Computed with Evidently: share of drifted columns and per-column drift test p-values (current window vs. training reference). Small p-values mean the distribution changed.</p>
 <div class="table-scroll" tabindex="0" role="region" aria-label="Drift {{ r.day }}"><table>

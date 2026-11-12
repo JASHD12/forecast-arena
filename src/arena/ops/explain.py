@@ -50,3 +50,48 @@ def power_importance(
     ]
     rows.sort(key=lambda d: float(d["mae_increase"]), reverse=True)
     return rows[:TOP]
+
+
+def pinball(y: float, q_pred: float, tau: float) -> float:
+    """Pinball (quantile) loss of one prediction at level tau."""
+    d = y - q_pred
+    return max(tau * d, (tau - 1) * d)
+
+
+def power_quantile_diagnostics(
+    domain: PowerDomain, model: Any, first: date, last: date
+) -> list[dict[str, Any]]:
+    """Per daily statistic: mean pinball loss over all quantile levels (EUR/MWh; a
+    discrete approximation of half the CRPS) and the empirical coverage of the central 80%
+    and 90% prediction intervals on the window's target days. [] if too few rows."""
+    from arena.forecasters.ml_power import QUANTILES, STATS
+
+    if not hasattr(model, "quantiles"):
+        return []
+    x, ys, _ = training_rows(domain.all_days(), first, last)
+    if len(x) < MIN_ROWS:
+        return []
+    i10, i90 = QUANTILES.index(0.1), QUANTILES.index(0.9)
+    i05, i95 = QUANTILES.index(0.05), QUANTILES.index(0.95)
+    out = []
+    for stat in STATS:
+        losses, in80, in90 = [], 0, 0
+        for row, y in zip(x, ys[stat], strict=True):
+            qv = sorted(model.quantiles(stat, list(row)))  # rearrangement: no crossing
+            losses.append(
+                sum(pinball(float(y), q, t) for q, t in zip(qv, QUANTILES, strict=True))
+                / len(QUANTILES)
+            )
+            in80 += int(qv[i10] <= y <= qv[i90])
+            in90 += int(qv[i05] <= y <= qv[i95])
+        n = len(losses)
+        out.append(
+            {
+                "stat": stat,
+                "n": n,
+                "pinball": round(sum(losses) / n, 3),
+                "coverage80": round(in80 / n, 3),
+                "coverage90": round(in90 / n, 3),
+            }
+        )
+    return out

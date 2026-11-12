@@ -109,3 +109,21 @@ def test_permutation_importance_in_summary(tmp_path, dom) -> None:
     model = registry.load_current(led, ["power"])["power"]
     assert power_importance(dom, model, first, last) == res.importance  # deterministic
     assert power_importance(dom, Constant(), first, last) == []
+
+
+def test_pinball_and_quantile_diagnostics(tmp_path, dom) -> None:
+    from arena.ops.explain import pinball, power_quantile_diagnostics
+
+    assert pinball(10.0, 8.0, 0.9) == pytest.approx(1.8)
+    assert pinball(10.0, 12.0, 0.9) == pytest.approx(0.2)
+    assert pinball(10.0, 10.0, 0.5) == 0.0
+    led = Ledger(tmp_path / "l")
+    res = weekly(led, FixedClock(NOW), {"power": dom}, {"power": trainer(dom)})
+    assert {d["stat"] for d in res.quantiles} == {"mean", "max", "min", "spread", "evening"}
+    for d in res.quantiles:
+        assert d["n"] > 0 and d["pinball"] >= 0
+        assert 0 <= d["coverage80"] <= d["coverage90"] <= 1
+    (summary,) = summaries(led)
+    assert summary["quantile_diagnostics"]["power"] == res.quantiles
+    first, last = window(NOW.date())
+    assert power_quantile_diagnostics(dom, Constant(), first, last) == []

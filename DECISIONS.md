@@ -443,6 +443,19 @@ Made by: agent
   `[FILL IN: ...]` placeholder. The site never publishes a file containing a placeholder
   (tested). The owner checks and completes them; they are not legal advice.
 
+## 2026-11-12 · Quantile diagnostics and site round 4 (owner request)
+
+- The weekly job also scores the promoted power model's full predictive distribution on
+  the evaluation window: mean pinball loss over the 13 quantile levels and the empirical
+  coverage of the central 80% and 90% intervals, after sorting the predicted quantiles
+  (rearrangement) so they never cross. Published in the weekly summary and on
+  Experiments. Display and monitoring only; question probabilities are unchanged.
+- Site: leaderboard podium and a forest plot of Brier scores with their 95% day-block
+  intervals (the same numbers as the tables), an HTML/CSS architecture diagram, and an
+  About page with the owner's name and city (given by the owner for the Imprint).
+- The ensemble (T090) is not built yet: it depends on T057 (ml live), and AGENTS.md says
+  never to skip ahead of unmet dependencies.
+
 ## Proposals for the human
 
 Ideas outside the specification. The agent lists them here and does not build them.

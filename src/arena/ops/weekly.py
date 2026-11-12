@@ -33,7 +33,7 @@ from arena.ledger import Ledger
 from arena.ledger.manifest import run_manifest
 from arena.models import Resolution
 from arena.ops.drift import power_drift
-from arena.ops.explain import power_importance
+from arena.ops.explain import power_importance, power_quantile_diagnostics
 from arena.ops.jobs import _maybe_dry
 from arena.scoring.core import brier
 
@@ -69,6 +69,7 @@ class WeeklyResult:
     decisions: list[Decision] = field(default_factory=list)
     drift: list[dict[str, Any]] = field(default_factory=list)
     importance: list[dict[str, Any]] = field(default_factory=list)
+    quantiles: list[dict[str, Any]] = field(default_factory=list)
 
     def lines(self) -> list[str]:
         """Printable summary."""
@@ -206,6 +207,7 @@ def weekly(
                 pdom = domains["power"]
                 if model is not None and isinstance(pdom, PowerDomain):
                     res.importance = power_importance(pdom, model, first, last)
+                    res.quantiles = power_quantile_diagnostics(pdom, model, first, last)
             except Exception as exc:  # explainability never blocks the weekly job
                 rec.warn(f"weekly/importance: {type(exc).__name__}: {exc}"[:300])
         summary = {
@@ -214,6 +216,7 @@ def weekly(
             "decisions": [asdict(x) for x in res.decisions],
             "drift": res.drift,
             "importance": {"power": res.importance},
+            "quantile_diagnostics": {"power": res.quantiles},
         }
         rel = f"models/weekly/{today.isoformat()}-summary.json"
         if not led.exists(rel):

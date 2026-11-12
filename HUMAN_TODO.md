@@ -30,7 +30,7 @@ Keep the first line of each item in exactly this shape; the status script parses
     `openai_compatible`, `ARENA_LLM_BASE_URL`.
   - Never paste the key into a chat, a file, or a commit.
   - Needed for tasks T064, T065, T068.
-- [ ] H05 · Finish the Imprint and Privacy text (drafts are ready)
+- [x] H05 · Finish the Imprint and Privacy text (drafts are ready)
   - The agent drafted both at your request: `docs/legal/imprint.md` and
     `docs/legal/privacy.md`. Replace every `[FILL IN: ...]` (your name, postal address,
     e-mail, your state's data protection authority, the date).
@@ -40,6 +40,8 @@ Keep the first line of each item in exactly this shape; the status script parses
   - Optional: `site_content/about.md` (who you are, a link to your profile).
   - Not legal advice: check the result, e.g. with a generator from a German data
     protection authority or a lawyer. Your address will be public on the site.
+  - Done 2026-11-12: published from the details the owner gave (name, 35390 Gießen,
+    e-mail, Hesse). Street and house number are still missing: see H14.
 - [ ] H06 · Recruit the human panel
   - Ask 10 to 15 classmates to forecast once a week. Follow `docs/PANEL_SETUP.md` (the
     agent writes it in task T091): create the form, hand out tokens, publish the sheet as
@@ -106,3 +108,7 @@ Keep the first line of each item in exactly this shape; the status script parses
     forecasters stay on `claude-haiku-5-5`, and the daily token cap in the workflows is
     150000 (worst case about $1 a month). Recommended: set the monthly spending limit in
     the Anthropic console to $1-2 as a second safety net.
+- [ ] H14 · Add your street and house number to the Imprint
+  - German law (DDG section 5) expects a full postal address in the Impressum, not only
+    postcode and city. Add the street line in `site_content/imprint.md` and
+    `site_content/privacy.md` (above "35390 Gießen"), or tell the agent.

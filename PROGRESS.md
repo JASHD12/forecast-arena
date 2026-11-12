@@ -43,6 +43,7 @@ move older "Done log" lines to `docs/progress-archive.md`.
 
 ## Done log
 
+- 2026-11-12 H05 published (owner details: name, 35390 Gießen, e-mail, Hesse/HBDI); H14 open for street address
 - 2026-11-12 H05 drafts written at owner request (docs/legal/, placeholders, never published unfinished)
 - 2026-11-12 pages v2 (owner request): shared page headers; calibration cards with metrics; findings progress + hypothesis cards; status health banner, schedule timeline, skip explanations
 - 2026-11-12 T045i-l (owner request): DuckDB SQL + Parquet open data, Diebold-Mariano, permutation importance, mypy clean in make check

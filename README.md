@@ -9,11 +9,49 @@ and when does it not? An honest "it does not" is a valid result.
 
 This is a research project. Nothing here is advice of any kind.
 
-**Status:** the code is complete through the offline pipeline, the models, the LLM
-forecasters and the site. The live pipeline (scheduled GitHub Actions, the public ledger
-branch and the GitHub Pages site) is not running yet: it waits for the repository owner
-to enable GitHub Actions and GitHub Pages (see `HUMAN_TODO.md`). Live site: not yet
-deployed. Rehearsal start date: not yet set.
+**Live site: <https://jashd12.github.io/forecast-arena/>**
+
+**Status (2026-11-12):** the live pipeline is running on GitHub Actions. The site and the
+public ledger branch went live on 2026-11-12; the first batch of questions and forecasts
+is scheduled for the morning run of 2026-11-13. The first days are a *rehearsal*: they are
+shown, but excluded from headline scores. The official record starts automatically after
+five consecutive clean days (SPEC 2.9). Electricity prices are live first; weather,
+Wikipedia attention and exchange rates follow once each has passed its next-day checks.
+
+## Using it
+
+You do not need to install anything to follow the benchmark.
+
+| I want to... | Go to |
+|---|---|
+| See today's questions and every forecaster's probability | [Home](https://jashd12.github.io/forecast-arena/) and [Questions](https://jashd12.github.io/forecast-arena/questions/index.html) |
+| See who is winning | [Leaderboard](https://jashd12.github.io/forecast-arena/leaderboard.html) (says "too early to tell" until there is enough data) |
+| See whether a forecaster's 70% really means 70% | [Calibration](https://jashd12.github.io/forecast-arena/calibration.html) |
+| Read the answer to the research question | [Findings](https://jashd12.github.io/forecast-arena/findings.html) |
+| Check that the system ran today | [Status](https://jashd12.github.io/forecast-arena/status.html) |
+| Understand the scoring | [Methods](https://jashd12.github.io/forecast-arena/methods.html) |
+
+How to read a question: each one is a yes/no statement about tomorrow with an exact
+resolution rule (source, threshold, time zone). Every forecaster gives the probability of
+YES before 09:30 UTC. When the official data is published, the question resolves and
+each forecast gets a Brier score (0 is perfect, 0.25 is what always saying 50% earns,
+lower is better).
+
+**Check the record yourself.** Every question, forecast and outcome is an append-only
+file on the [`ledger` branch](https://github.com/JASHD12/forecast-arena/tree/ledger),
+sealed by a hash chain. After `make setup` (see "Reproduce it"), anyone can verify that
+nothing was changed after the fact:
+
+```bash
+git clone --branch ledger --single-branch https://github.com/JASHD12/forecast-arena.git _ledger
+```
+
+```bash
+.venv/bin/arena --ledger-dir _ledger ledger verify --git
+```
+
+**Forecast yourself.** A human panel that forecasts the same questions is planned; it
+opens once the panel is set up (`docs/PANEL_SETUP.md`).
 
 ## How it works
 

@@ -1,0 +1,74 @@
+{
+  "additionalProperties": false,
+  "description": "A forecaster's probability of YES, written before the question's lock time.",
+  "properties": {
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "forecast_id": {
+      "title": "Forecast Id",
+      "type": "string"
+    },
+    "forecaster_id": {
+      "pattern": "^[a-z0-9][a-z0-9_]*$",
+      "title": "Forecaster Id",
+      "type": "string"
+    },
+    "forecaster_version": {
+      "minLength": 1,
+      "title": "Forecaster Version",
+      "type": "string"
+    },
+    "kind": {
+      "const": "forecast",
+      "default": "forecast",
+      "title": "Kind",
+      "type": "string"
+    },
+    "meta": {
+      "additionalProperties": true,
+      "title": "Meta",
+      "type": "object"
+    },
+    "probability": {
+      "maximum": 1.0,
+      "minimum": 0.0,
+      "title": "Probability",
+      "type": "number"
+    },
+    "question_id": {
+      "title": "Question Id",
+      "type": "string"
+    },
+    "rationale": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Rationale"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "forecast_id",
+    "question_id",
+    "forecaster_id",
+    "forecaster_version",
+    "probability",
+    "created_at"
+  ],
+  "title": "Forecast",
+  "type": "object"
+}

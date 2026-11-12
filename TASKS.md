@@ -24,7 +24,7 @@ Keep the first line of each task in exactly this shape; the status script parses
   - Do: `arena.config` (typed settings from `ARENA_*` environment variables with defaults;
     no secrets in code); `arena.clock` (`Clock` protocol, `SystemClock`, `FixedClock`).
   - Done when: unit tests cover defaults, overrides and a fixed clock.
-- [ ] T004 · Core schemas (deps: T003)
+- [x] T004 · Core schemas (deps: T003)
   - Do: pydantic v2 models for section 5; canonical JSON serialisation (sorted keys,
     UTF-8, newline-terminated); JSON Schemas exported to `docs/schemas/`.
   - Done when: round-trip and validation tests pass; a schema-drift test fails if models

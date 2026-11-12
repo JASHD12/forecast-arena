@@ -1,0 +1,55 @@
+{
+  "additionalProperties": false,
+  "description": "Seals every ledger file of one day and links it to the previous seal (SPEC 6).",
+  "properties": {
+    "chain_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Chain Sha256",
+      "type": "string"
+    },
+    "day": {
+      "format": "date",
+      "title": "Day",
+      "type": "string"
+    },
+    "files": {
+      "additionalProperties": {
+        "pattern": "^[0-9a-f]{64}$",
+        "type": "string"
+      },
+      "title": "Files",
+      "type": "object"
+    },
+    "kind": {
+      "const": "day_seal",
+      "default": "day_seal",
+      "title": "Kind",
+      "type": "string"
+    },
+    "prev_chain_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Prev Chain Sha256",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "sealed_at": {
+      "format": "date-time",
+      "title": "Sealed At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "day",
+    "sealed_at",
+    "files",
+    "prev_chain_sha256",
+    "chain_sha256"
+  ],
+  "title": "DaySeal",
+  "type": "object"
+}

@@ -1,0 +1,68 @@
+{
+  "additionalProperties": false,
+  "description": "A forecaster did not answer a question; the reason is recorded instead of a guess.",
+  "properties": {
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "detail": {
+      "default": "",
+      "title": "Detail",
+      "type": "string"
+    },
+    "forecaster_id": {
+      "pattern": "^[a-z0-9][a-z0-9_]*$",
+      "title": "Forecaster Id",
+      "type": "string"
+    },
+    "forecaster_version": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Forecaster Version"
+    },
+    "kind": {
+      "const": "skip",
+      "default": "skip",
+      "title": "Kind",
+      "type": "string"
+    },
+    "question_id": {
+      "title": "Question Id",
+      "type": "string"
+    },
+    "reason_code": {
+      "enum": [
+        "not_sampled",
+        "budget_exhausted",
+        "parse_failure",
+        "model_missing",
+        "error"
+      ],
+      "title": "Reason Code",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "question_id",
+    "forecaster_id",
+    "reason_code",
+    "created_at"
+  ],
+  "title": "Skip",
+  "type": "object"
+}

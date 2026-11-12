@@ -1,0 +1,149 @@
+{
+  "additionalProperties": false,
+  "description": "One concrete yes/no proposition about a target day.",
+  "properties": {
+    "base_rate_hint": {
+      "anyOf": [
+        {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Base Rate Hint"
+    },
+    "batch_date": {
+      "format": "date",
+      "title": "Batch Date",
+      "type": "string"
+    },
+    "comparator": {
+      "enum": [
+        "gt",
+        "ge",
+        "lt"
+      ],
+      "title": "Comparator",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "domain": {
+      "pattern": "^[a-z0-9][a-z0-9_]*$",
+      "title": "Domain",
+      "type": "string"
+    },
+    "entity": {
+      "title": "Entity",
+      "type": "string"
+    },
+    "kind": {
+      "const": "question",
+      "default": "question",
+      "title": "Kind",
+      "type": "string"
+    },
+    "lock_time": {
+      "format": "date-time",
+      "title": "Lock Time",
+      "type": "string"
+    },
+    "params": {
+      "additionalProperties": true,
+      "title": "Params",
+      "type": "object"
+    },
+    "question_id": {
+      "title": "Question Id",
+      "type": "string"
+    },
+    "resolution_rule": {
+      "title": "Resolution Rule",
+      "type": "string"
+    },
+    "resolution_source": {
+      "title": "Resolution Source",
+      "type": "string"
+    },
+    "resolve_after": {
+      "format": "date-time",
+      "title": "Resolve After",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "tags": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Tags",
+      "type": "array"
+    },
+    "target_date": {
+      "format": "date",
+      "title": "Target Date",
+      "type": "string"
+    },
+    "template": {
+      "pattern": "^[a-z0-9][a-z0-9_]*$",
+      "title": "Template",
+      "type": "string"
+    },
+    "template_version": {
+      "minimum": 1,
+      "title": "Template Version",
+      "type": "integer"
+    },
+    "text": {
+      "minLength": 10,
+      "title": "Text",
+      "type": "string"
+    },
+    "threshold": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Threshold"
+    },
+    "unit": {
+      "title": "Unit",
+      "type": "string"
+    }
+  },
+  "required": [
+    "question_id",
+    "domain",
+    "template",
+    "template_version",
+    "entity",
+    "text",
+    "batch_date",
+    "target_date",
+    "created_at",
+    "lock_time",
+    "resolve_after",
+    "resolution_source",
+    "resolution_rule",
+    "threshold",
+    "unit",
+    "comparator"
+  ],
+  "title": "Question",
+  "type": "object"
+}

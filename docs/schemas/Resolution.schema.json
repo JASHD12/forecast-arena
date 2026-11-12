@@ -1,0 +1,86 @@
+{
+  "$defs": {
+    "Evidence": {
+      "additionalProperties": false,
+      "description": "Where an outcome came from.",
+      "properties": {
+        "snapshot_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Snapshot Sha256",
+          "type": "string"
+        },
+        "source_url": {
+          "title": "Source Url",
+          "type": "string"
+        },
+        "values_used": {
+          "additionalProperties": true,
+          "title": "Values Used",
+          "type": "object"
+        }
+      },
+      "required": [
+        "source_url",
+        "snapshot_sha256"
+      ],
+      "title": "Evidence",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "The recorded outcome of a question.",
+  "properties": {
+    "evidence": {
+      "$ref": "#/$defs/Evidence"
+    },
+    "kind": {
+      "const": "resolution",
+      "default": "resolution",
+      "title": "Kind",
+      "type": "string"
+    },
+    "observed_value": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Observed Value"
+    },
+    "outcome": {
+      "enum": [
+        0,
+        1
+      ],
+      "title": "Outcome",
+      "type": "integer"
+    },
+    "question_id": {
+      "title": "Question Id",
+      "type": "string"
+    },
+    "resolved_at": {
+      "format": "date-time",
+      "title": "Resolved At",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "question_id",
+    "outcome",
+    "observed_value",
+    "resolved_at",
+    "evidence"
+  ],
+  "title": "Resolution",
+  "type": "object"
+}

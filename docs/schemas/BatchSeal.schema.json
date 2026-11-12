@@ -1,0 +1,43 @@
+{
+  "additionalProperties": false,
+  "description": "Seals the questions and forecasts files of one batch (SPEC 6).",
+  "properties": {
+    "batch_date": {
+      "format": "date",
+      "title": "Batch Date",
+      "type": "string"
+    },
+    "files": {
+      "additionalProperties": {
+        "pattern": "^[0-9a-f]{64}$",
+        "type": "string"
+      },
+      "title": "Files",
+      "type": "object"
+    },
+    "kind": {
+      "const": "batch_seal",
+      "default": "batch_seal",
+      "title": "Kind",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "sealed_at": {
+      "format": "date-time",
+      "title": "Sealed At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "batch_date",
+    "sealed_at",
+    "files"
+  ],
+  "title": "BatchSeal",
+  "type": "object"
+}

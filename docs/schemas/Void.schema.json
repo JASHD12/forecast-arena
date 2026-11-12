@@ -1,0 +1,50 @@
+{
+  "additionalProperties": false,
+  "description": "A question withdrawn from scoring for a stated, coded reason.",
+  "properties": {
+    "detail": {
+      "default": "",
+      "title": "Detail",
+      "type": "string"
+    },
+    "kind": {
+      "const": "void",
+      "default": "void",
+      "title": "Kind",
+      "type": "string"
+    },
+    "question_id": {
+      "title": "Question Id",
+      "type": "string"
+    },
+    "reason_code": {
+      "enum": [
+        "source_missing",
+        "source_revised",
+        "late_lock",
+        "ambiguous",
+        "bug"
+      ],
+      "title": "Reason Code",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "voided_at": {
+      "format": "date-time",
+      "title": "Voided At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "question_id",
+    "reason_code",
+    "voided_at"
+  ],
+  "title": "Void",
+  "type": "object"
+}

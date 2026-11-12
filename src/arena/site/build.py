@@ -32,7 +32,7 @@ from arena.scoring.boards import MIN_DAYS, all_boards, official
 from arena.scoring.core import Scored, clip, counts, load
 from arena.scoring.findings import findings
 from arena.scoring.stats import calibration_bins, expected_calibration_error, murphy
-from arena.site.charts import race_svg, reliability_svg, series_class
+from arena.site.charts import forest_svg, race_svg, reliability_svg, series_class
 from arena.site.methods_content import LIMITATIONS, PRINCIPLES
 from arena.site.titles import FORECASTER_NAMES, domain_name, forecaster_name, plain_title
 from arena.sources.brightsky import ATTRIBUTION as WX_ATTRIBUTION
@@ -158,6 +158,7 @@ def _env() -> Environment:
         qhref=question_href,
         is_ai=lambda fid: fid in AI_FORECASTERS,
         race_svg=race_svg,
+        forest_svg=forest_svg,
         series_class=series_class,
         all_names=FORECASTER_NAMES,
     )

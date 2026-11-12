@@ -169,3 +169,66 @@ def race_svg(
         )
     p.append("</svg>")
     return Markup("".join(p))
+
+
+FOREST_W, FOREST_ROW = 680, 34
+FOREST_PAD = (28, 24, 34, 170)  # top, right, bottom, left
+
+
+def forest_svg(rows: Sequence[Any], names: dict[str, str]) -> Markup:
+    """Forest plot: each forecaster's Brier score (dot) with its 95% day-block bootstrap
+    interval (whisker), sorted best first, with the coin-flip reference at 0.25.
+
+    `rows` are BoardRow-like objects (forecaster_id, brier.estimate/low/high)."""
+    rows = sorted(rows, key=lambda r: r.brier.estimate)
+    top, right, bottom, left = FOREST_PAD
+    h = top + bottom + FOREST_ROW * max(1, len(rows))
+    w = FOREST_W - left - right
+    lo = min([r.brier.low for r in rows] + [0.25])
+    hi = max([r.brier.high for r in rows] + [0.25])
+    step = 0.05 if hi - lo > 0.12 else 0.02
+    xmin = max(0.0, math.floor((lo - step / 2) / step) * step)
+    xmax = math.ceil((hi + step / 2) / step) * step
+
+    def x(v: float) -> float:
+        return left + (v - xmin) / (xmax - xmin) * w
+
+    p = [
+        f'<svg class="forest" viewBox="0 0 {FOREST_W} {h}" role="img" '
+        'aria-labelledby="forest-t forest-d">',
+        '<title id="forest-t">Brier score with 95% interval per forecaster</title>',
+        '<desc id="forest-d">Dots are mean Brier scores (lower is better); lines are 95% '
+        "day-block bootstrap intervals. Overlapping intervals mean the difference is not "
+        "established yet. The same numbers are in the table below.</desc>",
+    ]
+    t = xmin
+    while t <= xmax + 1e-9:
+        p.append(f'<line class="grid" x1="{x(t):.1f}" x2="{x(t):.1f}" y1="{top - 8}" '
+                 f'y2="{h - bottom + 4}"/>')  # fmt: skip
+        p.append(f'<text class="tick" x="{x(t):.1f}" y="{h - 12}" text-anchor="middle">'
+                 f"{t:.2f}</text>")  # fmt: skip
+        t = round(t + step, 10)
+    p.append(f'<line class="coinline" x1="{x(0.25):.1f}" x2="{x(0.25):.1f}" y1="{top - 14}" '
+             f'y2="{h - bottom + 4}"/>')  # fmt: skip
+    p.append(f'<text class="tick" x="{x(0.25) + 4:.1f}" y="{top - 16}">coin flip 0.25</text>')
+    for i, r in enumerate(rows):
+        cy = top + FOREST_ROW * i + FOREST_ROW / 2
+        cls = series_class(r.forecaster_id)
+        name = escape(names.get(r.forecaster_id, r.forecaster_id))
+        b = r.brier
+        tip = escape(
+            f"{names.get(r.forecaster_id, r.forecaster_id)}: {b.estimate:.3f} "
+            f"(95% interval {b.low:.3f} to {b.high:.3f}, n = {r.n})"
+        )
+        p.append(f'<text class="rowlabel" x="{left - 12}" y="{cy + 4:.1f}" text-anchor="end">'
+                 f"{name}</text>")  # fmt: skip
+        p.append(
+            f'<g class="pt"><title>{tip}</title>'
+            f'<rect class="hit" x="{left}" y="{cy - FOREST_ROW / 2:.1f}" width="{w}" '
+            f'height="{FOREST_ROW}"/>'
+            f'<line class="whisker {cls}" x1="{x(b.low):.1f}" x2="{x(b.high):.1f}" '
+            f'y1="{cy:.1f}" y2="{cy:.1f}"/>'
+            f'<circle class="dot {cls}" cx="{x(b.estimate):.1f}" cy="{cy:.1f}" r="5"/></g>'
+        )
+    p.append("</svg>")
+    return Markup("".join(p))

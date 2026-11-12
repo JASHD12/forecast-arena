@@ -178,3 +178,23 @@ def test_unfinished_legal_draft_is_never_published(tmp_path) -> None:
     _, res = _site(tmp_path / "x", content)
     assert "Pending" in (res.out_dir / "imprint.html").read_text()
     assert "FILL IN" not in (res.out_dir / "privacy.html").read_text()
+
+
+def test_leaderboard_forest_and_about_architecture(tmp_path) -> None:
+    from types import SimpleNamespace
+
+    from arena.site.charts import forest_svg
+
+    iv = SimpleNamespace(estimate=0.2, low=0.15, high=0.26)
+    rows = [
+        SimpleNamespace(forecaster_id="ml", n=40, brier=iv),
+        SimpleNamespace(forecaster_id="base_rate", n=40,
+                        brier=SimpleNamespace(estimate=0.24, low=0.2, high=0.3)),
+    ]  # fmt: skip
+    svg = forest_svg(rows, {"ml": "ML model", "base_rate": "Base rate"})
+    assert svg.index("ML model") < svg.index("Base rate")  # best first
+    assert "ML model: 0.200 (95% interval 0.150 to 0.260, n = 40)" in svg
+    _, res = _site(tmp_path)
+    about = (res.out_dir / "about.html").read_text()
+    assert "Jashdeep Singh" in about and "As-of gateway" in about
+    assert "As-of gateway" in (res.out_dir / "methods.html").read_text()

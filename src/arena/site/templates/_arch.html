@@ -1,0 +1,12 @@
+<figure class="arch" aria-labelledby="arch-cap">
+<ol class="arch-flow">
+<li class="arch-step"><span class="arch-k">1 · Sources</span><strong>Live public data</strong><span>SMARD · DWD/Bright Sky · Wikimedia · ECB · GDELT{% if has_crypto %} · CoinGecko{% endif %}</span></li>
+<li class="arch-step"><span class="arch-k">2 · As-of gateway</span><strong>No look-ahead</strong><span>every value carries the time it became public; forecasters only see the past</span></li>
+<li class="arch-step"><span class="arch-k">3 · Forecasters</span><strong>Baselines · ML · LLMs · agent</strong><span>scikit-learn boosting, calibrated; Claude zero-shot, with data, with tools</span></li>
+<li class="arch-step"><span class="arch-k">4 · Ledger</span><strong>Append-only, hash-chained</strong><span>git branch, sealed before the 09:30 UTC lock</span></li>
+<li class="arch-step"><span class="arch-k">5 · Scoring</span><strong>Proper scores + uncertainty</strong><span>Brier, log, calibration, bootstrap CIs, DuckDB SQL</span></li>
+<li class="arch-step"><span class="arch-k">6 · Publish</span><strong>Static site + open data</strong><span>GitHub Pages, Parquet, Atom feed</span></li>
+</ol>
+<div class="arch-ops"><strong>Orchestration:</strong> GitHub Actions (morning, 4× resolve, weekly retraining with MLflow and Evidently) · CI gate: ruff, mypy, pytest, end-to-end run, axe-core · production runs only code that passed CI</div>
+<figcaption id="arch-cap" class="note">How a forecast travels from raw data to a score.</figcaption>
+</figure>

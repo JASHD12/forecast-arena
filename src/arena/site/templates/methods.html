@@ -2,6 +2,8 @@
 {% from "macros.html" import page_head %}
 {% block content %}
 {{ page_head("How it works, precisely", "Methods", "The principles the system enforces in code, how scoring works, what each forecaster may see, and every model version that ever ran.") }}
+<h2>The pipeline</h2>
+{% include "_arch.html" %}
 <h2>Principles and where they are enforced</h2>
 <div class="table-scroll" tabindex="0" role="region" aria-label="Principles table"><table>
 <thead><tr><th scope="col">Principle</th><th scope="col">Rule</th><th scope="col">Enforced in</th></tr></thead>

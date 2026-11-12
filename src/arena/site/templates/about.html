@@ -1,11 +1,44 @@
 {% extends "base.html" %}
 {% from "macros.html" import page_head %}
 {% block content %}
-{{ page_head("The project", "About") }}
-{% if about %}<section class="prose">{{ about }}</section>{% else %}<p class="muted">The project owner has not written this page yet.</p>{% endif %}
-<h2>The research question</h2>
-<p>When does an AI agent beat a classical model at forecasting, and when does it not? An honest "it does not" is a valid result.</p>
+{{ page_head("The project", "About Forecast Arena", "A live, public benchmark that asks a simple question with a rigorous method: when does an AI agent beat a classical model at forecasting, and when does it not?") }}
+
+<div class="about-grid">
+<section class="card author">
+<p class="kicker-dark">Built and run by</p>
+<h2>Jashdeep Singh</h2>
+<p>Gießen, Germany</p>
+<p class="actions-row"><a class="btn-small" href="https://github.com/JASHD12">GitHub profile</a> <a class="btn-small" href="{{ repo_url }}">Source code</a> <a class="btn-small" href="imprint.html">Contact</a></p>
+{% if about %}<div class="prose">{{ about }}</div>{% endif %}
+</section>
+<section class="card">
+<p class="kicker-dark">The research question</p>
+<h2>When does an LLM agent beat a classical model?</h2>
+<p>An honest "it does not" is a valid result. Four hypotheses were written down before any data existed and are judged only by the official record:</p>
+<ol class="hyp-mini">
+<li>On numeric topics (electricity, weather), classical ML beats every LLM.</li>
+<li>On news-driven topics (Wikipedia attention), the tool-using agent beats ML.</li>
+<li>Nobody beats the base rate on exchange-rate direction.</li>
+<li>The ensemble is at least as good as the best single forecaster.</li>
+</ol>
+<p><a href="findings.html">See the current status of each →</a></p>
+</section>
+</div>
+
+<h2>How it works</h2>
+{% include "_arch.html" %}
+
+<h2>What this project demonstrates</h2>
+<ul class="skills">
+<li><h3>LLM engineering</h3><p>Claude via the official SDK, a tool-using agent, strict JSON contracts, prompt versioning, injection hygiene, hard cost caps.</p><a href="stack.html">Tech stack →</a></li>
+<li><h3>Machine learning</h3><p>Gradient-boosted quantile regression and classification, Platt calibration, time-series cross-validation without leakage.</p><a href="methods.html">Methods →</a></li>
+<li><h3>Statistics</h3><p>Proper scoring rules, reliability diagrams, Murphy decomposition, day-block bootstrap, Diebold-Mariano.</p><a href="calibration.html">Calibration →</a></li>
+<li><h3>MLOps</h3><p>Model registry, weekly champion/challenger retraining, MLflow tracking, Evidently drift, permutation importance.</p><a href="experiments.html">Experiments →</a></li>
+<li><h3>Data engineering</h3><p>Five live APIs, an as-of gateway, idempotent jobs, an append-only hash-chained ledger, DuckDB SQL and Parquet.</p><a href="data.html">Open data &amp; SQL →</a></li>
+<li><h3>Software quality</h3><p>Typed Python (mypy), hundreds of tests, offline end-to-end run, accessibility checks, CI-gated releases.</p><a href="status.html">Status →</a></li>
+</ul>
+
 <h2>How it was built</h2>
-<p>The project was specified by its owner and built by an AI coding agent following a written operating manual, with every design decision logged in the <a href="{{ repo_url }}">repository</a>.</p>
-<p><a href="imprint.html">Imprint</a> · <a href="privacy.html">Privacy</a> · <a href="guide.html">Guide &amp; FAQ</a></p>
+<p>The project was specified by its owner and built with an AI coding agent following a written operating manual. Every design decision is logged in the <a href="{{ repo_url }}">repository</a>, including the ones that were rejected and why.</p>
+<p class="note"><a href="imprint.html">Imprint</a> · <a href="privacy.html">Privacy</a> · <a href="guide.html">Guide &amp; FAQ</a></p>
 {% endblock %}

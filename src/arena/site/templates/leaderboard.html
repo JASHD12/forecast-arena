@@ -5,6 +5,20 @@
 <details class="faq"><summary>How the scores are computed</summary>
 <p>Brier and log scores are lower-is-better, on probabilities clipped to [0.01, 0.99]. Intervals are 95% day-block bootstrap intervals (questions from the same day are correlated, so days are resampled). A difference is called supported only when its interval excludes zero. With fewer than 30 official days or 300 resolved common-set forecasts every board says "too early to tell". The common set contains only the questions every forecaster in the group answered, so the comparison is fair.</p>
 </details>
+{% set main = headline[0] if official_start else rehearsal[0] %}
+{% if main and main.rows %}
+{% set ranked = main.rows|sort(attribute="brier.estimate") %}
+<section class="lb-hero" aria-labelledby="lb-top">
+<div class="section-head"><h2 id="lb-top">{{ "Official standings" if official_start else "Rehearsal standings" }}</h2>{% if main.label %}<span class="label">{{ main.label }}</span>{% endif %}</div>
+<ol class="podium">
+{% for r in ranked[:3] %}<li class="podium-{{ loop.index }}"><span class="medal-n" aria-hidden="true">{{ loop.index }}</span><span class="podium-name"><span class="dot-key {{ series_class(r.forecaster_id) }}" aria-hidden="true"></span><strong>{{ fname(r.forecaster_id) }}</strong>{% if is_ai(r.forecaster_id) %} <span class="label">AI</span>{% endif %}</span><span class="podium-score">{{ "%.3f"|format(r.brier.estimate) }}</span><span class="note">95% interval {{ "%.3f"|format(r.brier.low) }}–{{ "%.3f"|format(r.brier.high) }}</span></li>
+{% endfor %}</ol>
+<figure class="race-card">
+<figcaption class="note">Each dot is a forecaster's average Brier score on the same {{ main.questions }} questions ({{ main.days }} days); the line is its 95% day-block bootstrap interval. If two lines overlap, the data cannot yet tell them apart. Hover for exact values.</figcaption>
+{{ forest_svg(main.rows, all_names) }}
+</figure>
+</section>
+{% endif %}
 {% macro boards(list, note, suffix="") %}
 {% for b in list %}
 <h3>{{ "Same questions for everyone" if b.kind == "common" else "All questions" }} · {{ "All topics" if b.domain == "overall" else dname(b.domain) }}{{ suffix }}</h3>

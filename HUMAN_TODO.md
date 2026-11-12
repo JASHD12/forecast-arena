@@ -73,3 +73,11 @@ Keep the first line of each item in exactly this shape; the status script parses
   - Check: re-run the job; it should reach the "make check" step and go green.
   - Needed for T002, T074 (CI accessibility job), T083 (CI Docker job), T056 (weekly
     dry-run dispatch) and every live task (T030 onwards).
+- [ ] H11 · Approve a workflow that opens a non-incident issue
+  - T084 asks for a monthly workflow that opens an issue listing outdated dependency pins.
+    The standing approvals in CLAUDE.md cover only issues labelled `incident`, so this is
+    not pre-approved. If you agree, add a line to CLAUDE.md's standing approvals, e.g.
+    "7. Committing a workflow that opens and updates one issue labelled `dependencies`
+    listing outdated pins", and tick this item. Until then the report goes to the job
+    summary of the `deps` workflow.
+  - Needed for T084b.

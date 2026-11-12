@@ -291,10 +291,13 @@ Keep the first line of each task in exactly this shape; the status script parses
 - [x] T083 · Dockerfile (deps: T027)
   - Do: image that runs `make e2e`; CI builds it (no registry push).
   - Done when: `docker build` and the containerised e2e succeed in CI.
-- [ ] T084 · Dependency hygiene (deps: T002)
-  - Do: vulnerability audit in CI as a non-blocking report; a monthly workflow that opens
-    an issue listing outdated pins (no automatic merges).
+- [ ] T084a · Dependency hygiene: audit and outdated report (deps: T002)
+  - Do: vulnerability audit in CI as a non-blocking report; a monthly workflow that lists
+    outdated pins in its job summary (no automatic merges).
   - Done when: both workflows run successfully once.
+- [!] T084b · Dependency hygiene: open an issue with the outdated pins (deps: T084a; needs: H11) BLOCKED(needs H11)
+  - Do: let the monthly workflow open or update one issue listing outdated pins.
+  - Done when: a dispatch opens the issue once and a second dispatch updates it.
 - [ ] T085 · Explainer 07 (deps: T080)
   - Do: `docs/explainers/07-operations-and-monitoring.md`.
   - Done when: the file exists in the required format.

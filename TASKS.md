@@ -149,7 +149,7 @@ Keep the first line of each task in exactly this shape; the status script parses
     clients, station mapping in config, fixtures, decision recorded.
   - Done when: unit tests pass; `make smoke-sources` fetches a forecast and yesterday's
     observations for each city.
-- [ ] T041 · Weather questions, resolver, as-of snapshot (deps: T040)
+- [x] T041 · Weather questions, resolver, as-of snapshot (deps: T040)
   - Do: templates and resolver of section 7.2; the morning job stores the forecast values
     it saw under `snapshots/weather/`.
   - Done when: golden tests pass, including a day with missing observations (void).

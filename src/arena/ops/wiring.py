@@ -5,14 +5,16 @@ from __future__ import annotations
 from collections.abc import Callable, Sequence
 from datetime import date, datetime, timedelta
 
-from arena.config import Settings
+from arena.config import WEATHER_STATIONS, Settings
 from arena.domains.base import AsOfStore, Domain
 from arena.domains.power import PowerDomain
 from arena.domains.power_history import PRICE_KEY, berlin_date, to_observations
+from arena.domains.weather import WeatherDomain, weather_domain_from_responses
 from arena.forecasters.base import Forecaster, LedgerHistory
 from arena.forecasters.baselines import BaseRate, Persistence
 from arena.forecasters.replay import CombinedHistory, ReplayHistory
 from arena.ledger import Ledger
+from arena.sources.brightsky import BrightSkyClient
 from arena.sources.http import HttpClient
 from arena.sources.smard import FILTERS, SmardClient, berlin_day_bounds
 
@@ -39,9 +41,30 @@ def power_domain_from_client(
     return PowerDomain(store, evidence=evidence.get, on_skip=on_skip)
 
 
+#: Observation days loaded for weather: morning runs replay ~200 batches (each needing a
+#: 90-day window); resolve runs only need the last days within the grace period.
+WEATHER_DAYS = {"morning": 300, "resolve": 10}
+
+
+def weather_domain_live(
+    client: BrightSkyClient, now: datetime, days: int, with_forecast: bool,
+    on_skip: Callable[[str], None] | None = None,
+) -> WeatherDomain:  # fmt: skip
+    """Fetch observations (and tomorrow's MOSMIX forecast) for every station."""
+    today = berlin_date(now)
+    obs, fc = {}, {}
+    for city, (station, _) in WEATHER_STATIONS.items():
+        obs[city] = client.weather(station, today - timedelta(days=days), today)
+        if with_forecast:
+            tomorrow = today + timedelta(days=1)
+            fc[city] = client.weather(station, tomorrow, tomorrow)
+    return weather_domain_from_responses(WEATHER_STATIONS, obs, fc, now, on_skip=on_skip)
+
+
 def build_domains(
-    settings: Settings, now: datetime, on_skip: Callable[[str], None] | None = None
-) -> list[Domain]:
+    settings: Settings, now: datetime, on_skip: Callable[[str], None] | None = None,
+    job: str = "morning",
+) -> list[Domain]:  # fmt: skip
     """The domains enabled in settings, loaded from the live sources (with the cache)."""
     http = HttpClient(settings.user_agent())
     out: list[Domain] = []
@@ -49,6 +72,9 @@ def build_domains(
         if name == "power":
             client = SmardClient(http, cache_dir=settings.cache_dir)
             out.append(power_domain_from_client(client, now, on_skip=on_skip))
+        elif name == "weather":
+            out.append(weather_domain_live(BrightSkyClient(http), now, WEATHER_DAYS[job],
+                                           job == "morning", on_skip=on_skip))  # fmt: skip
         else:
             raise ValueError(f"domain {name!r} is not available yet")
     return out

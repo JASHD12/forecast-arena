@@ -18,6 +18,7 @@ from __future__ import annotations
 from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import UTC, date, datetime, time, timedelta
+from functools import lru_cache
 from typing import Any
 from zoneinfo import ZoneInfo
 
@@ -110,12 +111,13 @@ class BrightSkyClient:
         return WxResponse(resp.url, resp.sha256, parse_weather(resp.json()))
 
 
-def day_hours_ending(day: date) -> list[datetime]:
+@lru_cache(maxsize=8192)
+def day_hours_ending(day: date) -> tuple[datetime, ...]:
     """UTC end times of the hours of a Berlin day: 01:00 ... 24:00 local (23/24/25)."""
     start = datetime.combine(day, time(0), tzinfo=BERLIN).astimezone(UTC)
     end = datetime.combine(day + timedelta(days=1), time(0), tzinfo=BERLIN).astimezone(UTC)
     n = int((end - start) / timedelta(hours=1))
-    return [start + timedelta(hours=i + 1) for i in range(n)]
+    return tuple(start + timedelta(hours=i + 1) for i in range(n))
 
 
 @dataclass(frozen=True)

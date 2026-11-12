@@ -268,7 +268,7 @@ def daily_resolve(obj: Ctx, push: bool) -> None:
 
     remote = _sync(obj, push)
     now = obj.clock.now()
-    result = resolve(obj.ledger, obj.clock, build_domains(obj.settings, now),
+    result = resolve(obj.ledger, obj.clock, build_domains(obj.settings, now, job="resolve"),
                      dry_run=obj.dry_run)  # fmt: skip
     click.echo(result.line())
     for w in result.warnings:

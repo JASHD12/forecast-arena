@@ -271,7 +271,7 @@ Keep the first line of each task in exactly this shape; the status script parses
   - Do: semantic HTML, contrast, keyboard use, charts readable without colour alone,
     small page weight; link check in CI.
   - Done when: an automated accessibility lint run in CI reports no serious issues.
-- [ ] T075 · Explainer 06 (deps: T071)
+- [x] T075 · Explainer 06 (deps: T071)
   - Do: `docs/explainers/06-scoring-and-statistics.md`.
   - Done when: the file exists in the required format.
 

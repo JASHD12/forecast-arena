@@ -17,6 +17,15 @@ from pydantic import BaseModel, ConfigDict, Field, SecretStr, field_validator
 PREFIX = "ARENA_"
 DEFAULT_REPO_URL = "https://github.com/JASHD12/forecast-arena"
 
+#: Weather cities -> (DWD station id, station name). Chosen 2026-11-12 for long, continuous
+#: hourly records and a DWD MOSMIX forecast point at the same station (docs/SOURCES.md).
+WEATHER_STATIONS: dict[str, tuple[str, str]] = {
+    "frankfurt": ("01420", "Frankfurt/Main"),
+    "berlin": ("00403", "Berlin-Dahlem (FU)"),
+    "hamburg": ("01975", "Hamburg-Fuhlsbüttel"),
+    "munich": ("01262", "München-Flughafen"),
+}
+
 
 class Settings(BaseModel):
     """All runtime configuration. Field `foo_bar` is read from `ARENA_FOO_BAR`."""

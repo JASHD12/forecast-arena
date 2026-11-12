@@ -144,7 +144,7 @@ Keep the first line of each task in exactly this shape; the status script parses
 
 ## Phase 3 - More domains
 
-- [ ] T040 · Weather sources (deps: T022, T020)
+- [x] T040 · Weather sources (deps: T022, T020)
   - Do: verify and choose the forecast source and the observation source (section 7.2);
     clients, station mapping in config, fixtures, decision recorded.
   - Done when: unit tests pass; `make smoke-sources` fetches a forecast and yesterday's

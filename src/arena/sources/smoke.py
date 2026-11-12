@@ -24,7 +24,36 @@ def check_smard(http: HttpClient) -> str:
     return f"latest complete day {day}, {len(vals)} hourly prices, last {vals[-1]} EUR/MWh"
 
 
-CHECKS: dict[str, Callable[[HttpClient], str]] = {"smard": check_smard}
+def check_weather(http: HttpClient) -> str:
+    """Tomorrow's DWD forecast and yesterday's observations for every city (Bright Sky)."""
+    from arena.config import WEATHER_STATIONS
+    from arena.sources.brightsky import (
+        BERLIN,
+        FORECAST_TYPES,
+        OBSERVATION_TYPES,
+        BrightSkyClient,
+        day_values,
+    )
+
+    client = BrightSkyClient(http)
+    today = SystemClock().now().astimezone(BERLIN).date()
+    parts = []
+    for city, (station, _) in sorted(WEATHER_STATIONS.items()):
+        y, t = today - timedelta(days=1), today + timedelta(days=1)
+        obs = day_values(client.weather(station, y, y).records, y, "temperature",
+                         OBSERVATION_TYPES)  # fmt: skip
+        fc = day_values(client.weather(station, t, t).records, t, "temperature", FORECAST_TYPES)
+        if not obs.present or not fc.present:
+            raise RuntimeError(f"{city}: no observations or no forecast")
+        parts.append(f"{city} obs max {max(obs.present)} ({obs.missing} missing), "
+                     f"fc max {max(fc.present)}")  # fmt: skip
+    return "; ".join(parts)
+
+
+CHECKS: dict[str, Callable[[HttpClient], str]] = {
+    "smard": check_smard,
+    "weather": check_weather,
+}
 
 
 def main(argv: list[str] | None = None) -> int:

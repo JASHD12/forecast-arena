@@ -29,6 +29,7 @@ move older "Done log" lines to `docs/progress-archive.md`.
 
 ## Done log
 
+- 2026-11-12 T040: weather via Bright Sky (DWD obs + MOSMIX), 4 stations, fixtures, smoke
 - 2026-11-12 T029: static site v1 (Home, Methods, Status, About), disclaimer/attribution on every page, light/dark, link check
 - 2026-11-12 T028: scoring v1 (clip, Brier, log, skill vs base_rate, counts), property tests, `arena score show`
 - 2026-11-12 T027: daily morning/resolve jobs (lock enforced, idempotent, error skips, revisions), replay history, 5-day e2e

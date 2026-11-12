@@ -1,0 +1,10 @@
+{
+ "https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/de.wikipedia/all-access/user/Gibt_es_nicht_xyz_123/daily/20261101/20261111": "resp_06.json.gz",
+ "https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/de.wikipedia/all-access/user/Rudolf_H%C3%B6%C3%9F/daily/20260801/20261111": "resp_04.json.gz",
+ "https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/en.wikipedia/all-access/user/AC%2FDC/daily/20261101/20261111": "resp_05.json.gz",
+ "https://wikimedia.org/api/rest_v1/metrics/pageviews/top/de.wikipedia/all-access/2026/11/10": "resp_00.json.gz",
+ "https://wikimedia.org/api/rest_v1/metrics/pageviews/top/de.wikipedia/all-access/2026/11/13": "resp_01.json.gz",
+ "https://wikimedia.org/api/rest_v1/metrics/pageviews/top/en.wikipedia/all-access/2026/11/10": "resp_02.json.gz",
+ "https://wikimedia.org/api/rest_v1/metrics/pageviews/top/en.wikipedia/all-access/2026/11/13": "resp_03.json.gz",
+ "https://www.wikidata.org/w/api.php?action=wbgetentities&sites=dewiki&titles=Ilse+Aigner%7CThe+Zone+of+Interest+%28Film%29%7CRudolf+H%C3%B6%C3%9F%7CGibtsnicht+xyz&props=claims%7Csitelinks&sitefilter=dewiki&format=json": "resp_07.json.gz"
+}

@@ -22,6 +22,12 @@ checked against and the date. Code must not rely on anything that is not in this
 | DWD open data (spatial data and HVD) may be re-used under CC BY 4.0 with the source acknowledged | https://www.dwd.de/EN/service/legal_notice/legal_notice.html | 2026-11-12 | attribution used: "Deutscher Wetterdienst (DWD), via Bright Sky" |
 | Stations (DWD id): Frankfurt/Main 01420, Berlin-Dahlem (FU) 00403, Hamburg-Fuhlsbüttel 01975, München-Flughafen 01262; each has hourly observations since 2010/2011 and a MOSMIX forecast point | https://api.brightsky.dev/sources?dwd_station_id=... | 2026-11-12 | München-Stadt 03379 has no MOSMIX point; Berlin-Tempelhof has a 2022 gap |
 | Open-Meteo free API: non-commercial only, < 10,000 calls/day, 5,000/hour, 600/minute, per IP; data CC BY 4.0 | https://open-meteo.com/en/terms | 2026-11-12 | from this sandbox the shared IP had already exhausted the daily quota (HTTP 429) |
+| Wikimedia top list `https://wikimedia.org/api/rest_v1/metrics/pageviews/top/{project}/all-access/{YYYY}/{MM}/{DD}` returns up to 1000 articles (`article`, `views`, `rank`); 404 before publication | live calls | 2026-11-12 | de list of 11 Nov had 997 entries; lists of 11 Nov were published by 11:30 UTC on 12 Nov |
+| Wikimedia per-article `.../per-article/{project}/all-access/user/{title}/daily/{YYYYMMDD}/{YYYYMMDD}`; title percent-encoded incl. `/` (`AC%2FDC`); 404 when no data | live calls | 2026-11-12 | |
+| Wikimedia API rate limits (new in 2026): 200 req/min for unauthenticated clients with a compliant User-Agent (contact URL or e-mail), 10 req/min unidentified; at most 3 concurrent requests; honour Retry-After on 429/503 | https://www.mediawiki.org/wiki/Wikimedia_APIs/Rate_limits | 2026-11-12 | 429 with `retry-after: 2..11` seen from this shared sandbox IP |
+| Scripts must send an informative User-Agent with contact information | https://foundation.wikimedia.org/wiki/Policy:Wikimedia_Foundation_User-Agent_Policy | 2026-11-12 | ours: `ForecastArena/0.1 (+<repo URL>; <ARENA_CONTACT or repo URL>)` |
+| Wikidata `https://www.wikidata.org/w/api.php?action=wbgetentities&sites=dewiki&titles=a|b&props=claims|sitelinks` gives P31; human = Q5; missing titles are flagged `missing` | live call | 2026-11-12 | up to 50 titles per call |
+| Licence of pageview statistics: **not verified** (the API documentation page renders with JavaScript only) | https://doc.wikimedia.org/generated-data-platform/aqs/analytics-api/ | 2026-11-12 | site attribution names the source without claiming a licence; re-check |
 | `astral-sh/setup-uv` latest is v10.3.3 but moving major tags stop at `v7` | https://github.com/astral-sh/setup-uv (tags) | 2026-11-12 | not used: CI installs with pip from the lock file |
 
 ## Availability rules for historical data
@@ -37,3 +43,5 @@ Filled in per source by T023, T040, T042, T044.
   `arena.sources.brightsky.observation_available_at`.
 - **DWD MOSMIX forecasts**: no history is available through Bright Sky; the morning job
   snapshots the forecast it saw (`snapshots/weather/`), and only snapshots are used later.
+- **Wikimedia pageviews** of UTC day X: available from X+2 00:00 UTC (lists were seen
+  published by midday of X+1). `arena.sources.wikimedia.pageviews_available_at`.

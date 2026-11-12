@@ -153,7 +153,7 @@ Keep the first line of each task in exactly this shape; the status script parses
   - Do: templates and resolver of section 7.2; the morning job stores the forecast values
     it saw under `snapshots/weather/`.
   - Done when: golden tests pass, including a day with missing observations (void).
-- [ ] T042 · Wikimedia pageviews client (deps: T020)
+- [x] T042 · Wikimedia pageviews client (deps: T020)
   - Do: verify section 7.3; top-list and per-article fetch, title encoding, lag handling,
     Wikidata person check; fixtures.
   - Done when: unit tests pass; `make smoke-sources` fetches the latest published top list.

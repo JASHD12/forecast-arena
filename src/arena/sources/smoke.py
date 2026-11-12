@@ -50,7 +50,27 @@ def check_weather(http: HttpClient) -> str:
     return "; ".join(parts)
 
 
+def check_wikimedia(http: HttpClient) -> str:
+    """The latest published top list of each project (looking back up to four days)."""
+    from arena.sources.wikimedia import WikimediaClient
+
+    client = WikimediaClient(http)
+    today = SystemClock().now().date()
+    parts = []
+    for project in ("de.wikipedia", "en.wikipedia"):
+        for back in range(1, 5):
+            day = today - timedelta(days=back)
+            arts = client.top(project, day)
+            if arts:
+                parts.append(f"{project} {day}: {len(arts)} articles, #5 {arts[4].article}")
+                break
+        else:
+            raise RuntimeError(f"{project}: no top list in the last four days")
+    return "; ".join(parts)
+
+
 CHECKS: dict[str, Callable[[HttpClient], str]] = {
+    "wikimedia": check_wikimedia,
     "smard": check_smard,
     "weather": check_weather,
 }

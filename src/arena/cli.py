@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import sys
 from dataclasses import dataclass
-from datetime import date
+from datetime import date, timedelta
 from pathlib import Path
 
 import click
@@ -279,6 +279,54 @@ def daily_resolve(obj: Ctx, push: bool) -> None:
 @main.group()
 def report() -> None:
     """Reports computed from the public record."""
+
+
+@report.command("backtest-power")
+@click.option("--first", type=click.DateTime(["%Y-%m-%d"]), required=True)
+@click.option("--last", type=click.DateTime(["%Y-%m-%d"]), required=True)
+@click.option("--out", "out_dir", type=click.Path(path_type=Path), default=Path("backtests"))
+@click.option(
+    "--card",
+    type=click.Path(path_type=Path),
+    default=None,
+    help="Also write the model card (Markdown) here.",
+)
+@click.pass_obj
+def report_backtest_power(
+    obj: Ctx, first: object, last: object, out_dir: Path, card: Path | None
+) -> None:
+    """Walk-forward power backtest from the SMARD cache (ARENA_CACHE_DIR); labelled backtest."""
+    from arena.backtest import power as bt
+    from arena.backtest.harness import BacktestStore
+    from arena.backtest.report import markdown
+    from arena.domains.power import PowerDomain
+    from arena.domains.power_history import HISTORY_START, PRICE_KEY, PowerHistory
+    from arena.sources.http import HttpClient
+    from arena.sources.smard import SmardClient
+
+    f, la = first.date(), last.date()  # type: ignore[attr-defined]
+    client = SmardClient(HttpClient(obj.settings.user_agent()), cache_dir=obj.settings.cache_dir)
+    store = PowerHistory(client).store([PRICE_KEY], HISTORY_START, la + timedelta(days=2))
+    run_id = f"power-{f.isoformat()}-{la.isoformat()}-{obj.clock.now():%Y%m%dT%H%M}"
+    res = bt.run(PowerDomain(store), f, la, run_id=run_id)
+    text = markdown(
+        f"Power backtest {f} to {la}",
+        res.records,
+        ["base_rate", "persistence", "ml"],
+        [("ml", "base_rate"), ("ml", "persistence"), ("persistence", "base_rate")],
+        bt.NOTES,
+    )
+    path = BacktestStore(out_dir).write(
+        run_id, res.records, {"domain": "power", "first": f, "last": la}
+    )
+    (path / "report.md").write_text(text, encoding="utf-8")
+    click.echo(text)
+    if card is not None:
+        from arena.backtest.cards import power_card
+
+        card.parent.mkdir(parents=True, exist_ok=True)
+        card.write_text(power_card(text, run_id), encoding="utf-8")
+        click.echo(f"model card written: {card}")
 
 
 @report.command("cv")

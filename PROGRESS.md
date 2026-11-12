@@ -12,7 +12,8 @@ move older "Done log" lines to `docs/progress-archive.md`.
 
 ## In progress
 
-(nothing yet)
+- T051 power model: quantile GBM + Platt calibration written and tested; year-long
+  backtest (2025-11-01..2026-10-31) running to produce the report and model card.
 
 ## Open risks and surprises
 
@@ -29,6 +30,7 @@ move older "Done log" lines to `docs/progress-archive.md`.
 
 ## Done log
 
+- 2026-11-12 T060: LLM client protocol, FakeLLM, Anthropic (SDK) and OpenAI-compatible adapters, mocked tests
 - 2026-11-12 T050: walk-forward backtest harness, labelled store outside the ledger, refusal test
 - 2026-11-12 T045: markets questions (absmove_gt, up), publication-day rules, resolver; all 4 domains dry-run live (26 q)
 - 2026-11-12 T044: ECB reference-rate client, TARGET calendar verified against 8 years of data, smoke

@@ -297,6 +297,16 @@ class PowerDomain:
         }
 
     # ----- resolution --------------------------------------------------------------
+    def all_days(self) -> dict[date, list[float]]:
+        """Every complete Berlin day in the store, ignoring availability stamps.
+
+        Only for training on days strictly before a cut-off and for resolution."""
+        if self._all is None or self._all[0] != self.store.version:
+            far = datetime.max.replace(tzinfo=UTC)
+            pts = [Point(o.observed_at, o.value) for o in self.store.series(PRICE_KEY, far)]
+            self._all = (self.store.version, daily_series(pts))
+        return self._all[1]
+
     def observed(self, day: date) -> list[float] | None:
         """All hourly prices of Berlin day `day` that were fetched, or None if incomplete.
 

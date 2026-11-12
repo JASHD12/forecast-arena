@@ -3,6 +3,8 @@ VENV ?= .venv
 PY ?= $(if $(wildcard $(VENV)/bin/python),$(VENV)/bin/python,python3)
 RUFF ?= $(shell $(PY) -m ruff --version >/dev/null 2>&1 && echo '$(PY) -m ruff' || echo ruff)
 export PYTHONPATH := src
+# One OpenMP thread: deterministic model fits and no oversubscription in parallel jobs.
+export OMP_NUM_THREADS ?= 1
 
 .PHONY: setup setup-offline lint test e2e check status smoke-sources schemas
 

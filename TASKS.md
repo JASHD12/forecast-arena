@@ -67,7 +67,7 @@ Keep the first line of each task in exactly this shape; the status script parses
 
 ## Phase 2 - Power domain, baselines, first live day
 
-- [ ] T020 · HTTP layer (deps: T003)
+- [x] T020 · HTTP layer (deps: T003)
   - Do: shared HTTP client: timeouts, retries with backoff, identifying User-Agent (from
     `ARENA_CONTACT`, else the repository URL), optional response snapshot to disk.
   - Done when: tests with a mocked transport cover retry, timeout and User-Agent.

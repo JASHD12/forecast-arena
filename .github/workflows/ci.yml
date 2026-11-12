@@ -48,3 +48,14 @@ jobs:
           npx playwright install --with-deps chromium
       - name: Accessibility lint (fails on serious or critical issues)
         run: make a11y
+
+  docker:
+    needs: check
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      - name: Build the reproducibility image (not pushed anywhere)
+        run: docker build -t forecast-arena:ci .
+      - name: Run the offline end-to-end test in the container
+        run: docker run --rm --network none forecast-arena:ci

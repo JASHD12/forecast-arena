@@ -288,7 +288,7 @@ Keep the first line of each task in exactly this shape; the status script parses
   - Do: export MLflow run summaries to a page linked from Status; record in `DECISIONS.md`
     whether a remote tracking server is worth a human item (default: no).
   - Done when: the page lists at least the fixture runs.
-- [ ] T083 · Dockerfile (deps: T027)
+- [!] T083 · Dockerfile (deps: T027) BLOCKED(needs H10)
   - Do: image that runs `make e2e`; CI builds it (no registry push).
   - Done when: `docker build` and the containerised e2e succeed in CI.
 - [ ] T084 · Dependency hygiene (deps: T002)

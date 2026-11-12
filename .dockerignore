@@ -1,0 +1,10 @@
+.venv
+.git
+data_cache
+_ledger
+_site_e2e
+site
+backtests
+mlruns
+tools/a11y/node_modules
+**/__pycache__

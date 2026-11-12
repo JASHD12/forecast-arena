@@ -16,6 +16,7 @@ Verified on 2026-11-12 (docs/SOURCES.md):
 
 from __future__ import annotations
 
+import hashlib
 import json
 import urllib.parse
 from collections.abc import Iterable, Sequence
@@ -108,8 +109,13 @@ def instance_of(payload: object) -> dict[str, set[str] | None]:
 class WikimediaClient:
     """Pageviews (with an on-disk cache for published top lists) and the person check."""
 
-    def __init__(self, http: HttpClient, cache_dir: Path | None = None,
-                 base: str = BASE, wikidata: str = WIKIDATA_API) -> None:  # fmt: skip
+    def __init__(
+        self,
+        http: HttpClient,
+        cache_dir: Path | None = None,
+        base: str = BASE,
+        wikidata: str = WIKIDATA_API,
+    ) -> None:
         self.http = http
         self.cache_dir = cache_dir
         self.base = base.rstrip("/")
@@ -151,25 +157,54 @@ class WikimediaClient:
 
     def per_article_url(self, project: str, title: str, first: date, last: date) -> str:
         """URL of a daily per-article series."""
-        return (f"{self.base}/metrics/pageviews/per-article/{project}/{ACCESS}/{AGENT}/"
-                f"{encode_title(title)}/daily/{first:%Y%m%d}/{last:%Y%m%d}")  # fmt: skip
+        return (
+            f"{self.base}/metrics/pageviews/per-article/{project}/{ACCESS}/{AGENT}/"
+            f"{encode_title(title)}/daily/{first:%Y%m%d}/{last:%Y%m%d}"
+        )
 
-    def per_article(self, project: str, title: str, first: date, last: date
-                    ) -> tuple[str, str, dict[date, int]]:  # fmt: skip
+    def per_article(
+        self, project: str, title: str, first: date, last: date
+    ) -> tuple[str, str, dict[date, int]]:
         """(url, sha256, {day: views}); an empty dict when the API has no data (404)."""
         url = self.per_article_url(project, title, first, last)
+        cache = self._article_cache(url)
+        if cache is not None and cache.exists():
+            rec = json.loads(cache.read_text(encoding="utf-8"))
+            return url, rec["sha256"], {date.fromisoformat(k): v for k, v in rec["views"].items()}
         try:
             resp = self.http.get(url)
         except HttpError as exc:
             if exc.status == 404:
                 return url, "0" * 64, {}
             raise
-        return url, resp.sha256, parse_per_article(resp.json())
+        series = parse_per_article(resp.json())
+        if cache is not None and last in series:  # the whole range is published: keep it
+            cache.parent.mkdir(parents=True, exist_ok=True)
+            body = {"sha256": resp.sha256, "views": {d.isoformat(): v for d, v in series.items()}}
+            tmp = cache.with_suffix(".tmp")
+            tmp.write_text(json.dumps(body, sort_keys=True), encoding="utf-8")
+            tmp.replace(cache)
+        return url, resp.sha256, series
+
+    def _article_cache(self, url: str) -> Path | None:
+        if self.cache_dir is None:
+            return None
+        key = hashlib.sha256(url.encode()).hexdigest()[:24]
+        return self.cache_dir / "wikimedia" / "article" / f"{key}.json"
 
     def instance_of(self, project: str, titles: Sequence[str]) -> dict[str, set[str] | None]:
         """P31 ids per title (spaces as separators); titles not found map to None."""
         site = SITE_IDS[project]
         out: dict[str, set[str] | None] = {}
+        known = self._p31_load(project)
+        todo = []
+        for t in titles:
+            k = t.replace("_", " ")
+            if k in known:
+                out[k] = None if known[k] is None else set(known[k])
+            else:
+                todo.append(t)
+        titles = todo
         for i in range(0, len(titles), WIKIDATA_BATCH):
             batch = [t.replace("_", " ") for t in titles[i : i + WIKIDATA_BATCH]]
             params = {
@@ -180,8 +215,33 @@ class WikimediaClient:
                 "sitefilter": site,
                 "format": "json",
             }
-            out.update(instance_of(self.http.get(self.wikidata, params).json()))
+            got = instance_of(self.http.get(self.wikidata, params).json())
+            out.update(got)
+            self._p31_save(project, got)
         return out
+
+    def _p31_path(self, project: str) -> Path | None:
+        if self.cache_dir is None:
+            return None
+        return self.cache_dir / "wikimedia" / "p31" / f"{project}.json"
+
+    def _p31_load(self, project: str) -> dict[str, list[str] | None]:
+        path = self._p31_path(project)
+        if path is None or not path.exists():
+            return {}
+        return dict(json.loads(path.read_text(encoding="utf-8")))
+
+    def _p31_save(self, project: str, got: dict[str, set[str] | None]) -> None:
+        """Remember lookups that found an item (a missing title is retried next time)."""
+        path = self._p31_path(project)
+        if path is None:
+            return
+        known = self._p31_load(project)
+        known.update({k: sorted(v) for k, v in got.items() if v is not None})
+        path.parent.mkdir(parents=True, exist_ok=True)
+        tmp = path.with_suffix(".tmp")
+        tmp.write_text(json.dumps(known, sort_keys=True), encoding="utf-8")
+        tmp.replace(path)
 
 
 def person_titles(titles: Iterable[str], p31: dict[str, set[str] | None]) -> set[str]:

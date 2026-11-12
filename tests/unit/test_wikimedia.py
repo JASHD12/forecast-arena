@@ -65,3 +65,17 @@ def test_availability_rule() -> None:
 def test_malformed(fn) -> None:
     with pytest.raises(WikimediaError):
         fn({"nope": 1})
+
+
+def test_article_series_and_p31_are_cached(tmp_path) -> None:
+    client, transport = fixture_client(cache_dir=tmp_path)
+    args = ("de.wikipedia", "Rudolf_Höß", date(2026, 8, 1), date(2026, 11, 11))
+    first = client.per_article(*args)
+    n = len(transport.urls)
+    assert client.per_article(*args) == first and len(transport.urls) == n
+    titles = ["Ilse_Aigner", "The_Zone_of_Interest_(Film)", "Rudolf_Höß", "Gibtsnicht_xyz"]
+    a = client.instance_of("de.wikipedia", titles)
+    n = len(transport.urls)
+    b = client.instance_of("de.wikipedia", titles[:3])
+    assert len(transport.urls) == n  # all three found titles came from the cache
+    assert {k: a[k] for k in b} == b

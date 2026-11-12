@@ -42,6 +42,9 @@ move older "Done log" lines to `docs/progress-archive.md`.
 
 ## Done log
 
+- 2026-11-12 T082: experiments page from weekly summaries; no remote tracking server (DECISIONS)
+- 2026-11-12 T081: Evidently drift metrics in weekly summaries (fixture test green in CI), HTML as artifact
+- 2026-11-12 T056: weekly dry-run dispatch 43277710606 green; printed decisions (attention 0.1089 n=224, power 0.1418 n=168)
 - 2026-11-12 T084a: pip-audit CI job (no known vulnerabilities) and deps workflow green (runs 43263903360, 43263909444)
 - 2026-11-12 H10 fixed by the owner (Actions budget + billing lock); CI run 43256050346 attempt 4 green: check, a11y, docker
 - 2026-11-12 T083: Docker build + containerised e2e green in CI

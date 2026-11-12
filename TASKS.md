@@ -199,7 +199,7 @@ Keep the first line of each task in exactly this shape; the status script parses
   - Do: versioned artefacts with metadata under `models/` on the ledger; loading by
     version; `model_missing` skip when absent.
   - Done when: tests cover load, missing model and version reporting.
-- [!] T056 · Weekly retraining workflow (live) (deps: T055, T052, T053, T054) BLOCKED(needs H10)
+- [x] T056 · Weekly retraining workflow (live) (deps: T055, T052, T053, T054)
   - Do: `weekly.yml` per section 12: retrain, compare, promote by rule, model card, MLflow
     file-backed run with a published summary.
   - Done when: a `dry_run=true` dispatch succeeds and prints the promotion decision.
@@ -280,11 +280,11 @@ Keep the first line of each task in exactly this shape; the status script parses
 - [ ] T080 · Status page (deps: T072, T033)
   - Do: last runs, missed days, voids, parse failures, LLM usage, source freshness.
   - Done when: the page builds from the e2e ledger with all panels populated.
-- [ ] T081 · Drift monitoring (deps: T056)
+- [x] T081 · Drift monitoring (deps: T056)
   - Do: weekly Evidently report (feature drift, prediction drift, performance over time)
     published under the Status page.
   - Done when: the weekly dry run produces the report from fixture data.
-- [ ] T082 · Experiment summary (deps: T056)
+- [x] T082 · Experiment summary (deps: T056)
   - Do: export MLflow run summaries to a page linked from Status; record in `DECISIONS.md`
     whether a remote tracking server is worth a human item (default: no).
   - Done when: the page lists at least the fixture runs.

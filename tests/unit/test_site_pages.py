@@ -137,3 +137,29 @@ def test_stack_page_reads_versions_from_environment_and_ledger(tmp_path) -> None
             "model": "claude-opus-5-5",
         }
     ]
+
+
+def test_home_race_spotlight_and_honest_ml_status(tmp_path) -> None:
+    from types import SimpleNamespace
+
+    from arena.site.build import featured_row, race_data
+    from arena.site.charts import race_svg
+
+    _, res = _site(tmp_path)
+    home = (res.out_dir / "index.html").read_text()
+    assert "Biggest disagreement today" in home and "joining soon" in home
+    rows = [{"pn": {"a": 0.1, "b": 0.9}, "q": 1}, {"pn": {"a": 0.5, "b": 0.6}, "q": 2}]
+    assert featured_row(rows)["q"] == 1 and featured_row([]) is None
+    d = datetime(2026, 11, 1, tzinfo=UTC).date()
+    sc = [
+        SimpleNamespace(question_id=q, forecaster_id=f, batch_date=d, probability=p, outcome=1)
+        for q in ("q1", "q2")
+        for f, p in (("base_rate", 0.5), ("ml", 0.9))
+    ] + [SimpleNamespace(question_id="q3", forecaster_id="ml", batch_date=d, probability=0.1,
+                         outcome=1)]  # fmt: skip
+    r = race_data(sc)
+    assert r["n"] == 2  # q3 is not in the common set
+    assert r["series"]["base_rate"] == [("2026-11-01", 0.25)]
+    assert abs(r["series"]["ml"][0][1] - 0.01) < 1e-12
+    svg = race_svg(r["series"], {"ml": "ML model"}, r["days"])
+    assert "<title>ML model: 0.010 after 2026-11-01</title>" in svg and "coin flip" in svg

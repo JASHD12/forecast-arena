@@ -30,9 +30,9 @@ from arena.scoring.boards import all_boards, official
 from arena.scoring.core import Scored, clip, counts, load
 from arena.scoring.findings import findings
 from arena.scoring.stats import calibration_bins, expected_calibration_error, murphy
-from arena.site.charts import reliability_svg
+from arena.site.charts import race_svg, reliability_svg, series_class
 from arena.site.methods_content import LIMITATIONS, PRINCIPLES
-from arena.site.titles import domain_name, forecaster_name, plain_title
+from arena.site.titles import FORECASTER_NAMES, domain_name, forecaster_name, plain_title
 from arena.sources.brightsky import ATTRIBUTION as WX_ATTRIBUTION
 from arena.sources.brightsky import LICENCE as WX_LICENCE
 from arena.sources.ecb import ATTRIBUTION as ECB_ATTRIBUTION
@@ -146,11 +146,61 @@ def _env() -> Environment:
         dname=domain_name,
         qhref=question_href,
         is_ai=lambda fid: fid in AI_FORECASTERS,
+        race_svg=race_svg,
+        series_class=series_class,
+        all_names=FORECASTER_NAMES,
     )
     return env
 
 
 AI_FORECASTERS = frozenset({"llm_plain", "llm_context", "agent"})
+
+
+def race_data(scored: Sequence[Scored]) -> dict[str, Any]:
+    """Cumulative mean (clipped) Brier score per forecaster after each batch day, on the
+    questions every plotted forecaster answered (a fair, like-for-like race). Display only;
+    the leaderboards with intervals come from `arena.scoring`."""
+    by_q: dict[str, dict[str, Scored]] = {}
+    for s in scored:
+        by_q.setdefault(s.question_id, {})[s.forecaster_id] = s
+    fids = sorted({s.forecaster_id for s in scored})
+    common = [q for q, m in by_q.items() if all(f in m for f in fids)]
+    if len(fids) < 2 or not common:
+        return {"days": [], "series": {}, "n": 0, "fids": fids}
+    days = sorted({by_q[q][fids[0]].batch_date for q in common})
+    series: dict[str, list[tuple[str, float]]] = {f: [] for f in fids}
+    for f in fids:
+        tot, cnt = 0.0, 0
+        for d in days:
+            for q in common:
+                s = by_q[q][f]
+                if s.batch_date == d:
+                    tot += (clip(s.probability) - s.outcome) ** 2
+                    cnt += 1
+            series[f].append((d.isoformat(), tot / cnt))
+    return {"days": [d.isoformat() for d in days], "series": series, "n": len(common),
+            "fids": fids}  # fmt: skip
+
+
+def featured_row(rows: Sequence[dict[str, Any]]) -> dict[str, Any] | None:
+    """The latest question on which the forecasters disagree most (display only)."""
+    best, spread = None, -1.0
+    for r in rows:
+        ps = list(r["pn"].values())
+        if len(ps) >= 2 and max(ps) - min(ps) > spread:
+            best, spread = r, max(ps) - min(ps)
+    return None if best is None else {**best, "spread": spread}
+
+
+def domain_stats(rec: Any) -> list[dict[str, Any]]:
+    """Questions and resolved questions per domain."""
+    out: dict[str, dict[str, Any]] = {}
+    for q in rec.questions.values():
+        d = out.setdefault(q.domain, {"domain": q.domain, "questions": 0, "resolved": 0})
+        d["questions"] += 1
+        if q.question_id in rec.resolutions:
+            d["resolved"] += 1
+    return [out[k] for k in sorted(out)]
 
 
 def question_scores(forecasts: Sequence[Any], outcome: int | None) -> list[dict[str, Any]]:
@@ -339,6 +389,12 @@ def build_site(
         "index.html": (
             "Home",
             {
+                "race": race_data(off if off else rehearsal),
+                "race_scope": "official record" if off else "rehearsal days",
+                "featured": featured_row(latest),
+                "topics": domain_stats(rec),
+                "forecast_count": len(rec.forecasts),
+                "ml_live": any(f.forecaster_id == "ml" for f in rec.forecasts),
                 "days_live": len(batches),
                 "counts": counts(rec),
                 "verify_ok": rep.ok,

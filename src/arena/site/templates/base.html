@@ -25,8 +25,8 @@
 {% for href, name in nav %}<li><a href="{{ root }}{{ href }}"{% if href == page %} aria-current="page"{% endif %}>{{ name }}</a></li>
 {% endfor %}</ul></nav>
 </div></header>
-{% if not official_start %}<aside class="banner" aria-label="Rehearsal notice"><div class="wrap"><strong>Rehearsal.</strong>
-The official record has not started yet. It starts the day after the first run of five consecutive clean days; rehearsal days are shown but excluded from headline scores.</div></aside>{% endif %}
+{% if not official_start %}<aside class="banner" aria-label="Rehearsal notice"><div class="wrap"><strong>Rehearsal phase.</strong>
+The official record starts automatically after five clean days in a row; until then results are shown but don't count towards headline scores.</div></aside>{% endif %}
 <main id="main"><div class="wrap">
 {% block content %}{% endblock %}
 </div></main>

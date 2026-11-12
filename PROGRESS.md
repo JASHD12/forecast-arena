@@ -5,9 +5,8 @@ move older "Done log" lines to `docs/progress-archive.md`.
 
 ## Now
 
-- Phase: all agent-reachable work is done through Phase 9 except T053 (attention
-  backtest running). Everything live waits on the human: H10 (Actions jobs never get a
-  runner), H03 (Pages), H04 (LLM key), H06 (panel).
+- Phase: all agent-reachable work is done (OPEN_AGENT_TASKS=0). Everything live waits on
+  the human: H10 (Actions jobs never get a runner), H03 (Pages), H04 (LLM key), H06 (panel).
 - Rehearsal start date: (not yet live)
 - Official record start date: (not yet set, see SPEC 2.9)
 - Live site URL: (not yet deployed)
@@ -43,6 +42,7 @@ move older "Done log" lines to `docs/progress-archive.md`.
 
 ## Done log
 
+- 2026-11-12 T053: attention ml (top-list trajectory GBM); backtest 24 days: Brier 0.110 vs 0.250 (YES rate 0.50), interval excludes 0
 - 2026-11-12 T056 (work done, blocked on H10): weekly job + weekly.yml; live dry run: power candidate Brier 0.1418 on 168 questions, would promote
 - 2026-11-12 T083 (work done, blocked on H10): Dockerfile + CI build/run job; install+check verified on Python 3.12 (no Docker daemon here)
 - 2026-11-12 T103: 90-second demo script (docs/DEMO.md)

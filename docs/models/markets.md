@@ -19,6 +19,7 @@ choices fixed before any live resolution, not tuned on the record.
 **BACKTEST** (not part of the live record).
 
 Batches 2024-11-01 to 2026-10-30 (509 batch days).
+Observed YES rate on scored questions: 0.499 (a constant forecast of that rate would score Brier 0.2500).
 
 | Forecaster | n | Brier | 95% interval | Log score |
 |---|---|---|---|---|

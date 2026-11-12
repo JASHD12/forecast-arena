@@ -80,6 +80,13 @@ def markdown(
     lines = [f"# {title}", "", "**BACKTEST** (not part of the live record).", ""]
     if days:
         lines.append(f"Batches {days[0]} to {days[-1]} ({len(days)} batch days).")
+    by_q = {r.question_id: r.outcome for r in records if r.outcome is not None}
+    if by_q:
+        rate = sum(by_q.values()) / len(by_q)
+        lines.append(
+            f"Observed YES rate on scored questions: {rate:.3f} (a constant forecast of "
+            f"that rate would score Brier {rate * (1 - rate):.4f})."
+        )
     lines += ["", "| Forecaster | n | Brier | 95% interval | Log score |", "|---|---|---|---|---|"]
     for r in rows:
         lines.append(

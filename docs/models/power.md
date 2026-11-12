@@ -23,6 +23,7 @@ not it beats the baselines; the backtest says which.
 **BACKTEST** (not part of the live record).
 
 Batches 2025-11-01 to 2026-10-31 (365 batch days).
+Observed YES rate on scored questions: 0.483 (a constant forecast of that rate would score Brier 0.2497).
 
 | Forecaster | n | Brier | 95% interval | Log score |
 |---|---|---|---|---|

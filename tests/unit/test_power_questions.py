@@ -38,7 +38,12 @@ def test_deterministic_and_complete() -> None:
     asof = datetime.combine(batch, time(5, 30), tzinfo=UTC)
     qs = fixture_domain().generate_questions(batch, asof)
     assert {q.template for q in qs} == {
-        "mean_gt", "max_gt", "min_lt", "spread_gt", "evening_gt", "up_vs_today"
+        "mean_gt",
+        "max_gt",
+        "min_lt",
+        "spread_gt",
+        "evening_gt",
+        "up_vs_today",
     }
     for q in qs:
         assert q.target_date == date(2026, 11, 12)

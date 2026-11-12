@@ -19,6 +19,7 @@ from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from datetime import UTC, date, datetime, time, timedelta
 from decimal import ROUND_HALF_UP, Decimal
+from itertools import pairwise
 from typing import Any
 
 from arena.domains.base import AsOfStore, is_degenerate, trailing_frequency
@@ -222,7 +223,7 @@ class PowerDomain:
             return []
         ref = stats[batch_date]["mean"]
         window = ordered[-(UP_WINDOW + 1) :]
-        ups = [int(stats[b]["mean"] > stats[a]["mean"]) for a, b in zip(window, window[1:])
+        ups = [int(stats[b]["mean"] > stats[a]["mean"]) for a, b in pairwise(window)
                if b - a == timedelta(days=1)]  # fmt: skip
         freq = trailing_frequency(ups)
         if is_degenerate(freq):
@@ -231,8 +232,10 @@ class PowerDomain:
         text = (f"Will the daily mean German/Luxembourg day-ahead electricity price for "
                 f"{_fmt_day(target)} (Europe/Berlin delivery day) be higher than the daily "
                 f"mean for {_fmt_day(batch_date)}, which was {_num(ref)} {UNIT}?")  # fmt: skip
-        rule = ("Arithmetic mean of all hourly prices of D compared with the published mean "
-                "of B stored in params.reference_mean; YES if strictly greater.")
+        rule = (
+            "Arithmetic mean of all hourly prices of D compared with the published mean "
+            "of B stored in params.reference_mean; YES if strictly greater."
+        )
         return [self._question(batch_date, target, created, lock, "up_vs_today", text,
                                rule + COMMON_RULE, None, "gt",
                                {"stat": "mean", "reference_day": batch_date.isoformat(),

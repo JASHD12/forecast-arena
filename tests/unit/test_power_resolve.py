@@ -57,7 +57,7 @@ def _store_missing_hour(day: date) -> AsOfStore:
 
 
 def test_missing_hours_wait_then_void() -> None:
-    dom, qs = questions(date(2026, 11, 11))
+    _, qs = questions(date(2026, 11, 11))
     q = qs["mean_gt"]
     broken = PowerDomain(_store_missing_hour(q.target_date))
     assert broken.resolve(q, q.resolve_after + timedelta(hours=1)) is None
@@ -66,7 +66,7 @@ def test_missing_hours_wait_then_void() -> None:
 
 
 def test_ties_are_not_yes() -> None:
-    dom, qs = questions(date(2026, 11, 11))
+    _, qs = questions(date(2026, 11, 11))
     q = qs["mean_gt"]
     store = AsOfStore()
     for h in berlin_day_hours(q.target_date):

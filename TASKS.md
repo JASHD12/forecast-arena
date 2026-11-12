@@ -323,7 +323,7 @@ Keep the first line of each task in exactly this shape; the status script parses
   - Do: what it is, live link, architecture diagram, how it works, how to reproduce, data
     attribution, limitations, how it was built.
   - Done when: a newcomer can run `make setup && make check` from the README alone.
-- [ ] T101 · CV numbers report (deps: T071)
+- [x] T101 · CV numbers report (deps: T071)
   - Do: `arena report cv` prints days live, resolved forecasts and headline scores with
     intervals from the ledger only.
   - Done when: a test shows it refuses to print a comparison labelled "too early to tell"

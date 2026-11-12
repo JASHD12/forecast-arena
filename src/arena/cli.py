@@ -421,9 +421,13 @@ def report_backtest_attention(
 
 
 @report.command("cv")
-def report_cv() -> None:
-    """Headline numbers for a CV, from the ledger only (built in T101)."""
-    _not_yet("T101")
+@click.pass_obj
+def report_cv(obj: Ctx) -> None:
+    """Headline numbers for a CV, from the ledger only."""
+    from arena.scoring.cv import cv_lines
+
+    for line in cv_lines(obj.ledger):
+        click.echo(line)
 
 
 if __name__ == "__main__":

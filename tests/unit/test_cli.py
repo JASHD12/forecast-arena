@@ -41,6 +41,6 @@ def test_seal_list_and_verify(tmp_path: Path) -> None:
     assert bad.exit_code == 1 and "FAIL" in bad.output
 
 
-def test_unbuilt_commands_say_so() -> None:
-    res = CliRunner().invoke(main, ["report", "cv"])
-    assert res.exit_code == 2
+def test_cv_report_on_an_empty_ledger() -> None:
+    res = CliRunner().invoke(main, ["--ledger-dir", "/nonexistent-ledger", "report", "cv"])
+    assert res.exit_code == 0 and "too early to tell" in res.output

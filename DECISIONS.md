@@ -72,7 +72,19 @@ Alternatives: pandas (heavy dependency for little gain at this size; may be reco
 the ML tasks, with its own DECISIONS entry).
 Made by: agent
 
-## Proposals for the human
+## 2026-11-12 - Power templates: interpretation of SPEC 7.1
+Context: SPEC 7.1 leaves rounding, percentile method, the evening block and window end open.
+Decision: thresholds rounded half-up to whole EUR/MWh; daily statistics rounded half-up to
+two decimals (SMARD precision) before strict comparison; percentiles by linear interpolation
+(type 7); `evening_gt` = mean of the hours starting 17, 18, 19 Berlin; windows end at the
+latest complete day available at the creation time (normally B); a template is skipped
+(and logged) if its window has under 90% of its days or data is older than B-2; entity
+`DE_LU` (the id pattern forbids hyphens). Degeneracy frequency = share of window days whose
+statistic meets the threshold (for `up_vs_today`, share of day-on-day rises over 60 days).
+Resolution reads every fetched value (they exist), not the conservative availability stamps.
+Alternatives: thresholds to 0.1 EUR/MWh (false precision); nearest-rank percentiles.
+Made by: agent
+
 
 Ideas outside the specification. The agent lists them here and does not build them.
 

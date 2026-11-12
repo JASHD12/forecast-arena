@@ -85,7 +85,7 @@ Keep the first line of each task in exactly this shape; the status script parses
   - Do: fetch trailing windows for daily jobs; a full-history backfill into a git-ignored
     cache for training; conservative availability rules documented in `docs/SOURCES.md`.
   - Done when: backfill completes and prints a summary; cache is not tracked by git.
-- [ ] T024 · Power question templates (deps: T023)
+- [x] T024 · Power question templates (deps: T023)
   - Do: the six templates of section 7.1 with thresholds, ids, texts and params.
   - Done when: golden tests on fixed fixture dates (ordinary day, both clock-change days,
     a holiday) match; generation is deterministic.

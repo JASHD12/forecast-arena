@@ -1,0 +1,57 @@
+:root {
+  --bg: #ffffff; --fg: #1b1f24; --muted: #57606a; --line: #d0d7de;
+  --accent: #0b5cad; --banner: #fff4ce; --yes: #116329; --no: #9a2b19; --card: #f6f8fa;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0d1117; --fg: #e6edf3; --muted: #9da7b3; --line: #30363d;
+    --accent: #6cb6ff; --banner: #3b2e0a; --yes: #56d364; --no: #ff8e7a; --card: #161b22;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg);
+  font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+a { color: var(--accent); }
+a:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.wrap { max-width: 64rem; margin: 0 auto; padding: 0 1rem; }
+header { border-bottom: 1px solid var(--line); }
+header .wrap { display: flex; flex-wrap: wrap; gap: .5rem 1.25rem; align-items: baseline;
+  padding: .75rem 1rem; }
+header .brand { font-weight: 700; font-size: 1.15rem; text-decoration: none; color: var(--fg); }
+nav ul { display: flex; flex-wrap: wrap; gap: .25rem 1rem; list-style: none; margin: 0; padding: 0; }
+nav a[aria-current="page"] { font-weight: 700; text-decoration: none; }
+.banner { background: var(--banner); padding: .6rem 1rem; border-bottom: 1px solid var(--line); }
+main { padding: 1rem 0 2rem; }
+h1 { font-size: 1.6rem; margin: .5rem 0 1rem; }
+h2 { font-size: 1.25rem; margin: 2rem 0 .5rem; }
+.muted, .note { color: var(--muted); font-size: .9rem; }
+.table-scroll { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: .4rem .5rem; border-bottom: 1px solid var(--line);
+  vertical-align: top; }
+th { font-weight: 600; }
+td.num, th.num { text-align: right; white-space: nowrap; }
+.yes { color: var(--yes); font-weight: 600; }
+.no { color: var(--no); font-weight: 600; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: .75rem; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 6px; padding: .75rem; }
+.card .big { font-size: 1.4rem; font-weight: 700; display: block; }
+.label { display: inline-block; border: 1px solid var(--line); border-radius: 4px;
+  padding: 0 .4rem; font-size: .85rem; }
+footer { border-top: 1px solid var(--line); padding: 1rem 0 2rem; font-size: .9rem;
+  color: var(--muted); }
+.skip { position: absolute; left: -999px; top: 0; background: var(--bg); padding: .5rem; }
+.skip:focus { left: 0; }
+caption { text-align: left; caption-side: top; padding-bottom: .4rem; }
+.qtable td:first-child { min-width: 15rem; }
+.kv td { overflow-wrap: anywhere; }
+.kv th { white-space: nowrap; }
+.chart { width: 100%; max-width: 280px; height: auto; display: block; }
+.chart .grid { stroke: var(--line); stroke-width: 1; }
+.chart .ideal { stroke: var(--muted); stroke-width: 1.5; stroke-dasharray: 4 4; }
+.chart .series { fill: none; stroke: var(--accent); stroke-width: 2; stroke-linejoin: round; }
+.chart .mark { fill: var(--accent); stroke: var(--bg); stroke-width: 2; }
+.chart .tick, .chart .axis { fill: var(--muted); font-size: 10px; }
+.grid-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); gap: 1rem; }
+.rationale { border-left: 3px solid var(--line); padding-left: .75rem; }
+.board td:last-child { min-width: 13rem; }

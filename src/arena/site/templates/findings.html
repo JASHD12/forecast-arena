@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Findings</h1>
+<p>The four hypotheses below were stated before any data was collected and are shown unchanged. The statements under each are generated from the official record's scores: a hypothesis is called supported or contradicted only when the relevant paired difference has a 95% interval that excludes zero. No causal claims are made. Any of them may turn out false; this page reports whichever way it falls.</p>
+{% for f in findings %}
+<section aria-labelledby="h-{{ f.key }}">
+<h2 id="h-{{ f.key }}">{{ f.key }}: <span class="label">{{ f.status }}</span></h2>
+<p><strong>{{ f.text }}</strong></p>
+{% if f.comparisons %}<ul>{% for c in f.comparisons %}<li>{{ c.sentence() }}</li>{% endfor %}</ul>{% endif %}
+{% if f.note %}<p class="note">{{ f.note }}</p>{% endif %}
+</section>
+{% endfor %}
+<h2>The project owner's interpretation</h2>
+{% if human %}{{ human }}{% else %}<p class="muted">The project owner will write their own interpretation here after at least 30 official days.</p>{% endif %}
+{% endblock %}

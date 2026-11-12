@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>{{ title }} - Forecast Arena</title>
+<link rel="stylesheet" href="{{ root }}static/style.css">
+</head>
+<body>
+<header><div class="wrap">
+<a class="skip" href="#main">Skip to content</a>
+<a class="brand" href="{{ root }}index.html">Forecast Arena</a>
+<nav aria-label="Main"><ul>
+{% for href, name in nav %}<li><a href="{{ root }}{{ href }}"{% if href == page %} aria-current="page"{% endif %}>{{ name }}</a></li>
+{% endfor %}</ul></nav>
+</div></header>
+{% if not official_start %}<aside class="banner" aria-label="Rehearsal notice"><div class="wrap"><strong>Rehearsal.</strong>
+The official record has not started yet. It starts the day after the first run of five consecutive clean days; rehearsal days are shown but excluded from headline scores.</div></aside>{% endif %}
+<main id="main"><div class="wrap">
+{% block content %}{% endblock %}
+</div></main>
+<footer><div class="wrap">
+<p><strong>Research project, not advice.</strong> Forecast Arena is a research benchmark. Nothing on this site is financial, investment, energy-purchasing or any other kind of advice. Probabilities are experimental outputs and may be wrong.</p>
+<p>Data: {% for a in attributions %}{{ a }}{% if not loop.last %}; {% endif %}{% endfor %}.</p>
+<p>Built {{ built_at }} from the public ledger. No cookies, no trackers.</p>
+</div></footer>
+</body>
+</html>

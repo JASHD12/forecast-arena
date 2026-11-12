@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Methods</h1>
+<p class="note">This page is a summary; the full methods page grows with the project.</p>
+<h2>Rules</h2>
+<ul>
+<li><strong>Forecast before truth.</strong> Every question has a lock time (09:30 UTC on the batch day). Forecasts are written and committed to the public ledger before it. A late run writes nothing; nothing is backdated.</li>
+<li><strong>Append-only ledger.</strong> Questions, forecasts, resolutions and run records are appended to files on the public <code>ledger</code> branch and sealed with a SHA-256 hash chain. Corrections are new records.</li>
+<li><strong>No leakage.</strong> Forecasters only see data that was available at forecast time, through one as-of gateway with conservative availability rules.</li>
+<li><strong>Honest scoring.</strong> Brier and log scores on probabilities clipped to [0.01, 0.99]; the base-rate forecaster is always shown; voided questions are excluded and counted.</li>
+</ul>
+<h2>Forecasters</h2>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Table (scrolls sideways on small screens)"><table>
+<thead><tr><th scope="col">Id</th><th scope="col">Sees</th><th scope="col">Answers</th></tr></thead>
+<tbody>{% for f in information_sets %}<tr><th scope="row">{{ f[0] }}</th><td>{{ f[1] }}</td><td>{{ f[2] }}</td></tr>{% endfor %}</tbody>
+</table></div>
+<h2>Version changelog</h2>
+<p>Every forecaster version, with the first batch that used it. A version changes whenever a model artefact, an LLM model id or a prompt changes.</p>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Table (scrolls sideways on small screens)"><table><thead><tr><th scope="col">Since batch</th><th scope="col">Forecaster</th><th scope="col">Version</th></tr></thead>
+<tbody>{% for r in changelog %}<tr><td>{{ r.since }}</td><td>{{ r.forecaster }}</td><td><code>{{ r.version }}</code></td></tr>{% else %}<tr><td colspan="3" class="muted">No forecasts yet.</td></tr>{% endfor %}</tbody></table></div>
+<h2>Limits</h2>
+<p>Git commit times are evidence, not cryptographic proof. The public branch history, the hash chain and the GitHub Actions run logs together make silent edits detectable by anyone who has cloned the ledger branch.</p>
+{% endblock %}

@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Questions</h1>
+<p>Every question ever asked, newest batch first ({{ archive|length }} questions). Use your browser's find (Ctrl+F) to search; each question has its own page with every forecast, the outcome and the evidence.</p>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Table (scrolls sideways on small screens)"><table class="qtable">
+<thead><tr><th scope="col">Batch</th><th scope="col">Domain</th><th scope="col">Question</th><th scope="col">Outcome</th></tr></thead>
+<tbody>
+{% for q in archive %}{% set r = rec.resolutions.get(q.question_id) %}{% set v = rec.voids.get(q.question_id) %}<tr><td>{{ q.batch_date }}</td><td>{{ q.domain }}</td><td><a href="{{ qhref(q.question_id, '') }}">{{ q.text }}</a></td><td>{% if r %}{% if r.outcome == 1 %}<span class="yes">YES</span>{% else %}<span class="no">NO</span>{% endif %}{% elif v %}<span class="muted">void ({{ v.reason_code }})</span>{% else %}<span class="muted">open</span>{% endif %}</td></tr>
+{% endfor %}</tbody></table></div>
+{% endblock %}

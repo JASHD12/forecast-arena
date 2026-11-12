@@ -11,7 +11,7 @@ __pycache__/
 data_cache/
 _ledger/
 backtests/
-site/
+/site/
 mlruns/
 
 # Secrets: never commit

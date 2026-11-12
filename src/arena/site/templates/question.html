@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+<p><a href="{{ root }}questions/index.html">All questions</a></p>
+<h1>{{ q.text }}</h1>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Table (scrolls sideways on small screens)"><table class="kv"><tbody>
+<tr><th scope="row">Id</th><td><code>{{ q.question_id }}</code></td></tr>
+<tr><th scope="row">Batch / target</th><td>{{ q.batch_date }} / {{ q.target_date }}</td></tr>
+<tr><th scope="row">Lock time</th><td>{{ q.lock_time.strftime("%Y-%m-%d %H:%M UTC") }}</td></tr>
+<tr><th scope="row">Resolution rule</th><td>{{ q.resolution_rule }}</td></tr>
+<tr><th scope="row">Source</th><td>{{ q.resolution_source }}</td></tr>
+<tr><th scope="row">Outcome</th><td>{% if resolution %}{% if resolution.outcome == 1 %}<span class="yes">YES</span>{% else %}<span class="no">NO</span>{% endif %} (observed {{ resolution.observed_value }}; resolved {{ resolution.resolved_at.strftime("%Y-%m-%d %H:%M UTC") }}; evidence <a href="{{ resolution.evidence.source_url }}">source</a>, snapshot sha256 <code>{{ resolution.evidence.snapshot_sha256[:16] }}</code>){% elif void %}void: {{ void.reason_code }} ({{ void.detail }}){% else %}<span class="muted">open</span>{% endif %}</td></tr>
+</tbody></table></div>
+<h2>Forecasts</h2>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Table (scrolls sideways on small screens)"><table>
+<thead><tr><th scope="col">Forecaster</th><th scope="col">Version</th><th scope="col" class="num">P(YES)</th><th scope="col">Published</th></tr></thead>
+<tbody>{% for f in forecasts %}<tr><th scope="row">{{ f.forecaster_id }}</th><td><code>{{ f.forecaster_version }}</code></td><td class="num">{{ "%.3f"|format(f.probability) }}</td><td>{{ f.created_at.strftime("%Y-%m-%d %H:%M:%S UTC") }}</td></tr>{% else %}<tr><td colspan="4" class="muted">No forecasts.</td></tr>{% endfor %}</tbody></table></div>
+{% if skips %}<h2>Skipped</h2><ul>{% for s in skips %}<li>{{ s.forecaster_id }}: <code>{{ s.reason_code }}</code></li>{% endfor %}</ul>{% endif %}
+{% set rats = forecasts|selectattr("rationale")|list %}
+{% if rats %}<h2>Rationales</h2>
+<p class="note">AI-generated text. It may be wrong and is not advice.</p>
+{% for f in rats %}<div class="rationale"><p><strong>{{ f.forecaster_id }}</strong>: {{ f.rationale }}</p></div>{% endfor %}{% endif %}
+{% endblock %}

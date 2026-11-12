@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Status</h1>
+<div class="cards">
+<div class="card"><span class="big">{{ counts.questions }}</span>questions</div>
+<div class="card"><span class="big">{{ counts.open }}</span>open</div>
+<div class="card"><span class="big">{{ counts.voided.values()|sum }}</span>voided</div>
+<div class="card"><span class="big">{{ counts.skips.values()|sum }}</span>skipped forecasts</div>
+</div>
+<h2>Voids by reason</h2>
+{% if counts.voided %}<ul>{% for k, v in counts.voided.items() %}<li><code>{{ k }}</code>: {{ v }}</li>{% endfor %}</ul>{% else %}<p class="muted">None.</p>{% endif %}
+<h2>Skipped forecasts by reason</h2>
+{% if counts.skips %}<ul>{% for k, v in counts.skips.items() %}<li><code>{{ k }}</code>: {{ v }}</li>{% endfor %}</ul>{% else %}<p class="muted">None.</p>{% endif %}
+<h2>Latest runs</h2>
+{% if runs %}
+<div class="table-scroll" tabindex="0" role="region" aria-label="Table (scrolls sideways on small screens)"><table>
+<thead><tr><th scope="col">Run</th><th scope="col">Status</th><th scope="col">Started (UTC)</th><th scope="col">Counts</th><th scope="col">Warnings</th></tr></thead>
+<tbody>{% for r in runs %}<tr><th scope="row">{{ r.run_id }}{% if r.dry_run %} (dry run){% endif %}</th>
+<td>{% if r.status == "ok" %}<span class="yes">ok</span>{% else %}<span class="no">failed</span>{% endif %}</td>
+<td>{{ r.started_at.strftime("%Y-%m-%d %H:%M") }}</td>
+<td>{% for k, v in r.counts.items() %}{{ k }}={{ v }}{% if not loop.last %}, {% endif %}{% endfor %}</td>
+<td>{{ r.warnings|length }}{% if r.error %}; error: {{ r.error }}{% endif %}</td></tr>{% endfor %}</tbody></table></div>
+{% else %}<p class="muted">No runs recorded yet.</p>{% endif %}
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% from "macros.html" import board_table %}
+{% block content %}
+<h1>Leaderboard</h1>
+<p>Brier and log scores are lower-is-better, on probabilities clipped to [0.01, 0.99]. Intervals are 95% day-block bootstrap intervals (questions from the same day are correlated, so days are resampled). A difference is called supported only when its interval excludes zero. With fewer than 30 official days or 300 resolved common-set forecasts every board says "too early to tell".</p>
+<h2>Official record{% if official_start %} (since {{ official_start }}, {{ official_days }} days){% endif %}</h2>
+{% if not official_start %}<p class="muted">The official record has not started; these boards are empty until it does.</p>{% endif %}
+{% for b in headline %}
+<h3>{{ "Common set" if b.kind == "common" else "All questions" }} - {{ b.domain }}</h3>
+{{ board_table(b, ("Common set: only questions answered by every forecaster in the group" if b.kind == "common" else "All questions: forecasters that answer everything")) }}
+{% endfor %}
+<h2>Rehearsal days (excluded from the headline)</h2>
+{% for b in rehearsal %}
+<h3>{{ "Common set" if b.kind == "common" else "All questions" }} - {{ b.domain }} (rehearsal)</h3>
+{{ board_table(b, "Rehearsal days, shown for transparency and not part of the official record") }}
+{% endfor %}
+{% endblock %}

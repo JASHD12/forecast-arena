@@ -161,7 +161,7 @@ Keep the first line of each task in exactly this shape; the status script parses
   - Do: selection rules, exclusions, blocklist config, template and resolver (7.3).
   - Done when: golden tests show person articles and blocklisted titles are never
     selected, and selection is deterministic for a batch date.
-- [ ] T044 · ECB reference-rate client (deps: T020)
+- [x] T044 · ECB reference-rate client (deps: T020)
   - Do: verify the official endpoint and terms (7.4); client; publication-day calendar.
   - Done when: unit tests pass on fixtures; `make smoke-sources` fetches the latest fixing.
 - [ ] T045 · Markets questions and resolver (deps: T044, T022)

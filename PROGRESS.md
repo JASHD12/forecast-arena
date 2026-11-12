@@ -29,6 +29,7 @@ move older "Done log" lines to `docs/progress-archive.md`.
 
 ## Done log
 
+- 2026-11-12 T044: ECB reference-rate client, TARGET calendar verified against 8 years of data, smoke
 - 2026-11-12 T043: attention selection (persons, blocklist, namespaces, recent), K rule, resolver, recorded goldens
 - 2026-11-12 T042: Wikimedia top/per-article client, title encoding, Wikidata person check (fail closed), smoke
 - 2026-11-12 T041: weather templates, resolver (void on >2 missing hours), MOSMIX as-of snapshot, goldens

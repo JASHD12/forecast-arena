@@ -28,6 +28,10 @@ checked against and the date. Code must not rely on anything that is not in this
 | Scripts must send an informative User-Agent with contact information | https://foundation.wikimedia.org/wiki/Policy:Wikimedia_Foundation_User-Agent_Policy | 2026-11-12 | ours: `ForecastArena/0.1 (+<repo URL>; <ARENA_CONTACT or repo URL>)` |
 | Wikidata `https://www.wikidata.org/w/api.php?action=wbgetentities&sites=dewiki&titles=a|b&props=claims|sitelinks` gives P31; human = Q5; missing titles are flagged `missing` | live call | 2026-11-12 | up to 50 titles per call |
 | Licence of pageview statistics: **not verified** (the API documentation page renders with JavaScript only) | https://doc.wikimedia.org/generated-data-platform/aqs/analytics-api/ | 2026-11-12 | site attribution names the source without claiming a licence; re-check |
+| ECB Data Portal `https://data-api.ecb.europa.eu/service/data/EXR/D.USD+JPY.EUR.SP00.A?format=csvdata&startPeriod=...&detail=dataonly` returns CSV (`TIME_PERIOD`, `OBS_VALUE`, ...); no key | live calls | 2026-11-12 | fixing of 11 Nov had Last-Modified 14:57 UTC |
+| Reference rates are updated around 16:00 CET on working days except TARGET closing days; concertation around 14:10 CET; four decimals | https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html | 2026-11-12 | |
+| TARGET closing days = 1 Jan, Good Friday, Easter Monday, 1 May, 25 and 26 Dec: matches every weekday of the EUR/USD series 2019-01-01 to 2026-11-11 (0 mismatches) | the data above | 2026-11-12 | the TARGET calendar page is a PDF |
+| ECB website terms: free use; the ECB must be cited as source; modifications (e.g. computed growth rates) must be stated | https://www.ecb.europa.eu/home/disclaimer/html/index.en.html | 2026-11-12 | site says "log returns computed by Forecast Arena" |
 | `astral-sh/setup-uv` latest is v10.3.3 but moving major tags stop at `v7` | https://github.com/astral-sh/setup-uv (tags) | 2026-11-12 | not used: CI installs with pip from the lock file |
 
 ## Availability rules for historical data
@@ -45,3 +49,5 @@ Filled in per source by T023, T040, T042, T044.
   snapshots the forecast it saw (`snapshots/weather/`), and only snapshots are used later.
 - **Wikimedia pageviews** of UTC day X: available from X+2 00:00 UTC (lists were seen
   published by midday of X+1). `arena.sources.wikimedia.pageviews_available_at`.
+- **ECB fixing** of day X: available from 17:00 Europe/Berlin on X (published ~16:00 CET).
+  `arena.sources.ecb.fixing_available_at`.

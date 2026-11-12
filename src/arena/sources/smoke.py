@@ -69,7 +69,20 @@ def check_wikimedia(http: HttpClient) -> str:
     return "; ".join(parts)
 
 
+def check_ecb(http: HttpClient) -> str:
+    """The latest EUR/USD and EUR/JPY reference rates."""
+    from arena.sources.ecb import EcbClient
+
+    r = EcbClient(http).rates(["USD", "JPY"], SystemClock().now().date() - timedelta(days=10))
+    parts = []
+    for ccy in ("USD", "JPY"):
+        day = max(r.rates[ccy])
+        parts.append(f"EUR/{ccy} {day}: {r.rates[ccy][day]}")
+    return "; ".join(parts)
+
+
 CHECKS: dict[str, Callable[[HttpClient], str]] = {
+    "ecb": check_ecb,
     "wikimedia": check_wikimedia,
     "smard": check_smard,
     "weather": check_weather,

@@ -101,7 +101,7 @@ Keep the first line of each task in exactly this shape; the status script parses
     (late runs record a miss and write no forecasts), a failed forecaster never aborts the
     batch. `make e2e` simulates five days offline; add it to `make check`.
   - Done when: `make e2e` passes; running a job twice for one date changes nothing.
-- [ ] T028 · Scoring v1 (deps: T027)
+- [x] T028 · Scoring v1 (deps: T027)
   - Do: Brier, log score, skill against `base_rate`, counts, clipping (section 10).
   - Done when: property tests pass (perfect = 0, constant 0.5 = 0.25).
 - [ ] T029 · Static site v1 (deps: T028)

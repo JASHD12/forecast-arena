@@ -176,9 +176,16 @@ def score() -> None:
 
 
 @score.command("show")
-def score_show() -> None:
-    """Print scores (built in T028)."""
-    _not_yet("T028")
+@click.pass_obj
+def score_show(obj: Ctx) -> None:
+    """Print the leaderboard and record counts computed from the ledger."""
+    from arena.scoring.core import counts, format_table, leaderboard, load
+
+    rec = load(obj.ledger)
+    c = counts(rec)
+    click.echo(format_table(leaderboard(rec.scored)))
+    click.echo(f"questions={c.questions} resolved={c.resolved} open={c.open} "
+               f"voided={c.voided} forecasts={c.forecasts} skips={c.skips}")  # fmt: skip
 
 
 @main.group()

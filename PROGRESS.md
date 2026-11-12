@@ -29,6 +29,7 @@ move older "Done log" lines to `docs/progress-archive.md`.
 
 ## Done log
 
+- 2026-11-12 T028: scoring v1 (clip, Brier, log, skill vs base_rate, counts), property tests, `arena score show`
 - 2026-11-12 T027: daily morning/resolve jobs (lock enforced, idempotent, error skips, revisions), replay history, 5-day e2e
 - 2026-11-12 T025: power resolver (grace void, ties, 23/25h days, revision detection)
 - 2026-11-12 T024: six power templates; golden tests (ordinary, 23h, 25h, Christmas) on real SMARD fixtures

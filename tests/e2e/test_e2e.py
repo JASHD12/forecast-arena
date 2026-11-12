@@ -55,6 +55,13 @@ def test_five_days_offline(tmp_path) -> None:
     assert any(r.evidence.values_used["hours"] == 25 for r in rs)  # 25 Oct 2026
     rep = verify(led)
     assert rep.ok, rep.summary()
+    from arena.scoring.core import counts, leaderboard, load
+
+    rec = load(led)
+    board = {r.forecaster_id: r for r in leaderboard(rec.scored)}
+    assert set(board) == {"base_rate", "persistence"}
+    assert board["base_rate"].n == len(qs) and board["base_rate"].skill == 0
+    assert counts(rec).open == 0
 
 
 def test_rerunning_the_schedule_changes_nothing(tmp_path) -> None:

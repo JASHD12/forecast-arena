@@ -1,0 +1,12 @@
+token,question_id,probability,submitted_at
+alpha-token-0001,power-mean_gt-DE_LU-2026-11-13-v1,0.40,2026-11-12T06:00:00+00:00
+alpha-token-0001,power-mean_gt-DE_LU-2026-11-13-v1,0.55,2026-11-12T08:00:00+00:00
+beta-token-00002,power-mean_gt-DE_LU-2026-11-13-v1,0.70,2026-11-12T07:10:00+01:00
+gamma-token-0003,power-mean_gt-DE_LU-2026-11-13-v1,0.20,2026-11-12T09:00:00+00:00
+gamma-token-0003,power-mean_gt-DE_LU-2026-11-13-v1,0.99,2026-11-12T09:31:00+00:00
+delta-token-0004,power-mean_gt-DE_LU-2026-11-13-v1,0.65,2026-11-12T10:00:00+00:00
+short,power-mean_gt-DE_LU-2026-11-13-v1,0.50,2026-11-12T06:00:00+00:00
+epsilon-token-05,power-mean_gt-DE_LU-2026-11-13-v1,1.50,2026-11-12T06:00:00+00:00
+zeta-token-00006,power-mean_gt-DE_LU-2026-11-13-v1,0.50,yesterday
+eta-token-000007,power-max_gt-DE_LU-2026-11-13-v1,0.30,2026-11-12T06:00:00+00:00
+theta-token-0008,power-max_gt-DE_LU-2026-11-13-v1,0.35,2026-11-12T06:00:00+00:00

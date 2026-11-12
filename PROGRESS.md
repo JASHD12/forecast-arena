@@ -29,6 +29,7 @@ move older "Done log" lines to `docs/progress-archive.md`.
 
 ## Done log
 
+- 2026-11-12 T091: panel CSV intake (pseudonyms, late/duplicate/bad-token rules, median of >=3), PANEL_SETUP.md
 - 2026-11-12 T075: explainer 06 scoring and statistics (10 interview Q&A)
 - 2026-11-12 T074 (work done, blocked on H10): axe-core lint 0 serious locally, focusable scroll regions, landmarks, CI job written
 - 2026-11-12 T073: Findings page: H1-H4 statements from official scores (supported only if interval excludes 0) + owner block

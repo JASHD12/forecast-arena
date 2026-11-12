@@ -259,3 +259,11 @@ Ideas outside the specification. The agent lists them here and does not build th
   and entity. For attention the entity is an article that rarely repeats, so `base_rate`
   is always 0.5 there. A template-level variant (same template, any article) would be a
   more informative baseline. Needs a human decision because it changes a SPEC 8 rule.
+- **Panel timing (needed before T092).** The batch is sealed by the first morning run
+  (~05:30 UTC, SPEC 6), which is also when questions appear, so panel answers given before
+  the 09:30 lock cannot join the sealed batch. Options: (a) panel members forecast the
+  *next* morning's questions announced the evening before (needs questions generated
+  earlier: changes SPEC 4); (b) add a pre-lock run (~09:00 UTC) that appends panel
+  forecasts and only then seals (changes when the seal is written; seal still before lock);
+  (c) keep the panel out of the batch and publish it as a separate, clearly labelled
+  record. The agent recommends (b) with a hard rule that a late run writes nothing.

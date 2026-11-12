@@ -305,7 +305,7 @@ Keep the first line of each task in exactly this shape; the status script parses
   - Do: section 8.6 with walk-forward training and the activation threshold.
   - Done when: tests show it stays inactive below the threshold and trains only on
     resolved official-record forecasts.
-- [ ] T091 · Human panel intake (deps: T027)
+- [x] T091 · Human panel intake (deps: T027)
   - Do: section 8.7 CSV adapter, validation, pseudonyms, median rule; fixtures;
     `docs/PANEL_SETUP.md` with step-by-step instructions for the human.
   - Done when: tests cover late rows, duplicate rows, bad tokens and fewer than 3 answers.

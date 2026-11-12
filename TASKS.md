@@ -92,7 +92,7 @@ Keep the first line of each task in exactly this shape; the status script parses
 - [ ] T025 · Power resolver (deps: T024)
   - Do: resolution, evidence snapshot, grace period, void rules, revision detection.
   - Done when: tests cover a normal day, missing hours, a 23-hour and a 25-hour day.
-- [ ] T026 · Forecaster contract and baselines (deps: T022)
+- [x] T026 · Forecaster contract and baselines (deps: T022)
   - Do: `Forecaster` protocol; `base_rate` (8.1) and `persistence` (8.2), using history
     replayed through the real question and resolver code.
   - Done when: tests cover smoothing, the under-10-instances rule and the fallback.

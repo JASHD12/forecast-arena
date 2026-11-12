@@ -14,6 +14,24 @@ Made by: agent | human
 
 ## Decisions
 
+## 2026-11-12 - Persistence needs 10 transitions, else it falls back to the base rate
+Context: SPEC 8.2 says persistence is "estimated the same way" as the base rate, which
+uses 0.5 below 10 instances, and falls back to the base rate when yesterday is unknown.
+Decision: with fewer than 10 past days that followed the same outcome as yesterday,
+persistence returns the base-rate probability (which itself is 0.5 below 10 instances).
+The reason is in the forecast's `meta.fallback`.
+Alternatives: 0.5 directly (throws away the base rate for no gain).
+Made by: agent
+
+## 2026-11-12 - Baseline history is an injected interface
+Context: SPEC 8.1 asks for history replayed through the real question and resolver code
+before the live record is long enough.
+Decision: baselines read a `History`. `LedgerHistory` reads live resolutions written at or
+before `asof`; `StaticHistory` holds replayed instances. Each domain's replay producer is
+built with that domain (T024 onward) and uses the domain's own `generate_questions` and
+`resolve`.
+Made by: agent
+
 ## 2026-11-12 - Run manifests are filed by the UTC start date of the run
 Context: SPEC 6 names `runs/YYYY/MM/DD-<job>-<n>.json` without saying which date.
 Decision: the UTC date the run started. Day X is sealed by the first resolve run of X+1,

@@ -1,0 +1,1 @@
+"""Forecasters (SPEC 8)."""

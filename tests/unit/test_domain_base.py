@@ -49,7 +49,7 @@ def test_registry() -> None:
 
 
 def test_toy_domain_end_to_end() -> None:
-    store = AsOfStore(obs(d, float(d % 5)) for d in range(40))
+    store = AsOfStore(obs(d, float(d % 5)) for d in range(36))
     dom = ToyDomain(store)
     batch = date(2026, 11, 5)
     asof = datetime(2026, 11, 5, 6, tzinfo=UTC)

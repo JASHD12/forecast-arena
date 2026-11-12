@@ -205,6 +205,14 @@ Keep the first line of each task in exactly this shape; the status script parses
   - Do: `stack.html` from the build environment and the ledger; `ARENA_LLM_EFFORT`,
     output-token and daily-token caps as workflow variables; H13 for a frontier model.
   - Done when: tests cover the effort request field and the stack page.
+- [x] T045i · Open data and SQL analytics with DuckDB (owner request 2026-11-12) (deps: T045f)
+  - Done when: tests cover empty and populated ledgers and a Parquet round-trip.
+- [x] T045j · Diebold-Mariano test in backtest reports (owner request 2026-11-12) (deps: T071)
+  - Done when: tests check a hand-computed statistic and the edge cases.
+- [x] T045k · Permutation feature importance in the weekly job (owner request 2026-11-12) (deps: T056)
+  - Done when: a test shows it in the weekly summary and deterministic.
+- [x] T045l · mypy in make check (owner request 2026-11-12) (deps: T001)
+  - Done when: `mypy src/arena` reports no issues and runs in `make check`.
 - [ ] T046 · Enable the new domains (live) (deps: T041, T043, T045, T034)
   - Do: extend the e2e test to all four domains, then enable them in the live config.
   - Done when: the next real morning run writes questions for all applicable domains and

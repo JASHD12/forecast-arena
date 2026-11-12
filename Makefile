@@ -24,6 +24,7 @@ setup-offline:  ## Like setup, but reuse already-installed system packages (no n
 lint:
 	$(RUFF) check src tests scripts
 	$(RUFF) format --check src tests scripts
+	$(PY) -m mypy src/arena
 
 test:
 	$(PY) -m pytest tests/unit

@@ -414,6 +414,26 @@ Made by: agent
   model-size comparison proposal are withdrawn. Everything else stays free: public-repo
   GitHub Actions and Pages, free data sources, CoinGecko's free Demo plan.
 
+## 2026-11-12 · Data-science additions (owner request: skills asked for in AI/ML/DS jobs)
+
+- Context: the owner asked for an advanced, commonly requested stack at no extra cost.
+  Only working features were added; nothing is listed on the site that is not used (I5).
+- Decision:
+  - DuckDB SQL over the ledger at every site build, with the queries and results shown on
+    `data.html`, and the ledger tables published as zstd Parquet (`data/*.parquet`).
+    New dependency `duckdb` (runtime): one wheel, no server.
+  - Diebold-Mariano test (Newey-West long-run variance on daily-averaged loss
+    differences, HLN correction, Student t) in backtest reports next to the day-block
+    bootstrap. Supplementary only: SPEC 10 headline rules are unchanged.
+  - Permutation feature importance for the promoted power model in the weekly job,
+    stored in the weekly summary and shown on Experiments. Never blocks the job.
+  - mypy in `make check` (and CI); 19 findings fixed with correct types, not ignores.
+    New dev dependency `mypy`.
+- Alternatives rejected: PyTorch/deep learning (a large install with no expected gain on
+  these small tabular problems; would be listed without honest use), a paid dashboard
+  host or vector database (cost), SHAP (heavier dependency; permutation importance is
+  model-agnostic and enough here).
+
 ## Proposals for the human
 
 Ideas outside the specification. The agent lists them here and does not build them.

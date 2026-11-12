@@ -59,3 +59,33 @@ def test_bootstrap_is_seed_stable_and_covers_truth() -> None:
     assert a == b and a.low < 0.2 < a.high and a.days == 60
     diff = paired_brier_difference(days, [0.9] * len(days), [0.5] * len(days), [1] * len(days))
     assert diff.estimate == pytest.approx(0.01 - 0.25) and diff.excludes_zero
+
+
+def test_diebold_mariano_known_cases() -> None:
+    import math
+    from datetime import date, timedelta
+
+    from arena.scoring.stats import diebold_mariano
+
+    days = [date(2026, 1, 1) + timedelta(days=i) for i in range(40)]
+    rng = __import__("numpy").random.default_rng(0)
+    noise = rng.normal(0, 0.01, 40)
+    better = diebold_mariano(days, [0.1 + e for e in noise], [0.2 + e for e in noise[::-1]])
+    assert better is not None and better.statistic < -5 and better.p_value < 1e-6
+    assert better.days == 40 and better.lags == int(40 ** (1 / 3))
+    same = diebold_mariano(days, list(0.2 + noise), list(0.2 + noise[::-1]))
+    assert same is not None and same.p_value > 0.05
+    # Same-day forecasts are averaged first: 2 per day still gives 40 daily points.
+    dup = diebold_mariano(days + days, [0.1] * 40 + [0.3] * 40, [0.2] * 80)
+    assert dup is None  # mean difference 0 every day -> zero variance
+    assert diebold_mariano(days[:2], [0.1, 0.2], [0.2, 0.1]) is None
+    # Hand check of the HLN-corrected statistic without lags (T = 3).
+    r = diebold_mariano(days[:3], [0.3, 0.1, 0.2], [0.1, 0.1, 0.1])
+    d = [0.2, 0.0, 0.1]
+    m = sum(d) / 3
+    var = (
+        sum((x - m) ** 2 for x in d) / 3
+        + 2 * 0.5 * ((d[1] - m) * (d[0] - m) + (d[2] - m) * (d[1] - m)) / 3
+    )
+    expected = m / math.sqrt(var / 3) * math.sqrt((3 - 1) / 3)
+    assert r is not None and abs(r.statistic - expected) < 1e-9

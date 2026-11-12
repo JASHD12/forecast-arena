@@ -62,7 +62,7 @@ class LedgerHistory:
         sig = self._signature()
         if self._cached is None or self._cached[0] != sig:
             self._cached = (sig, self._read())
-        return self._cached[1]  # type: ignore[no-any-return]
+        return self._cached[1]
 
     def _read(self) -> tuple[dict[str, Question], list[Resolution], set[str]]:
         questions = {r.question_id: r for _, r in self.ledger.iter_family("questions")

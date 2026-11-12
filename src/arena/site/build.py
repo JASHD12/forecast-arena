@@ -20,6 +20,8 @@ from jinja2 import Environment, PackageLoader, select_autoescape
 from markupsafe import Markup
 
 from arena.agent.tools import GDELT_ATTRIBUTION
+from arena.analytics.sql import connect as sql_connect
+from arena.analytics.sql import export_parquet, run_queries
 from arena.clock import Clock
 from arena.config import DEFAULT_REPO_URL, DEFAULT_SITE_URL
 from arena.ledger import Ledger, layout
@@ -460,11 +462,16 @@ def build_site(
         ),
     }
     env = _env()
+    con = sql_connect(rec)
     tmp = out_dir.with_name(out_dir.name + ".building")
     if tmp.exists():
         shutil.rmtree(tmp)
     (tmp / "static").mkdir(parents=True)
     (tmp / "questions").mkdir()
+    pages["data.html"] = (
+        "Open data & SQL",
+        {"files": export_parquet(con, tmp / "data"), "results": run_queries(con)},
+    )
     for name, (title, ctx) in pages.items():
         root = "../" if "/" in name else ""
         nav_page = "questions/index.html" if name == "questions/index.html" else name

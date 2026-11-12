@@ -403,3 +403,9 @@ details.faq[open] summary { margin-bottom: .5rem; }
   .site-header nav ul { flex-wrap: nowrap; width: max-content; }
   .banner { font-size: .85rem; }
 }
+.filelist { display: flex; flex-wrap: wrap; gap: .5rem; list-style: none; padding: 0; }
+.filelist a { display: inline-block; background: var(--surface); border: 1px solid var(--line);
+  border-radius: 999px; padding: .35rem .85rem; text-decoration: none; }
+pre.sql { background: var(--ink); color: #e6edf3; border-radius: 10px; padding: .9rem 1rem; overflow-x: auto;
+  font-size: .85rem; line-height: 1.5; }
+.sqlblock h2 { margin-top: 2rem; }

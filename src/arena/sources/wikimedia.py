@@ -201,7 +201,8 @@ class WikimediaClient:
         for t in titles:
             k = t.replace("_", " ")
             if k in known:
-                out[k] = None if known[k] is None else set(known[k])
+                ids = known[k]
+                out[k] = None if ids is None else set(ids)
             else:
                 todo.append(t)
         titles = todo

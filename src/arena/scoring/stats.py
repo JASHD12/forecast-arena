@@ -5,6 +5,7 @@ Questions from the same day are correlated, so days are resampled, not questions
 
 from __future__ import annotations
 
+import math
 from collections.abc import Hashable, Sequence
 from dataclasses import dataclass
 
@@ -70,6 +71,52 @@ def paired_brier_difference(
     is better)."""
     a, b = brier_terms(p_a, y), brier_terms(p_b, y)
     return day_block_bootstrap(days, [x - z for x, z in zip(a, b, strict=True)], **kw)
+
+
+@dataclass(frozen=True)
+class DMResult:
+    """Diebold-Mariano test result (two-sided)."""
+
+    statistic: float
+    p_value: float
+    days: int
+    lags: int
+
+
+def diebold_mariano(
+    days: Sequence[Hashable], loss_a: Sequence[float], loss_b: Sequence[float]
+) -> DMResult | None:
+    """Diebold-Mariano test of equal predictive accuracy (Diebold & Mariano 1995) with the
+    Harvey-Leybourne-Newbold (1997) small-sample correction.
+
+    Loss differences are first averaged per batch day (forecasts made on the same day
+    are correlated), giving a daily series d_t. The long-run variance of its mean uses a
+    Newey-West (Bartlett) estimator with floor(T^(1/3)) lags; the statistic is compared
+    with a Student t on T - 1 degrees of freedom. Supplementary to the day-block bootstrap
+    (backtest reports only; SPEC 10 headline rules are unchanged). None if T < 3 or the
+    variance is zero."""
+    from scipy.stats import t as student_t
+
+    by: dict[Hashable, list[float]] = {}
+    for d, a, b in zip(days, loss_a, loss_b, strict=True):
+        by.setdefault(d, []).append(a - b)
+    series = np.asarray([float(np.mean(by[k])) for k in sorted(by, key=str)])
+    n = len(series)
+    if n < 3:
+        return None
+    lags = int(n ** (1 / 3))
+    dc = series - series.mean()
+    lrv = float(dc @ dc) / n
+    for k in range(1, lags + 1):
+        lrv += 2 * (1 - k / (lags + 1)) * float(dc[k:] @ dc[:-k]) / n
+    if lrv <= 0:
+        return None
+    dm = series.mean() / math.sqrt(lrv / n)
+    h = 1  # one-step-ahead forecasts
+    hln = math.sqrt((n + 1 - 2 * h + h * (h - 1) / n) / n)
+    stat = float(dm * hln)
+    p = float(2 * student_t.sf(abs(stat), n - 1))
+    return DMResult(stat, p, n, lags)
 
 
 # ----- calibration (SPEC 10) ---------------------------------------------------------

@@ -85,7 +85,7 @@ class ToyDomain:
         assert question.threshold is not None
         return Resolution(
             question_id=question.question_id,
-            outcome=int(value > question.threshold),
+            outcome=1 if value > question.threshold else 0,
             observed_value=value,
             resolved_at=now,
             evidence=Evidence(

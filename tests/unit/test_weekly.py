@@ -90,3 +90,22 @@ def test_drift_report_from_fixture_data(tmp_path, dom) -> None:
     assert (tmp_path / "mlruns" / "drift-2026-11-10.html").exists()
     (summary,) = summaries(led)
     assert summary["drift"] == res.drift
+
+
+def test_permutation_importance_in_summary(tmp_path, dom) -> None:
+    from arena.ops.drift import FEATURE_NAMES
+    from arena.ops.explain import TOP, power_importance
+
+    led = Ledger(tmp_path / "l")
+    res = weekly(led, FixedClock(NOW), {"power": dom}, {"power": trainer(dom)}, drift=True)
+    assert 0 < len(res.importance) <= TOP
+    feats = [r["feature"] for r in res.importance]
+    assert set(feats) <= set(FEATURE_NAMES)
+    vals = [r["mae_increase"] for r in res.importance]
+    assert vals == sorted(vals, reverse=True)
+    (summary,) = summaries(led)
+    assert summary["importance"]["power"] == res.importance
+    first, last = window(NOW.date())
+    model = registry.load_current(led, ["power"])["power"]
+    assert power_importance(dom, model, first, last) == res.importance  # deterministic
+    assert power_importance(dom, Constant(), first, last) == []

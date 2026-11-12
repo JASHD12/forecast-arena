@@ -31,8 +31,15 @@
 <li><strong>Proper scoring rules:</strong> Brier and log score on clipped probabilities, skill against the base rate.</li>
 <li><strong>Calibration:</strong> reliability diagrams, expected calibration error, Murphy decomposition (reliability, resolution, uncertainty).</li>
 <li><strong>Uncertainty:</strong> day-block bootstrap confidence intervals and paired differences; a result is "supported" only if its interval excludes zero.</li>
+<li><strong>Diebold-Mariano test</strong> (Newey-West variance, Harvey-Leybourne-Newbold correction) as a second opinion on every backtest comparison.</li>
 <li><strong>Walk-forward backtests</strong> kept strictly separate from the live record.</li>
 <li><strong>No leakage by construction:</strong> every forecaster sees data only through an as-of gateway that knows when each value was published.</li>
+</ul>
+
+<h2>Data analytics</h2>
+<ul class="checks">
+<li><strong>DuckDB SQL</strong> over the whole ledger at every build; the queries and their results are published on <a href="data.html">Open data &amp; SQL</a>.</li>
+<li><strong>Open data in Parquet</strong> (zstd-compressed, columnar): questions, forecasts, resolutions and skips, ready for pandas, Polars, Spark or DuckDB.</li>
 </ul>
 
 <h2>MLOps</h2>
@@ -40,6 +47,7 @@
 <li><strong>Model registry</strong> with versioned artefacts and model cards; promotions are new records, never overwrites.</li>
 <li><strong>Weekly champion/challenger retraining</strong> with a written promotion rule, tracked in <strong>MLflow</strong>.</li>
 <li><strong>Data-drift monitoring</strong> with <strong>Evidently</strong>.</li>
+<li><strong>Explainability:</strong> permutation feature importance (scikit-learn) for the promoted electricity model, published with every weekly run on <a href="experiments.html">Experiments</a>.</li>
 <li><strong>Versioning everywhere:</strong> every forecast records its model, prompt and settings, and version changes are visible on the site.</li>
 </ul>
 
@@ -53,7 +61,7 @@
 <h2>Infrastructure and quality</h2>
 <ul class="checks">
 <li><strong>GitHub Actions</strong> schedules (morning, resolve four times a day, weekly), <strong>GitHub Pages</strong> hosting, Docker image.</li>
-<li><strong>CI:</strong> ruff lint, hundreds of unit tests, an offline end-to-end run, accessibility checks (axe-core), dependency audit; code reaches production only after a green run (a separate <code>stable</code> branch).</li>
+<li><strong>CI:</strong> ruff lint, <strong>mypy</strong> static type checking, hundreds of unit tests, an offline end-to-end run, accessibility checks (axe-core), dependency audit; code reaches production only after a green run (a separate <code>stable</code> branch).</li>
 <li><strong>Static, private-by-design site:</strong> no JavaScript, cookies or third-party requests.</li>
 </ul>
 

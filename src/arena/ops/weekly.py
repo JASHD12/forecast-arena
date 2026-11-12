@@ -27,11 +27,13 @@ from typing import Any
 
 from arena.clock import Clock
 from arena.domains.base import Domain
+from arena.domains.power import PowerDomain
 from arena.forecasters import registry
 from arena.ledger import Ledger
 from arena.ledger.manifest import run_manifest
 from arena.models import Resolution
 from arena.ops.drift import power_drift
+from arena.ops.explain import power_importance
 from arena.ops.jobs import _maybe_dry
 from arena.scoring.core import brier
 
@@ -66,6 +68,7 @@ class WeeklyResult:
     day: date
     decisions: list[Decision] = field(default_factory=list)
     drift: list[dict[str, Any]] = field(default_factory=list)
+    importance: list[dict[str, Any]] = field(default_factory=list)
 
     def lines(self) -> list[str]:
         """Printable summary."""
@@ -193,14 +196,24 @@ def weekly(
                 model = registry.load_current(led, ["power"]).get("power")
                 if model is not None:
                     html = None if mlruns is None else mlruns / f"drift-{today.isoformat()}.html"
-                    res.drift = power_drift(domains["power"], model, first, last, html)
+                    pdom = domains["power"]
+                    if isinstance(pdom, PowerDomain):
+                        res.drift = power_drift(pdom, model, first, last, html)
             except Exception as exc:  # the drift report never blocks the weekly job
                 rec.warn(f"weekly/drift: {type(exc).__name__}: {exc}"[:300])
+            try:
+                model = registry.load_current(led, ["power"]).get("power")
+                pdom = domains["power"]
+                if model is not None and isinstance(pdom, PowerDomain):
+                    res.importance = power_importance(pdom, model, first, last)
+            except Exception as exc:  # explainability never blocks the weekly job
+                rec.warn(f"weekly/importance: {type(exc).__name__}: {exc}"[:300])
         summary = {
             "day": today.isoformat(),
             "dry_run": dry_run,
             "decisions": [asdict(x) for x in res.decisions],
             "drift": res.drift,
+            "importance": {"power": res.importance},
         }
         rel = f"models/weekly/{today.isoformat()}-summary.json"
         if not led.exists(rel):

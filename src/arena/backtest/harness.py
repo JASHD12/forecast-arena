@@ -21,7 +21,7 @@ from arena.domains.base import Domain
 from arena.forecasters.base import Forecaster, History, Instance
 from arena.models import Forecast, Question, Resolution
 
-LABEL = "backtest"
+LABEL: Literal["backtest"] = "backtest"
 MORNING = time(5, 30)
 FAR = datetime.max.replace(tzinfo=UTC)
 

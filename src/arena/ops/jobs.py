@@ -156,12 +156,12 @@ def morning(
         records: list[Forecast | Skip] = []
         contexts: dict[str, dict[str, Any]] = {}
         for q in all_qs:
-            dom = by_domain.get(q.domain)
-            if dom is None:
+            qdom = by_domain.get(q.domain)
+            if qdom is None:
                 continue
             asof = clock.now()
             try:
-                ctx = dom.context(q, asof)
+                ctx = qdom.context(q, asof)
             except Exception as exc:
                 rec.warn(f"{q.question_id}: context failed: {_short(exc)}")
                 ctx = {}
@@ -275,14 +275,14 @@ def resolve(
                      if isinstance(q, Question)}  # fmt: skip
         check = revised or _default_revised
         for qid, r in first.items():
-            q = questions.get(qid)
-            dom = by_domain.get(q.domain) if q else None
-            if q is None or dom is None or now - r.resolved_at > REVISION_WINDOW:
+            rq = questions.get(qid)
+            rdom = by_domain.get(rq.domain) if rq else None
+            if rq is None or rdom is None or now - r.resolved_at > REVISION_WINDOW:
                 continue
             if f"void::{qid}::source_revised" in voided_ids:
                 continue
             try:
-                if check(dom, q, r):
+                if check(rdom, rq, r):
                     out.append(Void(question_id=qid, reason_code="source_revised",
                                     detail="source values changed after the first "
                                            "resolution; the first resolution is kept",

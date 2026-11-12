@@ -11,7 +11,14 @@ from dataclasses import dataclass
 
 from arena.backtest.harness import BacktestRecord
 from arena.scoring.core import brier, log_score
-from arena.scoring.stats import Interval, day_block_bootstrap, paired_brier_difference
+from arena.scoring.stats import (
+    DMResult,
+    Interval,
+    brier_terms,
+    day_block_bootstrap,
+    diebold_mariano,
+    paired_brier_difference,
+)
 
 
 @dataclass(frozen=True)
@@ -67,6 +74,20 @@ def paired(records: Sequence[BacktestRecord], a: str, b: str) -> Interval | None
     )
 
 
+def dm_pair(records: Sequence[BacktestRecord], a: str, b: str) -> DMResult | None:
+    """Diebold-Mariano test on the Brier losses of a and b (common questions)."""
+    by = common_records(records, [a, b])
+    qs = list(by[a])
+    if not qs:
+        return None
+    y = [int(by[a][q].outcome or 0) for q in qs]
+    return diebold_mariano(
+        [by[a][q].batch_date for q in qs],
+        brier_terms([by[a][q].probability for q in qs], y),
+        brier_terms([by[b][q].probability for q in qs], y),
+    )
+
+
 def markdown(
     title: str,
     records: Sequence[BacktestRecord],
@@ -98,16 +119,19 @@ def markdown(
         "Paired Brier differences (negative = first is better), day-block "
         "bootstrap, 2000 replicates, fixed seed:",
         "",
-        "| Comparison | Difference | 95% interval | Supported? |",
-        "|---|---|---|---|",
+        "| Comparison | Difference | 95% interval | Supported? | Diebold-Mariano |",
+        "|---|---|---|---|---|",
     ]
     for a, b in comparisons:
         iv = paired(records, a, b)
         if iv is None:
             continue
         verdict = "yes" if iv.excludes_zero else "no (interval includes zero)"
+        dm = dm_pair(records, a, b)
+        dm_s = "-" if dm is None else f"DM = {dm.statistic:+.2f}, p = {dm.p_value:.3f}"
         lines.append(
-            f"| {a} - {b} | {iv.estimate:+.4f} | [{iv.low:+.4f}, {iv.high:+.4f}] | {verdict} |"
+            f"| {a} - {b} | {iv.estimate:+.4f} | [{iv.low:+.4f}, {iv.high:+.4f}] | {verdict} "
+            f"| {dm_s} |"
         )
     if notes:
         lines += ["", "Notes:", ""] + [f"- {n}" for n in notes]

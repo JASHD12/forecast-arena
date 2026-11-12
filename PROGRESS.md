@@ -43,6 +43,7 @@ move older "Done log" lines to `docs/progress-archive.md`.
 
 ## Done log
 
+- 2026-11-12 T045i-l (owner request): DuckDB SQL + Parquet open data, Diebold-Mariano, permutation importance, mypy clean in make check
 - 2026-11-12 home v3 (owner request): hero with live standings, KPIs, biggest-disagreement spotlight, race chart (validated palette), topic tiles, trust pillars; mobile nav; package data includes feed.xml
 - 2026-11-12 owner decision: zero-ish cost; stay on Haiku 5.5, daily token cap 150000 in workflows (~$1/month max); H13 declined
 - 2026-11-12 T045h (owner request): tech stack page, LLM effort setting, H13 (optional frontier model)

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero hero-small" aria-labelledby="data-title">
+<p class="kicker">Open data</p>
+<h1 id="data-title">Open data &amp; SQL</h1>
+<p>The whole public record as Parquet files, and the SQL behind the numbers below. Every query runs with DuckDB on each build of this site, straight from the ledger.</p>
+</section>
+
+<h2>Downloads</h2>
+<ul class="filelist">{% for f in files %}<li><a href="data/{{ f }}" download><code>{{ f }}</code></a></li>{% endfor %}</ul>
+<p class="note">Licence: the forecasts and outcomes are this project's own data; source data stays under its source's terms (see the credits below). Read them with, for example: <code>duckdb -c "SELECT * FROM 'forecasts.parquet' LIMIT 5"</code> or <code>pandas.read_parquet("forecasts.parquet")</code>.</p>
+
+{% for r in results %}
+<section class="sqlblock" id="{{ r.q.slug }}">
+<h2>{{ r.q.title }}</h2>
+<p class="note">{{ r.q.why }}</p>
+<details class="faq"><summary>Show the SQL</summary><pre class="sql"><code>{{ r.q.sql }}</code></pre></details>
+{% if r.rows %}<div class="table-scroll" tabindex="0" role="region" aria-label="{{ r.q.title }}"><table>
+<thead><tr>{% for c in r.columns %}<th scope="col">{{ c }}</th>{% endfor %}</tr></thead>
+<tbody>{% for row in r.rows %}<tr>{% for v in row %}<td>{{ fname(v) if r.columns[loop.index0] == "forecaster_id" else (dname(v) if r.columns[loop.index0] == "domain" else v) }}</td>{% endfor %}</tr>{% endfor %}</tbody></table></div>
+{% else %}<p class="empty">No rows yet.</p>{% endif %}
+</section>
+{% endfor %}
+<p class="note">Exploratory views. The headline comparison, with confidence intervals, is on the <a href="leaderboard.html">leaderboard</a>.</p>
+{% endblock %}

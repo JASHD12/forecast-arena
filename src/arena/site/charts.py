@@ -6,6 +6,7 @@ from __future__ import annotations
 import math
 from collections.abc import Sequence
 from html import escape
+from typing import Any
 
 from markupsafe import Markup
 
@@ -140,7 +141,7 @@ def race_svg(
             f'<text class="tick" x="{x(d):.1f}" y="{RACE_H - 8}" '
             f'text-anchor="{anchor}">{escape(d)}</text>'
         )
-    ends = []
+    ends: list[list[Any]] = []
     for fid, pts in series.items():
         if not pts:
             continue

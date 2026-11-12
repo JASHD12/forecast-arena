@@ -10,6 +10,7 @@ from dataclasses import dataclass, field
 from datetime import date, datetime
 from importlib import metadata
 from pathlib import Path
+from typing import Literal
 
 from arena.clock import Clock
 from arena.ledger import layout
@@ -91,7 +92,8 @@ def run_manifest(
     """
     started = clock.now()
     rec = RunRecorder()
-    status, error = "ok", None
+    status: Literal["ok", "failed"] = "ok"
+    error: str | None = None
     try:
         yield rec
     except BaseException as exc:

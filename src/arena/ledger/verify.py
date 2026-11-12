@@ -63,8 +63,9 @@ def verify(ledger: Ledger) -> VerifyReport:
             continue
         for rec in records:
             if fam is not None:
-                if rec.kind not in layout.FAMILIES[fam]:
-                    rep.errors.append(f"{rel}: {rec.kind} record in {fam} file")
+                kind = getattr(rec, "kind", type(rec).__name__)
+                if kind not in layout.FAMILIES[fam]:
+                    rep.errors.append(f"{rel}: {kind} record in {fam} file")
                 prior = seen[fam].get(rec.record_id)
                 if prior:
                     rep.errors.append(f"{rel}: duplicate id {rec.record_id} (first in {prior})")

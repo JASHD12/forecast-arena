@@ -117,10 +117,14 @@ def build_domains(
                 if ledger is None
                 else [q for _, q in ledger.iter_family("questions") if isinstance(q, Question)]
             )
+
+            def recent(project: str, batch: date, qs: list[Question] = questions) -> set[str]:
+                return titles_from_questions(qs, project, batch)
+
             out.append(
                 AttentionDomain(
                     WikimediaClient(http, cache_dir=settings.cache_dir),
-                    recent_titles=lambda p, b, qs=questions: titles_from_questions(qs, p, b),
+                    recent_titles=recent,
                     on_skip=on_skip,
                 )
             )

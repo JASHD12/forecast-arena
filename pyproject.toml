@@ -16,10 +16,11 @@ dependencies = [
     "numpy>=2,<3",
     "scikit-learn>=1.5,<2",
     "anthropic>=2.8,<3",
+    "duckdb>=1.1,<2",
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=8", "ruff>=0.6"]
+dev = ["pytest>=8", "ruff>=0.6", "mypy>=1.11"]
 
 [project.scripts]
 arena = "arena.cli:main"
@@ -46,3 +47,10 @@ ignore = ["RUF001", "RUF002", "RUF003"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q --strict-markers"
+
+[tool.mypy]
+python_version = "3.12"
+ignore_missing_imports = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+check_untyped_defs = true

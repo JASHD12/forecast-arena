@@ -17,7 +17,7 @@ from pydantic import AfterValidator, BaseModel, ConfigDict, Field, TypeAdapter, 
 
 from arena.clock import ensure_utc
 
-SCHEMA_VERSION = 1
+SCHEMA_VERSION: Literal[1] = 1
 MAX_RATIONALE_WORDS = 80
 
 UTCDatetime = Annotated[datetime, AfterValidator(ensure_utc)]

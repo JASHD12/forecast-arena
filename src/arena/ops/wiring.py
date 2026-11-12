@@ -12,6 +12,7 @@ from arena.agent.tools import GdeltBackend, wikipedia_summary
 from arena.config import WEATHER_STATIONS, Settings
 from arena.domains.attention import AttentionDomain, titles_from_questions
 from arena.domains.base import AsOfStore, Domain
+from arena.domains.crypto import COINS, crypto_domain_from_prices
 from arena.domains.markets import PAIRS, markets_domain_from_rates
 from arena.domains.power import PowerDomain
 from arena.domains.power_history import PRICE_KEY, berlin_date, to_observations
@@ -26,6 +27,7 @@ from arena.llm.client import LLMClient
 from arena.llm.factory import client_from_settings
 from arena.models import Question
 from arena.sources.brightsky import BrightSkyClient
+from arena.sources.coingecko import CoinGeckoClient
 from arena.sources.ecb import EcbClient
 from arena.sources.http import HttpClient
 from arena.sources.smard import FILTERS, SmardClient, berlin_day_bounds
@@ -59,6 +61,8 @@ def power_domain_from_client(
 #: Calendar days of ECB fixings loaded: 250 returns for the `up` window plus ~200 replayed
 #: batches (about 450 publication days, ~650 calendar days).
 MARKETS_DAYS = 660
+#: Daily crypto prices fetched per coin (the Demo API keeps 365 days).
+CRYPTO_DAYS = 365
 
 #: Observation days loaded for weather: morning runs replay ~200 batches (each needing a
 #: 90-day window); resolve runs only need the last days within the grace period.
@@ -117,6 +121,21 @@ def build_domains(
                 AttentionDomain(
                     WikimediaClient(http, cache_dir=settings.cache_dir),
                     recent_titles=lambda p, b, qs=questions: titles_from_questions(qs, p, b),
+                    on_skip=on_skip,
+                )
+            )
+        elif name == "crypto":
+            if settings.coingecko_api_key is None:
+                # The keyless API is not meant for scheduled use (docs/SOURCES.md): no key,
+                # no crypto questions today, and the run manifest says why.
+                (on_skip or (lambda m: None))("crypto: ARENA_COINGECKO_API_KEY is not set")
+                continue
+            cg = CoinGeckoClient(http, settings.coingecko_api_key.get_secret_value())
+            fetched = {coin: cg.daily(coin, CRYPTO_DAYS) for coin in COINS}
+            out.append(
+                crypto_domain_from_prices(
+                    {c: f.prices for c, f in fetched.items()},
+                    {c: (f.url, f.sha256) for c, f in fetched.items()},
                     on_skip=on_skip,
                 )
             )

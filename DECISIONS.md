@@ -345,6 +345,28 @@ Made by: agent
   treated as a GDPR violation (LG München I, 2022); the system font stack avoids that.
 - Checked with `make a11y` (axe-core, desktop light and phone dark): 0 serious/critical.
 
+## 2026-11-12 · Crypto domain (owner request)
+
+- Context: the owner asked for Bitcoin and other major coins and will create a CoinGecko
+  account.
+- Decision: a `crypto` domain with five fixed coins (Bitcoin, Ethereum, Solana, XRP, BNB)
+  and two templates per coin, `up` and `bigmove`, about the UTC day D = B+1, built like
+  the ECB markets domain (same threshold and degeneracy rules, same EWMA + Student-t `ml`
+  rule as `crypto-ewma-t5-r1`, direction 0.5). Prices are CoinGecko's daily 00:00 UTC
+  points, known from 01:00 UTC (docs: after 00:35). Resolution after D+1 01:00 UTC with
+  revisions recorded (CoinGecko may revise for 2 days), the SMARD approach, rather than
+  waiting 2 days.
+- The Demo key travels only in a request header, never in a URL, log or the ledger.
+  Without a key the domain is skipped with a warning (the keyless API is documented as
+  unsuitable for scheduled use).
+- Not live yet: the API terms page could not be read by the agent (see SOURCES.md), the
+  key is the owner's, and passing a new secret to a workflow is not a standing approval.
+  All three are in HUMAN_TODO H12; T045e waits for it.
+- Alternatives: hourly prices for "close of the European day" questions (rejected: Demo
+  hourly history is 100 days, too short for degeneracy windows); "above a round price"
+  questions (rejected for now: the threshold choice would be arbitrary; `bigmove` plus the
+  plain title already reads naturally).
+
 ## Proposals for the human
 
 Ideas outside the specification. The agent lists them here and does not build them.

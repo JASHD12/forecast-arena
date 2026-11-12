@@ -23,7 +23,10 @@ What to look at (a few minutes):
 3. The repository's **Actions** tab: the last morning and resolve runs are green.
 4. Open issues labelled `incident` (once health checks are live, T033).
 
-Manual runs (standing approval 6): Actions tab > workflow > Run workflow. Keep
+Manual runs (standing approval 6): Actions tab > workflow > Run workflow, **from `main`**
+(the `github-pages` environment only accepts deployments from `main`; a run started from
+`stable` fails in its deploy job; scheduled runs are fine because they start on `main` and
+check out `stable`'s code). Keep
 `dry_run` ticked to test without writing anything; untick it only for a deliberate real
 run (a real morning run after 09:30 UTC is refused by the job itself and writes nothing).
 
@@ -50,7 +53,7 @@ new correcting records.
 | Morning run fails in question generation for one domain | A source was down or returned malformed data | The other domains still run. Check the source with `make smoke-sources`. The run manifest on the ledger lists the warning. |
 | Push to `ledger` rejected | Another job pushed first | The job pulls with rebase and retries up to five times; if it still fails, re-run the workflow (it is idempotent). |
 | `ledger verify` fails | A sealed file changed or a forecast is after its lock | Stop: this is an integrity incident. Do not "fix" the ledger. Open an issue, compare with an older clone, and investigate the commit history. |
-| Site not updated | The Pages deploy job failed | Re-run the workflow; Settings > Pages must have source "GitHub Actions". |
+| Site not updated | The Pages deploy job failed | Re-run the workflow from `main`; Settings > Pages must have source "GitHub Actions". "Branch ... is not allowed to deploy to github-pages" means it was started from another branch. |
 | `promote` fails ("not an ancestor") | `stable` diverged from `main` | Investigate; never force-push `stable`. |
 | LLM forecasters show `budget_exhausted` | The daily caps were reached | Expected behaviour (SPEC 9.4). Raise caps only deliberately, via Actions variables. |
 | LLM forecasters show `model_missing` | No key or model configured | H04 in HUMAN_TODO.md. |

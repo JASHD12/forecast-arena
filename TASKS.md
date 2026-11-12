@@ -181,6 +181,16 @@ Keep the first line of each task in exactly this shape; the status script parses
   - Do: verify the gust field in the source docs; gust-only fixture recorded from the real
     API; generation, resolver, context, `ml` rules (`weather-rules-r2`).
   - Done when: golden and unit tests pass; stations without gust data get no gust question.
+- [x] T045d · Crypto domain: CoinGecko client, `up` and `bigmove` for five coins (deps: T022) (owner request 2026-11-12)
+  - Do: verify the API docs; client with the key in a header; domain, resolver with
+    revisions, `ml` rule, titles, site attribution; fixtures recorded from the real API.
+  - Done when: unit tests cover parsing, generation, no leakage, ties, voids, revisions,
+    the model, the missing-key skip and the attribution.
+- [!] T045e · Enable crypto (live) (deps: T045d, T046; needs: H12) BLOCKED(needs H12)
+  - Do: pass `ARENA_COINGECKO_API_KEY` to the morning and resolve workflows; add `crypto`
+    to the live domains.
+  - Done when: a real morning run writes crypto questions and verify passes, or
+    `WAIT(until=<date>)`.
 - [ ] T046 · Enable the new domains (live) (deps: T041, T043, T045, T034)
   - Do: extend the e2e test to all four domains, then enable them in the live config.
   - Done when: the next real morning run writes questions for all applicable domains and
@@ -218,7 +228,9 @@ Keep the first line of each task in exactly this shape; the status script parses
     file-backed run with a published summary.
   - Done when: a `dry_run=true` dispatch succeeds and prints the promotion decision.
 - [ ] T057 · Enable the ML forecaster (live) (deps: T056, T046)
-  - Do: turn on `ml` in the live config after the e2e test includes it.
+  - Do: turn on `ml` in the live config after the e2e test includes it (models: power,
+    attention from the registry; weather `WeatherRules`, markets `MarketsModel`, crypto
+    `CryptoModel`).
   - Done when: a real morning run records `ml` forecasts for every question, or
     `WAIT(until=<date>)` until that run exists.
 - [ ] T058 · Explainer 04 (deps: T057)

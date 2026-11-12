@@ -81,3 +81,19 @@ Keep the first line of each item in exactly this shape; the status script parses
     listing outdated pins", and tick this item. Until then the report goes to the job
     summary of the `deps` workflow.
   - Needed for T084b.
+- [ ] H12 · Crypto: confirm CoinGecko terms, add the key, approve the workflow secret
+  - Read the CoinGecko API Terms of Service in your browser:
+    https://www.coingecko.com/en/api_terms . Check that a free Demo key may be used to show
+    daily prices and yes/no outcomes derived from them on a public, non-commercial research
+    site with the credit "Data provided by CoinGecko". If it may not, tell the agent and
+    crypto stays off. (The agent could not read this page: it answers 403 to scripts, and
+    opening it in a headless browser was refused by the permission system. Refused
+    command: `node terms.js .../cg/terms.txt` (Playwright `page.goto` of the terms page),
+    wanted to read the terms before building, per AGENTS.md S7.)
+  - Create a free CoinGecko Demo account and an API key (developer dashboard).
+  - Add it as an Actions secret named `ARENA_COINGECKO_API_KEY` (Settings > Secrets and
+    variables > Actions > New repository secret). Never paste it anywhere else.
+  - Add to CLAUDE.md's standing approvals: "8. Committing workflows that pass the
+    repository secret `ARENA_COINGECKO_API_KEY` to api.coingecko.com to fetch crypto
+    prices." (Approval 2 covers only the LLM key.)
+  - Tick this item. Needed for T045e.

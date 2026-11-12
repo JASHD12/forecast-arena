@@ -22,7 +22,7 @@ The official record has not started yet. It starts the day after the first run o
 </div></main>
 <footer><div class="wrap">
 <p><strong>Research project, not advice.</strong> Forecast Arena is a research benchmark. Nothing on this site is financial, investment, energy-purchasing or any other kind of advice. Probabilities are experimental outputs and may be wrong.</p>
-<p>Data: {% for a in attributions %}{{ a }}{% if not loop.last %}; {% endif %}{% endfor %}.</p>
+<p>Data: {% for a in attributions %}{{ a }}{% if not loop.last %}; {% endif %}{% endfor %}.{% if has_crypto %} Crypto prices: <a href="https://www.coingecko.com">Data provided by CoinGecko</a>.{% endif %}</p>
 <p>Built {{ built_at }} from the public ledger. No cookies, no trackers.</p>
 </div></footer>
 </body>

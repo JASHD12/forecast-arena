@@ -339,6 +339,21 @@ a source with clearly compatible terms is found; otherwise leave it out.
 Earthquakes (pure base-rate control): "Will an earthquake of magnitude 6.0 or greater
 occur anywhere on D (UTC)?" from the USGS public feed. Only after Phase 8.
 
+### 7.5 Crypto (added 2026-11-12 at the owner's request, before the official record)
+
+Source: CoinGecko daily USD prices (`/coins/{id}/market_chart`, Demo API key, attribution
+"Data provided by CoinGecko" with a link). Coins: Bitcoin, Ethereum, Solana, XRP, BNB.
+P0 = price stamped 00:00 UTC on D (= B+1), P1 = price stamped 00:00 UTC on D+1, both
+unknown at the lock. Resolve after D+1 01:00 UTC; grace 72 hours; later source revisions
+are recorded. Research only; no trading, no advice (S1, S12).
+
+| Template | Question | Threshold | Window |
+|---|---|---|---|
+| `up` | ln(P1/P0) > 0? | none (unchanged is NO) | 250 days for the degeneracy check |
+| `bigmove` | abs(ln(P1/P0)) > T? | median abs daily log return, rounded to 0.001 | 60 days |
+
+Goes live only after HUMAN_TODO H12 (terms confirmed, key, workflow approval).
+
 ## 8. Forecasters
 
 Each forecaster implements:

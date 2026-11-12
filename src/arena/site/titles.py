@@ -29,6 +29,7 @@ DOMAIN_NAMES = {
     "weather": "Weather",
     "attention": "Wikipedia",
     "markets": "Currencies",
+    "crypto": "Crypto",
 }
 
 
@@ -105,6 +106,12 @@ def plain_title(q: Question) -> str:
             f"Will the {lang} Wikipedia article “{_article(q)}” get at least "
             f"{_num(q.threshold)} views {d}?"
         )
+    if q.domain == "crypto":
+        coin = str(q.params.get("coin_name", q.entity))
+        if t == "up":
+            return f"Will {coin} end the day higher {d}?"
+        if t == "bigmove" and q.threshold is not None:
+            return f"Will {coin} move more than {q.threshold * 100:.1f}% {d}?"
     if q.domain == "markets":
         ccy = str(q.params.get("currency", ""))
         if t == "up":

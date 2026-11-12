@@ -99,13 +99,19 @@ class HttpClient:
         self.sleep = sleep
         self.snapshot_dir = snapshot_dir
 
-    def get(self, url: str, params: Mapping[str, str] | None = None) -> HttpResponse:
-        """GET `url` (with optional query params). Retries 429/5xx and network errors."""
+    def get(
+        self,
+        url: str,
+        params: Mapping[str, str] | None = None,
+        headers: Mapping[str, str] | None = None,
+    ) -> HttpResponse:
+        """GET `url` (with optional query params and extra request headers, e.g. an API
+        key, which never becomes part of the URL). Retries 429/5xx and network errors."""
         if params:
             url = f"{url}{'&' if '?' in url else '?'}{urllib.parse.urlencode(params)}"
         req = HttpRequest(
             url,
-            {"User-Agent": self.user_agent, "Accept-Encoding": "gzip"},
+            {"User-Agent": self.user_agent, "Accept-Encoding": "gzip", **(headers or {})},
             self.timeout,
         )
         last = "no attempt made"

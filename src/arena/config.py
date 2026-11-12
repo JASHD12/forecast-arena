@@ -51,6 +51,7 @@ class Settings(BaseModel):
     agent_max_tool_calls: int = Field(4, ge=0)
 
     panel_csv_url: str | None = None
+    coingecko_api_key: SecretStr | None = None
     domains: tuple[str, ...] = ("power",)
 
     @field_validator("domains", mode="before")
@@ -67,6 +68,7 @@ class Settings(BaseModel):
         "llm_model",
         "llm_base_url",
         "panel_csv_url",
+        "coingecko_api_key",
         mode="before",
     )
     @classmethod

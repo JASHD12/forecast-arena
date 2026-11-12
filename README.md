@@ -148,6 +148,7 @@ locally and in tests they use a scripted fake.
 | Wikipedia pageviews, article metadata | Wikimedia Foundation, Wikidata | Wikimedia API terms |
 | Exchange rates | European Central Bank (log returns computed by this project) | ECB terms: free use with source cited |
 | News headlines (agent tool) | GDELT Project | free use with citation |
+| Crypto prices (built, not live yet) | [Data provided by CoinGecko](https://www.coingecko.com) | CoinGecko API terms, attribution required |
 
 Every external fact the code relies on is listed with its source and date in
 [docs/SOURCES.md](docs/SOURCES.md).

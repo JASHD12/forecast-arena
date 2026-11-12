@@ -10,6 +10,7 @@
   --shadow: 0 1px 2px rgba(16, 22, 42, .06), 0 4px 16px rgba(16, 22, 42, .06);
   --radius: 14px;
   --c-power: #b45309; --c-weather: #0369a1; --c-attention: #7c3aed; --c-markets: #047857;
+  --c-crypto: #c2410c;
 }
 @media (prefers-color-scheme: dark) {
   :root {
@@ -21,6 +22,7 @@
     --bar: #9ea4ff; --bar-ai: #f08bcf; --bar-base: #9aa3b5; --track: #222b40;
     --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 6px 20px rgba(0, 0, 0, .35);
     --c-power: #fbbf24; --c-weather: #7dd3fc; --c-attention: #c4b5fd; --c-markets: #6ee7b7;
+    --c-crypto: #fdba74;
   }
 }
 * { box-sizing: border-box; }
@@ -107,6 +109,7 @@ h3 { font-size: 1.05rem; margin: 0; line-height: 1.35; }
 .chip-weather::before { background: var(--c-weather); }
 .chip-attention::before { background: var(--c-attention); }
 .chip-markets::before { background: var(--c-markets); }
+.chip-crypto::before { background: var(--c-crypto); }
 .bars { list-style: none; margin: 0; padding: 0; display: grid; gap: .35rem; }
 .bars li { display: grid; grid-template-columns: 9.5rem 1fr 3rem; gap: .5rem; align-items: center;
   font-size: .85rem; }

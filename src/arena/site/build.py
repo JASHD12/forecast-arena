@@ -249,6 +249,7 @@ def build_site(
         "qhref": question_href,
         "plain_title": plain_title,
         "fname": forecaster_name,
+        "has_crypto": any(q.domain == "crypto" for q in rec.questions.values()),
         "dname": domain_name,
     }
     archive = sorted(

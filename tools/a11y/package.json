@@ -1,0 +1,9 @@
+{
+  "name": "forecast-arena-a11y",
+  "private": true,
+  "description": "Accessibility lint of the built site with axe-core (T074).",
+  "dependencies": {
+    "axe-core": "4.14.0",
+    "playwright": "1.63.0"
+  }
+}

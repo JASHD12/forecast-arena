@@ -243,6 +243,14 @@ The 300-forecast threshold counts questions x covered forecasters. Without an of
 start date, headline boards are empty and labelled "too early to tell".
 Made by: agent
 
+## 2026-11-12 - Accessibility lint: axe-core in Chromium (tools/a11y)
+Decision: `make a11y` builds the site from the offline e2e run, link-checks it and runs
+axe-core 4.14.0 on every top-level page and a sample of question pages, at 1200 px (light)
+and 390 px (dark); serious or critical violations fail the job. Node dependencies are pinned
+in `tools/a11y/package-lock.json`; CI installs them and Chromium in a separate job.
+Alternatives: pa11y (wraps the same engine, more dependencies); a hand-written linter.
+Made by: agent
+
 ## Proposals for the human
 
 Ideas outside the specification. The agent lists them here and does not build them.

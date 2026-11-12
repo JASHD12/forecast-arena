@@ -29,3 +29,7 @@ dist/
 .coverage
 htmlcov/
 _tmp_*/
+
+# Node tools
+node_modules/
+_site_e2e/

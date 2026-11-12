@@ -38,6 +38,7 @@ checked against and the date. Code must not rely on anything that is not in this
 | GDELT terms: all datasets free for unlimited, unrestricted use; any use or redistribution must cite the GDELT Project and link https://www.gdeltproject.org/ | https://gdeltproject.org/about.html#termsofuse | 2026-11-12 | |
 | GDELT DOC 2.0 API `https://api.gdeltproject.org/api/v2/doc/doc` (`query`, `mode=artlist`, `format=rss` (RSS only in ArtList mode), `sort=datedesc`, `maxrecords` up to 250, `startdatetime`/`enddatetime` YYYYMMDDHHMMSS); limit: one request every 5 seconds | https://blog.gdeltproject.org/gdelt-doc-2-0-api-debuts/ and the API's own 429 message | 2026-11-12 | from this sandbox's shared IP: one 200 (empty result), then 429s and connection resets |
 | Wikipedia REST `https://{lang}.wikipedia.org/api/rest_v1/page/summary/{title}` returns `title`, `description`, `extract` (lead) | live calls | 2026-11-12 | same Wikimedia rate limits as above; only the URL is stored in traces |
+| `actions/setup-node` current major is `v7` (v7.1.0); axe-core 4.14.0 is the latest stable npm release | https://github.com/actions/setup-node (tags), `npm view axe-core` | 2026-11-12 | T074 a11y job |
 | `astral-sh/setup-uv` latest is v10.3.3 but moving major tags stop at `v7` | https://github.com/astral-sh/setup-uv (tags) | 2026-11-12 | not used: CI installs with pip from the lock file |
 
 ## Availability rules for historical data

@@ -26,3 +26,25 @@ jobs:
         run: make setup
       - name: make check
         run: make check
+
+  a11y:
+    needs: check
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+      - name: Install pinned dependencies
+        run: make setup
+      - name: Install axe-core and Chromium
+        working-directory: tools/a11y
+        run: |
+          npm ci --ignore-scripts
+          npx playwright install --with-deps chromium
+      - name: Accessibility lint (fails on serious or critical issues)
+        run: make a11y

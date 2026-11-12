@@ -6,7 +6,7 @@ export PYTHONPATH := src
 # One OpenMP thread: deterministic model fits and no oversubscription in parallel jobs.
 export OMP_NUM_THREADS ?= 1
 
-.PHONY: setup setup-offline lint test e2e check status smoke-sources schemas
+.PHONY: setup setup-offline lint test e2e check status smoke-sources schemas site-e2e a11y
 
 setup:  ## Create .venv and install pinned dependencies
 	@if uv --version >/dev/null 2>&1; then \
@@ -41,3 +41,10 @@ schemas:  ## Re-export JSON Schemas after changing arena.models
 
 smoke-sources:  ## Live source checks (network). Not part of `make check`.
 	$(PY) -m arena.sources.smoke
+
+site-e2e:  ## Build the site from the offline e2e run into _site_e2e/ (link-checked)
+	$(PY) scripts/build_e2e_site.py _site_e2e
+	$(PY) -m arena.site.linkcheck _site_e2e
+
+a11y: site-e2e  ## axe-core accessibility lint (needs Node and tools/a11y dependencies)
+	NODE_PATH=tools/a11y/node_modules node tools/a11y/check.js _site_e2e

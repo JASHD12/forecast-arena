@@ -267,7 +267,7 @@ Keep the first line of each task in exactly this shape; the status script parses
   - Do: templated factual statements about H1-H4 from the scores, plus the human block
     from `site_content/findings.md` (placeholder if absent).
   - Done when: tests show no statement claims support unless the interval excludes zero.
-- [ ] T074 · Accessibility and performance pass (deps: T072)
+- [!] T074 · Accessibility and performance pass (deps: T072) BLOCKED(needs H10)
   - Do: semantic HTML, contrast, keyboard use, charts readable without colour alone,
     small page weight; link check in CI.
   - Done when: an automated accessibility lint run in CI reports no serious issues.

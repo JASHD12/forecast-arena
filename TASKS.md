@@ -177,7 +177,7 @@ Keep the first line of each task in exactly this shape; the status script parses
 
 ## Phase 4 - Classical ML forecasters
 
-- [ ] T050 · Backtest harness (deps: T027)
+- [x] T050 · Backtest harness (deps: T027)
   - Do: walk-forward replay through the real question, context and resolver code into a
     separate `backtests/` store, labelled as backtest everywhere (integrity rule I4).
   - Done when: a test proves backtest records cannot be written to the live ledger.

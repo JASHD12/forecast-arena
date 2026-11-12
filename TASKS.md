@@ -60,7 +60,7 @@ Keep the first line of each task in exactly this shape; the status script parses
   - Do: a context manager that records job, date, code SHA, package versions, timings,
     counts, warnings and LLM usage to `runs/`.
   - Done when: tests show a manifest is written on success and on failure.
-- [ ] T015 · Command-line interface (deps: T014)
+- [x] T015 · Command-line interface (deps: T014)
   - Do: `arena` CLI with groups `questions`, `forecast`, `resolve`, `score`, `site`,
     `ledger`, `daily`, `report`; common options `--date`, `--dry-run`, `--ledger-dir`.
   - Done when: `arena --help` lists the groups and CLI tests pass.

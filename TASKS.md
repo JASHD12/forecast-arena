@@ -217,7 +217,7 @@ Keep the first line of each task in exactly this shape; the status script parses
   - Do: section 9.1: protocol, `FakeLLM`, two adapters written against current official
     API documentation, usage accounting.
   - Done when: adapter tests pass with mocked HTTP; no test needs a key.
-- [ ] T061 · Budget guard (deps: T060, T014)
+- [x] T061 · Budget guard (deps: T060, T014)
   - Do: section 9.4 caps counted across all runs of a UTC day.
   - Done when: tests show the cap stops calls and produces `budget_exhausted` skips.
 - [ ] T062 · Prompts and strict parsing (deps: T060)

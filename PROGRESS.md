@@ -76,6 +76,15 @@ move older "Done log" lines to `docs/progress-archive.md`.
 
 ## Session summaries
 
+- 2026-11-12 (session 2, cloud sandbox with GitHub, PyPI and the data sources reachable
+  through a personal environment `forecast-arena`): built T021-T029, T040-T045, T050-T056,
+  T060-T063, T066-T067, T070-T075, T083, T091, T100-T103; 358 unit tests + 2 e2e green;
+  fresh-clone `make setup && make check` verified on Python 3.12 and 3.13. Backtests:
+  power ml beats both baselines, markets nothing beats the base rate, attention ml beats
+  the (weak, per-article) baselines. Blocked on H10 (Actions never starts a job): T002,
+  T056, T074, T083; every live task also waits on H03/H04/H06. Next session: once H10 is
+  fixed, check CI on main, then T030 (needs H03) onwards. Work was pushed to `main` as the
+  owner approved; the session branch `claude/relaxed-bardeen-rmhyal` was not updated.
 - 2026-11-12 (cloud sandbox, no network to PyPI/GitHub): built Phase 0 except T002 and all
   of Phase 1. `make check` green: 57 unit tests + e2e placeholder. Next: T002 locally,
   then T020/T022 (offline) and T021 (needs live SMARD docs).

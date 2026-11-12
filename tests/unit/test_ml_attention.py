@@ -42,3 +42,23 @@ def test_features_require_views_on_reference_day() -> None:
     traj[-1]["views"] = None
     with pytest.raises(ValueError):
         features(traj, 500, "de.wikipedia", date(2026, 11, 10))
+
+
+def test_transient_unpublished_list_is_not_remembered() -> None:
+    from arena.domains.attention import top_trajectory
+    from arena.sources.wikimedia import TopArticle
+
+    class Flaky:
+        def __init__(self) -> None:
+            self.calls = 0
+
+        def top(self, project, day):
+            self.calls += 1
+            if self.calls == 1:
+                return None  # first answer: "not published"
+            return [TopArticle("X", 500, 7)]
+
+    src = Flaky()
+    first = top_trajectory(src, "de.wikipedia", "X", date(2026, 11, 1), days=1)
+    second = top_trajectory(src, "de.wikipedia", "X", date(2026, 11, 1), days=1)
+    assert first[-1]["views"] is None and second[-1]["views"] == 500

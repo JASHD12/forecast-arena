@@ -21,7 +21,6 @@ import urllib.parse
 from collections.abc import Callable, Iterable, Sequence
 from dataclasses import dataclass
 from datetime import UTC, date, datetime, time, timedelta
-from functools import lru_cache
 from importlib import resources
 from typing import Any, Protocol
 
@@ -320,12 +319,24 @@ class AttentionDomain:
         return d in series and series[d] != first.evidence.values_used.get("views")
 
 
-@lru_cache(maxsize=8192)
+_INDEX: dict[tuple[int, str, date], tuple[dict[str, TopArticle], int | None]] = {}
+
+
 def _top_index(
     source: PageviewSource, project: str, day: date
 ) -> tuple[dict[str, TopArticle], int | None]:
+    """Title index of a top list. Only published (non-empty) lists are memoised, so a
+    transient 'not published' answer is retried rather than remembered."""
+    key = (id(source), project, day)
+    if key in _INDEX:
+        return _INDEX[key]
     top = source.top(project, day) or []
-    return {x.article: x for x in top}, min((x.views for x in top), default=None)
+    out = {x.article: x for x in top}, min((x.views for x in top), default=None)
+    if top:
+        if len(_INDEX) > 16384:
+            _INDEX.clear()
+        _INDEX[key] = out
+    return out
 
 
 def top_trajectory(

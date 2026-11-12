@@ -42,6 +42,7 @@ move older "Done log" lines to `docs/progress-archive.md`.
 
 ## Done log
 
+- 2026-11-12 T084a: pip-audit CI job (no known vulnerabilities) and deps workflow green (runs 43263903360, 43263909444)
 - 2026-11-12 H10 fixed by the owner (Actions budget + billing lock); CI run 43256050346 attempt 4 green: check, a11y, docker
 - 2026-11-12 T083: Docker build + containerised e2e green in CI
 - 2026-11-12 T074: axe-core lint green in CI (0 serious)

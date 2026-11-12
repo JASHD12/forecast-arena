@@ -291,7 +291,7 @@ Keep the first line of each task in exactly this shape; the status script parses
 - [x] T083 · Dockerfile (deps: T027)
   - Do: image that runs `make e2e`; CI builds it (no registry push).
   - Done when: `docker build` and the containerised e2e succeed in CI.
-- [ ] T084a · Dependency hygiene: audit and outdated report (deps: T002)
+- [x] T084a · Dependency hygiene: audit and outdated report (deps: T002)
   - Do: vulnerability audit in CI as a non-blocking report; a monthly workflow that lists
     outdated pins in its job summary (no automatic merges).
   - Done when: both workflows run successfully once.

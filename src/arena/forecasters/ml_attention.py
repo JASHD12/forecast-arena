@@ -140,6 +140,8 @@ def training_rows(domain: AttentionDomain, first_ref: date, last_ref: date) -> R
                     continue  # label unknown: below the list, but K is below its floor too
                 label = int(v3 is not None and v3 >= k)
                 traj = top_trajectory(domain.source, project, a.article, r)
+                if traj[-1]["views"] is None:
+                    continue  # inconsistent list answers for R: skip, never guess
                 rows.x.append(features(traj, k, project, r + timedelta(days=HORIZON)))
                 rows.y.append(label)
                 rows.ref.append(r)

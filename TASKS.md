@@ -104,7 +104,7 @@ Keep the first line of each task in exactly this shape; the status script parses
 - [x] T028 · Scoring v1 (deps: T027)
   - Do: Brier, log score, skill against `base_rate`, counts, clipping (section 10).
   - Done when: property tests pass (perfect = 0, constant 0.5 = 0.25).
-- [ ] T029 · Static site v1 (deps: T028)
+- [x] T029 · Static site v1 (deps: T028)
   - Do: `arena site build`: Home, Methods stub, Status, About placeholder; disclaimer and
     attributions on every page; responsive; light and dark theme.
   - Done when: the site builds from the e2e ledger; an internal link check passes.

@@ -194,9 +194,23 @@ def site() -> None:
 
 
 @site.command("build")
-def site_build() -> None:
-    """Build `site/` from the ledger (built in T029)."""
-    _not_yet("T029")
+@click.option("--out", "out_dir", type=click.Path(path_type=Path), default=Path("site"),
+              show_default=True, help="Output directory.")  # fmt: skip
+@click.option("--check-links/--no-check-links", default=True, show_default=True)
+@click.pass_obj
+def site_build(obj: Ctx, out_dir: Path, check_links: bool) -> None:
+    """Build the static site from the ledger, then check internal links."""
+    from arena.site.build import build_site
+    from arena.site.linkcheck import check_site
+
+    res = build_site(obj.ledger, out_dir, obj.clock)
+    click.echo(f"site built: {len(res.pages)} pages in {res.out_dir}")
+    if check_links:
+        errors = check_site(res.out_dir)
+        for e in errors:
+            click.echo(e, err=True)
+        click.echo(f"link check: {'FAIL' if errors else 'PASS'}")
+        sys.exit(1 if errors else 0)
 
 
 @main.group()

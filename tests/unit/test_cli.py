@@ -42,5 +42,5 @@ def test_seal_list_and_verify(tmp_path: Path) -> None:
 
 
 def test_unbuilt_commands_say_so() -> None:
-    res = CliRunner().invoke(main, ["site", "build"])
+    res = CliRunner().invoke(main, ["report", "cv"])
     assert res.exit_code == 2

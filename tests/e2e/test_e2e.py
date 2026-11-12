@@ -63,6 +63,14 @@ def test_five_days_offline(tmp_path) -> None:
     assert board["base_rate"].n == len(qs) and board["base_rate"].skill == 0
     assert counts(rec).open == 0
 
+    from arena.site.build import build_site
+    from arena.site.linkcheck import check_site
+
+    site = build_site(led, tmp_path / "site", FixedClock(datetime(2026, 10, 27, tzinfo=UTC)))
+    assert check_site(site.out_dir) == []
+    home = (site.out_dir / "index.html").read_text()
+    assert "base_rate" in home and "not advice" in home and "SMARD.de" in home
+
 
 def test_rerunning_the_schedule_changes_nothing(tmp_path) -> None:
     a = run_schedule(tmp_path / "a")

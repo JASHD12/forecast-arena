@@ -29,6 +29,7 @@ move older "Done log" lines to `docs/progress-archive.md`.
 
 ## Done log
 
+- 2026-11-12 T102: METHODS.md and Methods page: every SPEC 2 principle with code locations, limitations list
 - 2026-11-12 T101: `arena report cv` from the ledger only; refuses wins while too early or unsupported
 - 2026-11-12 T091: panel CSV intake (pseudonyms, late/duplicate/bad-token rules, median of >=3), PANEL_SETUP.md
 - 2026-11-12 T075: explainer 06 scoring and statistics (10 interview Q&A)

@@ -29,6 +29,7 @@ from arena.scoring.core import Scored, counts, load
 from arena.scoring.findings import findings
 from arena.scoring.stats import calibration_bins, expected_calibration_error, murphy
 from arena.site.charts import reliability_svg
+from arena.site.methods_content import LIMITATIONS, PRINCIPLES
 from arena.sources.brightsky import ATTRIBUTION as WX_ATTRIBUTION
 from arena.sources.brightsky import LICENCE as WX_LICENCE
 from arena.sources.ecb import ATTRIBUTION as ECB_ATTRIBUTION
@@ -279,7 +280,12 @@ def build_site(
         ),
         "methods.html": (
             "Methods",
-            {"information_sets": INFORMATION_SETS, "changelog": version_changelog(rec)},
+            {
+                "information_sets": INFORMATION_SETS,
+                "changelog": version_changelog(rec),
+                "principles": PRINCIPLES,
+                "limitations": LIMITATIONS,
+            },
         ),
         "status.html": ("Status", {"counts": counts(rec), "runs": _runs(ledger)}),
         "about.html": (

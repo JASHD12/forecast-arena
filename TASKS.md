@@ -328,7 +328,7 @@ Keep the first line of each task in exactly this shape; the status script parses
     intervals from the ledger only.
   - Done when: a test shows it refuses to print a comparison labelled "too early to tell"
     as a win.
-- [ ] T102 · Methods and limitations (deps: T072)
+- [x] T102 · Methods and limitations (deps: T072)
   - Do: complete `docs/METHODS.md` and the Methods page, including every known limitation.
   - Done when: each principle of section 2 is explained with where it is enforced in code.
 - [ ] T103 · Demo outline (deps: T100)

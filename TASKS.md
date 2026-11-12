@@ -45,7 +45,7 @@ Keep the first line of each task in exactly this shape; the status script parses
   - Do: batch seal, day seal, chain, and `arena ledger verify` as in section 6.
   - Done when: tamper tests (edit, delete, reorder, forecast after lock) each make `verify`
     fail with a clear message; an untouched ledger passes.
-- [ ] T012 · Git sync for the ledger branch (deps: T010)
+- [x] T012 · Git sync for the ledger branch (deps: T010)
   - Do: helpers that check out `ledger` into `./_ledger` (creating the orphan branch if
     absent), commit as `ledger: <job> <date>`, pull with rebase and retry on conflict, and
     never force.

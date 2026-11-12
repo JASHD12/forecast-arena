@@ -1,8 +1,7 @@
 {% extends "base.html" %}
-{% from "macros.html" import board_table %}
+{% from "macros.html" import board_table, page_head %}
 {% block content %}
-<h1>Leaderboard</h1>
-<p class="lead">Lower is better. A forecaster that always says 50% scores 0.25 (the line on each bar). The base rate is the yardstick to beat.</p>
+{{ page_head("Who forecasts best?", "Leaderboard", "Lower is better. A forecaster that always says 50% scores 0.25 (the line on each bar). The base rate is the yardstick to beat.") }}
 <details class="faq"><summary>How the scores are computed</summary>
 <p>Brier and log scores are lower-is-better, on probabilities clipped to [0.01, 0.99]. Intervals are 95% day-block bootstrap intervals (questions from the same day are correlated, so days are resampled). A difference is called supported only when its interval excludes zero. With fewer than 30 official days or 300 resolved common-set forecasts every board says "too early to tell". The common set contains only the questions every forecaster in the group answered, so the comparison is fair.</p>
 </details>

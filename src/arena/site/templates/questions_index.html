@@ -1,7 +1,7 @@
 {% extends "base.html" %}
+{% from "macros.html" import page_head %}
 {% block content %}
-<h1>{% if current %}{{ dname(current) }} questions{% else %}All questions{% endif %}</h1>
-<p>{{ archive|length }} questions, newest first. Each has its own page with every forecast, the outcome, who was closest and the evidence.</p>
+{{ page_head("Archive", (dname(current) ~ " questions") if current else "All questions", archive|length ~ " questions, newest first. Each has its own page with every forecast, the outcome, who was closest and the evidence.") }}
 <nav aria-label="Filter by topic" class="filters">
 <a href="index.html" class="filter{% if not current %} active{% endif %}"{% if not current %} aria-current="page"{% endif %}>All</a>
 {% for d in domains %}<a href="topic-{{ d }}.html" class="filter{% if current == d %} active{% endif %}"{% if current == d %} aria-current="page"{% endif %}><span class="chip chip-{{ d }}">{{ dname(d) }}</span></a>{% endfor %}

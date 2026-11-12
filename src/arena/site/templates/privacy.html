@@ -1,6 +1,7 @@
 {% extends "base.html" %}
+{% from "macros.html" import page_head %}
 {% block content %}
-<h1>Privacy</h1>
+{{ page_head("Your data", "Privacy", "This site sets no cookies, runs no trackers and loads nothing from third parties.") }}
 {% if owner_privacy %}<section class="card prose">{{ owner_privacy }}</section>
 {% else %}<p class="notice"><strong>Pending:</strong> the project owner's privacy notice (who is responsible, how to contact them, your rights) has not been added yet. The facts below describe what the site does technically.</p>{% endif %}
 

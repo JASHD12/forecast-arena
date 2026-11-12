@@ -1,8 +1,9 @@
 {% extends "base.html" %}
+{% from "macros.html" import page_head %}
 {% block content %}
-<h1>Experiments</h1>
+{{ page_head("MLOps", "Experiments", "Champion/challenger retraining every Sunday, with promotion decisions, drift reports and feature importance, published to the public ledger.") }}
 <p>Every weekly retraining run, newest first. Each run trains a candidate model per domain, scores it next to the current model on the last 28 days of real questions, and promotes it only if it is not worse (rule in <code>src/arena/ops/weekly.py</code>). The runs are logged with MLflow to a file; this page shows the summaries that each run publishes to the public ledger.</p>
-{% if not runs %}<p class="muted">No weekly runs yet.</p>{% endif %}
+{% if not runs %}<p class="empty">No weekly runs yet. The first runs on Sunday at 02:00 UTC.</p>{% endif %}
 {% for r in runs %}
 <h2>{{ r.day }}{% if r.dry_run %} (dry run){% endif %}</h2>
 <div class="table-scroll" tabindex="0" role="region" aria-label="Weekly run {{ r.day }}"><table>

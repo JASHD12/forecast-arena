@@ -1,7 +1,7 @@
 {% extends "base.html" %}
+{% from "macros.html" import page_head %}
 {% block content %}
-<h1>Methods</h1>
-<p class="note">This page is a summary; the full methods page grows with the project.</p>
+{{ page_head("How it works, precisely", "Methods", "The principles the system enforces in code, how scoring works, what each forecaster may see, and every model version that ever ran.") }}
 <h2>Principles and where they are enforced</h2>
 <div class="table-scroll" tabindex="0" role="region" aria-label="Principles table"><table>
 <thead><tr><th scope="col">Principle</th><th scope="col">Rule</th><th scope="col">Enforced in</th></tr></thead>
@@ -11,12 +11,12 @@
 <h2>Forecasters</h2>
 <div class="table-scroll" tabindex="0" role="region" aria-label="Table (scrolls sideways on small screens)"><table>
 <thead><tr><th scope="col">Id</th><th scope="col">Sees</th><th scope="col">Answers</th></tr></thead>
-<tbody>{% for f in information_sets %}<tr><th scope="row">{{ f[0] }}</th><td>{{ f[1] }}</td><td>{{ f[2] }}</td></tr>{% endfor %}</tbody>
+<tbody>{% for f in information_sets %}<tr><th scope="row">{{ fname(f[0]) }}{% if is_ai(f[0]) %} <span class="label">AI</span>{% endif %}<br><code class="muted">{{ f[0] }}</code></th><td>{{ f[1] }}</td><td>{{ f[2] }}</td></tr>{% endfor %}</tbody>
 </table></div>
 <h2>Version changelog</h2>
 <p>Every forecaster version, with the first batch that used it. A version changes whenever a model artefact, an LLM model id or a prompt changes.</p>
 <div class="table-scroll" tabindex="0" role="region" aria-label="Table (scrolls sideways on small screens)"><table><thead><tr><th scope="col">Since batch</th><th scope="col">Forecaster</th><th scope="col">Version</th></tr></thead>
-<tbody>{% for r in changelog %}<tr><td>{{ r.since }}</td><td>{{ r.forecaster }}</td><td><code>{{ r.version }}</code></td></tr>{% else %}<tr><td colspan="3" class="muted">No forecasts yet.</td></tr>{% endfor %}</tbody></table></div>
+<tbody>{% for r in changelog %}<tr><td>{{ r.since }}</td><td>{{ fname(r.forecaster) }}</td><td><code>{{ r.version }}</code></td></tr>{% else %}<tr><td colspan="3" class="muted">No forecasts yet.</td></tr>{% endfor %}</tbody></table></div>
 <h2>Limits</h2>
 <p>Git timestamps are evidence, not cryptographic proof. The public branch history, the hash chain and the GitHub Actions run logs together make silent edits detectable by anyone who has cloned the ledger branch.</p>
 <ul>{% for l in limitations %}<li>{{ l }}</li>{% endfor %}</ul>

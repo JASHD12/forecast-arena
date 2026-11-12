@@ -1,15 +1,22 @@
 {% extends "base.html" %}
+{% from "macros.html" import page_head %}
 {% block content %}
-<h1>Findings</h1>
-<p>The four hypotheses below were stated before any data was collected and are shown unchanged. The statements under each are generated from the official record's scores: a hypothesis is called supported or contradicted only when the relevant paired difference has a 95% interval that excludes zero. No causal claims are made. Any of them may turn out false; this page reports whichever way it falls.</p>
+{{ page_head("The research question", "Findings", "Four hypotheses, written down before any data was collected and never changed. Each is judged only by the official record, and only when a 95% interval excludes zero.") }}
+<div class="progress-card">
+<div><strong>{{ official_days }} of {{ min_days }}</strong> official days needed before any hypothesis can be judged.</div>
+<div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="{{ min_days }}" aria-valuenow="{{ official_days }}" aria-label="Official days"><span style="width: {{ '%.1f'|format([official_days / min_days, 1]|min * 100) }}%"></span></div>
+</div>
+<ol class="hyps">
 {% for f in findings %}
-<section aria-labelledby="h-{{ f.key }}">
-<h2 id="h-{{ f.key }}">{{ f.key }}: <span class="label">{{ f.status }}</span></h2>
-<p><strong>{{ f.text }}</strong></p>
+<li class="hyp hyp-{{ f.status|replace(' ', '-') }}" aria-labelledby="h-{{ f.key }}">
+<div class="hyp-top"><span class="hyp-key">{{ f.key }}</span><span class="label status-pill">{{ f.status }}</span></div>
+<h2 id="h-{{ f.key }}">{{ f.text }}</h2>
 {% if f.comparisons %}<ul>{% for c in f.comparisons %}<li>{{ c.sentence() }}</li>{% endfor %}</ul>{% endif %}
 {% if f.note %}<p class="note">{{ f.note }}</p>{% endif %}
-</section>
+</li>
 {% endfor %}
+</ol>
+<p class="note">No causal claims are made. Any hypothesis may turn out false; this page reports whichever way it falls. An honest "it does not" is a valid result.</p>
 <h2>The project owner's interpretation</h2>
-{% if human %}{{ human }}{% else %}<p class="muted">The project owner will write their own interpretation here after at least 30 official days.</p>{% endif %}
+{% if human %}<section class="prose">{{ human }}</section>{% else %}<p class="empty">The project owner will write their own interpretation here after at least 30 official days.</p>{% endif %}
 {% endblock %}

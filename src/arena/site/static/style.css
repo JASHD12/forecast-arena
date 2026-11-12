@@ -409,3 +409,48 @@ details.faq[open] summary { margin-bottom: .5rem; }
 pre.sql { background: var(--ink); color: #e6edf3; border-radius: 10px; padding: .9rem 1rem; overflow-x: auto;
   font-size: .85rem; line-height: 1.5; }
 .sqlblock h2 { margin-top: 2rem; }
+
+/* ---- Pages v2: shared head, calibration, findings, status ---- */
+.page-head { padding: .5rem 0 1rem; border-bottom: 1px solid var(--line); margin-bottom: 1.5rem; }
+.page-head h1 { margin: .25rem 0 .5rem; }
+.page-head .lead { margin: 0; }
+.explain { display: grid; grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr)); gap: 1rem; margin-bottom: 1rem; }
+.explain > div { background: var(--accent-soft); border-radius: var(--radius); padding: 1rem 1.1rem; }
+.explain h2 { font-size: 1rem; margin: 0 0 .35rem; }
+.explain p { margin: 0; font-size: .93rem; }
+.cal-grid { grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr)); }
+.cal-head { display: flex; align-items: center; gap: .35rem; margin-bottom: .5rem; }
+.cal-head h2 { margin: 0; font-size: 1.05rem; }
+.cal-card .chart { margin: 0 auto; }
+.metrics { display: grid; grid-template-columns: repeat(2, 1fr); gap: .5rem; margin: .75rem 0; }
+.metrics div { background: var(--surface-2); border-radius: 8px; padding: .4rem .6rem; }
+.metrics dt { font-size: .75rem; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+.metrics dd { margin: 0; font-weight: 800; font-variant-numeric: tabular-nums; }
+.progress-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 1rem 1.1rem; box-shadow: var(--shadow); display: grid; gap: .6rem; margin-bottom: 1.25rem; }
+.progress { height: .7rem; background: var(--track); border-radius: 999px; overflow: hidden; }
+.progress span { display: block; height: 100%; background: linear-gradient(90deg, var(--bar), var(--bar-ai));
+  border-radius: 999px; min-width: .7rem; }
+.hyps { list-style: none; padding: 0; margin: 0; display: grid; gap: .9rem; }
+.hyp { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--muted);
+  border-radius: var(--radius); padding: 1rem 1.2rem; box-shadow: var(--shadow); }
+.hyp-supported { border-left-color: var(--yes); }
+.hyp-contradicted { border-left-color: var(--no); }
+.hyp-top { display: flex; align-items: center; gap: .6rem; }
+.hyp-key { font-weight: 900; font-size: 1.1rem; color: var(--accent); }
+.hyp h2 { font-size: 1.1rem; margin: .4rem 0; line-height: 1.4; }
+.health { display: flex; flex-wrap: wrap; gap: .4rem 1rem; align-items: center; border-radius: var(--radius);
+  padding: .9rem 1.1rem; background: var(--surface); border: 1px solid var(--line); }
+.health-big { font-weight: 900; font-size: 1.1rem; }
+.health-ok { background: var(--yes-bg); border-color: transparent; }
+.health-ok .health-big { color: var(--yes); }
+.health-bad { background: var(--no-bg); border-color: transparent; }
+.health-bad .health-big { color: var(--no); }
+.timeline { list-style: none; padding: 0; margin: 0 0 1.5rem; border-left: 2px solid var(--line); }
+.timeline li { position: relative; padding: .3rem 0 .9rem 1.2rem; display: grid; gap: .1rem; }
+.timeline li::before { content: ""; position: absolute; left: -.42rem; top: .55rem; width: .7rem; height: .7rem;
+  border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 3px var(--bg); }
+.timeline time { font-weight: 800; font-variant-numeric: tabular-nums; }
+.timeline span { color: var(--muted); }
+ul.plain { list-style: none; padding: 0; margin: 0; display: grid; gap: .45rem; }
+.card h2 { font-size: 1.05rem; margin: 0 0 .5rem; }

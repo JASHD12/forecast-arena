@@ -1,6 +1,7 @@
 {% extends "base.html" %}
+{% from "macros.html" import page_head %}
 {% block content %}
-<h1>Imprint</h1>
+{{ page_head("Legal", "Imprint") }}
 {% if imprint %}<section class="card prose">{{ imprint }}</section>
 {% else %}<p class="notice"><strong>Pending:</strong> the provider identification (Impressum) has not been added by the project owner yet.</p>{% endif %}
 <h2>About this project</h2>

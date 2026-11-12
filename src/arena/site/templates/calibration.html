@@ -1,17 +1,30 @@
 {% extends "base.html" %}
+{% from "macros.html" import page_head %}
 {% block content %}
-<h1>Calibration</h1>
-<p>Scope: {{ scope }}. A calibrated forecaster's points lie on the dashed diagonal: of all questions it gave about 30%, about 30% resolved YES. Bins with fewer than 10 forecasts are merged with a neighbour. Brier = reliability - resolution + uncertainty (Murphy decomposition; lower reliability and higher resolution are better).</p>
-{% if not panels %}<p class="muted">No resolved forecasts yet.</p>{% endif %}
-<div class="grid-cards">
+{{ page_head("Are the probabilities honest?", "Calibration", "When a forecaster says 30%, does it happen about 30% of the time? Points on the dashed diagonal mean yes.") }}
+<div class="explain">
+<div><h2>How to read a chart</h2><p>Each dot groups forecasts with similar probabilities (x) and shows how often those questions actually resolved YES (y). Dots <strong>below</strong> the diagonal mean over-confident about YES; <strong>above</strong> it, under-confident.</p></div>
+<div><h2>The numbers</h2><p><strong>ECE</strong> (expected calibration error) is the average gap to the diagonal. The Brier score splits into <strong>reliability</strong> (calibration error, lower is better), <strong>resolution</strong> (how well forecasts separate YES from NO, higher is better) and <strong>uncertainty</strong> (how hard the questions were).</p></div>
+</div>
+<p class="note">Scope: {{ scope }}. Bins with fewer than 10 forecasts are merged with a neighbour.</p>
+{% if not panels %}<p class="empty">No resolved forecasts yet. Calibration charts appear after the first answers arrive.</p>{% endif %}
+<div class="grid-cards cal-grid">
 {% for c in panels %}
-<section class="card" aria-labelledby="h-{{ c.forecaster }}">
-<h2 id="h-{{ c.forecaster }}">{{ c.forecaster }}</h2>
+<section class="card cal-card" aria-labelledby="h-{{ c.forecaster }}">
+<div class="cal-head"><span class="dot-key {{ series_class(c.forecaster) }}" aria-hidden="true"></span><h2 id="h-{{ c.forecaster }}">{{ fname(c.forecaster) }}</h2>{% if is_ai(c.forecaster) %}<span class="label">AI</span>{% endif %}</div>
 {{ c.svg }}
-<p class="note">n = {{ c.n }}; expected calibration error {{ "%.3f"|format(c.ece) }}; reliability {{ "%.4f"|format(c.murphy.reliability) }}, resolution {{ "%.4f"|format(c.murphy.resolution) }}, uncertainty {{ "%.4f"|format(c.murphy.uncertainty) }}.</p>
-<div class="table-scroll" tabindex="0" role="region" aria-label="Table (scrolls sideways on small screens)"><table><caption class="muted">Bins of {{ c.forecaster }}</caption>
+<dl class="metrics">
+<div><dt>forecasts</dt><dd>{{ c.n }}</dd></div>
+<div><dt>ECE</dt><dd>{{ "%.3f"|format(c.ece) }}</dd></div>
+<div><dt>reliability</dt><dd>{{ "%.4f"|format(c.murphy.reliability) }}</dd></div>
+<div><dt>resolution</dt><dd>{{ "%.4f"|format(c.murphy.resolution) }}</dd></div>
+</dl>
+<details class="faq"><summary>Bins</summary>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Bins of {{ fname(c.forecaster) }}"><table>
 <thead><tr><th scope="col">Bin</th><th scope="col" class="num">n</th><th scope="col" class="num">Mean forecast</th><th scope="col" class="num">Observed</th></tr></thead>
-<tbody>{% for b in c.bins %}<tr><td>{{ "%.1f"|format(b.low) }}-{{ "%.1f"|format(b.high) }}</td><td class="num">{{ b.n }}</td><td class="num">{{ "%.2f"|format(b.mean_forecast) }}</td><td class="num">{{ "%.2f"|format(b.observed_rate) }}</td></tr>{% endfor %}</tbody></table></div>
+<tbody>{% for b in c.bins %}<tr><td>{{ "%.1f"|format(b.low) }}–{{ "%.1f"|format(b.high) }}</td><td class="num">{{ b.n }}</td><td class="num">{{ "%.2f"|format(b.mean_forecast) }}</td><td class="num">{{ "%.2f"|format(b.observed_rate) }}</td></tr>{% endfor %}</tbody></table></div>
+<p class="note">Uncertainty term: {{ "%.4f"|format(c.murphy.uncertainty) }}.</p>
+</details>
 </section>
 {% endfor %}
 </div>

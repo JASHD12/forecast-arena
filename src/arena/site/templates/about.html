@@ -1,6 +1,7 @@
 {% extends "base.html" %}
+{% from "macros.html" import page_head %}
 {% block content %}
-<h1>About</h1>
+{{ page_head("The project", "About") }}
 {% if about %}<section class="prose">{{ about }}</section>{% else %}<p class="muted">The project owner has not written this page yet.</p>{% endif %}
 <h2>The research question</h2>
 <p>When does an AI agent beat a classical model at forecasting, and when does it not? An honest "it does not" is a valid result.</p>

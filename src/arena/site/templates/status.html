@@ -1,25 +1,46 @@
 {% extends "base.html" %}
+{% from "macros.html" import page_head %}
 {% block content %}
-<h1>Status</h1>
-<div class="cards">
-<div class="card"><span class="big">{{ counts.questions }}</span>questions</div>
-<div class="card"><span class="big">{{ counts.open }}</span>open</div>
-<div class="card"><span class="big">{{ counts.voided.values()|sum }}</span>voided</div>
-<div class="card"><span class="big">{{ counts.skips.values()|sum }}</span>skipped forecasts</div>
+{{ page_head("Operations", "Status", "Is the system running? Every run, every void and every skipped forecast is recorded and shown here.") }}
+{% if runs %}{% set bad = runs[:8]|selectattr("status", "ne", "ok")|list %}
+<div class="health {{ 'health-ok' if not bad else 'health-bad' }}" role="status">
+<span class="health-big">{{ "✓ All recent runs succeeded" if not bad else "✗ " ~ bad|length ~ " of the last 8 runs failed" }}</span>
+<span>Last run: <code>{{ runs[0].run_id }}</code> at {{ runs[0].started_at.strftime("%Y-%m-%d %H:%M UTC") }}.</span>
 </div>
-<h2>Voids by reason</h2>
-{% if counts.voided %}<ul>{% for k, v in counts.voided.items() %}<li><code>{{ k }}</code>: {{ v }}</li>{% endfor %}</ul>{% else %}<p class="muted">None.</p>{% endif %}
-<h2>Skipped forecasts by reason</h2>
-{% if counts.skips %}<ul>{% for k, v in counts.skips.items() %}<li><code>{{ k }}</code>: {{ v }}</li>{% endfor %}</ul>{% else %}<p class="muted">None.</p>{% endif %}
-<p><a href="experiments.html">Experiments: weekly retraining runs, model decisions and drift reports</a></p>
+{% else %}<div class="health" role="status"><span class="health-big">No runs recorded yet</span><span>The first scheduled run writes its manifest here.</span></div>{% endif %}
+
+<div class="kpis">
+<div class="kpi"><span class="kpi-n">{{ counts.questions }}</span><span class="kpi-l">questions</span></div>
+<div class="kpi"><span class="kpi-n">{{ counts.open }}</span><span class="kpi-l">waiting for an answer</span></div>
+<div class="kpi"><span class="kpi-n">{{ counts.voided.values()|sum }}</span><span class="kpi-l">voided</span></div>
+<div class="kpi"><span class="kpi-n">{{ counts.skips.values()|sum }}</span><span class="kpi-l">skipped forecasts</span></div>
+</div>
+
+<h2>Daily schedule (UTC)</h2>
+<ol class="timeline">
+<li><time>05:30</time><span><strong>Morning run</strong>: questions created, every forecaster runs, batch sealed. A second run at 07:00 is a safety net.</span></li>
+<li><time>09:30</time><span><strong>Lock</strong>: nothing can be added for the day after this.</span></li>
+<li><time>12:30 · 16:30 · 20:30 · 03:30</time><span><strong>Resolve runs</strong>: answers collected from the official sources, days sealed into the hash chain, site rebuilt.</span></li>
+<li><time>Sunday 02:00</time><span><strong>Weekly job</strong>: models retrained, promoted only by a written rule, drift and feature importance published on <a href="experiments.html">Experiments</a>.</span></li>
+</ol>
+
+<div class="grid-cards">
+<section class="card"><h2>Skipped forecasts</h2>
+{% if counts.skips %}<ul class="plain">{% for k, v in counts.skips.items() %}<li><strong>{{ v }}</strong> · <code>{{ k }}</code> <span class="note">{{ skip_help.get(k, "") }}</span></li>{% endfor %}</ul>{% else %}<p class="note">None.</p>{% endif %}
+<p class="note">A skip is recorded instead of a guess; nobody fills in 50%.</p></section>
+<section class="card"><h2>Voided questions</h2>
+{% if counts.voided %}<ul class="plain">{% for k, v in counts.voided.items() %}<li><strong>{{ v }}</strong> · <code>{{ k }}</code></li>{% endfor %}</ul>{% else %}<p class="note">None. A question is voided only when its official data never arrives or is later revised.</p>{% endif %}</section>
+</div>
+
 <h2>Latest runs</h2>
 {% if runs %}
-<div class="table-scroll" tabindex="0" role="region" aria-label="Table (scrolls sideways on small screens)"><table>
-<thead><tr><th scope="col">Run</th><th scope="col">Status</th><th scope="col">Started (UTC)</th><th scope="col">Counts</th><th scope="col">Warnings</th></tr></thead>
-<tbody>{% for r in runs %}<tr><th scope="row">{{ r.run_id }}{% if r.dry_run %} (dry run){% endif %}</th>
-<td>{% if r.status == "ok" %}<span class="yes">ok</span>{% else %}<span class="no">failed</span>{% endif %}</td>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Latest runs"><table>
+<thead><tr><th scope="col">Run</th><th scope="col">Status</th><th scope="col">Started (UTC)</th><th scope="col">What it did</th><th scope="col" class="num">Warnings</th></tr></thead>
+<tbody>{% for r in runs %}<tr><th scope="row"><span class="label">{{ r.job }}</span> <code>{{ r.run_id }}</code>{% if r.dry_run %} <span class="label">dry run</span>{% endif %}</th>
+<td>{% if r.status == "ok" %}<span class="yes">✓ ok</span>{% else %}<span class="no">✗ failed</span>{% endif %}</td>
 <td>{{ r.started_at.strftime("%Y-%m-%d %H:%M") }}</td>
-<td>{% for k, v in r.counts.items() %}{{ k }}={{ v }}{% if not loop.last %}, {% endif %}{% endfor %}</td>
-<td>{{ r.warnings|length }}{% if r.error %}; error: {{ r.error }}{% endif %}</td></tr>{% endfor %}</tbody></table></div>
-{% else %}<p class="muted">No runs recorded yet.</p>{% endif %}
+<td>{% for k, v in r.counts.items() %}{{ k|replace("_", " ") }}: {{ v }}{% if not loop.last %}, {% endif %}{% else %}<span class="muted">nothing new</span>{% endfor %}</td>
+<td class="num">{{ r.warnings|length }}{% if r.error %}; error: {{ r.error }}{% endif %}</td></tr>{% endfor %}</tbody></table></div>
+{% else %}<p class="empty">No runs recorded yet.</p>{% endif %}
+<p><a href="experiments.html">Experiments: weekly retraining runs, model decisions, drift and feature importance →</a></p>
 {% endblock %}

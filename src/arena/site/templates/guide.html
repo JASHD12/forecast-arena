@@ -1,7 +1,7 @@
 {% extends "base.html" %}
+{% from "macros.html" import page_head %}
 {% block content %}
-<h1>Guide &amp; FAQ</h1>
-<p class="lead">Everything you need to read this site, in plain language. No maths background needed.</p>
+{{ page_head("Start here", "Guide & FAQ", "Everything you need to read this site, in plain language. No maths background needed.") }}
 
 <ol class="steps">
 <li><span class="step-n">1</span><div><h2>Questions about tomorrow</h2><p>Every morning around 05:30 UTC the system creates yes/no questions about the next day from live public data: German electricity prices, the weather in four German cities, attention to Wikipedia articles and exchange rates.</p></div></li>

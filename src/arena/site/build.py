@@ -28,7 +28,7 @@ from arena.ledger import Ledger, layout
 from arena.ledger.verify import verify
 from arena.models import Question, RunManifest
 from arena.ops.weekly import summaries as weekly_summaries
-from arena.scoring.boards import all_boards, official
+from arena.scoring.boards import MIN_DAYS, all_boards, official
 from arena.scoring.core import Scored, clip, counts, load
 from arena.scoring.findings import findings
 from arena.scoring.stats import calibration_bins, expected_calibration_error, murphy
@@ -65,6 +65,13 @@ ATTRIBUTIONS = (
     f"news headlines for the agent: {GDELT_ATTRIBUTION}",
 )
 FEED_BATCHES = 7
+SKIP_HELP = {
+    "not_sampled": "the AI forecasters answer a fixed daily sample per topic, to cap cost",
+    "budget_exhausted": "the daily AI token or request cap was reached",
+    "parse_failure": "the AI answer did not match the required JSON format, even after a repair",
+    "model_missing": "no AI model or key configured",
+    "error": "the forecaster raised an error (for example missing input data)",
+}
 #: Libraries shown on the tech-stack page, with the version installed where the site is
 #: built (read at build time, never typed in by hand).
 STACK_LIBRARIES = (
@@ -443,7 +450,12 @@ def build_site(
         "404.html": ("Page not found", {"base_href": site_url.rstrip("/") + "/"}),
         "findings.html": (
             "Findings",
-            {"findings": findings(off, off_days), "human": read_content("findings.md")},
+            {
+                "findings": findings(off, off_days),
+                "human": read_content("findings.md"),
+                "official_days": off_days,
+                "min_days": MIN_DAYS,
+            },
         ),
         "methods.html": (
             "Methods",
@@ -455,7 +467,10 @@ def build_site(
             },
         ),
         "experiments.html": ("Experiments", {"runs": weekly_summaries(ledger)}),
-        "status.html": ("Status", {"counts": counts(rec), "runs": _runs(ledger)}),
+        "status.html": (
+            "Status",
+            {"counts": counts(rec), "runs": _runs(ledger), "skip_help": SKIP_HELP},
+        ),
         "about.html": (
             "About",
             {"about": read_content("about.md"), "legal": read_content("legal.md")},

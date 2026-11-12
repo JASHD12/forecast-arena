@@ -463,5 +463,36 @@ def report_cv(obj: Ctx) -> None:
         click.echo(line)
 
 
+# ----- llm -----------------------------------------------------------------------------
+@main.group()
+def llm() -> None:
+    """Checks of the configured LLM provider."""
+
+
+@llm.command("smoke")
+@click.pass_obj
+def llm_smoke(obj: Ctx) -> None:
+    """Two live calls that report token usage and write nothing (GitHub Actions only)."""
+    import os
+
+    from arena.llm.factory import client_from_settings
+    from arena.llm.smoke import run_smoke
+
+    if os.environ.get("GITHUB_ACTIONS") != "true":
+        click.echo(
+            "refused: live LLM calls run only inside GitHub Actions (AGENTS.md S8)", err=True
+        )
+        sys.exit(2)
+    client = client_from_settings(obj.settings)
+    if client is None:
+        click.echo("model_missing: ARENA_LLM_PROVIDER, ARENA_LLM_MODEL and ARENA_LLM_API_KEY "
+                   "must all be set", err=True)  # fmt: skip
+        sys.exit(1)
+    res = run_smoke(client, obj.settings.llm_max_output_tokens)
+    for line in res.lines:
+        click.echo(line)
+    sys.exit(0 if res.ok else 1)
+
+
 if __name__ == "__main__":
     main()

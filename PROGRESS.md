@@ -14,7 +14,10 @@ move older "Done log" lines to `docs/progress-archive.md`.
 
 ## In progress
 
-(nothing)
+- T064 live LLM smoke workflow (H04 ticked by the owner 2026-11-12)
+  - `arena llm smoke`: two calls (output contract + tool round-trip), usage printed, nothing written; refuses outside Actions
+  - `llm-smoke.yml`: manual dispatch only
+  - dispatch once, read usage from the job summary, then tick
 
 ## Open risks and surprises
 

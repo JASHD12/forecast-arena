@@ -21,7 +21,7 @@ Keep the first line of each item in exactly this shape; the status script parses
 
 ## Needed later (the agent keeps working on other tasks meanwhile)
 
-- [ ] H04 · Choose an LLM provider and add the key
+- [x] H04 · Choose an LLM provider and add the key
   - Pick a provider and an inexpensive model. **Set a monthly spending limit in the
     provider's console first.** The project's own caps (SPEC 9.4) are a second safety net.
   - In the repository's Actions secrets, add `ARENA_LLM_API_KEY`.

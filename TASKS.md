@@ -36,7 +36,7 @@ Keep the first line of each task in exactly this shape; the status script parses
 
 ## Phase 1 - Ledger
 
-- [ ] T010 · Append-only ledger storage (deps: T004)
+- [x] T010 · Append-only ledger storage (deps: T004)
   - Do: `arena.ledger` reader and writer over a directory with the layout of section 6:
     atomic writes, schema validation on write and read, duplicate-id rejection.
   - Done when: tests prove appends never change earlier bytes, a simulated crash leaves no

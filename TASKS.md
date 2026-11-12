@@ -11,7 +11,7 @@ Keep the first line of each task in exactly this shape; the status script parses
 
 ## Phase 0 - Bootstrap
 
-- [ ] T001 · Repository skeleton and tooling (deps: -)
+- [x] T001 · Repository skeleton and tooling (deps: -)
   - Do: `pyproject.toml` (package `arena`, Python >= 3.12, `src/` layout), lock file, lint
     and test config, `Makefile` with `setup`, `lint`, `test`, `e2e` (no-op for now),
     `check`, `status`, `smoke-sources`; MIT `LICENSE`; `README.md` stub; extend `.gitignore`.

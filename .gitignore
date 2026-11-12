@@ -22,3 +22,10 @@ mlruns/
 # OS and editors
 .DS_Store
 *.swp
+
+# Build and tooling
+build/
+dist/
+.coverage
+htmlcov/
+_tmp_*/

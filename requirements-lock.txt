@@ -1,0 +1,15 @@
+# Exact pins for the runtime and development environment.
+# Regenerate with `uv pip compile pyproject.toml --extra dev -o requirements-lock.txt`
+# when changing dependencies (see DECISIONS.md, 2026-11-12 "Lock file format").
+annotated-types==0.8.0
+click==8.5.0
+iniconfig==2.3.0
+packaging==26.3
+pluggy==1.6.0
+pydantic==2.13.5
+pydantic-core==2.46.5
+pygments==2.21.0
+pytest==9.1.1
+ruff==0.16.9
+typing-extensions==4.16.0
+typing-inspection==0.4.4

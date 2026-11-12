@@ -17,12 +17,13 @@ Reads TASKS.md and HUMAN_TODO.md from the repository root and prints, as KEY=VAL
 
 No third-party dependencies. Exit code is always 0 unless a file is missing or malformed.
 """
+
 from __future__ import annotations
 
 import re
 import sys
 from dataclasses import dataclass, field
-from datetime import date, datetime, timezone
+from datetime import UTC, date, datetime
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -60,8 +61,12 @@ def parse_tasks(text: str) -> list[Task]:
                 id=tid,
                 state=state,
                 title=rest.split(" (deps:")[0].strip(),
-                deps=[d for d in ID_RE.findall(deps_m.group(1)) if d.startswith("T")] if deps_m else [],
-                needs=[n for n in ID_RE.findall(needs_m.group(1)) if n.startswith("H")] if needs_m else [],
+                deps=[d for d in ID_RE.findall(deps_m.group(1)) if d.startswith("T")]
+                if deps_m
+                else [],
+                needs=[n for n in ID_RE.findall(needs_m.group(1)) if n.startswith("H")]
+                if needs_m
+                else [],
                 wait_until=date.fromisoformat(wait_m.group(1)) if wait_m else None,
             )
         )
@@ -87,7 +92,9 @@ def main() -> int:
     if not tasks:
         print("ERROR=no tasks parsed from TASKS.md (check the line format)", file=sys.stderr)
         return 2
-    human_done = parse_human_done(human_path.read_text(encoding="utf-8")) if human_path.exists() else set()
+    human_done = (
+        parse_human_done(human_path.read_text(encoding="utf-8")) if human_path.exists() else set()
+    )
 
     by_id = {t.id: t for t in tasks}
     if len(by_id) != len(tasks):
@@ -125,16 +132,14 @@ def main() -> int:
             return False
         if not human_ok(t):
             return True
-        return any(
-            waits_on_human(by_id[d], seen | {t.id}) for d in t.deps if d not in done
-        )
+        return any(waits_on_human(by_id[d], seen | {t.id}) for d in t.deps if d not in done)
 
     open_tasks = [t for t in tasks if t.state == "open"]
     ready = [t for t in open_tasks if human_ok(t) and all(d in done for d in t.deps)]
     blocked = [t for t in tasks if t.state == "blocked"]
     waiting = [t for t in open_tasks if waits_on_human(t)]
     needs_human = sorted({n for t in open_tasks for n in t.needs if n not in human_done})
-    today = datetime.now(timezone.utc).date()
+    today = datetime.now(UTC).date()
     wait_expired = [t.id for t in blocked if t.wait_until and t.wait_until <= today]
 
     print(f"DONE={len(done)}")

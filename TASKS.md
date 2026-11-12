@@ -108,7 +108,7 @@ Keep the first line of each task in exactly this shape; the status script parses
   - Do: `arena site build`: Home, Methods stub, Status, About placeholder; disclaimer and
     attributions on every page; responsive; light and dark theme.
   - Done when: the site builds from the e2e ledger; an internal link check passes.
-- [ ] T030 · Scheduled workflows (live) (deps: T027, T029; needs: H03)
+- [x] T030 · Scheduled workflows (live) (deps: T027, T029; needs: H03)
   - Do: `morning.yml`, `resolve.yml` per sections 4 and 12 with a `dry_run` input, shared
     concurrency group, minimal permissions, ledger push and Pages deploy.
   - Done when: `gh workflow run morning.yml -f dry_run=true` and the same for `resolve.yml`

@@ -39,6 +39,9 @@ checked against and the date. Code must not rely on anything that is not in this
 | GDELT DOC 2.0 API `https://api.gdeltproject.org/api/v2/doc/doc` (`query`, `mode=artlist`, `format=rss` (RSS only in ArtList mode), `sort=datedesc`, `maxrecords` up to 250, `startdatetime`/`enddatetime` YYYYMMDDHHMMSS); limit: one request every 5 seconds | https://blog.gdeltproject.org/gdelt-doc-2-0-api-debuts/ and the API's own 429 message | 2026-11-12 | from this sandbox's shared IP: one 200 (empty result), then 429s and connection resets |
 | Wikipedia REST `https://{lang}.wikipedia.org/api/rest_v1/page/summary/{title}` returns `title`, `description`, `extract` (lead) | live calls | 2026-11-12 | same Wikimedia rate limits as above; only the URL is stored in traces |
 | `actions/setup-node` current major is `v7` (v7.1.0); axe-core 4.14.0 is the latest stable npm release | https://github.com/actions/setup-node (tags), `npm view axe-core` | 2026-11-12 | T074 a11y job |
+| `actions/cache` major `v6`, `actions/upload-artifact` major `v7` | https://github.com/actions/cache, https://github.com/actions/upload-artifact (tags) | 2026-11-12 | weekly workflow |
+| MLflow 3.18: the plain file store is in maintenance mode and raises unless `MLFLOW_ALLOW_FILE_STORE=true`; a SQLite file (`sqlite:///...`) works with `mlflow-skinny` + SQLAlchemy + Alembic | the installed package's own error message and a test run | 2026-11-12 | |
+| Evidently 0.7.23: `Report([DataDriftPreset()]).run(current, reference)`, `.save_html()`, `.dict()["metrics"]`; needs pandas < 3; telemetry via `iterative-telemetry` is used by its UI/collector and is disabled by `DO_NOT_TRACK` | the installed package source and a test run | 2026-11-12 | weekly drift report |
 | `astral-sh/setup-uv` latest is v10.3.3 but moving major tags stop at `v7` | https://github.com/astral-sh/setup-uv (tags) | 2026-11-12 | not used: CI installs with pip from the lock file |
 
 ## Availability rules for historical data

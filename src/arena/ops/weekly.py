@@ -31,6 +31,7 @@ from arena.forecasters import registry
 from arena.ledger import Ledger
 from arena.ledger.manifest import run_manifest
 from arena.models import Resolution
+from arena.ops.drift import power_drift
 from arena.ops.jobs import _maybe_dry
 from arena.scoring.core import brier
 
@@ -64,6 +65,7 @@ class WeeklyResult:
 
     day: date
     decisions: list[Decision] = field(default_factory=list)
+    drift: list[dict[str, Any]] = field(default_factory=list)
 
     def lines(self) -> list[str]:
         """Printable summary."""
@@ -120,6 +122,7 @@ def weekly(
     cards: Mapping[str, Callable[[Decision], str]] | None = None,
     dry_run: bool = False,
     mlruns: Path | None = None,
+    drift: bool = True,
 ) -> WeeklyResult:
     """Run the weekly retraining for every domain that has a trainer."""
     today = clock.now().date()
@@ -185,10 +188,19 @@ def weekly(
             d.promoted = final.version
             d.reason = f"promoted {final.version} ({why})"
             rec.count(f"promoted_{name}")
+        if "power" in domains and "power" in trainers and drift:
+            try:
+                model = registry.load_current(led, ["power"]).get("power")
+                if model is not None:
+                    html = None if mlruns is None else mlruns / f"drift-{today.isoformat()}.html"
+                    res.drift = power_drift(domains["power"], model, first, last, html)
+            except Exception as exc:  # the drift report never blocks the weekly job
+                rec.warn(f"weekly/drift: {type(exc).__name__}: {exc}"[:300])
         summary = {
             "day": today.isoformat(),
             "dry_run": dry_run,
             "decisions": [asdict(x) for x in res.decisions],
+            "drift": res.drift,
         }
         rel = f"models/weekly/{today.isoformat()}-summary.json"
         if not led.exists(rel):

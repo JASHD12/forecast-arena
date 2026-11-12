@@ -78,3 +78,15 @@ def test_mlflow_logging_when_installed(tmp_path, dom) -> None:
     )
     assert log_mlflow(r, tmp_path / "mlruns") is not None
     assert (tmp_path / "mlruns" / "mlflow.db").exists()
+
+
+def test_drift_report_from_fixture_data(tmp_path, dom) -> None:
+    pytest.importorskip("evidently")
+    led = Ledger(tmp_path / "l")
+    res = weekly(
+        led, FixedClock(NOW), {"power": dom}, {"power": trainer(dom)}, mlruns=tmp_path / "mlruns"
+    )
+    assert res.drift and any("Drift" in m["metric"] for m in res.drift)
+    assert (tmp_path / "mlruns" / "drift-2026-11-10.html").exists()
+    (summary,) = summaries(led)
+    assert summary["drift"] == res.drift

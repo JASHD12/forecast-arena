@@ -29,6 +29,8 @@ jobs:
       ARENA_CONTACT: ${{ vars.ARENA_CONTACT }}
       ARENA_LEDGER_REMOTE: https://github.com/${{ github.repository }}.git
       MLFLOW_DISABLE_AGENT_HINT: "1"
+      DO_NOT_TRACK: "1"            # Evidently / iterative-telemetry off
+      ITERATIVE_DO_NOT_TRACK: "1"
       OMP_NUM_THREADS: "2"
     steps:
       - uses: actions/checkout@v7
@@ -65,3 +67,11 @@ jobs:
           else
             .venv/bin/arena weekly run --push
           fi
+      - name: Keep the drift report (HTML) as a workflow artifact
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: drift-report
+          path: mlruns/drift-*.html
+          if-no-files-found: ignore
+          retention-days: 90

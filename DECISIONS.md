@@ -274,6 +274,18 @@ would add an always-on service, credentials and cost (against SPEC 2.6) for info
 the ledger already holds publicly. Revisit only if experiments grow beyond weekly runs.
 Made by: agent
 
+## 2026-11-12 - Drift report with Evidently, metrics on the ledger, HTML as an artifact
+Context: SPEC 12 asks for a weekly Evidently drift report published on the site.
+Decision: Evidently 0.7.23 (pinned with pandas 2.3.3 in `requirements-tracking.txt`; it
+does not import with pandas 3) compares the power features and the model's median
+prediction on the 28-day window with the year before. Its telemetry dependency is
+disabled with `DO_NOT_TRACK` in code and in the workflow. The full HTML report is ~4 MB
+of JavaScript, so it is kept as a 90-day workflow artifact; the computed metrics are
+written to the weekly summary on the ledger and shown on the Experiments page (no
+JavaScript on the site). Performance over time is the weekly Brier series in the
+summaries.
+Made by: agent
+
 ## Proposals for the human
 
 Ideas outside the specification. The agent lists them here and does not build them.

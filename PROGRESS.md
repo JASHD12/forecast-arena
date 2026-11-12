@@ -21,11 +21,18 @@ move older "Done log" lines to `docs/progress-archive.md`.
     First local session: run `make setup`; if it fails on a pin, regenerate the lock with uv.
   - T002 (CI) not started: action versions could not be looked up. Do it first locally,
     once the repo is on GitHub and `gh auth status` works.
-  - Nothing has been pushed; there is no `origin` remote yet (H01).
+  - `origin` is https://github.com/JASHD12/forecast-arena.git but nothing is pushed yet:
+    the session's git proxy refused (repo not in the session's authorized set).
+  - SMARD, Wikimedia and ECB were unreachable from that sandbox (egress allowlist), so
+    T021/T040/T042/T044 need a session whose network allows those hosts.
 - `make setup-offline` exists for environments without network (reuses system packages).
 
 ## Done log
 
+- 2026-11-12 T026: base_rate and persistence baselines, LedgerHistory/StaticHistory
+- 2026-11-12 T022: domain contract, as-of gateway, degeneracy rule, registry, toy domain
+- 2026-11-12 T020: stdlib HTTP client (retries, backoff, User-Agent, snapshots)
+- 2026-11-12 T002 (part): ci.yml written with verified action versions; tick after first green run
 - 2026-11-12 T015: arena CLI with all groups; ledger verify / seal-batch / seal-days
 - 2026-11-12 T013: verify --git checks batch commits landed before lock; limits in METHODS
 - 2026-11-12 T014: run manifests on success and failure

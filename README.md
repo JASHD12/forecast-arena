@@ -29,7 +29,9 @@ You do not need to install anything to follow the benchmark.
 | See whether a forecaster's 70% really means 70% | [Calibration](https://jashd12.github.io/forecast-arena/calibration.html) |
 | Read the answer to the research question | [Findings](https://jashd12.github.io/forecast-arena/findings.html) |
 | Check that the system ran today | [Status](https://jashd12.github.io/forecast-arena/status.html) |
-| Understand the scoring | [Methods](https://jashd12.github.io/forecast-arena/methods.html) |
+| Understand the scoring in plain language | [Guide & FAQ](https://jashd12.github.io/forecast-arena/guide.html) |
+| Read the full methods | [Methods](https://jashd12.github.io/forecast-arena/methods.html) |
+| Get each day's questions in a feed reader | [Atom feed](https://jashd12.github.io/forecast-arena/feed.xml) |
 
 How to read a question: each one is a yes/no statement about tomorrow with an exact
 resolution rule (source, threshold, time zone). Every forecaster gives the probability of
@@ -172,6 +174,7 @@ decision logged in `DECISIONS.md` and the agent's state in `PROGRESS.md`. The ex
 - [Specification](docs/SPEC.md)
 - [Methods](docs/METHODS.md)
 - [Runbook](docs/RUNBOOK.md)
+- [EU and German rules checklist](docs/COMPLIANCE.md)
 - [Verified external sources](docs/SOURCES.md)
 - [Model cards](docs/models/)
 - [Explainers](docs/explainers/README.md)

@@ -1,10 +1,21 @@
 {% extends "base.html" %}
 {% block content %}
-<h1>Questions</h1>
-<p>Every question ever asked, newest batch first ({{ archive|length }} questions). Use your browser's find (Ctrl+F) to search; each question has its own page with every forecast, the outcome and the evidence.</p>
-<div class="table-scroll" tabindex="0" role="region" aria-label="Table (scrolls sideways on small screens)"><table class="qtable">
-<thead><tr><th scope="col">Batch</th><th scope="col">Domain</th><th scope="col">Question</th><th scope="col">Outcome</th></tr></thead>
-<tbody>
-{% for q in archive %}{% set r = rec.resolutions.get(q.question_id) %}{% set v = rec.voids.get(q.question_id) %}<tr><td>{{ q.batch_date }}</td><td>{{ q.domain }}</td><td><a href="{{ qhref(q.question_id, '') }}">{{ plain_title(q) }}</a></td><td>{% if r %}{% if r.outcome == 1 %}<span class="yes">YES</span>{% else %}<span class="no">NO</span>{% endif %}{% elif v %}<span class="muted">void ({{ v.reason_code }})</span>{% else %}<span class="muted">open</span>{% endif %}</td></tr>
-{% endfor %}</tbody></table></div>
+<h1>{% if current %}{{ dname(current) }} questions{% else %}All questions{% endif %}</h1>
+<p>{{ archive|length }} questions, newest first. Each has its own page with every forecast, the outcome, who was closest and the evidence.</p>
+<nav aria-label="Filter by topic" class="filters">
+<a href="index.html" class="filter{% if not current %} active{% endif %}"{% if not current %} aria-current="page"{% endif %}>All</a>
+{% for d in domains %}<a href="topic-{{ d }}.html" class="filter{% if current == d %} active{% endif %}"{% if current == d %} aria-current="page"{% endif %}><span class="chip chip-{{ d }}">{{ dname(d) }}</span></a>{% endfor %}
+</nav>
+{% if archive %}
+{% for batch, qs in archive|groupby("batch_date")|reverse %}
+<h2 class="day-head">{{ batch.strftime("%A %d %B %Y") }} <span class="muted">· {{ qs|length }} questions</span></h2>
+<ul class="qlist">
+{% for q in qs %}{% set r = rec.resolutions.get(q.question_id) %}{% set v = rec.voids.get(q.question_id) %}<li>
+<span class="chip chip-{{ q.domain }}">{{ dname(q.domain) }}</span>
+<a href="{{ qhref(q.question_id, '') }}">{{ plain_title(q) }}</a>
+{% if r %}{% if r.outcome == 1 %}<span class="outcome yes-badge">✓ YES</span>{% else %}<span class="outcome no-badge">✗ NO</span>{% endif %}{% elif v %}<span class="label">void</span>{% else %}<span class="label">open</span>{% endif %}
+</li>{% endfor %}
+</ul>
+{% endfor %}
+{% else %}<p class="empty">No questions yet.</p>{% endif %}
 {% endblock %}

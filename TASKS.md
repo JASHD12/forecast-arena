@@ -191,6 +191,16 @@ Keep the first line of each task in exactly this shape; the status script parses
     to the live domains.
   - Done when: a real morning run writes crypto questions and verify passes, or
     `WAIT(until=<date>)`.
+- [x] T045f · Site improvements (owner request 2026-11-12) (deps: T045a)
+  - Do: guide/FAQ, question-page verdict and "who was closest", archive by day with topic
+    filters, leaderboard bars and friendly names, how-it-works strip, Atom feed, favicon
+    and share metadata, 404 page, print styles.
+  - Done when: tests cover the new pages, the feed and the ranking; link check and a11y
+    lint pass.
+- [x] T045g · EU compliance groundwork (owner request 2026-11-12) (deps: T045f)
+  - Do: Imprint and Privacy pages on every page, factual privacy section, AI disclosure,
+    CC BY change notes, no-third-party-requests test, `docs/COMPLIANCE.md`.
+  - Done when: tests pass; the owner's legal text is tracked in H05.
 - [ ] T046 · Enable the new domains (live) (deps: T041, T043, T045, T034)
   - Do: extend the e2e test to all four domains, then enable them in the live config.
   - Done when: the next real morning run writes questions for all applicable domains and

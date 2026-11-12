@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Guide &amp; FAQ</h1>
+<p class="lead">Everything you need to read this site, in plain language. No maths background needed.</p>
+
+<ol class="steps">
+<li><span class="step-n">1</span><div><h2>Questions about tomorrow</h2><p>Every morning around 05:30 UTC the system creates yes/no questions about the next day from live public data: German electricity prices, the weather in four German cities, attention to Wikipedia articles and exchange rates.</p></div></li>
+<li><span class="step-n">2</span><div><h2>Forecasts before the facts</h2><p>Each forecaster publishes a probability that the answer is YES. At 09:30 UTC everything locks. Forecasts are written to a public, append-only ledger, so nobody can change them later.</p></div></li>
+<li><span class="step-n">3</span><div><h2>Reality keeps score</h2><p>When the official data is published, usually the next day, each question resolves YES or NO and every forecast gets a score.</p></div></li>
+</ol>
+
+<h2 id="forecasters">Who is forecasting?</h2>
+<div class="grid-cards">
+<div class="card"><h3>Base rate</h3><p>How often the answer was YES for this kind of question in the past. The yardstick everyone must beat.</p></div>
+<div class="card"><h3>Same as last time</h3><p>Assumes tomorrow looks like the most recent answer to the same question.</p></div>
+<div class="card"><h3>ML model</h3><p>A classical statistics or machine-learning model per topic, trained only on data that existed at forecast time.</p></div>
+<div class="card"><h3>AI, question only <span class="label">AI</span></h3><p>A large language model that sees only the question and the rules, no data.</p></div>
+<div class="card"><h3>AI with data <span class="label">AI</span></h3><p>The same model, also given the recent data the ML model sees.</p></div>
+<div class="card"><h3>AI agent with tools <span class="label">AI</span></h3><p>The model with data plus a few read-only tools, such as news headlines and a Wikipedia summary.</p></div>
+</div>
+
+<h2 id="probability">How do I read "70%"?</h2>
+<p>70% means: of all the times a forecaster says 70%, about 7 in 10 should come true. A single question can't prove a forecaster right or wrong. Only many questions can, which is why the <a href="calibration.html">Calibration</a> page plots said-versus-happened.</p>
+
+<h2 id="brier">What is the Brier score?</h2>
+<p>For each question: take the probability given to what actually happened, subtract it from 1, square it. Lower is better.</p>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Brier score examples"><table>
+<thead><tr><th scope="col">Forecast for YES</th><th scope="col">Answer</th><th scope="col" class="num">Brier</th><th scope="col">Reading</th></tr></thead>
+<tbody>
+<tr><td>90%</td><td>YES</td><td class="num">0.01</td><td>confident and right: excellent</td></tr>
+<tr><td>50%</td><td>either</td><td class="num">0.25</td><td>a coin flip: the "know-nothing" score</td></tr>
+<tr><td>90%</td><td>NO</td><td class="num">0.81</td><td>confident and wrong: heavily punished</td></tr>
+</tbody></table></div>
+<p>So a forecaster only beats the coin flip if its average stays below 0.25, and it only beats the base rate if it is lower than the base rate's average on the same questions.</p>
+
+<h2 id="faq">Frequently asked questions</h2>
+<details class="faq"><summary>Why only yes/no questions?</summary><p>They can be scored fairly and simply, and they make different kinds of forecasters directly comparable.</p></details>
+<details class="faq"><summary>Why does it say "too early to tell"?</summary><p>Differences between forecasters are only called real when a 95% interval excludes zero, which needs at least 30 official days. Until then the honest answer is that we don't know yet.</p></details>
+<details class="faq"><summary>What is the "rehearsal"?</summary><p>The first days, while the pipeline proves itself. They are shown for transparency but excluded from the headline scores. The official record starts automatically after five clean days in a row.</p></details>
+<details class="faq"><summary>Can I check that nothing was changed afterwards?</summary><p>Yes. Every question, forecast and outcome is a file on the public <a href="{{ repo_url }}/tree/ledger">ledger branch</a>, sealed with a hash chain, and git records when each was written. The README explains the two commands that verify it.</p></details>
+<details class="faq"><summary>Is this investment or energy advice?</summary><p>No. It is a research benchmark. The probabilities are experimental outputs and may be wrong.</p></details>
+<details class="faq"><summary>Why are there no stock-price questions?</summary><p>Stock and index prices are licensed data; we found no free source whose terms allow publishing them here. Publishing daily predictions about named shares could also fall under EU market-abuse rules for investment recommendations.</p></details>
+<details class="faq"><summary>What happens if a forecaster fails?</summary><p>The failure is recorded as a skip with a reason (see <a href="status.html">Status</a>). Nobody fills in a 50% guess.</p></details>
+<details class="faq"><summary>Does this site track me?</summary><p>No cookies, no analytics, no third-party scripts or fonts. See <a href="privacy.html">Privacy</a> for what the hosting provider logs.</p></details>
+<details class="faq"><summary>Can I take part?</summary><p>A human panel that forecasts the same questions is planned. Follow the <a href="feed.xml">feed</a> or the repository for news.</p></details>
+{% endblock %}

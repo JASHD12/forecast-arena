@@ -13,13 +13,17 @@ CLOCK = FixedClock(datetime(2026, 11, 13, tzinfo=UTC))
 def test_empty_ledger_builds_every_page(tmp_path) -> None:
     res = build_site(Ledger(tmp_path / "l"), tmp_path / "site", CLOCK, tmp_path / "none")
     assert res.pages == [
+        "404.html",
         "about.html",
         "calibration.html",
         "experiments.html",
         "findings.html",
+        "guide.html",
+        "imprint.html",
         "index.html",
         "leaderboard.html",
         "methods.html",
+        "privacy.html",
         "questions/index.html",
         "status.html",
     ]

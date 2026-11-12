@@ -24,7 +24,12 @@ def main() -> int:
     out = Path(sys.argv[1] if len(sys.argv) > 1 else "site")
     with tempfile.TemporaryDirectory() as tmp:
         led = run_schedule(Path(tmp) / "ledger")
-        res = build_site(led, out.resolve(), FixedClock(datetime(2026, 10, 27, tzinfo=UTC)))
+        res = build_site(
+            led,
+            out.resolve(),
+            FixedClock(datetime(2026, 10, 27, tzinfo=UTC)),
+            site_url=out.resolve().as_uri() + "/",  # offline: the 404 page's <base> is local
+        )
     print(f"built {len(res.pages)} pages into {res.out_dir}")
     return 0
 

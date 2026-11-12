@@ -82,6 +82,10 @@ def plain_title(q: Question) -> str:
     """A short headline for the question; the exact text when the template is unknown."""
     d = _when(q.target_date)
     t = q.template
+    if q.domain == "power" and t == "up_vs_today":
+        ref = q.params.get("reference_mean")
+        ref_s = f" than today's {_num(float(ref))} €/MWh" if ref is not None else ""
+        return f"Will German electricity be pricier{ref_s} {d}?"
     if q.domain == "power" and t in POWER:
         return POWER[t].format(t=_num(q.threshold), d=d)
     if q.domain == "weather":

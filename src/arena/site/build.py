@@ -21,12 +21,13 @@ from markupsafe import Markup
 
 from arena.agent.tools import GDELT_ATTRIBUTION
 from arena.clock import Clock
+from arena.config import DEFAULT_REPO_URL, DEFAULT_SITE_URL
 from arena.ledger import Ledger, layout
 from arena.ledger.verify import verify
 from arena.models import Question, RunManifest
 from arena.ops.weekly import summaries as weekly_summaries
 from arena.scoring.boards import all_boards, official
-from arena.scoring.core import Scored, counts, load
+from arena.scoring.core import Scored, clip, counts, load
 from arena.scoring.findings import findings
 from arena.scoring.stats import calibration_bins, expected_calibration_error, murphy
 from arena.site.charts import reliability_svg
@@ -41,21 +42,26 @@ from arena.sources.wikimedia import ATTRIBUTION as WIKI_ATTRIBUTION
 
 NAV: tuple[tuple[str, str], ...] = (
     ("index.html", "Home"),
+    ("questions/index.html", "Questions"),
     ("leaderboard.html", "Leaderboard"),
     ("calibration.html", "Calibration"),
-    ("questions/index.html", "Questions"),
     ("findings.html", "Findings"),
+    ("guide.html", "Guide"),
     ("methods.html", "Methods"),
     ("status.html", "Status"),
     ("about.html", "About"),
 )
+#: CC BY 4.0 asks to indicate changes: daily statistics, thresholds and returns are
+#: computed by this project from the published values.
 ATTRIBUTIONS = (
-    f"electricity prices: {SMARD_ATTRIBUTION} ({SMARD_LICENCE})",
-    f"weather: {WX_ATTRIBUTION} ({WX_LICENCE})",
+    f"electricity prices: {SMARD_ATTRIBUTION} ({SMARD_LICENCE}; daily statistics computed "
+    "by this project)",
+    f"weather: {WX_ATTRIBUTION} ({WX_LICENCE}; daily values computed by this project)",
     f"attention: {WIKI_ATTRIBUTION}",
     f"exchange rates: {ECB_ATTRIBUTION}",
     f"news headlines for the agent: {GDELT_ATTRIBUTION}",
 )
+FEED_BATCHES = 7
 INFORMATION_SETS = (
     ("base_rate", "Trailing outcomes of the same template and entity", "all questions"),
     ("persistence", "Yesterday's outcome of the same template and entity", "all questions"),
@@ -83,12 +89,35 @@ class SiteResult:
 
 
 def _env() -> Environment:
-    return Environment(
+    env = Environment(
         loader=PackageLoader("arena.site", "templates"),
-        autoescape=select_autoescape(["html"]),
+        autoescape=select_autoescape(["html", "xml"]),
         trim_blocks=True,
         lstrip_blocks=True,
     )
+    env.globals.update(
+        plain_title=plain_title,
+        fname=forecaster_name,
+        dname=domain_name,
+        qhref=question_href,
+        is_ai=lambda fid: fid in AI_FORECASTERS,
+    )
+    return env
+
+
+AI_FORECASTERS = frozenset({"llm_plain", "llm_context", "agent"})
+
+
+def question_scores(forecasts: Sequence[Any], outcome: int | None) -> list[dict[str, Any]]:
+    """Per forecast of one question: probability and, once resolved, its (clipped) Brier
+    score; closest first. Display only; leaderboards come from `arena.scoring`."""
+    rows = []
+    for f in forecasts:
+        b = None if outcome is None else (clip(f.probability) - outcome) ** 2
+        rows.append({"f": f, "brier": b})
+    if outcome is not None:
+        rows.sort(key=lambda r: (r["brier"], r["f"].forecaster_id))
+    return rows
 
 
 def simple_markdown(text: str) -> Markup:
@@ -207,7 +236,11 @@ def question_href(question_id: str, prefix: str = "questions/") -> str:
 
 
 def build_site(
-    ledger: Ledger, out_dir: Path, clock: Clock, content_dir: Path | None = None
+    ledger: Ledger,
+    out_dir: Path,
+    clock: Clock,
+    content_dir: Path | None = None,
+    site_url: str = DEFAULT_SITE_URL,
 ) -> SiteResult:
     """Render every page into `out_dir` (built aside, then moved into place)."""
     rec = load(ledger)
@@ -251,6 +284,8 @@ def build_site(
         "fname": forecaster_name,
         "has_crypto": any(q.domain == "crypto" for q in rec.questions.values()),
         "dname": domain_name,
+        "site_url": site_url.rstrip("/") + "/",
+        "repo_url": DEFAULT_REPO_URL,
     }
     archive = sorted(
         rec.questions.values(), key=lambda q: (q.batch_date, q.question_id), reverse=True
@@ -284,7 +319,17 @@ def build_site(
                 "scope": "official record" if off else "rehearsal days (not the official record)",
             },
         ),
-        "questions/index.html": ("Questions", {"archive": archive, "rec": rec}),
+        "questions/index.html": (
+            "Questions",
+            {"archive": archive, "rec": rec, "domains": domains, "current": None},
+        ),
+        "guide.html": ("Guide", {}),
+        "privacy.html": ("Privacy", {"owner_privacy": read_content("privacy.md")}),
+        "imprint.html": (
+            "Imprint",
+            {"imprint": read_content("imprint.md") or read_content("legal.md")},
+        ),
+        "404.html": ("Page not found", {"base_href": site_url.rstrip("/") + "/"}),
         "findings.html": (
             "Findings",
             {"findings": findings(off, off_days), "human": read_content("findings.md")},
@@ -318,6 +363,27 @@ def build_site(
             title=title, page=nav_page, **{**common, "root": root}, **ctx
         )
         (tmp / name).write_text(html_text, encoding="utf-8")
+    itpl = env.get_template("questions_index.html")
+    for dom in domains:
+        html_text = itpl.render(
+            title=f"Questions: {domain_name(dom)}",
+            page="questions/index.html",
+            **{**common, "root": "../"},
+            archive=[q for q in archive if q.domain == dom],
+            rec=rec,
+            domains=domains,
+            current=dom,
+        )
+        (tmp / "questions" / f"topic-{dom}.html").write_text(html_text, encoding="utf-8")
+    feed = env.get_template("feed.xml").render(
+        **common,
+        updated=clock.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+        batches=[
+            (b, sorted(by_batch[b], key=lambda q: q.question_id))
+            for b in reversed(batches[-FEED_BATCHES:])
+        ],
+    )
+    (tmp / "feed.xml").write_text(feed, encoding="utf-8")
     qtpl = env.get_template("question.html")
     for q in rec.questions.values():
         fs = sorted(
@@ -327,8 +393,10 @@ def build_site(
         sk = sorted(
             (s for s in rec.skips if s.question_id == q.question_id), key=lambda s: s.forecaster_id
         )
+        res_q = rec.resolutions.get(q.question_id)
         html_text = qtpl.render(
-            title=q.question_id,
+            title=plain_title(q),
+            scores=question_scores(fs, None if res_q is None else res_q.outcome),
             page="questions/index.html",
             **{**common, "root": "../"},
             q=q,

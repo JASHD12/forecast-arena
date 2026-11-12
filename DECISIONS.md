@@ -367,10 +367,33 @@ Made by: agent
   questions (rejected for now: the threshold choice would be arbitrary; `bigmove` plus the
   plain title already reads naturally).
 
+## 2026-11-12 · Site improvements and EU compliance (owner request)
+
+- Context: the owner asked to "follow all rules" (EU) and to make the site better
+  "visually, functionally in all things".
+- Decision (site): Guide & FAQ page; Imprint and Privacy pages linked from every page;
+  question pages with a YES/NO verdict, "who was closest" (per-question Brier, display
+  only), AI labels and collapsible raw forecasts; archive grouped by day with topic
+  filters (static pages `questions/topic-<domain>.html`, no JavaScript); leaderboard with
+  friendly names and score bars against the 0.25 coin-flip line, rehearsal scores first
+  until the official start; "how it works" strip on Home; Atom feed `feed.xml` (last 7
+  batches); favicon, share metadata; a 404 page; print styles.
+- Decision (rules): `docs/COMPLIANCE.md` lists each rule, its status and the owner's part.
+  Built: no scripts, cookies or third-party requests (tested), referrer off, an AI
+  disclosure on every page, CC BY change notes in the credits. Not built (owner): the
+  Imprint and Privacy text (H05).
+- The per-question score is display only; leaderboards still come only from
+  `arena.scoring` (SPEC 10 unchanged).
+
 ## Proposals for the human
 
 Ideas outside the specification. The agent lists them here and does not build them.
 
+- **Human panel published only as an aggregate (GDPR).** The ledger is append-only and
+  public, so a panel member's pseudonymous entries could never be erased (GDPR Art. 17).
+  Safer: write only the panel median per question (the `human_panel` forecast) to the
+  public ledger, and keep individual answers out of it (in the owner's form tool, which
+  can delete them). Needs a human decision before T092.
 - **Template-level base rate for attention.** SPEC 8.1 defines `base_rate` per template
   and entity. For attention the entity is an article that rarely repeats, so `base_rate`
   is always 0.5 there. A template-level variant (same template, any article) would be a

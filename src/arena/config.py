@@ -16,6 +16,7 @@ from pydantic import BaseModel, ConfigDict, Field, SecretStr, field_validator
 
 PREFIX = "ARENA_"
 DEFAULT_REPO_URL = "https://github.com/JASHD12/forecast-arena"
+DEFAULT_SITE_URL = "https://jashd12.github.io/forecast-arena/"
 
 #: Weather cities -> (DWD station id, station name). Chosen 2026-11-12 for long, continuous
 #: hourly records and a DWD MOSMIX forecast point at the same station (docs/SOURCES.md).
@@ -34,6 +35,7 @@ class Settings(BaseModel):
 
     contact: str | None = Field(None, description="Contact for the HTTP User-Agent")
     repo_url: str = DEFAULT_REPO_URL
+    site_url: str = DEFAULT_SITE_URL
     ledger_dir: Path = Path("_ledger")
     ledger_remote: str | None = Field(None, description="Git remote of the ledger branch")
     cache_dir: Path = Path("data_cache")

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+<title>Forecast Arena: daily questions</title>
+<subtitle>Yes/no questions about tomorrow, forecast before the facts. Research only, not advice.</subtitle>
+<id>{{ site_url }}</id>
+<link rel="alternate" href="{{ site_url }}"/>
+<link rel="self" href="{{ site_url }}feed.xml"/>
+<updated>{{ updated }}</updated>
+<author><name>Forecast Arena</name></author>
+{% for b, qs in batches %}
+<entry>
+<title>Questions for {{ b }} ({{ qs|length }})</title>
+<id>{{ site_url }}batch/{{ b }}</id>
+<link rel="alternate" href="{{ site_url }}questions/index.html"/>
+<updated>{{ b }}T09:30:00Z</updated>
+<content type="html">&lt;ul&gt;{% for q in qs %}&lt;li&gt;&lt;a href="{{ site_url }}{{ qhref(q.question_id) }}"&gt;{{ plain_title(q) }}&lt;/a&gt;&lt;/li&gt;{% endfor %}&lt;/ul&gt;</content>
+</entry>
+{% endfor %}
+</feed>

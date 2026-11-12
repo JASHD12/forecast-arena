@@ -203,7 +203,7 @@ def site_build(obj: Ctx, out_dir: Path, check_links: bool) -> None:
     from arena.site.build import build_site
     from arena.site.linkcheck import check_site
 
-    res = build_site(obj.ledger, out_dir, obj.clock)
+    res = build_site(obj.ledger, out_dir, obj.clock, site_url=obj.settings.site_url)
     click.echo(f"site built: {len(res.pages)} pages in {res.out_dir}")
     if check_links:
         errors = check_site(res.out_dir)

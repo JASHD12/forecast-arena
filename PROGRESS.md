@@ -43,6 +43,7 @@ move older "Done log" lines to `docs/progress-archive.md`.
 
 ## Done log
 
+- 2026-11-12 T045f/T045g (owner request): guide, imprint/privacy, question verdicts, archive filters, leaderboard bars, feed, 404; docs/COMPLIANCE.md; a11y 0 serious
 - 2026-11-12 T045d (owner request): crypto domain (CoinGecko, 5 coins, up/bigmove), off until H12; terms page read refused by permission system (recorded in H12)
 - 2026-11-12 site redesign live (resolve run 43300900342); manual dispatches must use --ref main (Pages environment allows main only)
 - 2026-11-12 T045a-c (owner request): plain question titles; weather duels warmer_than/wetter_than; frost_day, gust_gt; weather-rules-r2; v1 weather questions byte-identical (frozen goldens)

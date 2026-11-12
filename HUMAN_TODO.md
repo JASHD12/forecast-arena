@@ -30,12 +30,15 @@ Keep the first line of each item in exactly this shape; the status script parses
     `openai_compatible`, `ARENA_LLM_BASE_URL`.
   - Never paste the key into a chat, a file, or a commit.
   - Needed for tasks T064, T065, T068.
-- [ ] H05 · Write the About and legal text
+- [ ] H05 · Write the About, Imprint and Privacy text
   - `site_content/about.md`: who you are, a link to your profile, how the project was built.
-  - `site_content/legal.md`: check what a website published from Germany must show
-    (a provider identification and a privacy notice are commonly required). This is your
-    responsibility to confirm; the agent must not invent legal text.
-  - Until then the site shows a placeholder.
+  - `site_content/imprint.md`: the provider identification a website run from Germany
+    usually needs (DDG section 5): your name, postal address and e-mail.
+  - `site_content/privacy.md`: who is responsible and how to reach them, plus the points
+    listed in `docs/COMPLIANCE.md` ("What the owner should do"). The site already shows
+    the technical facts (no cookies, no trackers, GitHub Pages logs IP addresses).
+  - This is your responsibility to confirm; the agent must not invent legal text. Until
+    then the Imprint and Privacy pages say "Pending".
 - [ ] H06 · Recruit the human panel
   - Ask 10 to 15 classmates to forecast once a week. Follow `docs/PANEL_SETUP.md` (the
     agent writes it in task T091): create the form, hand out tokens, publish the sheet as

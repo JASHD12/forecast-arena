@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Imprint</h1>
+{% if imprint %}<section class="card prose">{{ imprint }}</section>
+{% else %}<p class="notice"><strong>Pending:</strong> the provider identification (Impressum) has not been added by the project owner yet.</p>{% endif %}
+<h2>About this project</h2>
+<p>Forecast Arena is a non-commercial research project. The source code and the full public record are on <a href="{{ repo_url }}">GitHub</a>. Data attributions are listed at the bottom of every page.</p>
+{% endblock %}

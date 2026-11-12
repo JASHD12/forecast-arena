@@ -2,10 +2,20 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+{% if base_href %}<base href="{{ base_href }}">{% endif %}
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#10162a">
+<meta name="description" content="Forecast Arena: a live research benchmark where simple baselines, a classical ML model and AI forecasters predict tomorrow's electricity prices, weather, Wikipedia attention and more, and are scored against reality.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Forecast Arena">
+<meta property="og:title" content="{{ title }} - Forecast Arena">
+<meta property="og:description" content="Can AI predict tomorrow better than a simple model? Forecasts published before the facts, scored in public.">
+<meta name="referrer" content="no-referrer">
 <title>{{ title }} - Forecast Arena</title>
+<link rel="icon" href="{{ root }}static/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="{{ root }}static/style.css">
+<link rel="alternate" type="application/atom+xml" title="Forecast Arena: daily questions" href="{{ root }}feed.xml">
 </head>
 <body>
 <header class="site-header"><div class="wrap">
@@ -21,9 +31,21 @@ The official record has not started yet. It starts the day after the first run o
 {% block content %}{% endblock %}
 </div></main>
 <footer><div class="wrap">
+<div class="footer-grid">
+<div>
 <p><strong>Research project, not advice.</strong> Forecast Arena is a research benchmark. Nothing on this site is financial, investment, energy-purchasing or any other kind of advice. Probabilities are experimental outputs and may be wrong.</p>
-<p>Data: {% for a in attributions %}{{ a }}{% if not loop.last %}; {% endif %}{% endfor %}.{% if has_crypto %} Crypto prices: <a href="https://www.coingecko.com">Data provided by CoinGecko</a>.{% endif %}</p>
-<p>Built {{ built_at }} from the public ledger. No cookies, no trackers.</p>
+<p><strong>AI disclosure.</strong> Forecasters labelled "AI" are generated automatically by a large language model; their numbers and rationales are machine-generated and published without human editing.</p>
+</div>
+<nav aria-label="Footer"><ul class="footer-links">
+<li><a href="{{ root }}guide.html">Guide &amp; FAQ</a></li>
+<li><a href="{{ root }}imprint.html">Imprint</a></li>
+<li><a href="{{ root }}privacy.html">Privacy</a></li>
+<li><a href="{{ root }}feed.xml">Feed (Atom)</a></li>
+<li><a href="{{ repo_url }}">Source code and ledger</a></li>
+</ul></nav>
+</div>
+<p class="attrib">Data: {% for a in attributions %}{{ a }}{% if not loop.last %}; {% endif %}{% endfor %}.{% if has_crypto %} Crypto prices: <a href="https://www.coingecko.com">Data provided by CoinGecko</a>.{% endif %}</p>
+<p>Built {{ built_at }} from the public ledger. No cookies, no trackers, no third-party requests.</p>
 </div></footer>
 </body>
 </html>

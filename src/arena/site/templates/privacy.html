@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Privacy</h1>
+{% if owner_privacy %}<section class="card prose">{{ owner_privacy }}</section>
+{% else %}<p class="notice"><strong>Pending:</strong> the project owner's privacy notice (who is responsible, how to contact them, your rights) has not been added yet. The facts below describe what the site does technically.</p>{% endif %}
+
+<h2>What this site does and does not do</h2>
+<ul class="checks">
+<li><strong>No cookies</strong>, no local storage, no analytics, no tracking pixels.</li>
+<li><strong>No third-party requests</strong>: no external fonts, scripts, images or embeds. Every file comes from this site.</li>
+<li><strong>No forms and no accounts</strong>: the site does not ask you for any data.</li>
+<li><strong>No personal data in the content</strong>: questions are about prices, weather, exchange rates and Wikipedia articles; articles about people are excluded by design.</li>
+</ul>
+
+<h2>Hosting</h2>
+<p>The site is a static website served by <strong>GitHub Pages</strong> (GitHub, Inc.). According to GitHub's documentation, when a GitHub Pages site is visited, the visitor's IP address is logged and stored for security purposes. This happens on GitHub's side; this project has no access to those logs. See the <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement">GitHub Privacy Statement</a>.</p>
+
+<h2>Links to other sites</h2>
+<p>Links to data sources and to GitHub are ordinary links; nothing is loaded from them until you click. The site asks browsers not to send referrer information.</p>
+
+<h2>Human panel (planned)</h2>
+<p>If a human forecasting panel starts, its members will be told in advance and in writing what is stored (a pseudonym, their probabilities and submission times), that it is published permanently in an append-only public record, and they must agree before taking part.</p>
+{% endblock %}

@@ -174,3 +174,107 @@ footer strong { color: var(--fg); }
   .qcard { transition: transform .15s ease, box-shadow .15s ease; }
   .qcard:hover { transform: translateY(-2px); }
 }
+
+/* ---- Additions: guide, legal pages, question page, archive, leaderboard bars ---- */
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.lead { font-size: 1.1rem; color: var(--muted); max-width: 46rem; }
+.prose { max-width: 46rem; }
+.card h3 { margin-bottom: .35rem; }
+.card p { margin: 0; color: var(--muted); font-size: .95rem; }
+.notice { background: var(--banner); color: var(--banner-fg); border-radius: 10px; padding: .75rem 1rem; }
+.checks { list-style: none; padding: 0; display: grid; gap: .5rem; }
+.checks li { background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+  padding: .6rem .9rem .6rem 2.4rem; position: relative; }
+.checks li::before { content: "✓"; position: absolute; left: .9rem; top: .6rem; color: var(--yes);
+  font-weight: 800; }
+
+/* Buttons */
+.actions { display: flex; flex-wrap: wrap; gap: .6rem; margin-top: 1rem; }
+.btn { display: inline-block; background: #fff; color: #10162a; font-weight: 700; text-decoration: none;
+  padding: .55rem 1rem; border-radius: 999px; }
+.btn-ghost { background: transparent; color: #fff; border: 1px solid rgba(255, 255, 255, .4); }
+.hero .btn { color: #10162a; }
+.hero .btn-ghost { color: #fff; }
+.hero-small h1 { font-size: clamp(1.5rem, 1.2rem + 1.2vw, 2rem); }
+
+/* How it works strip */
+.how { list-style: none; counter-reset: how; padding: 0; margin: 1.25rem 0 0; display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: .75rem; }
+.how li { counter-increment: how; background: var(--surface); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: .8rem 1rem .8rem 3.2rem; position: relative; font-size: .95rem;
+  color: var(--muted); }
+.how li::before { content: counter(how); position: absolute; left: 1rem; top: .8rem; width: 1.6rem;
+  height: 1.6rem; border-radius: 50%; background: var(--accent-soft); color: var(--accent);
+  font-weight: 800; display: grid; place-items: center; font-size: .9rem; }
+.how strong { display: block; color: var(--fg); }
+
+/* Guide steps and FAQ */
+.steps { list-style: none; padding: 0; display: grid; gap: .75rem; }
+.steps li { display: flex; gap: 1rem; background: var(--surface); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 1rem 1.1rem; box-shadow: var(--shadow); }
+.steps h2 { margin: 0 0 .25rem; font-size: 1.1rem; }
+.steps p { margin: 0; color: var(--muted); }
+.step-n { flex: none; width: 2.2rem; height: 2.2rem; border-radius: 50%; background: var(--accent);
+  color: var(--accent-ink); font-weight: 800; display: grid; place-items: center; }
+details.faq { background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+  padding: .7rem 1rem; margin: .5rem 0; }
+details.faq summary { cursor: pointer; font-weight: 700; }
+details.faq[open] summary { margin-bottom: .5rem; }
+
+/* Question page */
+.crumbs { font-size: .9rem; color: var(--muted); margin: 0 0 .5rem; }
+.qhead h1 { margin-top: .6rem; }
+.verdict { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem 1rem; border-radius: var(--radius);
+  padding: .9rem 1.1rem; margin: 1rem 0; border: 1px solid var(--line); background: var(--surface); }
+.verdict-big { font-size: 1.4rem; font-weight: 900; }
+.verdict-yes { background: var(--yes-bg); color: var(--yes); border-color: transparent; }
+.verdict-no { background: var(--no-bg); color: var(--no); border-color: transparent; }
+.verdict-yes span:not(.verdict-big), .verdict-no span:not(.verdict-big) { color: var(--fg); }
+.verdict-open .verdict-big, .verdict-void .verdict-big { color: var(--muted); }
+.bars-wide { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 1rem; box-shadow: var(--shadow); gap: .55rem; }
+.bars-wide li { grid-template-columns: minmax(9rem, 14rem) 1fr 3rem 3.5rem; font-size: .95rem; }
+.bars-wide li:not(:has(.score)) { grid-template-columns: minmax(9rem, 14rem) 1fr 3rem; }
+.bars .score { text-align: right; font-variant-numeric: tabular-nums; color: var(--muted); font-size: .85rem; }
+.medal { color: #d97706; }
+
+/* Archive */
+.filters { display: flex; flex-wrap: wrap; gap: .5rem; margin: 1rem 0 .5rem; }
+.filter { text-decoration: none; color: var(--fg); border: 1px solid var(--line); background: var(--surface);
+  border-radius: 999px; padding: .3rem .8rem; font-weight: 600; font-size: .9rem; display: inline-flex;
+  align-items: center; }
+.filter .chip { background: transparent; padding: 0; }
+.filter.active { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft); }
+.day-head { font-size: 1.05rem; margin: 2rem 0 .5rem; }
+.qlist { list-style: none; padding: 0; margin: 0; background: var(--surface); border: 1px solid var(--line);
+  border-radius: var(--radius); box-shadow: var(--shadow); }
+.qlist li { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem .75rem; padding: .65rem 1rem;
+  border-bottom: 1px solid var(--line); }
+.qlist li:last-child { border-bottom: 0; }
+.qlist a { flex: 1 1 18rem; color: var(--fg); text-decoration: none; font-weight: 600; }
+.qlist a:hover { color: var(--accent); text-decoration: underline; }
+
+/* Leaderboard bars */
+.barcell { min-width: 9rem; vertical-align: middle; }
+.sbar { position: relative; display: block; height: .6rem; background: var(--track); border-radius: 999px; }
+.sfill { display: block; height: 100%; background: var(--bar); border-radius: 999px; }
+.sfill.ai { background: var(--bar-ai); }
+.coin { position: absolute; top: -.25rem; bottom: -.25rem; left: 71.4%; width: 2px; background: var(--fg);
+  opacity: .5; }
+
+/* Footer */
+.footer-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 1rem 2rem; }
+.footer-links { list-style: none; padding: 0; margin: 0; display: grid; gap: .3rem; }
+.attrib { font-size: .85rem; }
+@media (max-width: 40rem) {
+  .footer-grid { grid-template-columns: 1fr; }
+  .bars-wide li, .bars-wide li:not(:has(.score)) { grid-template-columns: 7.5rem 1fr 2.6rem; }
+  .bars-wide .score { grid-column: 3; }
+}
+@media print {
+  .site-header nav, .banner, footer nav, .filters { display: none; }
+  body { background: #fff; color: #000; }
+  .qcard, .card, .table-scroll, .bars-wide { box-shadow: none; }
+}
+.board th[scope="row"] { min-width: 11rem; }

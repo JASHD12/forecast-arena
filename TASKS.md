@@ -181,7 +181,7 @@ Keep the first line of each task in exactly this shape; the status script parses
   - Do: walk-forward replay through the real question, context and resolver code into a
     separate `backtests/` store, labelled as backtest everywhere (integrity rule I4).
   - Done when: a test proves backtest records cannot be written to the live ledger.
-- [ ] T051 · Power model (deps: T050, T023)
+- [x] T051 · Power model (deps: T050, T023)
   - Do: section 8.3 power model, validation, calibration, model card. Measure for seven
     days whether official day-ahead forecasts are published before lock before using them.
   - Done when: the backtest report compares `ml` with `base_rate` and `persistence` with

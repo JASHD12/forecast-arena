@@ -12,8 +12,7 @@ move older "Done log" lines to `docs/progress-archive.md`.
 
 ## In progress
 
-- T051 power model: quantile GBM + Platt calibration written and tested; year-long
-  backtest (2025-11-01..2026-10-31) running to produce the report and model card.
+(nothing)
 
 ## Open risks and surprises
 
@@ -30,6 +29,7 @@ move older "Done log" lines to `docs/progress-archive.md`.
 
 ## Done log
 
+- 2026-11-12 T051: power ml model; 1-year backtest Brier 0.193 vs base_rate 0.247, persistence 0.221 (intervals exclude 0); model card
 - 2026-11-12 T063: llm_plain and llm_context, seeded stratified daily sample, e2e with FakeLLM
 - 2026-11-12 T062: versioned prompt files, strict parser, one repair retry, parse_failure skips
 - 2026-11-12 T061: budget guard: daily caps across manifests, budget_exhausted skips

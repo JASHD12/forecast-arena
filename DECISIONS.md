@@ -314,3 +314,29 @@ Ideas outside the specification. The agent lists them here and does not build th
   forecasts and only then seals (changes when the seal is written; seal still before lock);
   (c) keep the panel out of the batch and publish it as a separate, clearly labelled
   record. The agent recommends (b) with a hard rule that a late run writes nothing.
+- **More interesting questions for people to vote on (owner request, 2026-11-12).** The
+  owner finds the current questions dry for a human audience. Ideas, in order of how little
+  they disturb the record. All need a human decision; any new question type is a new
+  template (or `template_version`) added before the official start (SPEC 2.9), never a
+  change to an existing one.
+  1. *Plain-language titles* (no rule change): every question page already has a
+     machine-made title; add a one-line human title such as "Will Berlin hit 20 °C
+     tomorrow?" next to the exact resolution rule. The resolution rule stays the source of
+     truth.
+  2. *"Question of the day" for the panel* (needs the panel timing decision above): pick
+     3-5 questions a day for people, chosen by a fixed rule written before the batch
+     (e.g. the attention question with the largest recent jump, the closest-to-50/50
+     weather question by the `ml` forecast) so the choice cannot be tuned on outcomes (I8).
+  3. *Head-to-head weather questions* (new template): "Will Berlin be warmer than Munich
+     tomorrow?", "Will it rain more in Hamburg than in Frankfurt?". Same stations and
+     source as today.
+  4. *Event-style weather questions* (new template): first frost, snow, a "tropical night"
+     (minimum >= 20 °C), wind gusts above a storm threshold, from the same DWD data.
+  5. *Wikipedia head-to-head* (new template): "Will article A get more views than article B
+     tomorrow?" for two trending, non-person articles. Same source and person filter.
+  6. *US stock index* (H08): researched 2026-11-12; no free source found whose terms clearly
+     allow automated use and publication (S&P index values on FRED are marked
+     "reproduction prohibited without prior written permission"). Only with written
+     permission from the index owner, which only the human can request (S2).
+  The agent recommends 1 now, 2 together with the panel, and 3-4 as the first new
+  templates before the official start, because they reuse verified sources.

@@ -157,7 +157,7 @@ Keep the first line of each task in exactly this shape; the status script parses
   - Do: verify section 7.3; top-list and per-article fetch, title encoding, lag handling,
     Wikidata person check; fixtures.
   - Done when: unit tests pass; `make smoke-sources` fetches the latest published top list.
-- [ ] T043 · Attention questions and resolver (deps: T042, T022)
+- [x] T043 · Attention questions and resolver (deps: T042, T022)
   - Do: selection rules, exclusions, blocklist config, template and resolver (7.3).
   - Done when: golden tests show person articles and blocklisted titles are never
     selected, and selection is deterministic for a batch date.

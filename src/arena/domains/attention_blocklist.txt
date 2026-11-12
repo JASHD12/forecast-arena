@@ -1,0 +1,19 @@
+# Attention domain blocklist (SPEC 7.3). One case-insensitive regular expression per line,
+# matched against the article title with underscores replaced by spaces. When in doubt,
+# exclude. Lines starting with # are comments.
+#
+# Adult content
+porn
+\bxxx\b
+\bsex
+xvideos|xhamster|xnxx|onlyfans|chaturbate|stripchat|brazzers
+\bnude|\bnackt|erotik|erotic|hentai|fetisch|fetish|prostitut|escort
+# Death lists, violent death, crime and disasters
+deaths in|todesfälle|nekrolog|liste der todesopfer|list of .*deaths
+\bdeath|\btod\b|\btot\b|suizid|suicide|selbstmord
+murder|\bmord|mörder|killing|massacre|massaker|amoklauf|shooting|schießerei
+terror|anschlag|attack|bombing|genocide|völkermord|holocaust|shoah
+\bwar\b|\bkrieg|invasion|hostage|geisel
+\bcrash|absturz|unglück|disaster|katastrophe|erdbeben|earthquake|tsunami
+# Medical, self-harm and similar
+overdose|überdosis|eating disorder|essstörung

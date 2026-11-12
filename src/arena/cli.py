@@ -249,7 +249,7 @@ def daily_morning(obj: Ctx, push: bool) -> None:
     from arena.ops.wiring import build_domains, build_forecasters
 
     remote = _sync(obj, push)
-    domains = build_domains(obj.settings, obj.clock.now())
+    domains = build_domains(obj.settings, obj.clock.now(), ledger=obj.ledger)
     result = morning(obj.ledger, obj.day, obj.clock, domains,
                      build_forecasters(obj.ledger, domains), dry_run=obj.dry_run)  # fmt: skip
     click.echo(result.line())
@@ -268,8 +268,8 @@ def daily_resolve(obj: Ctx, push: bool) -> None:
 
     remote = _sync(obj, push)
     now = obj.clock.now()
-    result = resolve(obj.ledger, obj.clock, build_domains(obj.settings, now, job="resolve"),
-                     dry_run=obj.dry_run)  # fmt: skip
+    domains = build_domains(obj.settings, now, job="resolve", ledger=obj.ledger)
+    result = resolve(obj.ledger, obj.clock, domains, dry_run=obj.dry_run)
     click.echo(result.line())
     for w in result.warnings:
         click.echo(f"warning: {w}")

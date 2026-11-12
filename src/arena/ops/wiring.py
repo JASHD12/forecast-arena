@@ -6,6 +6,7 @@ from collections.abc import Callable, Sequence
 from datetime import date, datetime, timedelta
 
 from arena.config import WEATHER_STATIONS, Settings
+from arena.domains.attention import AttentionDomain, titles_from_questions
 from arena.domains.base import AsOfStore, Domain
 from arena.domains.power import PowerDomain
 from arena.domains.power_history import PRICE_KEY, berlin_date, to_observations
@@ -14,9 +15,11 @@ from arena.forecasters.base import Forecaster, LedgerHistory
 from arena.forecasters.baselines import BaseRate, Persistence
 from arena.forecasters.replay import CombinedHistory, ReplayHistory
 from arena.ledger import Ledger
+from arena.models import Question
 from arena.sources.brightsky import BrightSkyClient
 from arena.sources.http import HttpClient
 from arena.sources.smard import FILTERS, SmardClient, berlin_day_bounds
+from arena.sources.wikimedia import WikimediaClient
 
 #: Days of history a live power domain loads: replay window (200) + longest template
 #: window (60) + margin.
@@ -63,7 +66,7 @@ def weather_domain_live(
 
 def build_domains(
     settings: Settings, now: datetime, on_skip: Callable[[str], None] | None = None,
-    job: str = "morning",
+    job: str = "morning", ledger: Ledger | None = None,
 ) -> list[Domain]:  # fmt: skip
     """The domains enabled in settings, loaded from the live sources (with the cache)."""
     http = HttpClient(settings.user_agent())
@@ -75,6 +78,16 @@ def build_domains(
         elif name == "weather":
             out.append(weather_domain_live(BrightSkyClient(http), now, WEATHER_DAYS[job],
                                            job == "morning", on_skip=on_skip))  # fmt: skip
+        elif name == "attention":
+            questions = (
+                []
+                if ledger is None
+                else [q for _, q in ledger.iter_family("questions") if isinstance(q, Question)]
+            )
+            out.append(AttentionDomain(
+                WikimediaClient(http, cache_dir=settings.cache_dir),
+                recent_titles=lambda p, b, qs=questions: titles_from_questions(qs, p, b),
+                on_skip=on_skip))  # fmt: skip
         else:
             raise ValueError(f"domain {name!r} is not available yet")
     return out
@@ -82,5 +95,6 @@ def build_domains(
 
 def build_forecasters(ledger: Ledger, domains: Sequence[Domain]) -> list[Forecaster]:
     """Baselines over live history, filled with replayed history (SPEC 8.1)."""
-    history = CombinedHistory(LedgerHistory(ledger), [ReplayHistory(d) for d in domains])
+    replays = [ReplayHistory(d) for d in domains if getattr(d, "replayable", True)]
+    history = CombinedHistory(LedgerHistory(ledger), replays)
     return [BaseRate(history), Persistence(history)]

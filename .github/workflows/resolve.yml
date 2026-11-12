@@ -46,6 +46,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           ref: ${{ github.event_name == 'workflow_dispatch' && github.ref || 'stable' }}
+          persist-credentials: false  # the ledger push sets its own header; avoid a duplicate
       - uses: actions/setup-python@v7
         with:
           python-version: "3.12"

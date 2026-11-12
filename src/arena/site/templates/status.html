@@ -11,6 +11,7 @@
 {% if counts.voided %}<ul>{% for k, v in counts.voided.items() %}<li><code>{{ k }}</code>: {{ v }}</li>{% endfor %}</ul>{% else %}<p class="muted">None.</p>{% endif %}
 <h2>Skipped forecasts by reason</h2>
 {% if counts.skips %}<ul>{% for k, v in counts.skips.items() %}<li><code>{{ k }}</code>: {{ v }}</li>{% endfor %}</ul>{% else %}<p class="muted">None.</p>{% endif %}
+<p><a href="experiments.html">Experiments: weekly retraining runs, model decisions and drift reports</a></p>
 <h2>Latest runs</h2>
 {% if runs %}
 <div class="table-scroll" tabindex="0" role="region" aria-label="Table (scrolls sideways on small screens)"><table>

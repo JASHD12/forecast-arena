@@ -15,6 +15,7 @@ def test_empty_ledger_builds_every_page(tmp_path) -> None:
     assert res.pages == [
         "about.html",
         "calibration.html",
+        "experiments.html",
         "findings.html",
         "index.html",
         "leaderboard.html",
@@ -79,3 +80,16 @@ def test_question_pages_rationales_and_changelog(tmp_path) -> None:
     page = (res.out_dir / "questions" / f"{q.question_id}.html").read_text()
     assert "Short reason." in page and "AI-generated" in page
     assert "llm_plain" in (res.out_dir / "methods.html").read_text()
+
+
+def test_experiments_page_lists_weekly_runs(tmp_path) -> None:
+    from pathlib import Path
+
+    led = Ledger(tmp_path / "l")
+    fx = Path(__file__).parents[1] / "fixtures" / "weekly" / "2026-11-10-summary.json"
+    led.write_raw("models/weekly/2026-11-10-summary.json", fx.read_bytes())
+    res = build_site(led, tmp_path / "site", CLOCK, tmp_path / "none")
+    page = (res.out_dir / "experiments.html").read_text()
+    assert "2026-11-10" in page and "power" in page and "first model" in page
+    assert 'href="experiments.html"' in (res.out_dir / "status.html").read_text()
+    assert check_site(res.out_dir) == []

@@ -266,6 +266,14 @@ with SQLAlchemy and Alembic) is pinned in `requirements-tracking.txt`, installed
 weekly workflow and CI, not by `make setup`.
 Made by: agent
 
+## 2026-11-12 - No remote MLflow tracking server (T082)
+Context: T082 asks whether a remote tracking server is worth a human item.
+Decision: no. Each weekly run logs to a local SQLite file and publishes a JSON summary
+to the ledger; the Experiments page (linked from Status) lists every summary. A server
+would add an always-on service, credentials and cost (against SPEC 2.6) for information
+the ledger already holds publicly. Revisit only if experiments grow beyond weekly runs.
+Made by: agent
+
 ## Proposals for the human
 
 Ideas outside the specification. The agent lists them here and does not build them.

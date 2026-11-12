@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Experiments</h1>
+<p>Every weekly retraining run, newest first. Each run trains a candidate model per domain, scores it next to the current model on the last 28 days of real questions, and promotes it only if it is not worse (rule in <code>src/arena/ops/weekly.py</code>). The runs are logged with MLflow to a file; this page shows the summaries that each run publishes to the public ledger.</p>
+{% if not runs %}<p class="muted">No weekly runs yet.</p>{% endif %}
+{% for r in runs %}
+<h2>{{ r.day }}{% if r.dry_run %} (dry run){% endif %}</h2>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Weekly run {{ r.day }}"><table>
+<thead><tr><th scope="col">Domain</th><th scope="col">Window</th><th scope="col" class="num">Questions</th><th scope="col" class="num">Candidate Brier</th><th scope="col" class="num">Current Brier</th><th scope="col">Decision</th></tr></thead>
+<tbody>{% for d in r.decisions %}<tr><th scope="row">{{ d.domain }}</th><td>{{ d.window_first }} to {{ d.window_last }}</td><td class="num">{{ d.n }}</td><td class="num">{{ "%.4f"|format(d.brier_candidate) if d.brier_candidate is not none else "-" }}</td><td class="num">{{ "%.4f"|format(d.brier_current) if d.brier_current is not none else "-" }}</td><td>{{ d.reason }}</td></tr>{% endfor %}</tbody></table></div>
+{% if r.drift %}<h3>Drift ({{ r.day }})</h3>
+<p class="note">Computed with Evidently: share of drifted columns and per-column drift test p-values (current window vs. training reference). Small p-values mean the distribution changed.</p>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Drift {{ r.day }}"><table>
+<thead><tr><th scope="col">Domain</th><th scope="col">Metric</th><th scope="col" class="num">Value</th></tr></thead>
+<tbody>{% for m in r.drift %}<tr><td>{{ m.domain }}</td><td><code>{{ m.metric }}</code></td><td class="num">{{ m.value }}</td></tr>{% endfor %}</tbody></table></div>{% endif %}
+{% endfor %}
+{% endblock %}

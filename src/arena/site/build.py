@@ -24,6 +24,7 @@ from arena.clock import Clock
 from arena.ledger import Ledger, layout
 from arena.ledger.verify import verify
 from arena.models import Question, RunManifest
+from arena.ops.weekly import summaries as weekly_summaries
 from arena.scoring.boards import all_boards, official
 from arena.scoring.core import Scored, counts, load
 from arena.scoring.findings import findings
@@ -287,6 +288,7 @@ def build_site(
                 "limitations": LIMITATIONS,
             },
         ),
+        "experiments.html": ("Experiments", {"runs": weekly_summaries(ledger)}),
         "status.html": ("Status", {"counts": counts(rec), "runs": _runs(ledger)}),
         "about.html": (
             "About",

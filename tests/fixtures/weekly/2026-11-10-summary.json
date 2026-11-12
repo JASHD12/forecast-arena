@@ -1,0 +1,18 @@
+{
+ "day": "2026-11-10",
+ "decisions": [
+  {
+   "brier_candidate": 0.27178285093197774,
+   "brier_current": null,
+   "candidate_version": "power-gbq-r1-2026-10-10",
+   "current_version": null,
+   "domain": "power",
+   "n": 168,
+   "promoted": "power-gbq-r1-2026-11-07",
+   "reason": "promoted power-gbq-r1-2026-11-07 (first model)",
+   "window_first": "2026-10-11",
+   "window_last": "2026-11-07"
+  }
+ ],
+ "dry_run": false
+}

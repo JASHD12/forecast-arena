@@ -77,7 +77,7 @@ Keep the first line of each task in exactly this shape; the status script parses
     weekly chunks; record small real fixtures with provenance.
   - Done when: unit tests pass on fixtures including a clock-change week;
     `make smoke-sources` fetches the latest day-ahead prices.
-- [ ] T022 · Domain contract and registry (deps: T004)
+- [x] T022 · Domain contract and registry (deps: T004)
   - Do: the `Domain` protocol of section 7.0, a registry, the as-of gateway helper, the
     degeneracy rule, and a toy domain for tests.
   - Done when: tests show the gateway never returns a value newer than `asof`.

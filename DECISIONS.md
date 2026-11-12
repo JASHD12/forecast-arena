@@ -438,6 +438,21 @@ Made by: agent
 
 Ideas outside the specification. The agent lists them here and does not build them.
 
+- **Open public participation ("players vs AI vs ML"), owner question 2026-11-12.** Today
+  anyone in any country can *view* the site; nobody can *submit* forecasts. A free design:
+  (1) the owner creates a Google Form (nickname, consent checkbox, one probability per
+  question) whose responses sheet is published as CSV; (2) questions are published the
+  evening before (about 18:00 UTC) instead of 05:30, so every time zone gets a window
+  before the 09:30 UTC lock; (3) a pre-lock run (about 09:00 UTC) reads the CSV, keeps only
+  answers time-stamped before the lock, and writes them to the ledger as player forecasts
+  under a random player id; (4) the site gets a players' leaderboard on the same
+  questions and scoring rules as the AI and ML forecasters, with a minimum number of
+  answered questions before a player is ranked. The ledger stays the database (git +
+  hash chain), DuckDB/Parquet serve the analysis; no server or paid database. Needs:
+  owner decision (changes SPEC 4 timing and SPEC 8's forecaster list), the owner's form,
+  a privacy notice and consent text (GDPR: nicknames are personal data; ledger entries
+  cannot be erased later, so players must be told before joining), and an anti-spam
+  rule (e.g. one entry per nickname per question, latest valid answer counts).
 - **Human panel published only as an aggregate (GDPR).** The ledger is append-only and
   public, so a panel member's pseudonymous entries could never be erased (GDPR Art. 17).
   Safer: write only the panel median per question (the `human_panel` forecast) to the

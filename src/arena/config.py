@@ -15,7 +15,7 @@ from typing import Any
 from pydantic import BaseModel, ConfigDict, Field, SecretStr, field_validator
 
 PREFIX = "ARENA_"
-DEFAULT_REPO_URL = "https://github.com/forecast-arena/forecast-arena"
+DEFAULT_REPO_URL = "https://github.com/JASHD12/forecast-arena"
 
 
 class Settings(BaseModel):

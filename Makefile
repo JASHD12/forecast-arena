@@ -38,4 +38,4 @@ schemas:  ## Re-export JSON Schemas after changing arena.models
 	$(PY) -m arena.models
 
 smoke-sources:  ## Live source checks (network). Not part of `make check`.
-	@echo "No live sources implemented yet (Phase 2)."
+	$(PY) -m arena.sources.smoke

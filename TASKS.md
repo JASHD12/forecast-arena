@@ -16,7 +16,7 @@ Keep the first line of each task in exactly this shape; the status script parses
     and test config, `Makefile` with `setup`, `lint`, `test`, `e2e` (no-op for now),
     `check`, `status`, `smoke-sources`; MIT `LICENSE`; `README.md` stub; extend `.gitignore`.
   - Done when: `make setup && make check` exit 0; `python -c "import arena"` works.
-- [ ] T002 · CI workflow (deps: T001)
+- [!] T002 · CI workflow (deps: T001) BLOCKED(needs H10)
   - Do: `.github/workflows/ci.yml` running `make check` on push and pull request to `main`.
     Look up current action versions and record them in `docs/SOURCES.md`.
   - Done when: `gh run list --branch main --limit 1` shows a successful run of this commit.
@@ -71,7 +71,7 @@ Keep the first line of each task in exactly this shape; the status script parses
   - Do: shared HTTP client: timeouts, retries with backoff, identifying User-Agent (from
     `ARENA_CONTACT`, else the repository URL), optional response snapshot to disk.
   - Done when: tests with a mocked transport cover retry, timeout and User-Agent.
-- [ ] T021 · SMARD client (deps: T020)
+- [x] T021 · SMARD client (deps: T020)
   - Do: verify section 7.1 against the live service and current community docs; implement
     chunk index and series fetch returning a tidy UTC-indexed frame; handle nulls and
     weekly chunks; record small real fixtures with provenance.

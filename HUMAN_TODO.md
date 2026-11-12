@@ -62,4 +62,13 @@ Keep the first line of each item in exactly this shape; the status script parses
 
 ## Added by the agent
 
-(none yet)
+- [ ] H10 · Make GitHub Actions jobs start
+  - Every `ci` run on `main` fails within about 5 seconds and never gets a runner
+    (run https://github.com/JASHD12/forecast-arena/actions/runs/43195868006, attempts 1
+    and 2). The workflow file and action versions are valid; this pattern usually means an
+    account-level block (billing / spending limit, a locked account, or Actions disabled
+    or restricted in Settings > Actions > General).
+  - Open the run in the browser: the annotation at the top of the job says the exact cause.
+    Fix it there (the agent must not change repository or account settings).
+  - Check: re-run the job; it should reach the "make check" step and go green.
+  - Needed for T002 and for every live task (T030 onwards).

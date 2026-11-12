@@ -63,6 +63,14 @@ Alternatives: `argparse` (no nested groups without boilerplate), `typer` (adds a
 top of click for little gain).
 Made by: agent
 
+## 2026-11-12 - Time series without pandas
+Context: T021 asks for "a tidy UTC-indexed frame". The series are small (hourly, at most
+~70k points for the full SMARD history).
+Decision: plain frozen dataclasses (`Point(start, value)`) sorted by UTC start, plus helper
+functions for Berlin days. No new dependency.
+Alternatives: pandas (heavy dependency for little gain at this size; may be reconsidered for
+the ML tasks, with its own DECISIONS entry).
+Made by: agent
 
 ## Proposals for the human
 

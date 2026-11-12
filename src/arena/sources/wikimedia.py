@@ -114,6 +114,7 @@ class WikimediaClient:
         self.cache_dir = cache_dir
         self.base = base.rstrip("/")
         self.wikidata = wikidata
+        self._mem: dict[tuple[str, date], list[TopArticle]] = {}
 
     def top_url(self, project: str, day: date) -> str:
         """URL of a daily top list."""
@@ -121,9 +122,13 @@ class WikimediaClient:
 
     def top(self, project: str, day: date) -> list[TopArticle] | None:
         """The top list of a UTC day, or None if it is not published yet."""
+        if (project, day) in self._mem:
+            return self._mem[(project, day)]
         cache = self._cache(project, day)
         if cache is not None and cache.exists():
-            return parse_top(json.loads(cache.read_text(encoding="utf-8")))
+            arts = parse_top(json.loads(cache.read_text(encoding="utf-8")))
+            self._mem[(project, day)] = arts
+            return arts
         try:
             resp = self.http.get(self.top_url(project, day))
         except HttpError as exc:
@@ -131,6 +136,7 @@ class WikimediaClient:
                 return None
             raise
         arts = parse_top(resp.json())
+        self._mem[(project, day)] = arts
         if cache is not None:
             cache.parent.mkdir(parents=True, exist_ok=True)
             tmp = cache.with_suffix(".tmp")

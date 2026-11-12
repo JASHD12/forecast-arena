@@ -21,6 +21,7 @@ import urllib.parse
 from collections.abc import Callable, Iterable, Sequence
 from dataclasses import dataclass
 from datetime import UTC, date, datetime, time, timedelta
+from functools import lru_cache
 from importlib import resources
 from typing import Any, Protocol
 
@@ -45,6 +46,7 @@ HORIZON = 3  # D = R + 3
 TOP_RANK, MID_RANK, LOW_RANK = 5, 50, 200
 PER_BAND = 2
 RECENT_BATCHES = 3
+TRAJECTORY_DAYS = 7
 SOURCE = "https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article"
 
 _NAMESPACES = {
@@ -279,6 +281,9 @@ class AttentionDomain:
             "reference_rank": question.params["reference_rank"],
             "target_weekday": question.target_date.strftime("%A"),
             "daily_views": [{"day": d.isoformat(), "views": v} for d, v in sorted(known.items())],
+            "top_trajectory": top_trajectory(
+                self.source, project, title, date.fromisoformat(question.params["reference_day"])
+            ),
         }
 
     # ----- resolution --------------------------------------------------------------
@@ -313,6 +318,36 @@ class AttentionDomain:
         d = question.target_date
         _, _, series = self.source.per_article(project, title, d, d)
         return d in series and series[d] != first.evidence.values_used.get("views")
+
+
+@lru_cache(maxsize=8192)
+def _top_index(
+    source: PageviewSource, project: str, day: date
+) -> tuple[dict[str, TopArticle], int | None]:
+    top = source.top(project, day) or []
+    return {x.article: x for x in top}, min((x.views for x in top), default=None)
+
+
+def top_trajectory(
+    source: PageviewSource, project: str, title: str, ref: date, days: int = TRAJECTORY_DAYS
+) -> list[dict[str, Any]]:
+    """The article's views on R-days+1 .. R from the daily top lists. Where it is absent,
+    `views` is None and `floor` (the list's lowest count) bounds it from above. Only days
+    up to R are used (as-of: R is the latest published day)."""
+    out = []
+    for back in range(days - 1, -1, -1):
+        d = ref - timedelta(days=back)
+        index, floor = _top_index(source, project, d)
+        hit = index.get(title)
+        out.append(
+            {
+                "day": d.isoformat(),
+                "views": hit.views if hit else None,
+                "rank": hit.rank if hit else None,
+                "floor": floor,
+            }
+        )
+    return out
 
 
 def titles_from_questions(questions: Iterable[Question], project: str, batch: date,

@@ -379,6 +379,47 @@ def report_backtest_markets(
         click.echo(f"model card written: {card}")
 
 
+@report.command("backtest-attention")
+@click.option("--first", type=click.DateTime(["%Y-%m-%d"]), required=True)
+@click.option("--last", type=click.DateTime(["%Y-%m-%d"]), required=True)
+@click.option("--out", "out_dir", type=click.Path(path_type=Path), default=Path("backtests"))
+@click.option("--card", type=click.Path(path_type=Path), default=None)
+@click.pass_obj
+def report_backtest_attention(
+    obj: Ctx, first: object, last: object, out_dir: Path, card: Path | None
+) -> None:
+    """Walk-forward attention backtest (top lists from the cache; live per-article calls)."""
+    from arena.backtest import attention as bt
+    from arena.backtest.cards import attention_card
+    from arena.backtest.harness import BacktestStore
+    from arena.backtest.report import markdown
+    from arena.domains.attention import AttentionDomain
+    from arena.sources.http import HttpClient
+    from arena.sources.wikimedia import WikimediaClient
+
+    f, la = first.date(), last.date()  # type: ignore[attr-defined]
+    http = HttpClient(obj.settings.user_agent(), backoff=4.0, retries=4)
+    dom = AttentionDomain(WikimediaClient(http, cache_dir=obj.settings.cache_dir))
+    run_id = f"attention-{f.isoformat()}-{la.isoformat()}-{obj.clock.now():%Y%m%dT%H%M}"
+    res = bt.run(dom, f, la, run_id=run_id)
+    text = markdown(
+        f"Attention backtest {f} to {la}",
+        res.records,
+        ["base_rate", "persistence", "ml"],
+        [("ml", "base_rate"), ("ml", "persistence")],
+        bt.NOTES,
+    )
+    path = BacktestStore(out_dir).write(
+        run_id, res.records, {"domain": "attention", "first": f, "last": la}
+    )
+    (path / "report.md").write_text(text, encoding="utf-8")
+    click.echo(text)
+    if card is not None:
+        card.parent.mkdir(parents=True, exist_ok=True)
+        card.write_text(attention_card(text, run_id), encoding="utf-8")
+        click.echo(f"model card written: {card}")
+
+
 @report.command("cv")
 def report_cv() -> None:
     """Headline numbers for a CV, from the ledger only (built in T101)."""

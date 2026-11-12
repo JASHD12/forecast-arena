@@ -36,23 +36,32 @@ def reliability_svg(name: str, bins: Sequence[Bin]) -> Markup:
     for t in (0.0, 0.5, 1.0):
         parts.append(f'<line class="grid" x1="{x(t)}" y1="{y(0)}" x2="{x(t)}" y2="{y(1)}"/>')
         parts.append(f'<line class="grid" x1="{x(0)}" y1="{y(t)}" x2="{x(1)}" y2="{y(t)}"/>')
-        parts.append(f'<text class="tick" x="{x(t)}" y="{SIZE - PAD + 14}" '
-                     f'text-anchor="middle">{t:g}</text>')
-        parts.append(f'<text class="tick" x="{PAD - 6}" y="{y(t) + 4}" '
-                     f'text-anchor="end">{t:g}</text>')
+        parts.append(
+            f'<text class="tick" x="{x(t)}" y="{SIZE - PAD + 14}" text-anchor="middle">{t:g}</text>'
+        )
+        parts.append(
+            f'<text class="tick" x="{PAD - 6}" y="{y(t) + 4}" text-anchor="end">{t:g}</text>'
+        )
     parts.append(f'<line class="ideal" x1="{x(0)}" y1="{y(0)}" x2="{x(1)}" y2="{y(1)}"/>')
     pts = [(x(b.mean_forecast), y(b.observed_rate), b) for b in bins]
     if len(pts) > 1:
-        path = " ".join(f"{'M' if i == 0 else 'L'}{px:.1f},{py:.1f}"
-                        for i, (px, py, _) in enumerate(pts))
+        path = " ".join(
+            f"{'M' if i == 0 else 'L'}{px:.1f},{py:.1f}" for i, (px, py, _) in enumerate(pts)
+        )
         parts.append(f'<path class="series" d="{path}"/>')
     for px, py, b in pts:
-        parts.append(f'<circle class="mark" cx="{px:.1f}" cy="{py:.1f}" r="5"><title>'
-                     f"forecast {b.mean_forecast:.2f}, observed {b.observed_rate:.2f}, "
-                     f"n={b.n}</title></circle>")
-    parts.append(f'<text class="axis" x="{SIZE / 2}" y="{SIZE - 4}" text-anchor="middle">'
-                 "mean forecast</text>")
-    parts.append(f'<text class="axis" transform="translate(11 {SIZE / 2}) rotate(-90)" '
-                 'text-anchor="middle">observed frequency</text>')
+        parts.append(
+            f'<circle class="mark" cx="{px:.1f}" cy="{py:.1f}" r="5"><title>'
+            f"forecast {b.mean_forecast:.2f}, observed {b.observed_rate:.2f}, "
+            f"n={b.n}</title></circle>"
+        )
+    parts.append(
+        f'<text class="axis" x="{SIZE / 2}" y="{SIZE - 4}" text-anchor="middle">'
+        "mean forecast</text>"
+    )
+    parts.append(
+        f'<text class="axis" transform="translate(11 {SIZE / 2}) rotate(-90)" '
+        'text-anchor="middle">observed frequency</text>'
+    )
     parts.append("</svg>")
     return Markup("".join(parts))

@@ -25,6 +25,7 @@ def test_empty_ledger_builds_every_page(tmp_path) -> None:
         "methods.html",
         "privacy.html",
         "questions/index.html",
+        "stack.html",
         "status.html",
     ]
     assert check_site(res.out_dir) == []

@@ -10,7 +10,7 @@ import os
 from collections.abc import Mapping
 from datetime import time
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, SecretStr, field_validator
 
@@ -46,6 +46,10 @@ class Settings(BaseModel):
     llm_base_url: str | None = None
     llm_api_key: SecretStr | None = None
     llm_temperature: float = 0.0
+    #: Anthropic `output_config.effort` (low|medium|high|xhigh|max); unset = provider default.
+    #: Thinking tokens count against `llm_max_output_tokens`, so larger models need low effort
+    #: or a higher output cap.
+    llm_effort: Literal["low", "medium", "high", "xhigh", "max"] | None = None
     llm_questions_per_domain: int = Field(3, ge=0)
     llm_max_requests_per_day: int = Field(100, ge=0)
     llm_max_tokens_per_day: int = Field(400_000, ge=0)
@@ -69,6 +73,7 @@ class Settings(BaseModel):
         "llm_provider",
         "llm_model",
         "llm_base_url",
+        "llm_effort",
         "panel_csv_url",
         "coingecko_api_key",
         mode="before",

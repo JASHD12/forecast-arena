@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero hero-small" aria-labelledby="stack-title">
+<p class="kicker">How it is built</p>
+<h1 id="stack-title">Tech stack</h1>
+<p>A production-style forecasting system: live data pipelines, classical ML and frontier LLMs side by side, proper scoring and uncertainty, MLOps, and a tamper-evident public record. Everything below is in the <a href="{{ repo_url }}">open-source repository</a>.</p>
+</section>
+
+<h2>Forecasters and models</h2>
+<p class="note">Status: baselines and the LLM forecasters run live; the classical ML models are trained and backtested (and retrained weekly) and join the live record together with the remaining topics. The table "Running right now" below shows exactly what is live.</p>
+<div class="grid-cards">
+<div class="card"><h3>Frontier LLMs (Anthropic Claude)</h3><p>Three designs on the same questions: zero-shot (question only), data-grounded (as-of data in the prompt), and a <strong>tool-using agent</strong> (news-headline search via GDELT, Wikipedia summaries; at most 4 tool calls, 90 s). Strict JSON output contract with one repair attempt, prompt-injection hygiene, versioned prompts, and a hard daily token and request budget enforced in code.</p></div>
+<div class="card"><h3>Electricity: quantile gradient boosting</h3><p>scikit-learn <code>HistGradientBoostingRegressor</code> with quantile loss predicts the full distribution of tomorrow's price statistics; probabilities are read off the predicted CDF and <strong>Platt-calibrated</strong> on out-of-fold predictions from expanding windows with a gap (no shuffling, no leakage).</p></div>
+<div class="card"><h3>Wikipedia attention: boosted classifier</h3><p><code>HistGradientBoostingClassifier</code> on 7-day attention trajectories (growth, volatility, rank, presence), with time-series cross-validation and Platt calibration.</p></div>
+<div class="card"><h3>Exchange rates and crypto: volatility models</h3><p>EWMA variance (RiskMetrics, &lambda; = 0.94) with fat-tailed <strong>Student-t</strong> returns for "big move" questions; direction is held at 50% unless a backtest proves skill.</p></div>
+<div class="card"><h3>Weather: numerical-weather-prediction rules</h3><p>Transparent probabilistic rules on the DWD MOSMIX forecast (normal error models for temperature, gusts and city duels), fixed before any outcome was seen.</p></div>
+<div class="card"><h3>Baselines</h3><p>Base rate and persistence, replayed through the real question and resolver code so they are fair from day one. Every leaderboard shows them.</p></div>
+</div>
+
+<h2>Running right now</h2>
+{% if live %}
+<p class="note">Read from the latest forecasts in the public ledger; updates automatically.</p>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Live forecaster versions"><table>
+<thead><tr><th scope="col">Forecaster</th><th scope="col">Model / version in production</th></tr></thead>
+<tbody>{% for r in live %}<tr><th scope="row">{{ fname(r.id) }}{% if is_ai(r.id) %} <span class="label">AI</span>{% endif %}</th><td><code>{{ r.model }}</code>{% if r.model != r.version %}<br><span class="note">{{ r.version }}</span>{% endif %}</td></tr>{% endfor %}</tbody></table></div>
+{% else %}<p class="empty">The first forecasts have not been published yet; this table fills in automatically.</p>{% endif %}
+{% if weekly %}<p class="note">Latest weekly retraining: {{ weekly[0].day }} (<a href="experiments.html">details</a>).</p>{% endif %}
+
+<h2>Evaluation and statistics</h2>
+<ul class="checks">
+<li><strong>Proper scoring rules:</strong> Brier and log score on clipped probabilities, skill against the base rate.</li>
+<li><strong>Calibration:</strong> reliability diagrams, expected calibration error, Murphy decomposition (reliability, resolution, uncertainty).</li>
+<li><strong>Uncertainty:</strong> day-block bootstrap confidence intervals and paired differences; a result is "supported" only if its interval excludes zero.</li>
+<li><strong>Walk-forward backtests</strong> kept strictly separate from the live record.</li>
+<li><strong>No leakage by construction:</strong> every forecaster sees data only through an as-of gateway that knows when each value was published.</li>
+</ul>
+
+<h2>MLOps</h2>
+<ul class="checks">
+<li><strong>Model registry</strong> with versioned artefacts and model cards; promotions are new records, never overwrites.</li>
+<li><strong>Weekly champion/challenger retraining</strong> with a written promotion rule, tracked in <strong>MLflow</strong>.</li>
+<li><strong>Data-drift monitoring</strong> with <strong>Evidently</strong>.</li>
+<li><strong>Versioning everywhere:</strong> every forecast records its model, prompt and settings, and version changes are visible on the site.</li>
+</ul>
+
+<h2>Data engineering and integrity</h2>
+<ul class="checks">
+<li><strong>Five live public data sources</strong> (SMARD, DWD via Bright Sky, Wikimedia + Wikidata, ECB, GDELT), with recorded fixtures for offline tests.</li>
+<li><strong>Append-only ledger</strong> on a git branch, sealed with a SHA-256 hash chain; anyone can verify it with one command.</li>
+<li><strong>Idempotent, restartable jobs</strong> with atomic writes; time injected through a clock; Europe/Berlin day handling (23/25-hour days).</li>
+</ul>
+
+<h2>Infrastructure and quality</h2>
+<ul class="checks">
+<li><strong>GitHub Actions</strong> schedules (morning, resolve four times a day, weekly), <strong>GitHub Pages</strong> hosting, Docker image.</li>
+<li><strong>CI:</strong> ruff lint, hundreds of unit tests, an offline end-to-end run, accessibility checks (axe-core), dependency audit; code reaches production only after a green run (a separate <code>stable</code> branch).</li>
+<li><strong>Static, private-by-design site:</strong> no JavaScript, cookies or third-party requests.</li>
+</ul>
+
+<h2>Libraries</h2>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Libraries"><table>
+<thead><tr><th scope="col">Library</th><th scope="col">Version</th><th scope="col">Used for</th></tr></thead>
+<tbody>{% for l in libraries %}<tr><th scope="row">{{ l.name }}</th><td><code>{{ l.version }}</code></td><td>{{ l.role }}</td></tr>{% endfor %}</tbody></table></div>
+<p class="note">Python 3.12. Versions are read from the environment that built this page.</p>
+{% endblock %}

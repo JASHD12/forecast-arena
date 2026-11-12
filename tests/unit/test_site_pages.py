@@ -113,3 +113,27 @@ def test_question_page_ranks_closest_first(tmp_path) -> None:
     assert [r["f"].forecaster_id for r in rows] == ["a", "b"]
     assert rows[0]["brier"] == (0.9 - 1) ** 2
     assert all(r["brier"] is None for r in question_scores([forecast(q, "a", 0.9)], None))
+
+
+def test_stack_page_reads_versions_from_environment_and_ledger(tmp_path) -> None:
+    from importlib.metadata import version
+
+    from arena.site.build import live_versions
+
+    _, res = _site(tmp_path)
+    page = (res.out_dir / "stack.html").read_text()
+    assert version("scikit-learn") in page and version("anthropic") in page
+    assert "HistGradientBoostingRegressor" in page and "Running right now" in page
+
+    from types import SimpleNamespace
+
+    f = forecast(question(), "llm_context", 0.3).model_copy(
+        update={"forecaster_version": "claude-opus-5-5|prompt-v1-abc"}
+    )
+    assert live_versions(SimpleNamespace(forecasts=[f])) == [
+        {
+            "id": "llm_context",
+            "version": "claude-opus-5-5|prompt-v1-abc",
+            "model": "claude-opus-5-5",
+        }
+    ]

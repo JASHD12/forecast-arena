@@ -47,15 +47,20 @@ class AnthropicLLM:
         client: anthropic.Anthropic | None = None,
         timeout: float = 60.0,
         max_retries: int = 2,
+        effort: str | None = None,
     ) -> None:
         self.model = model
+        self.effort = effort
         self.client = client or anthropic.Anthropic(
             base_url=BASE_URL, api_key=api_key, timeout=timeout, max_retries=max_retries
         )
 
     def sampling(self) -> dict[str, Any]:
-        """No sampling parameters are sent (rejected by current models)."""
-        return {"temperature": "provider default (not sent)"}
+        """No sampling parameters are sent (rejected by current models); the effort level
+        is recorded when one is configured."""
+        out: dict[str, Any] = {"temperature": "provider default (not sent)"}
+        out["effort"] = self.effort or "provider default (not sent)"
+        return out
 
     @staticmethod
     def to_messages(turns: Sequence[Turn]) -> list[dict[str, Any]]:
@@ -93,6 +98,8 @@ class AnthropicLLM:
             "system": system,
             "messages": self.to_messages(turns),
         }
+        if self.effort:
+            kwargs["output_config"] = {"effort": self.effort}
         if tools:
             kwargs["tools"] = [
                 {"name": t.name, "description": t.description, "input_schema": t.input_schema}

@@ -48,6 +48,7 @@ NAV: tuple[tuple[str, str], ...] = (
     ("findings.html", "Findings"),
     ("guide.html", "Guide"),
     ("methods.html", "Methods"),
+    ("stack.html", "Tech stack"),
     ("status.html", "Status"),
     ("about.html", "About"),
 )
@@ -62,6 +63,50 @@ ATTRIBUTIONS = (
     f"news headlines for the agent: {GDELT_ATTRIBUTION}",
 )
 FEED_BATCHES = 7
+#: Libraries shown on the tech-stack page, with the version installed where the site is
+#: built (read at build time, never typed in by hand).
+STACK_LIBRARIES = (
+    ("scikit-learn", "gradient-boosted quantile regression and classification, calibration"),
+    ("numpy", "numerics"),
+    ("scipy", "Student-t distributions for volatility models"),
+    ("anthropic", "official Claude SDK for the LLM and agent forecasters"),
+    ("pydantic", "typed, validated ledger records and settings"),
+    ("jinja2", "static site generation"),
+    ("click", "command-line interface for every job"),
+    ("joblib", "model artefacts in the registry"),
+    ("mlflow-skinny", "experiment tracking of the weekly retraining (SQLite backend)"),
+    ("evidently", "data-drift reports on model inputs"),
+)
+
+
+def library_versions() -> list[dict[str, str]]:
+    """Name, installed version (or "not installed here") and role of each library."""
+    from importlib.metadata import PackageNotFoundError, version
+
+    out = []
+    for name, role in STACK_LIBRARIES:
+        try:
+            v = version(name)
+        except PackageNotFoundError:
+            v = "used by the weekly job; not installed in this build"
+        out.append({"name": name, "version": v, "role": role})
+    return out
+
+
+def live_versions(rec: Any) -> list[dict[str, str]]:
+    """The most recent version string each forecaster published, from the ledger."""
+    latest: dict[str, tuple[Any, str]] = {}
+    for f in rec.forecasts:
+        cur = latest.get(f.forecaster_id)
+        if cur is None or f.created_at > cur[0]:
+            latest[f.forecaster_id] = (f.created_at, f.forecaster_version)
+    rows = []
+    for fid in sorted(latest):
+        v = latest[fid][1]
+        rows.append({"id": fid, "version": v, "model": v.split("|", 1)[0] if "|" in v else v})
+    return rows
+
+
 INFORMATION_SETS = (
     ("base_rate", "Trailing outcomes of the same template and entity", "all questions"),
     ("persistence", "Yesterday's outcome of the same template and entity", "all questions"),
@@ -324,6 +369,14 @@ def build_site(
             {"archive": archive, "rec": rec, "domains": domains, "current": None},
         ),
         "guide.html": ("Guide", {}),
+        "stack.html": (
+            "Tech stack",
+            {
+                "libraries": library_versions(),
+                "live": live_versions(rec),
+                "weekly": weekly_summaries(ledger)[:1],
+            },
+        ),
         "privacy.html": ("Privacy", {"owner_privacy": read_content("privacy.md")}),
         "imprint.html": (
             "Imprint",

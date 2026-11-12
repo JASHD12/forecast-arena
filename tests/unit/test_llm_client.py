@@ -33,7 +33,7 @@ TOOL = ToolSpec(
 )
 
 
-def anthropic_with(handler) -> tuple[AnthropicLLM, list[dict]]:
+def anthropic_with(handler, effort=None) -> tuple[AnthropicLLM, list[dict]]:
     seen: list[dict] = []
 
     def h(request: httpx2.Request) -> httpx2.Response:
@@ -51,7 +51,7 @@ def anthropic_with(handler) -> tuple[AnthropicLLM, list[dict]]:
         max_retries=0,
         http_client=httpx2.Client(transport=httpx2.MockTransport(h)),
     )
-    return AnthropicLLM("claude-test", "unused", client=sdk), seen
+    return AnthropicLLM("claude-test", "unused", client=sdk, effort=effort), seen
 
 
 def message(content, stop="end_turn"):
@@ -207,3 +207,26 @@ def test_fake_llm_and_factory() -> None:
     )
     assert client_from_settings(s).provider == "anthropic"  # type: ignore[union-attr]
     assert "dummy" not in repr(s)
+
+
+def test_anthropic_effort_sent_only_when_configured() -> None:
+    llm, seen = anthropic_with(lambda r: message([{"type": "text", "text": "x"}]))
+    llm.complete("SYS", [UserText("q")], max_tokens=400)
+    assert "output_config" not in seen[0]["body"]
+    assert llm.sampling()["effort"].startswith("provider default")
+    llm2, seen2 = anthropic_with(lambda r: message([{"type": "text", "text": "x"}]), "low")
+    llm2.complete("SYS", [UserText("q")], max_tokens=400)
+    assert seen2[0]["body"]["output_config"] == {"effort": "low"}
+    assert llm2.sampling()["effort"] == "low"
+    assert "thinking" not in seen2[0]["body"] and "temperature" not in seen2[0]["body"]
+
+
+def test_effort_setting_validated() -> None:
+    import pytest
+
+    from arena.config import Settings
+
+    assert Settings.from_env({"ARENA_LLM_EFFORT": "low"}).llm_effort == "low"
+    assert Settings.from_env({"ARENA_LLM_EFFORT": ""}).llm_effort is None
+    with pytest.raises(ValueError):
+        Settings.from_env({"ARENA_LLM_EFFORT": "turbo"})

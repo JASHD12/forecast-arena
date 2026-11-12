@@ -201,6 +201,10 @@ Keep the first line of each task in exactly this shape; the status script parses
   - Do: Imprint and Privacy pages on every page, factual privacy section, AI disclosure,
     CC BY change notes, no-third-party-requests test, `docs/COMPLIANCE.md`.
   - Done when: tests pass; the owner's legal text is tracked in H05.
+- [x] T045h · Tech stack page and LLM effort setting (owner request 2026-11-12) (deps: T045f, T063)
+  - Do: `stack.html` from the build environment and the ledger; `ARENA_LLM_EFFORT`,
+    output-token and daily-token caps as workflow variables; H13 for a frontier model.
+  - Done when: tests cover the effort request field and the stack page.
 - [ ] T046 · Enable the new domains (live) (deps: T041, T043, T045, T034)
   - Do: extend the e2e test to all four domains, then enable them in the live config.
   - Done when: the next real morning run writes questions for all applicable domains and

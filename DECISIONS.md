@@ -385,10 +385,32 @@ Made by: agent
 - The per-question score is display only; leaderboards still come only from
   `arena.scoring` (SPEC 10 unchanged).
 
+## 2026-11-12 · Frontier-model option and a tech-stack page (owner request)
+
+- Context: the owner wants "advanced models" and a site that shows the stack to hiring
+  managers.
+- Decision: `ARENA_LLM_EFFORT` (Anthropic `output_config.effort`, unset = provider
+  default) and the workflow variables `ARENA_LLM_MAX_OUTPUT_TOKENS` and
+  `ARENA_LLM_MAX_TOKENS_PER_DAY` (defaults 400 and 400000 = SPEC 9.4). Current Claude
+  models always think, and thinking tokens count against `max_tokens`; a larger model
+  with the 400-token cap could stop before its answer, so the switch is documented with
+  matching settings (HUMAN_TODO H13). The effort is recorded on every forecast.
+- Server-side refusal fallbacks stay off (see the Anthropic adapter): a forecast must be
+  attributable to exactly one model; a refusal is a recorded skip.
+- A model switch is a version change visible on the site; it is not made because of how a
+  live question resolved (I8).
+- `stack.html` describes only what exists; library versions are read from the build
+  environment and the live models from the ledger, so the page cannot overstate.
+
 ## Proposals for the human
 
 Ideas outside the specification. The agent lists them here and does not build them.
 
+- **Model-size comparison (research upgrade).** Run two LLM tiers side by side (e.g.
+  Claude Haiku 5.5 and Claude Opus 5.5) as separate forecasters on the same daily
+  sample. That turns "does a bigger model forecast better, and is it worth the cost?" into
+  a measured result, which is a stronger story than using one large model. Doubles LLM
+  cost; needs a decision on the forecaster list (SPEC 8).
 - **Human panel published only as an aggregate (GDPR).** The ledger is append-only and
   public, so a panel member's pseudonymous entries could never be erased (GDPR Art. 17).
   Safer: write only the panel median per question (the `human_panel` forecast) to the

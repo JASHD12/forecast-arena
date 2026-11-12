@@ -37,7 +37,9 @@ class SmokeResult:
 def run_smoke(client: LLMClient, max_tokens: int) -> SmokeResult:
     """Make exactly two calls; never raises for provider or parse failures."""
     res = SmokeResult()
-    res.lines.append(f"provider={client.provider} model={client.model}")
+    res.lines.append(
+        f"provider={client.provider} model={client.model} sampling={client.sampling()}"
+    )
     try:
         r1 = client.complete(
             load_prompt("system"), [UserText(PRACTICE_QUESTION)], max_tokens=max_tokens

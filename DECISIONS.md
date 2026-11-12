@@ -190,6 +190,18 @@ above (written during T027-T060) were silently not saved; they were restored the
 from the session record. Edits to this file now assert that their anchor exists.
 Made by: agent
 
+## 2026-11-12 - Agent news backend: GDELT DOC API (RSS output)
+Context: SPEC 9.3 names GDELT or outlet RSS feeds as candidates for `search_news`.
+Decision: GDELT DOC 2.0 in ArtList mode with RSS output, bounded by `enddatetime` = the
+forecast time, so the agent only sees items published before it (no leakage). GDELT's
+terms allow any use with a citation and link (shown in tool output). RSS output is used
+because the documentation lists the RSS format but not the JSON field names. Requests are
+spaced 5 seconds apart as GDELT asks. Only title, outlet (link host), URL and time are
+kept. Risk: GDELT throttles shared IPs (seen here); a failed search is a tool error the
+agent sees, never a reason to guess.
+Alternatives: individual outlet RSS feeds (terms differ per outlet; no time filter).
+Made by: agent
+
 ## Proposals for the human
 
 Ideas outside the specification. The agent lists them here and does not build them.

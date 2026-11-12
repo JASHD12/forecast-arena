@@ -233,7 +233,7 @@ Keep the first line of each task in exactly this shape; the status script parses
   - Do: enable both in the live config.
   - Done when: a real morning run records their forecasts within the caps, or
     `WAIT(until=<date>)`.
-- [ ] T066 · Agent tools (deps: T063)
+- [x] T066 · Agent tools (deps: T063)
   - Do: section 9.3 tools; verify terms and choose news backends; compact trace logging.
   - Done when: tests cover each tool, the call limit and the time limit.
 - [ ] T067 · Agent forecaster (deps: T066, T055)

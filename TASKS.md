@@ -113,11 +113,11 @@ Keep the first line of each task in exactly this shape; the status script parses
     concurrency group, minimal permissions, ledger push and Pages deploy.
   - Done when: `gh workflow run morning.yml -f dry_run=true` and the same for `resolve.yml`
     finish successfully.
-- [ ] T031 · Promotion to stable (live) (deps: T030)
+- [x] T031 · Promotion to stable (live) (deps: T030)
   - Do: `promote.yml` fast-forwards `stable` after CI succeeds on `main`; scheduled jobs
     check out `stable`.
   - Done when: after a green CI run, `stable` and `main` point to the same commit.
-- [ ] T032 · Rehearsal go-live (live) (deps: T031)
+- [!] T032 · Rehearsal go-live (live) (deps: T031) WAIT(until=2026-11-13)
   - Do: trigger a real morning run; confirm the ledger branch holds today's questions,
     forecasts and batch seal committed before lock; confirm the site is reachable at the
     Pages URL; write "Daily operations" and "If something breaks" in `docs/RUNBOOK.md`;

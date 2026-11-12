@@ -5,8 +5,9 @@ move older "Done log" lines to `docs/progress-archive.md`.
 
 ## Now
 
-- Phase: all agent-reachable work is done (OPEN_AGENT_TASKS=0). Everything live waits on
-  the human: H10 (Actions jobs never get a runner), H03 (Pages), H04 (LLM key), H06 (panel).
+- Phase: 2 go-live. Actions (H10) and Pages (H03) are fixed by the owner; CI, promote,
+  morning/resolve/weekly dry runs are green. T032 waits for the first scheduled real
+  morning run (2026-11-13 05:30 UTC). Still waiting on the owner: H04, H06, H11.
 - Rehearsal start date: (not yet live)
 - Official record start date: (not yet set, see SPEC 2.9)
 - Live site URL: (not yet deployed)
@@ -42,6 +43,8 @@ move older "Done log" lines to `docs/progress-archive.md`.
 
 ## Done log
 
+- 2026-11-12 T032 waiting: first real morning run is the scheduled 05:30 UTC run on 2026-11-13 (from stable); RUNBOOK written
+- 2026-11-12 T031: promote.yml green; stable == main == 48e7b5b
 - 2026-11-12 T030: morning.yml + resolve.yml dry-run dispatches green (runs 43286773304, 43286778910)
 - 2026-11-12 T082: experiments page from weekly summaries; no remote tracking server (DECISIONS)
 - 2026-11-12 T081: Evidently drift metrics in weekly summaries (fixture test green in CI), HTML as artifact

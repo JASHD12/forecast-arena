@@ -29,7 +29,7 @@ Keep the first line of each task in exactly this shape; the status script parses
     UTF-8, newline-terminated); JSON Schemas exported to `docs/schemas/`.
   - Done when: round-trip and validation tests pass; a schema-drift test fails if models
     change without re-exporting.
-- [ ] T005 · Documentation scaffolding (deps: T001)
+- [x] T005 · Documentation scaffolding (deps: T001)
   - Do: `docs/SOURCES.md` (table: fact, source URL, date checked), `docs/RUNBOOK.md` stub,
     `docs/METHODS.md` stub, `docs/explainers/README.md`.
   - Done when: files exist and are linked from `README.md`.

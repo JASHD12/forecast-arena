@@ -6,8 +6,9 @@ and retry, up to five attempts; never force-push; never rewrite history.
 
 from __future__ import annotations
 
+import os
 import subprocess
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
@@ -28,7 +29,12 @@ class GitIdentity:
     email: str = "forecast-arena-bot@users.noreply.github.com"
 
 
-def git(args: Sequence[str], cwd: Path, identity: GitIdentity | None = None) -> str:
+def git(
+    args: Sequence[str],
+    cwd: Path,
+    identity: GitIdentity | None = None,
+    env: Mapping[str, str] | None = None,
+) -> str:
     """Run one git command and return stdout; raise GitError with stderr on failure."""
     ident = identity or GitIdentity()
     cmd = [
@@ -38,7 +44,8 @@ def git(args: Sequence[str], cwd: Path, identity: GitIdentity | None = None) -> 
         "-c", "commit.gpgsign=false",
         *args,
     ]  # fmt: skip
-    res = subprocess.run(cmd, cwd=cwd, capture_output=True, text=True, check=False)
+    full_env = {**os.environ, **env} if env else None
+    res = subprocess.run(cmd, cwd=cwd, capture_output=True, text=True, check=False, env=full_env)
     if res.returncode != 0:
         raise GitError(f"git {' '.join(args)} failed: {res.stderr.strip() or res.stdout.strip()}")
     return res.stdout.strip()

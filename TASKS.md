@@ -51,7 +51,7 @@ Keep the first line of each task in exactly this shape; the status script parses
     never force.
   - Done when: tests against a temporary bare repository cover first run, normal run and
     a simulated concurrent push.
-- [ ] T013 · Commit-time verification (deps: T011, T012)
+- [x] T013 · Commit-time verification (deps: T011, T012)
   - Do: `arena ledger verify --git` checks from branch history that each batch commit
     landed before its lock time. Write the honest limits of this evidence into
     `docs/METHODS.md`.

@@ -250,8 +250,16 @@ def daily_morning(obj: Ctx, push: bool) -> None:
 
     remote = _sync(obj, push)
     domains = build_domains(obj.settings, obj.clock.now(), ledger=obj.ledger)
-    result = morning(obj.ledger, obj.day, obj.clock, domains,
-                     build_forecasters(obj.ledger, domains), dry_run=obj.dry_run)  # fmt: skip
+    forecasters, guard = build_forecasters(
+        obj.ledger, domains, obj.settings, obj.day, dry_run=obj.dry_run
+    )
+
+    def attach(rec: object) -> None:
+        if guard is not None:
+            guard.recorder = rec  # type: ignore[assignment]
+
+    result = morning(obj.ledger, obj.day, obj.clock, domains, forecasters,
+                     dry_run=obj.dry_run, on_record=attach)  # fmt: skip
     click.echo(result.line())
     for w in result.warnings:
         click.echo(f"warning: {w}")

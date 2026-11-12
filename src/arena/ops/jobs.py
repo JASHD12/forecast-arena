@@ -143,6 +143,13 @@ def morning(
             res.written["questions"] = led.append(qpath, new_qs)
         all_qs = existing + new_qs
 
+        for f in forecasters:  # e.g. the LLM forecasters draw their shared daily sample
+            prepare = getattr(f, "prepare", None)
+            if callable(prepare):
+                try:
+                    prepare(all_qs)
+                except Exception as exc:
+                    rec.warn(f"{f.forecaster_id}: prepare failed: {_short(exc)}")
         fpath = layout.forecasts_path(batch)
         done = {r.record_id for r in led.read(fpath)}
         by_domain = {d.name: d for d in domains}

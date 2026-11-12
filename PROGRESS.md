@@ -30,6 +30,7 @@ move older "Done log" lines to `docs/progress-archive.md`.
 
 ## Done log
 
+- 2026-11-12 T063: llm_plain and llm_context, seeded stratified daily sample, e2e with FakeLLM
 - 2026-11-12 T062: versioned prompt files, strict parser, one repair retry, parse_failure skips
 - 2026-11-12 T061: budget guard: daily caps across manifests, budget_exhausted skips
 - 2026-11-12 T060: LLM client protocol, FakeLLM, Anthropic (SDK) and OpenAI-compatible adapters, mocked tests

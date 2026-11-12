@@ -14,8 +14,12 @@ from arena.domains.power_history import PRICE_KEY, berlin_date, to_observations
 from arena.domains.weather import WeatherDomain, weather_domain_from_responses
 from arena.forecasters.base import Forecaster, LedgerHistory
 from arena.forecasters.baselines import BaseRate, Persistence
+from arena.forecasters.llm import LLMContext, LLMPlain
 from arena.forecasters.replay import CombinedHistory, ReplayHistory
 from arena.ledger import Ledger
+from arena.llm.budget import BudgetGuard, Caps, GuardedLLM, usage_from_manifests
+from arena.llm.client import LLMClient
+from arena.llm.factory import client_from_settings
 from arena.models import Question
 from arena.sources.brightsky import BrightSkyClient
 from arena.sources.ecb import EcbClient
@@ -29,9 +33,11 @@ POWER_HISTORY_DAYS = 280
 
 
 def power_domain_from_client(
-    client: SmardClient, now: datetime, days: int = POWER_HISTORY_DAYS,
+    client: SmardClient,
+    now: datetime,
+    days: int = POWER_HISTORY_DAYS,
     on_skip: Callable[[str], None] | None = None,
-) -> PowerDomain:  # fmt: skip
+) -> PowerDomain:
     """A power domain with `days` of price history up to D+1, with chunk evidence."""
     today = berlin_date(now)
     start = berlin_day_bounds(today - timedelta(days=days))[0]
@@ -56,9 +62,12 @@ WEATHER_DAYS = {"morning": 300, "resolve": 10}
 
 
 def weather_domain_live(
-    client: BrightSkyClient, now: datetime, days: int, with_forecast: bool,
+    client: BrightSkyClient,
+    now: datetime,
+    days: int,
+    with_forecast: bool,
     on_skip: Callable[[str], None] | None = None,
-) -> WeatherDomain:  # fmt: skip
+) -> WeatherDomain:
     """Fetch observations (and tomorrow's MOSMIX forecast) for every station."""
     today = berlin_date(now)
     obs, fc = {}, {}
@@ -71,9 +80,12 @@ def weather_domain_live(
 
 
 def build_domains(
-    settings: Settings, now: datetime, on_skip: Callable[[str], None] | None = None,
-    job: str = "morning", ledger: Ledger | None = None,
-) -> list[Domain]:  # fmt: skip
+    settings: Settings,
+    now: datetime,
+    on_skip: Callable[[str], None] | None = None,
+    job: str = "morning",
+    ledger: Ledger | None = None,
+) -> list[Domain]:
     """The domains enabled in settings, loaded from the live sources (with the cache)."""
     http = HttpClient(settings.user_agent())
     out: list[Domain] = []
@@ -82,8 +94,11 @@ def build_domains(
             client = SmardClient(http, cache_dir=settings.cache_dir)
             out.append(power_domain_from_client(client, now, on_skip=on_skip))
         elif name == "weather":
-            out.append(weather_domain_live(BrightSkyClient(http), now, WEATHER_DAYS[job],
-                                           job == "morning", on_skip=on_skip))  # fmt: skip
+            out.append(
+                weather_domain_live(
+                    BrightSkyClient(http), now, WEATHER_DAYS[job], job == "morning", on_skip=on_skip
+                )
+            )
         elif name == "markets":
             start = berlin_date(now) - timedelta(days=MARKETS_DAYS)
             r = EcbClient(http).rates(list(PAIRS), start)
@@ -94,17 +109,40 @@ def build_domains(
                 if ledger is None
                 else [q for _, q in ledger.iter_family("questions") if isinstance(q, Question)]
             )
-            out.append(AttentionDomain(
-                WikimediaClient(http, cache_dir=settings.cache_dir),
-                recent_titles=lambda p, b, qs=questions: titles_from_questions(qs, p, b),
-                on_skip=on_skip))  # fmt: skip
+            out.append(
+                AttentionDomain(
+                    WikimediaClient(http, cache_dir=settings.cache_dir),
+                    recent_titles=lambda p, b, qs=questions: titles_from_questions(qs, p, b),
+                    on_skip=on_skip,
+                )
+            )
         else:
             raise ValueError(f"domain {name!r} is not available yet")
     return out
 
 
-def build_forecasters(ledger: Ledger, domains: Sequence[Domain]) -> list[Forecaster]:
-    """Baselines over live history, filled with replayed history (SPEC 8.1)."""
+def build_forecasters(
+    ledger: Ledger,
+    domains: Sequence[Domain],
+    settings: Settings | None = None,
+    day: date | None = None,
+    *,
+    dry_run: bool = False,
+    llm: LLMClient | None = None,
+) -> tuple[list[Forecaster], BudgetGuard | None]:
+    """Baselines over live history (filled with replayed history, SPEC 8.1) and the LLM
+    forecasters behind the daily budget guard. Dry runs get no LLM client: their manifests
+    never reach the ledger, so their usage could not be counted against the caps."""
     replays = [ReplayHistory(d) for d in domains if getattr(d, "replayable", True)]
     history = CombinedHistory(LedgerHistory(ledger), replays)
-    return [BaseRate(history), Persistence(history)]
+    out: list[Forecaster] = [BaseRate(history), Persistence(history)]
+    guard = None
+    if settings is None:
+        return out, None
+    client = llm if llm is not None else (None if dry_run else client_from_settings(settings))
+    if client is not None and day is not None:
+        guard = BudgetGuard(Caps.from_settings(settings), usage_from_manifests(ledger, day))
+        client = GuardedLLM(client, guard)
+    n = settings.llm_questions_per_domain
+    out += [LLMPlain(client, n), LLMContext(client, n)]
+    return out, guard

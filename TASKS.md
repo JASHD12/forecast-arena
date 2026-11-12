@@ -223,7 +223,7 @@ Keep the first line of each task in exactly this shape; the status script parses
 - [x] T062 · Prompts and strict parsing (deps: T060)
   - Do: section 9.2: versioned prompt files, strict parser, one repair retry.
   - Done when: tests with malformed outputs produce `parse_failure` skips, never a number.
-- [ ] T063 · Plain and context LLM forecasters (deps: T061, T062, T027)
+- [x] T063 · Plain and context LLM forecasters (deps: T061, T062, T027)
   - Do: `llm_plain`, `llm_context`, and the seeded stratified daily sample (8.4).
   - Done when: e2e with `FakeLLM` shows all LLM forecasters answering the same sample.
 - [ ] T064 · Live LLM smoke workflow (deps: T063; needs: H04)

@@ -4,18 +4,29 @@ Data: recorded SMARD fixtures. Time: a fixed clock moved through the daily sched
 SPEC 4 (two morning runs, four resolve runs). Ends with ledger verification.
 """
 
+import json
 from datetime import UTC, date, datetime, time, timedelta
 
 from power_fixtures import fixture_domain
 
 from arena.clock import FixedClock
+from arena.config import Settings
 from arena.ledger import Ledger, layout
 from arena.ledger.verify import verify
-from arena.models import Forecast, Question, Resolution
+from arena.llm.client import FakeLLM
+from arena.models import Forecast, Question, Resolution, Skip
 from arena.ops.jobs import morning, resolve
 from arena.ops.wiring import build_forecasters
 
 FIRST = date(2026, 10, 21)
+SETTINGS = Settings.from_env({"ARENA_LLM_QUESTIONS_PER_DOMAIN": "3"})
+GOOD = json.dumps({"probability": 0.5, "rationale": "Fake.", "key_factors": []})
+
+
+def answer(system, turns, tools):
+    return GOOD
+
+
 DAYS = 5
 MORNINGS = (time(5, 30), time(7, 0))
 RESOLVES = (time(3, 30), time(12, 30), time(16, 30), time(20, 30))
@@ -25,7 +36,7 @@ def run_schedule(root) -> Ledger:
     led = Ledger(root)
     clock = FixedClock(datetime.combine(FIRST, time(0), tzinfo=UTC))
     domains = [fixture_domain()]
-    forecasters = build_forecasters(led, domains)
+    forecasters, _ = build_forecasters(led, domains, SETTINGS, FIRST, llm=FakeLLM(answer))
     for i in range(DAYS + 1):
         day = FIRST + timedelta(days=i)
         events = [(t, "resolve") for t in RESOLVES]
@@ -47,7 +58,16 @@ def test_five_days_offline(tmp_path) -> None:
     rs = [r for _, r in led.iter_family("resolutions") if isinstance(r, Resolution)]
     assert len({q.batch_date for q in qs}) == DAYS
     assert len(qs) >= 5 * DAYS
-    assert len(fs) == 2 * len(qs)  # base_rate and persistence answer everything
+    base = [f for f in fs if f.forecaster_id in ("base_rate", "persistence")]
+    assert len(base) == 2 * len(qs)  # base_rate and persistence answer everything
+    llm = {
+        fid: {f.question_id for f in fs if f.forecaster_id == fid}
+        for fid in ("llm_plain", "llm_context")
+    }
+    assert llm["llm_plain"] == llm["llm_context"]  # paired: the same daily sample
+    assert len(llm["llm_plain"]) == 3 * DAYS
+    skips = [r for _, r in led.iter_family("forecasts") if isinstance(r, Skip)]
+    assert {s.reason_code for s in skips} == {"not_sampled"}
     assert {r.question_id for r in rs} == {q.question_id for q in qs}
     for d in range(DAYS):
         assert led.exists(layout.batch_seal_path(FIRST + timedelta(days=d)))
@@ -59,7 +79,7 @@ def test_five_days_offline(tmp_path) -> None:
 
     rec = load(led)
     board = {r.forecaster_id: r for r in leaderboard(rec.scored)}
-    assert set(board) == {"base_rate", "persistence"}
+    assert set(board) == {"base_rate", "persistence", "llm_plain", "llm_context"}
     assert board["base_rate"].n == len(qs) and board["base_rate"].skill == 0
     assert counts(rec).open == 0
 

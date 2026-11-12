@@ -29,6 +29,7 @@ move older "Done log" lines to `docs/progress-archive.md`.
 
 ## Done log
 
+- 2026-11-12 T023: power history/as-of store; live backfill 424 chunks, 2964 complete days, 0 gaps
 - 2026-11-12 T021: SMARD client (index, weekly chunks, nulls, Berlin days, cache), fixtures, smoke
 - 2026-11-12 T026: base_rate and persistence baselines, LedgerHistory/StaticHistory
 - 2026-11-12 T022: domain contract, as-of gateway, degeneracy rule, registry, toy domain

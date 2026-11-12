@@ -150,6 +150,11 @@ class SmardClient:
             tmp.replace(cached)
         return chunk
 
+    def is_cached(self, filter_id: int, ts: int) -> bool:
+        """True if the chunk is in the on-disk cache."""
+        path = self._cache_path(filter_id, ts)
+        return path is not None and path.exists()
+
     def _cache_path(self, filter_id: int, ts: int) -> Path | None:
         if self.cache_dir is None:
             return None

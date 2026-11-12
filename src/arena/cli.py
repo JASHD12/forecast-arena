@@ -126,6 +126,27 @@ def questions_generate() -> None:
     _not_yet("T027")
 
 
+# ----- data ----------------------------------------------------------------------------
+@main.group()
+def data() -> None:
+    """Fetch and cache source data (git-ignored cache, ARENA_CACHE_DIR)."""
+
+
+@data.command("backfill")
+@click.option("--series", "keys", multiple=True, default=["price_de_lu"], show_default=True,
+              help="SMARD series key(s) to backfill.")  # fmt: skip
+@click.pass_obj
+def data_backfill(obj: Ctx, keys: tuple[str, ...]) -> None:
+    """Fetch the full SMARD history into the cache and print a summary."""
+    from arena.domains.power_history import backfill
+    from arena.sources.http import HttpClient
+    from arena.sources.smard import SmardClient
+
+    client = SmardClient(HttpClient(obj.settings.user_agent()), cache_dir=obj.settings.cache_dir)
+    for key in keys:
+        click.echo(backfill(client, key, until=obj.clock.now()).line())
+
+
 # ----- the other groups ----------------------------------------------------------------
 @main.group()
 def forecast() -> None:

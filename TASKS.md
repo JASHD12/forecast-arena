@@ -81,7 +81,7 @@ Keep the first line of each task in exactly this shape; the status script parses
   - Do: the `Domain` protocol of section 7.0, a registry, the as-of gateway helper, the
     degeneracy rule, and a toy domain for tests.
   - Done when: tests show the gateway never returns a value newer than `asof`.
-- [ ] T023 · Power history and availability rules (deps: T021, T022)
+- [x] T023 · Power history and availability rules (deps: T021, T022)
   - Do: fetch trailing windows for daily jobs; a full-history backfill into a git-ignored
     cache for training; conservative availability rules documented in `docs/SOURCES.md`.
   - Done when: backfill completes and prints a summary; cache is not tracked by git.

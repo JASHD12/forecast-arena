@@ -14,10 +14,7 @@ move older "Done log" lines to `docs/progress-archive.md`.
 
 ## In progress
 
-- T064 live LLM smoke workflow (H04 ticked by the owner 2026-11-12)
-  - `arena llm smoke`: two calls (output contract + tool round-trip), usage printed, nothing written; refuses outside Actions
-  - `llm-smoke.yml`: manual dispatch only
-  - dispatch once, read usage from the job summary, then tick
+(nothing)
 
 ## Open risks and surprises
 
@@ -46,6 +43,7 @@ move older "Done log" lines to `docs/progress-archive.md`.
 
 ## Done log
 
+- 2026-11-12 T064: llm-smoke run 43294520796 green: anthropic/claude-haiku-5-5, contract ok, tool round-trip ok, 2 requests, 762 in / 215 out tokens
 - 2026-11-12 T032 waiting: first real morning run is the scheduled 05:30 UTC run on 2026-11-13 (from stable); RUNBOOK written
 - 2026-11-12 T031: promote.yml green; stable == main == 48e7b5b
 - 2026-11-12 T030: morning.yml + resolve.yml dry-run dispatches green (runs 43286773304, 43286778910)

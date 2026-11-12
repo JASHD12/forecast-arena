@@ -286,6 +286,18 @@ JavaScript on the site). Performance over time is the weekly Brier series in the
 summaries.
 Made by: agent
 
+## 2026-11-12 · LLM forecasters run from the first real morning run
+
+- Context: `build_forecasters` has always included `llm_plain`, `llm_context` and `agent`,
+  recording `model_missing` skips while no key was set. With H04 done, the first real
+  morning run (rehearsal, 2026-11-13) will make real calls, before T046/T065 are ticked.
+- Decision: keep it. The calls run only in Actions, under the SPEC 9.4 caps (100
+  requests, 400k tokens per UTC day), forecasts are written before lock like every other
+  forecaster, and the rehearsal period is not part of the official record. T065 and T068
+  are still ticked only after their own checks.
+- Alternative: hide the LLM forecasters until T065 (rejected: no integrity gain, and the
+  rehearsal is exactly where cost and failure modes should show up).
+
 ## Proposals for the human
 
 Ideas outside the specification. The agent lists them here and does not build them.

@@ -20,7 +20,7 @@ Keep the first line of each task in exactly this shape; the status script parses
   - Do: `.github/workflows/ci.yml` running `make check` on push and pull request to `main`.
     Look up current action versions and record them in `docs/SOURCES.md`.
   - Done when: `gh run list --branch main --limit 1` shows a successful run of this commit.
-- [ ] T003 · Config and clock (deps: T001)
+- [x] T003 · Config and clock (deps: T001)
   - Do: `arena.config` (typed settings from `ARENA_*` environment variables with defaults;
     no secrets in code); `arena.clock` (`Clock` protocol, `SystemClock`, `FixedClock`).
   - Done when: unit tests cover defaults, overrides and a fixed clock.

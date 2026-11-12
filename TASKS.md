@@ -213,7 +213,7 @@ Keep the first line of each task in exactly this shape; the status script parses
 
 ## Phase 5 - LLM forecasters
 
-- [ ] T060 · LLM client (deps: T003)
+- [x] T060 · LLM client (deps: T003)
   - Do: section 9.1: protocol, `FakeLLM`, two adapters written against current official
     API documentation, usage accounting.
   - Done when: adapter tests pass with mocked HTTP; no test needs a key.

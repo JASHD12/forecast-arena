@@ -29,6 +29,7 @@ move older "Done log" lines to `docs/progress-archive.md`.
 
 ## Done log
 
+- 2026-11-12 T054: markets EWMA-t model; 2-year backtest: no supported gain over base_rate (H3-consistent); direction 0.5
 - 2026-11-12 T052: weather model stage 1: transparent MOSMIX rules (weather-rules-r1) until 60 days of snapshots
 - 2026-11-12 T067: agent forecaster (bounded tool loop, injection test, traces to agent_traces/), in e2e
 - 2026-11-12 T055: model registry on the ledger (xz artefacts, hashes, promotions), model_missing skips

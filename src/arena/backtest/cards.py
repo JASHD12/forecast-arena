@@ -29,3 +29,26 @@ not it beats the baselines; the backtest says which.
 def power_card(report_md: str, run_id: str) -> str:
     """Model card text with the generated backtest report appended."""
     return POWER_CARD + f"\n## Backtest (run `{run_id}`)\n\n" + report_md.split("\n", 2)[2]
+
+
+MARKETS_CARD = """# Model card: `ml` for markets (markets-ewma-t5-r1)
+
+**What it predicts.** For EUR/USD and EUR/JPY ECB reference rates: the probability that the
+absolute log change from today's fixing to the next one exceeds the question's threshold,
+from an EWMA (lambda 0.94) volatility estimate of per-weekday log returns and a Student t
+distribution with 5 degrees of freedom, scaled by the weekdays between the two fixings.
+
+**Direction.** The `up` template is answered with 0.5. A direction model would only be used
+if a backtest showed skill with an interval excluding zero; none was built, so the markets
+domain stays a clean null test of hypothesis H3.
+
+**Inputs.** Only the fixings published before the batch day's fixing (as-of context).
+
+**Known limits.** No fitted parameters; lambda and the degrees of freedom are textbook
+choices fixed before any live resolution, not tuned on the record.
+"""
+
+
+def markets_card(report_md: str, run_id: str) -> str:
+    """Model card text with the generated backtest report appended."""
+    return MARKETS_CARD + f"\n## Backtest (run `{run_id}`)\n\n" + report_md.split("\n", 2)[2]

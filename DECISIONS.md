@@ -223,6 +223,16 @@ Alternatives: calibrating the spread on observations vs. forecasts (impossible w
 as-of forecast history; that is stage 2).
 Made by: agent
 
+## 2026-11-12 - Markets direction fixed at 0.5; persistence falls back for markets
+Context: SPEC 8.3 fixes direction at 0.5 unless a backtest shows skill.
+Decision: no direction model was built, so `up` is 0.5 (H3 stays a clean null test). The
+volatility model (`absmove_gt`) is shipped although its backtest gain over `base_rate`
+(-0.0013 Brier, interval [-0.0050, +0.0024], 2024-11 to 2026-10) is not supported; the
+model card says so. `persistence` equals `base_rate` on markets because yesterday's
+outcome (the previous day's fixing) is published at 16:00 CET, after the 09:30 UTC lock,
+so it is never known at forecast time; the fallback is the rule of SPEC 8.2.
+Made by: agent
+
 ## Proposals for the human
 
 Ideas outside the specification. The agent lists them here and does not build them.

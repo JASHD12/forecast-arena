@@ -192,7 +192,7 @@ Keep the first line of each task in exactly this shape; the status script parses
 - [ ] T053 · Attention model (deps: T050, T043)
   - Do: section 8.3 attention model with backtest and model card.
   - Done when: the backtest report exists with intervals.
-- [ ] T054 · Markets model (deps: T050, T045)
+- [x] T054 · Markets model (deps: T050, T045)
   - Do: section 8.3 volatility model; direction fixed at 0.5 unless skill is shown.
   - Done when: the backtest report exists; the direction decision is recorded.
 - [x] T055 · Model registry (deps: T051)

@@ -186,7 +186,7 @@ Keep the first line of each task in exactly this shape; the status script parses
     days whether official day-ahead forecasts are published before lock before using them.
   - Done when: the backtest report compares `ml` with `base_rate` and `persistence` with
     intervals. Ship it even if it does not win, and say so on the model card.
-- [ ] T052 · Weather model (deps: T050, T041)
+- [x] T052 · Weather model (deps: T050, T041)
   - Do: section 8.3 weather model; rule-based version until 60 days of snapshots exist.
   - Done when: the forecaster returns probabilities for both templates in tests.
 - [ ] T053 · Attention model (deps: T050, T043)

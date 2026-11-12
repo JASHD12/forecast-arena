@@ -212,6 +212,17 @@ verify` treats `models/` and `meta/` as non-record files (only `runs/` and `chai
 single-record JSON). Loading checks the artefact hash.
 Made by: agent
 
+## 2026-11-12 - Weather model stage 1: fixed rules on the MOSMIX forecast
+Context: SPEC 8.3 asks for rule-based weather probabilities until 60 days of as-of forecast
+snapshots exist.
+Decision: `tmax_gt` uses a normal distribution around the forecast daily maximum with a
+2.0 C standard deviation; `wet_day` uses a fixed step function of the forecast daily total
+(module docstring). Both were set before any live resolution and are labelled
+`weather-rules-r1`. A missing forecast is an `error` skip.
+Alternatives: calibrating the spread on observations vs. forecasts (impossible without
+as-of forecast history; that is stage 2).
+Made by: agent
+
 ## Proposals for the human
 
 Ideas outside the specification. The agent lists them here and does not build them.

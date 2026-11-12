@@ -52,7 +52,17 @@ class MLForecaster:
                 detail=f"no model for {q.domain}",
                 created_at=asof,
             )
-        p = model.probability(q, ctx)
+        try:
+            p = model.probability(q, ctx)
+        except (ValueError, KeyError) as exc:
+            return Skip(
+                question_id=q.question_id,
+                forecaster_id=self.forecaster_id,
+                forecaster_version=model.version,
+                reason_code="error",
+                detail=f"{type(exc).__name__}: {exc}"[:300],
+                created_at=asof,
+            )
         if not 0.0 <= p <= 1.0 or p != p:
             return Skip(
                 question_id=q.question_id,

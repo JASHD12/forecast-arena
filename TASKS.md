@@ -164,7 +164,7 @@ Keep the first line of each task in exactly this shape; the status script parses
 - [x] T044 · ECB reference-rate client (deps: T020)
   - Do: verify the official endpoint and terms (7.4); client; publication-day calendar.
   - Done when: unit tests pass on fixtures; `make smoke-sources` fetches the latest fixing.
-- [ ] T045 · Markets questions and resolver (deps: T044, T022)
+- [x] T045 · Markets questions and resolver (deps: T044, T022)
   - Do: templates and resolver of section 7.4.
   - Done when: tests cover a Friday batch, a weekend (no questions) and a holiday.
 - [ ] T046 · Enable the new domains (live) (deps: T041, T043, T045, T034)

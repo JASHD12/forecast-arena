@@ -8,6 +8,7 @@ from datetime import date, datetime, timedelta
 from arena.config import WEATHER_STATIONS, Settings
 from arena.domains.attention import AttentionDomain, titles_from_questions
 from arena.domains.base import AsOfStore, Domain
+from arena.domains.markets import PAIRS, markets_domain_from_rates
 from arena.domains.power import PowerDomain
 from arena.domains.power_history import PRICE_KEY, berlin_date, to_observations
 from arena.domains.weather import WeatherDomain, weather_domain_from_responses
@@ -17,6 +18,7 @@ from arena.forecasters.replay import CombinedHistory, ReplayHistory
 from arena.ledger import Ledger
 from arena.models import Question
 from arena.sources.brightsky import BrightSkyClient
+from arena.sources.ecb import EcbClient
 from arena.sources.http import HttpClient
 from arena.sources.smard import FILTERS, SmardClient, berlin_day_bounds
 from arena.sources.wikimedia import WikimediaClient
@@ -43,6 +45,10 @@ def power_domain_from_client(
             evidence[berlin_date(p.start)] = (chunk.url, chunk.sha256)
     return PowerDomain(store, evidence=evidence.get, on_skip=on_skip)
 
+
+#: Calendar days of ECB fixings loaded: 250 returns for the `up` window plus ~200 replayed
+#: batches (about 450 publication days, ~650 calendar days).
+MARKETS_DAYS = 660
 
 #: Observation days loaded for weather: morning runs replay ~200 batches (each needing a
 #: 90-day window); resolve runs only need the last days within the grace period.
@@ -78,6 +84,10 @@ def build_domains(
         elif name == "weather":
             out.append(weather_domain_live(BrightSkyClient(http), now, WEATHER_DAYS[job],
                                            job == "morning", on_skip=on_skip))  # fmt: skip
+        elif name == "markets":
+            start = berlin_date(now) - timedelta(days=MARKETS_DAYS)
+            r = EcbClient(http).rates(list(PAIRS), start)
+            out.append(markets_domain_from_rates(r.rates, r.url, r.sha256, on_skip=on_skip))
         elif name == "attention":
             questions = (
                 []

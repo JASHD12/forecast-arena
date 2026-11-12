@@ -47,7 +47,8 @@ def test_home_shows_questions_and_forecasts(tmp_path) -> None:
 
     from arena.site.titles import plain_title
 
-    assert "0.61" in home and "base_rate" in home and _html.escape(plain_title(q)) in home
+    assert "61%" in home and "width: 61.0%" in home and "Base rate" in home
+    assert _html.escape(plain_title(q)) in home
     text = (res.out_dir / "questions" / f"{q.question_id}.html").read_text()
     assert "Exact question:" in text
     assert _html.escape(q.text) in text and _html.escape(q.resolution_rule) in text

@@ -1,39 +1,46 @@
 {% extends "base.html" %}
 {% from "macros.html" import board_table %}
+{% macro outcome_badge(row) %}{% if row.outcome is none %}<span class="label">{{ row.state }}</span>{% elif row.outcome == 1 %}<span class="outcome yes-badge">✓ YES</span>{% else %}<span class="outcome no-badge">✗ NO</span>{% endif %}{% endmacro %}
+{% macro bar_class(f) %}{% if f in ("llm_plain", "llm_context", "agent") %}ai{% elif f in ("base_rate", "persistence") %}base{% endif %}{% endmacro %}
 {% block content %}
-<h1>Forecasts before the facts</h1>
-<p>Every morning the system asks yes/no questions about tomorrow, several forecasters publish a probability before the answer exists, and every forecast is scored when the answer arrives.</p>
-<div class="cards">
-<div class="card"><span class="big">{{ days_live }}</span>days with questions</div>
-<div class="card"><span class="big">{{ counts.resolved }}</span>questions resolved</div>
-<div class="card"><span class="big">{{ official_start or "not yet" }}</span>official start</div>
-<div class="card"><span class="big">{{ "PASS" if verify_ok else "FAIL" }}</span>ledger verification<br><span class="note">{{ verify_summary }}</span></div>
+<section class="hero" aria-labelledby="hero-title">
+<p class="kicker">A live forecasting benchmark</p>
+<h1 id="hero-title">Can AI predict tomorrow better than a simple model?</h1>
+<p>Every morning we ask yes/no questions about tomorrow: electricity prices, the weather in four German cities, what people read on Wikipedia, exchange rates. Simple baselines, a classical ML model and three kinds of AI each publish a probability <strong>before</strong> the answer exists. Then reality keeps score. <a href="methods.html">How it works</a></p>
+<div class="stats">
+<div class="stat"><span class="big">{{ days_live }}</span><span class="small">days with questions</span></div>
+<div class="stat"><span class="big">{{ counts.resolved }}</span><span class="small">questions resolved</span></div>
+<div class="stat"><span class="big">{{ official_start or "Rehearsal" }}</span><span class="small">official start</span></div>
+<div class="stat"><span class="big">{{ "✓ PASS" if verify_ok else "✗ FAIL" }}</span><span class="small">ledger verification</span></div>
 </div>
+</section>
 
-<h2>Latest questions{% if latest_batch %} (batch {{ latest_batch }}){% endif %}</h2>
+<div class="section-head"><h2>{% if latest_batch %}Questions for {{ latest_batch }}{% else %}Latest questions{% endif %}</h2>
+<span class="note">Bars show each forecaster's probability of YES, published before the lock time.</span></div>
 {% if latest %}
-<div class="table-scroll" tabindex="0" role="region" aria-label="Table (scrolls sideways on small screens)"><table class="qtable">
-<caption class="muted">Probability of YES published before the lock time. A dash means no forecast (see Status for skips).</caption>
-<thead><tr><th scope="col">Question</th>{% for f in forecasters %}<th scope="col" class="num">{{ f }}</th>{% endfor %}<th scope="col">Outcome</th></tr></thead>
-<tbody>
-{% for row in latest %}<tr><td><a href="{{ qhref(row.qid) }}">{{ row.title }}</a><br><span class="note">locks {{ row.lock }}</span></td>
-{% for f in forecasters %}<td class="num">{{ row.p.get(f, "-") }}</td>{% endfor %}
-<td>{% if row.outcome is none %}<span class="muted">{{ row.state }}</span>{% elif row.outcome == 1 %}<span class="yes">YES</span>{% else %}<span class="no">NO</span>{% endif %}</td></tr>
-{% endfor %}</tbody></table></div>
-{% else %}<p class="muted">No questions yet.</p>{% endif %}
+<ul class="qgrid">
+{% for row in latest %}<li class="qcard">
+<div class="qmeta"><span class="chip chip-{{ row.domain }}">{{ dname(row.domain) }}</span><span>locks {{ row.lock }}</span>{{ outcome_badge(row) }}</div>
+<h3><a href="{{ qhref(row.qid) }}">{{ row.title }}</a></h3>
+<ul class="bars" aria-label="Forecasts">
+{% for f in forecasters %}{% set p = row.pn.get(f) %}<li class="{{ bar_class(f) }}{% if p is none %} none{% endif %}"><span class="who" title="{{ f }}">{{ fname(f) }}</span><span class="track" aria-hidden="true">{% if p is not none %}<span class="fill" style="width: {{ '%.1f'|format(p * 100) }}%"></span>{% endif %}</span><span class="val">{% if p is not none %}{{ '%.0f'|format(p * 100) }}%{% else %}<abbr title="no forecast (see Status for skips)">–</abbr>{% endif %}</span></li>
+{% endfor %}</ul>
+</li>
+{% endfor %}</ul>
+{% else %}<p class="empty">No questions yet. The first batch is written by the morning run (05:30 UTC) and locks at 09:30 UTC.</p>{% endif %}
 
-<h2>Previous batch outcomes{% if previous_batch %} (batch {{ previous_batch }}){% endif %}</h2>
+<div class="section-head"><h2>{% if previous_batch %}How {{ previous_batch }} turned out{% else %}Previous outcomes{% endif %}</h2></div>
 {% if previous %}
-<div class="table-scroll" tabindex="0" role="region" aria-label="Table (scrolls sideways on small screens)"><table class="qtable">
+<div class="table-scroll" tabindex="0" role="region" aria-label="Previous outcomes (scrolls sideways on small screens)"><table class="qtable">
 <thead><tr><th scope="col">Question</th><th scope="col">Outcome</th><th scope="col" class="num">Observed</th></tr></thead>
-<tbody>{% for row in previous %}<tr><td><a href="{{ qhref(row.qid) }}">{{ row.title }}</a></td>
-<td>{% if row.outcome is none %}<span class="muted">{{ row.state }}</span>{% elif row.outcome == 1 %}<span class="yes">YES</span>{% else %}<span class="no">NO</span>{% endif %}</td>
-<td class="num">{{ row.observed if row.observed is not none else "-" }}</td></tr>{% endfor %}</tbody></table></div>
-{% else %}<p class="muted">Nothing resolved yet.</p>{% endif %}
+<tbody>{% for row in previous %}<tr><td><span class="chip chip-{{ row.domain }}">{{ dname(row.domain) }}</span><br><a href="{{ qhref(row.qid) }}">{{ row.title }}</a></td>
+<td>{{ outcome_badge(row) }}</td>
+<td class="num">{{ row.observed if row.observed is not none else "–" }}</td></tr>{% endfor %}</tbody></table></div>
+{% else %}<p class="empty">Nothing resolved yet. Answers arrive when the official data is published, usually the day after.</p>{% endif %}
 
-<h2>Leaderboard</h2>
+<div class="section-head"><h2>Leaderboard</h2><span class="note"><a href="leaderboard.html">All leaderboards</a> · <a href="calibration.html">Calibration</a></span></div>
 {% if official_start %}{{ board_table(headline, "Common set, official record, all domains") }}
-{% else %}<p class="note">The official record has not started. Rehearsal scores, for transparency only:</p>
+{% else %}<p class="note">The official record has not started. Rehearsal scores, for transparency only. Lower Brier is better; 0.25 is what always saying 50% earns.</p>
 {{ board_table(rehearsal_board, "Common set, rehearsal days (excluded from the headline)") }}{% endif %}
-<p><a href="leaderboard.html">All leaderboards</a> · <a href="calibration.html">Calibration</a></p>
+<p class="note">Ledger check: {{ verify_summary }}</p>
 {% endblock %}

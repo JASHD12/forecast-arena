@@ -13,6 +13,35 @@ from datetime import date
 
 from arena.models import Question
 
+#: Friendly names for forecasters and domains (display only; ids stay in tables and data).
+FORECASTER_NAMES = {
+    "base_rate": "Base rate",
+    "persistence": "Same as last time",
+    "ml": "ML model",
+    "llm_plain": "AI, question only",
+    "llm_context": "AI with data",
+    "agent": "AI agent with tools",
+    "ensemble": "Ensemble",
+    "human_panel": "Human panel",
+}
+DOMAIN_NAMES = {
+    "power": "Electricity",
+    "weather": "Weather",
+    "attention": "Wikipedia",
+    "markets": "Currencies",
+}
+
+
+def forecaster_name(fid: str) -> str:
+    """Friendly forecaster name; the id itself when unknown."""
+    return FORECASTER_NAMES.get(fid, fid)
+
+
+def domain_name(domain: str) -> str:
+    """Friendly domain name; the id itself when unknown."""
+    return DOMAIN_NAMES.get(domain, domain.title())
+
+
 CITY = {
     "berlin": "Berlin",
     "frankfurt": "Frankfurt",

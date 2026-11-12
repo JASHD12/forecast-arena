@@ -334,6 +334,17 @@ Made by: agent
   redundant); a fixed storm threshold for gusts (rejected: almost always NO, so skipped as
   degenerate).
 
+## 2026-11-12 · Site redesign (owner request: "looks very basic")
+
+- Decision: new stylesheet and home page: a hero with the research question and the key
+  numbers, question cards with one labelled bar per forecaster (the percentage is always
+  printed, so nothing depends on colour), friendly forecaster and domain names (ids kept
+  in tables and data), rounded cards and tables, light and dark themes.
+- Still SPEC 11: static, no JavaScript, no cookies or trackers. No web fonts: loading
+  Google Fonts would send every visitor's IP address to Google, which German courts have
+  treated as a GDPR violation (LG München I, 2022); the system font stack avoids that.
+- Checked with `make a11y` (axe-core, desktop light and phone dark): 0 serious/critical.
+
 ## Proposals for the human
 
 Ideas outside the specification. The agent lists them here and does not build them.
@@ -376,3 +387,19 @@ Ideas outside the specification. The agent lists them here and does not build th
      permission from the index owner, which only the human can request (S2).
   The agent recommends 1 now, 2 together with the panel, and 3-4 as the first new
   templates before the official start, because they reuse verified sources.
+- **Money-related topics with a usable source (researched 2026-11-12, owner asked for
+  topics like stock prices).** Search results only, official terms still to be read
+  before building; each needs an account or key, which only the human can create (S2):
+  1. *Bitcoin / crypto prices* via CoinGecko: the free Demo plan allows display with
+     attribution ("Powered by CoinGecko API"); redistribution of the API itself is not
+     allowed. Questions like "Will Bitcoin be above $X at 00:00 UTC on D?". Needs a free
+     CoinGecko account and key.
+  2. *German fuel prices* via Tankerkoenig (MTS-K data, labelled CC BY 4.0, older AGB
+     forbid passing on raw datasets): "Will average diesel in Berlin be above X €/l on D?".
+     Needs a free API key; confirm the current terms with Tankerkoenig first.
+  3. *Stock prices (US, India, Germany)*: not usable. Index and exchange data (S&P,
+     Nasdaq, NSE, DAX/STOXX) need a licence or written permission. Single stocks such as
+     Google (Alphabet) are exchange data with the same problem. Publishing daily
+     probabilities about named listed shares could also count as an "investment
+     recommendation" under the EU Market Abuse Regulation (Art. 20), with disclosure
+     duties; get legal advice before ever doing it.

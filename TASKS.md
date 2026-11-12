@@ -89,7 +89,7 @@ Keep the first line of each task in exactly this shape; the status script parses
   - Do: the six templates of section 7.1 with thresholds, ids, texts and params.
   - Done when: golden tests on fixed fixture dates (ordinary day, both clock-change days,
     a holiday) match; generation is deterministic.
-- [ ] T025 · Power resolver (deps: T024)
+- [x] T025 · Power resolver (deps: T024)
   - Do: resolution, evidence snapshot, grace period, void rules, revision detection.
   - Done when: tests cover a normal day, missing hours, a 23-hour and a 25-hour day.
 - [x] T026 · Forecaster contract and baselines (deps: T022)

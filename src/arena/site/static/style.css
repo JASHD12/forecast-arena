@@ -598,3 +598,13 @@ ul.plain { list-style: none; padding: 0; margin: 0; display: grid; gap: .45rem; 
   border: 1px solid var(--line); background: var(--surface); color: var(--fg); }
 
 [hidden] { display: none !important; }
+
+/* For recruiters (T140): print as a one-pager */
+@media print {
+  .site-header, .banner, .site-footer, .theme-toggle, .btn { display: none !important; }
+  body { background: #fff; color: #000; font-size: 10.5pt; }
+  .card, .kpi { box-shadow: none; border: 1px solid #ccc; break-inside: avoid; }
+  .table-scroll { overflow: visible; border: 0; }
+  .proof td, .proof th { padding: .2rem .35rem; }
+  a { color: #000; text-decoration: none; }
+}

@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% from "macros.html" import page_head %}
+{% block content %}
+{{ page_head("For recruiters", "Forecast Arena in 60 seconds", "A live benchmark that asks whether AI agents beat classical machine learning at forecasting tomorrow, built end to end by one person, with every claim checkable.") }}
+<div class="kpis">
+<div class="kpi"><span class="kpi-n">{{ k.questions }}</span><span class="kpi-l">questions asked</span></div>
+<div class="kpi"><span class="kpi-n">{{ k.forecasts }}</span><span class="kpi-l">forecasts published before the answer</span></div>
+<div class="kpi"><span class="kpi-n">{{ k.forecasters }}</span><span class="kpi-l">forecasters compared</span></div>
+<div class="kpi"><span class="kpi-n">{{ k.days }}</span><span class="kpi-l">days of data</span></div>
+</div>
+<section class="card" aria-labelledby="r-what"><h2 id="r-what">What it is</h2>
+<p>Every morning the system creates yes/no questions about tomorrow from public data (electricity prices first). Baselines, a gradient-boosting model, LLM forecasters and two LLM agents each publish a probability <strong>before</strong> the answer exists, into an append-only, hash-chained public record. The next day the answers arrive and every forecast is scored with proper scoring rules. It runs entirely on GitHub Actions and Pages for about one US dollar a month of AI usage.</p>
+<p><strong>Measured so far:</strong> see the <a href="backtests.html">backtests</a> (a year of replayed past days, clearly labelled as not live), the <a href="evals.html">LLM evaluation</a> (it found and fixed a real bug) and the <a href="leaderboard.html">live leaderboard</a>, which says "too early to tell" until the statistics can decide.</p>
+</section>
+{% if personal %}<section class="card" aria-labelledby="r-me"><h2 id="r-me">About me</h2><div class="prose">{{ personal }}</div></section>{% endif %}
+<h2>What the postings ask for, and where to see it</h2>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Skills and proof"><table class="proof">
+<thead><tr><th scope="col">Skill</th><th scope="col">In this project</th><th scope="col">See it</th><th scope="col">Code</th></tr></thead>
+<tbody>{% for skill, what, page, paths in proofs %}<tr><th scope="row">{{ skill }}</th><td>{{ what }}</td><td>{% if page %}<a href="{{ page }}">{{ page.split("#")[0]|replace(".html", "")|replace("questions/index", "question pages")|replace("_", " ") }}</a>{% else %}<span class="muted">in the code</span>{% endif %}</td><td>{% for p in paths %}<a href="{{ repo_url }}/{{ 'tree' if '.' not in p.split('/')[-1] else 'blob' }}/main/{{ p }}"><code>{{ p }}</code></a>{% if not loop.last %}<br>{% endif %}{% endfor %}</td></tr>{% endfor %}</tbody></table></div>
+<p class="note">Every row links to code that runs in CI on every push. Honest limits are on the <a href="methods.html">Methods</a> page; results that lose (for example the PyTorch network) are published like the ones that win.</p>
+<p><a class="btn btn-accent" href="{{ repo_url }}">Source code on GitHub</a></p>
+{% endblock %}

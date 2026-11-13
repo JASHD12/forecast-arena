@@ -50,6 +50,7 @@ from arena.site.methods_content import LIMITATIONS, PRINCIPLES
 from arena.site.ops_status import llm_usage, missed_days, parse_failures, source_freshness
 from arena.site.profiles import profile
 from arena.site.qchart import chart_data, series_svg
+from arena.site.recruiters import PROOFS
 from arena.site.titles import FORECASTER_NAMES, domain_name, forecaster_name, plain_title
 from arena.site.topics import topic
 from arena.sources.brightsky import ATTRIBUTION as WX_ATTRIBUTION
@@ -61,6 +62,7 @@ from arena.sources.wikimedia import ATTRIBUTION as WIKI_ATTRIBUTION
 
 NAV: tuple[tuple[str, str], ...] = (
     ("index.html", "Home"),
+    ("recruiters.html", "For recruiters"),
     ("play.html", "Play"),
     ("questions/index.html", "Questions"),
     ("leaderboard.html", "Leaderboard"),
@@ -634,6 +636,19 @@ def build_site(
         "evals.html": ("LLM evals", {"runs": eval_runs(evals_dir)}),
         "backtests.html": ("Backtests", {"cards": load_cards(models_dir)}),
         "api.html": ("JSON API", {"endpoints": ENDPOINTS}),
+        "recruiters.html": (
+            "For recruiters",
+            {
+                "proofs": PROOFS,
+                "personal": read_content("recruiters.md"),
+                "k": {
+                    "questions": len(rec.questions),
+                    "forecasts": len(rec.forecasts),
+                    "forecasters": len({f.forecaster_id for f in rec.forecasts}),
+                    "days": len({q.batch_date for q in rec.questions.values()}),
+                },
+            },
+        ),
         "forecasters/index.html": ("Forecasters", {"profiles": profiles}),
         "topics/index.html": ("Topics", {"topics": [topic(d, rec) for d in domains]}),
         "play.html": (

@@ -42,6 +42,7 @@ move older "Done log" lines to `docs/progress-archive.md`.
 
 ## Done log
 
+- 2026-11-13 T140: recruiters.html (60-second summary, live counts, skill -> page -> code table tested against the repo and CI, print layout); personal section waits for H16
 - 2026-11-13 T153: Airflow 3 DAGs mirroring morning/resolve/weekly (same commands, schedules, one ledger pool), DagBag check in a CI job with official constraints; T151 kind and T152 dbt jobs green in CI
 - 2026-11-13 T152: dbt-duckdb project (staging, fct, marts, 21 tests) built in CI in its own venv; Data page executes the mart SQL; marts match scoring in a unit test
 - 2026-11-13 T151: deploy/k8s (API Deployment+Service, CronJob) applied to a kind cluster in CI with API smoke test and one CronJob run; validated, not hosted

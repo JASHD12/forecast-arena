@@ -32,6 +32,7 @@ def test_empty_ledger_builds_every_page(tmp_path) -> None:
         "play.html",
         "privacy.html",
         "questions/index.html",
+        "recruiters.html",
         "stack.html",
         "status.html",
         "topics/index.html",

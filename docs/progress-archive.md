@@ -94,3 +94,4 @@ Older "Done log" lines moved from PROGRESS.md (newest first).
 - 2026-11-12 T040: weather via Bright Sky (DWD obs + MOSMIX), 4 stations, fixtures, smoke
 - 2026-11-13 T035+T110: clean-day streak from run manifests, recorded health reports and day seals; official start written once (write_raw refuses a second write); not-before gate (default 2099-12-31 until roadmap changes are live); streak on Status
 - 2026-11-13 T036: explainers 01 (ledger, forecast before truth) and 02 (power questions), ten Q&A each
+- 2026-11-13 T080: Status page adds missed days, source freshness (latest batch/answer, overdue), LLM usage per day vs cap, LLM parse-failure rates; e2e now records usage like the CLI

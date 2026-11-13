@@ -518,7 +518,7 @@ CI jobs; core `make check` stays offline and fast.
   - Done when: tests cover late, duplicate and invalid rows.
 - [ ] T162 · Players' leaderboard and Play page (live) (deps: T161; needs: H15)
   - Done when: a real pre-lock run ingests player rows, or WAIT.
-- [ ] T170 · Interview kit (deps: T140)
+- [x] T170 · Interview kit (deps: T140)
   - Do: `docs/interview/`: pitch (EN/DE), system design walkthrough, 40 Q&A, STAR
     stories, CV bullets from `arena report cv`.
   - Done when: the files exist and every number is from the ledger or a card.

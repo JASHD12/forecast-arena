@@ -16,6 +16,12 @@
 <div class="kpi"><span class="kpi-n">{{ counts.skips.values()|sum }}</span><span class="kpi-l">skipped forecasts</span></div>
 </div>
 
+<section class="card" aria-labelledby="streak-title">
+<h2 id="streak-title">Road to the official record</h2>
+<p>{{ streak.summary() }}. The official record starts the day after the first {{ streak_needed }} consecutive <strong>clean days</strong>: a successful morning run, no failed run, every health check passed and the day sealed into the hash chain (SPEC 2.9).</p>
+{% if streak.statuses %}<ul class="plain">{% for st in streak.statuses[-7:]|reverse %}<li>{% if st.clean %}<span class="yes">✓ clean</span>{% else %}<span class="no">✗ not clean</span>{% endif %} {{ st.day }}{% if not st.clean %} <span class="note">({{ st.reasons|join("; ") }})</span>{% endif %}</li>{% endfor %}</ul>{% endif %}
+</section>
+
 <h2>Daily schedule (UTC)</h2>
 <ol class="timeline">
 <li><time>05:30</time><span><strong>Morning run</strong>: questions created, every forecaster runs, batch sealed. A second run at 07:00 is a safety net.</span></li>

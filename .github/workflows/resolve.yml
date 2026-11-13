@@ -42,6 +42,9 @@ jobs:
       ARENA_CONTACT: ${{ vars.ARENA_CONTACT }}
       ARENA_LEDGER_REMOTE: https://github.com/${{ github.repository }}.git
       ARENA_DOMAINS: ${{ vars.ARENA_DOMAINS || 'power' }}
+      # T110: never start the official record before this date; replaced by a real date
+      # once the roadmap's model and timing changes are live.
+      ARENA_OFFICIAL_START_NOT_BEFORE: ${{ vars.ARENA_OFFICIAL_START_NOT_BEFORE || '2099-12-31' }}
       ARENA_LLM_PROVIDER: ${{ vars.ARENA_LLM_PROVIDER }}
       ARENA_LLM_MODEL: ${{ vars.ARENA_LLM_MODEL }}
       ARENA_LLM_EFFORT: ${{ vars.ARENA_LLM_EFFORT || 'low' }}  # thinking must not eat the 400-token answer budget
@@ -106,7 +109,7 @@ jobs:
         continue-on-error: true
         run: |
           set -o pipefail  # keep the check's exit code through tee
-          .venv/bin/arena health check --job resolve --report health.json ${{ (github.event_name == 'workflow_dispatch' && inputs.fail_health) && '--force-fail' || '' }} | tee -a "$GITHUB_STEP_SUMMARY"
+          .venv/bin/arena health check --job resolve --report health.json ${{ (github.event_name == 'workflow_dispatch' && inputs.fail_health) && '--force-fail' || '' }} ${{ steps.mode.outputs.dry_run == 'false' && '--record' || '' }} | tee -a "$GITHUB_STEP_SUMMARY"
       - name: Open, update or close the incident issue
         if: always()
         env:
@@ -114,6 +117,9 @@ jobs:
         run: |
           .venv/bin/arena health incident --report health.json --job-status "${{ job.status }}" \
             --run-url "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+      - name: Official start (SPEC 2.9; records the health report, writes the start once)
+        if: always() && steps.mode.outputs.dry_run == 'false'
+        run: .venv/bin/arena official update --push
       - name: Fail the run when a health check failed
         if: always() && steps.health.outcome == 'failure'
         run: exit 1

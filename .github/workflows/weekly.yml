@@ -31,6 +31,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 90
     env:
+      # T110: never start the official record before this date; replaced by a real date
+      # once the roadmap's model and timing changes are live.
+      ARENA_OFFICIAL_START_NOT_BEFORE: ${{ vars.ARENA_OFFICIAL_START_NOT_BEFORE || '2099-12-31' }}
       ARENA_CONTACT: ${{ vars.ARENA_CONTACT }}
       ARENA_LEDGER_REMOTE: https://github.com/${{ github.repository }}.git
       MLFLOW_DISABLE_AGENT_HINT: "1"
@@ -88,7 +91,7 @@ jobs:
         continue-on-error: true
         run: |
           set -o pipefail  # keep the check's exit code through tee
-          .venv/bin/arena health check --job weekly --report health.json ${{ (github.event_name == 'workflow_dispatch' && inputs.fail_health) && '--force-fail' || '' }} | tee -a "$GITHUB_STEP_SUMMARY"
+          .venv/bin/arena health check --job weekly --report health.json ${{ (github.event_name == 'workflow_dispatch' && inputs.fail_health) && '--force-fail' || '' }} --record | tee -a "$GITHUB_STEP_SUMMARY"
       - name: Open, update or close the incident issue
         if: always() && !(github.event_name == 'workflow_dispatch' && inputs.dry_run)
         env:
@@ -96,6 +99,9 @@ jobs:
         run: |
           .venv/bin/arena health incident --report health.json --job-status "${{ job.status }}" \
             --run-url "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+      - name: Official start (SPEC 2.9; records the health report, writes the start once)
+        if: always() && !(github.event_name == 'workflow_dispatch' && inputs.dry_run)
+        run: .venv/bin/arena official update --push
       - name: Fail the run when a health check failed
         if: always() && !(github.event_name == 'workflow_dispatch' && inputs.dry_run) && steps.health.outcome == 'failure'
         run: exit 1

@@ -17,6 +17,7 @@ _DATED_JSONL = re.compile(
     r"^(questions|forecasts|resolutions|agent_traces)/(\d{4})/(\d{2})/(\d{2})\.jsonl$"
 )
 _RUN = re.compile(r"^runs/(\d{4})/(\d{2})/(\d{2})-[a-z0-9_]+-\d+\.json$")
+_HEALTH = re.compile(r"^health/(\d{4})/(\d{2})/(\d{2})-[a-z0-9_]+-\d+\.json$")
 _SNAPSHOT = re.compile(r"^snapshots/[a-z0-9_]+/(\d{4})/(\d{2})/(\d{2})/.+$")
 _BATCH_SEAL = re.compile(r"^chain/batch/(\d{4})-(\d{2})-(\d{2})\.json$")
 _DAY_SEAL = re.compile(r"^chain/day/(\d{4})-(\d{2})-(\d{2})\.json$")
@@ -66,6 +67,11 @@ def day_seal_path(day: date) -> str:
     return f"chain/day/{day.isoformat()}.json"
 
 
+def health_path(day: date, job: str, n: int) -> str:
+    """Path of the n-th health report of a job on a day (sealed with that day)."""
+    return f"health/{_ymd(day)}-{job}-{n}.json"
+
+
 OFFICIAL_START_PATH = "meta/official_start.json"
 
 
@@ -79,7 +85,7 @@ def family_of(path: str) -> str | None:
 
 def day_of(path: str) -> date | None:
     """The ledger day a file belongs to, for day sealing. Day seals themselves: None."""
-    for pattern in (_DATED_JSONL, _RUN, _SNAPSHOT, _BATCH_SEAL):
+    for pattern in (_DATED_JSONL, _RUN, _HEALTH, _SNAPSHOT, _BATCH_SEAL):
         m = pattern.match(path)
         if m:
             y, mo, d = (int(g) for g in m.groups()[-3:])

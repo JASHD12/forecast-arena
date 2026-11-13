@@ -133,7 +133,7 @@ Keep the first line of each task in exactly this shape; the status script parses
     seal exists and verify passes. Fix anything found. If it is too early, mark this task
     `WAIT(until=<date>)`.
   - Done when: the Status page shows one fully resolved batch.
-- [ ] T035 · Official-start rule (deps: T033)
+- [x] T035 · Official-start rule (deps: T033)
   - Do: implement principle 2.9: clean-day streak tracking, one-time write of
     `meta/official_start.json`, rehearsal banner on the site, exclusion from headline scores.
   - Done when: tests cover a streak broken by an incident and the one-time write.
@@ -400,7 +400,7 @@ German and dashboard pages; players' leaderboard. Zero extra cost; nothing is li
 site that CI does not run (I5). Heavy extras use optional requirement files and their own
 CI jobs; core `make check` stays offline and fast.
 
-- [ ] T110 · Official-start gate (deps: T035)
+- [x] T110 · Official-start gate (deps: T035)
   - Do: `ARENA_OFFICIAL_START_NOT_BEFORE` (date); the official start is the later of the
     5-clean-days rule and this date. Owner: not before Phases 1-2 and T160 are live.
   - Done when: tests show the gate delays the start and never advances it.

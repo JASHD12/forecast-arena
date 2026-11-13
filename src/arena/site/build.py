@@ -27,6 +27,7 @@ from arena.config import DEFAULT_REPO_URL, DEFAULT_SITE_URL
 from arena.ledger import Ledger, layout
 from arena.ledger.verify import verify
 from arena.models import Question, RunManifest
+from arena.ops.official import STREAK, update_official_start
 from arena.ops.weekly import summaries as weekly_summaries
 from arena.scoring.boards import MIN_DAYS, all_boards, official
 from arena.scoring.core import Scored, clip, counts, load
@@ -481,7 +482,13 @@ def build_site(
         "experiments.html": ("Experiments", {"runs": weekly_summaries(ledger)}),
         "status.html": (
             "Status",
-            {"counts": counts(rec), "runs": _runs(ledger), "skip_help": SKIP_HELP},
+            {
+                "counts": counts(rec),
+                "runs": _runs(ledger),
+                "skip_help": SKIP_HELP,
+                "streak": update_official_start(ledger, clock.now(), write=False),
+                "streak_needed": STREAK,
+            },
         ),
         "about.html": (
             "About",

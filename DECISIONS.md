@@ -507,6 +507,20 @@ Made by: agent
   missing or malformed field (`parse_top`, `parse_weather`, `parse_daily`, the SMARD and
   ECB parsers, each with tests); pandera was not added, to avoid a second validation layer.
 
+## 2026-11-13 · Official start: clean days and the not-before gate (T035, T110)
+
+- A clean day: a real morning run succeeded, no real run failed, at least one health
+  report was recorded and all passed (a failed report is what opens the incident issue,
+  so this is the ledger-side record of "no open incident"), and the day is sealed. Health
+  reports are written to `health/YYYY/MM/DD-<job>-<n>.json` and sealed with their day,
+  so the streak is auditable from the public ledger alone.
+- The official start is the day after the first 5 consecutive clean days, but never
+  before `ARENA_OFFICIAL_START_NOT_BEFORE`. The workflows default that to 2099-12-31 until
+  the roadmap's model and timing changes are live (owner decision); the agent then sets
+  the real date in the workflow files. `meta/official_start.json` is written once, when
+  the start takes effect; `Ledger.write_raw` refuses any second write.
+- Only completed days count (up to yesterday); the decision runs after every real job.
+
 ## Proposals for the human
 
 Ideas outside the specification. The agent lists them here and does not build them.

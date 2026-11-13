@@ -73,16 +73,44 @@ def health() -> None:
 @click.option("--report", "report_path", type=click.Path(path_type=Path), default=None,
               help="Also write the report as JSON here.")  # fmt: skip
 @click.option("--force-fail", is_flag=True, help="Add a failing check (dry-run tests only).")
+@click.option("--record", is_flag=True, help="Also write the report to the ledger (health/).")
 @click.pass_obj
-def health_check(obj: Ctx, job: str, report_path: Path | None, force_fail: bool) -> None:
+def health_check(
+    obj: Ctx, job: str, report_path: Path | None, force_fail: bool, record: bool
+) -> None:
     """Run the health checks against the ledger; exit 1 if any fails."""
     from arena.ops.health import run_checks
+    from arena.ops.official import record_health
 
-    rep = run_checks(obj.ledger, job, obj.clock.now(), force_fail=force_fail)
+    now = obj.clock.now()
+    rep = run_checks(obj.ledger, job, now, force_fail=force_fail)
     click.echo(rep.markdown())
     if report_path is not None:
         report_path.write_text(rep.to_json(), encoding="utf-8")
+    if record:
+        click.echo(f"recorded: {record_health(obj.ledger, rep.to_json(), job, now.date())}")
     sys.exit(0 if rep.ok else 1)
+
+
+@main.group()
+def official() -> None:
+    """The pre-registered official start (SPEC 2.9)."""
+
+
+@official.command("update")
+@click.option("--push", is_flag=True, help="Commit and push the ledger afterwards.")
+@click.pass_obj
+def official_update(obj: Ctx, push: bool) -> None:
+    """Evaluate the clean-day rule; write meta/official_start.json once when due."""
+    from arena.ops.official import update_official_start
+
+    now = obj.clock.now()
+    dec = update_official_start(obj.ledger, now, obj.settings.official_start_not_before)
+    for st in dec.statuses[-7:]:
+        click.echo(f"{st.day}: {'clean' if st.clean else '; '.join(st.reasons)}")
+    click.echo(dec.summary())
+    if push and obj.settings.ledger_remote and not obj.dry_run:
+        _push(obj, obj.settings.ledger_remote, "health", now.date())
 
 
 @health.command("incident")

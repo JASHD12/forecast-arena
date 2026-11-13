@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import os
 from collections.abc import Mapping
-from datetime import time
+from datetime import date, time
 from pathlib import Path
 from typing import Any, Literal
 
@@ -40,6 +40,8 @@ class Settings(BaseModel):
     ledger_remote: str | None = Field(None, description="Git remote of the ledger branch")
     cache_dir: Path = Path("data_cache")
     lock_time_utc: time = time(9, 30)
+    #: T110: the official record never starts before this date (owner decision).
+    official_start_not_before: date | None = None
 
     llm_provider: str | None = None
     llm_model: str | None = None
@@ -76,6 +78,7 @@ class Settings(BaseModel):
         "llm_effort",
         "panel_csv_url",
         "coingecko_api_key",
+        "official_start_not_before",
         mode="before",
     )
     @classmethod

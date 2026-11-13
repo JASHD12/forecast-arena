@@ -126,3 +126,18 @@ def test_a_failed_load_records_model_missing_with_the_reason(tmp_path, monkeypat
     assert (
         isinstance(out, Skip) and out.reason_code == "model_missing" and "llama_cpp" in out.detail
     )
+
+
+def test_output_cap_comes_from_settings_and_shows_in_the_version(tmp_path) -> None:
+    from factories import B
+
+    from arena.config import Settings
+    from arena.ledger import Ledger
+    from arena.llm.client import FakeLLM
+    from arena.ops.wiring import build_forecasters
+
+    s = Settings.from_env({"ARENA_LLM_MAX_OUTPUT_TOKENS": "1024"})
+    fs, _ = build_forecasters(Ledger(tmp_path), [], s, B, llm=FakeLLM([GOOD]))
+    llms = [f for f in fs if hasattr(f, "max_output_tokens")]
+    assert {f.forecaster_id for f in llms} >= {"llm_plain", "llm_context", "agent"}
+    assert all(f.max_output_tokens == 1024 and "|out-1024" in f.version() for f in llms)

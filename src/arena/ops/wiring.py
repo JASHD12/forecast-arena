@@ -231,6 +231,9 @@ def build_forecasters(
                 retriever=retriever,
             )
         )
+    for f in out:  # per-call output cap from the settings (thinking counts against it)
+        if hasattr(f, "max_output_tokens"):
+            f.max_output_tokens = settings.llm_max_output_tokens
     return out, guard
 
 

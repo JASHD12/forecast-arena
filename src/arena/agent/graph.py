@@ -78,7 +78,7 @@ class GraphAgentForecaster(AgentForecaster):
         rag = f"|rag-{self.retriever.embedder.name}" if self.retriever is not None else ""
         lg = _pkg_version("langgraph")
         return (f"{model}|graph-prompt-{self.prompt_version}-{fp}|tools-{self.max_tool_calls}"
-                f"{rag}|langgraph-{lg}")  # fmt: skip
+                f"{rag}|out-{self.max_output_tokens}|langgraph-{lg}")  # fmt: skip
 
     def _call(self, system: str, s: State) -> State:
         assert self.client is not None

@@ -652,7 +652,8 @@ def eval_run(
         if not clients:
             click.echo("model_missing: no LLM configured", err=True)
             sys.exit(1)
-    caps = EvalCaps(max_requests=max(1, 2 * len(items) * len(clients)), max_tokens=max_tokens)
+    caps = EvalCaps(max_requests=max(1, 2 * len(items) * len(clients)), max_tokens=max_tokens,
+                    max_output_tokens=obj.settings.llm_max_output_tokens)  # fmt: skip
     res = run(items, clients, obj.clock, golden=golden.name, golden_sha256=sha, caps=caps)
     if fake:
         res["run_id"] = "fake-" + res["run_id"]

@@ -85,6 +85,7 @@ def run(
     versions: dict[str, str] = {}
     for name, client in clients.items():
         f = VARIANTS[name](TracingLLM(GuardedLLM(client, guard), tracer, clock))
+        f.max_output_tokens = caps.max_output_tokens
         versions[name] = f.version()
         for it in items:
             with scope(name, it.question.question_id, f.prompt_version):

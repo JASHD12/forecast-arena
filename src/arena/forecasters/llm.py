@@ -84,7 +84,7 @@ class LLMForecaster:
         """Model id and prompt version (SPEC 8.5)."""
         model = self.client.model if self.client is not None else "none"
         fp = prompts.fingerprint(self.prompt_files, self.prompt_version)
-        return f"{model}|prompt-{self.prompt_version}-{fp}"
+        return f"{model}|prompt-{self.prompt_version}-{fp}|out-{self.max_output_tokens}"
 
     def user_prompt(self, q: Question, ctx: dict[str, Any], asof: datetime) -> str:
         """The first user message."""

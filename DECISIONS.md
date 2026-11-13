@@ -628,6 +628,20 @@ Made by: agent
   committed to `evals/results/` by the agent and shown on `evals.html` under an
   EVALUATION banner, never in a leaderboard (I4).
 
+## 2026-11-13 · Output cap 1024 per call, found by the first eval (T124)
+
+- Evidence (`llm-eval` runs 43418758614 and 43420219082 on the golden set, not the live
+  record): with 400 output tokens per call, Claude Haiku 5.5 at effort low stopped with
+  `max_tokens` on 10 of 12 first answers of `llm_plain` and 6 of 12 of `llm_context`;
+  the repairs then used up the eval budget. Thinking tokens count against the cap.
+- Decision: forecasters now take the per-call cap from `ARENA_LLM_MAX_OUTPUT_TOKENS`
+  (before, a hard-coded 400 inside each forecaster also applied), the cap is part of
+  every LLM forecaster's version (`|out-N`, visible in the changelog), and the workflow
+  default is 1024. The SPEC 9.4 code default (400) and the daily cap (150,000 tokens)
+  are unchanged; fewer repairs mean fewer calls, so daily use should not rise much.
+- This is a format and cost fix from an evaluation, not a change made because of how a
+  live question resolved (I8). It happens before the official start.
+
 ## Proposals for the human
 
 Ideas outside the specification. The agent lists them here and does not build them.

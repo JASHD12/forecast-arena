@@ -36,7 +36,12 @@ def run_schedule(root) -> Ledger:
     led = Ledger(root)
     clock = FixedClock(datetime.combine(FIRST, time(0), tzinfo=UTC))
     domains = [fixture_domain()]
-    forecasters, _ = build_forecasters(led, domains, SETTINGS, FIRST, llm=FakeLLM(answer))
+    forecasters, guard = build_forecasters(led, domains, SETTINGS, FIRST, llm=FakeLLM(answer))
+
+    def attach(rec) -> None:  # as the CLI does: usage goes into the run manifest
+        if guard is not None:
+            guard.recorder = rec
+
     for i in range(DAYS + 1):
         day = FIRST + timedelta(days=i)
         events = [(t, "resolve") for t in RESOLVES]
@@ -45,7 +50,7 @@ def run_schedule(root) -> Ledger:
         for t, job in sorted(events):
             clock.set(datetime.combine(day, t, tzinfo=UTC))
             if job == "morning":
-                morning(led, day, clock, domains, forecasters)
+                morning(led, day, clock, domains, forecasters, on_record=attach)
             else:
                 resolve(led, clock, domains)
     return led
@@ -91,6 +96,15 @@ def test_five_days_offline(tmp_path) -> None:
     assert check_site(site.out_dir) == []
     home = (site.out_dir / "index.html").read_text()
     assert "base_rate" in home and "not advice" in home and "SMARD.de" in home
+    status = (site.out_dir / "status.html").read_text()
+    for panel in ("Missed days", "Source freshness", "LLM usage", "LLM parse failures"):
+        assert panel in status, panel
+    from arena.site.ops_status import llm_usage, parse_failures, source_freshness
+
+    assert sum(u.requests for u in llm_usage(led, FIRST + timedelta(days=DAYS), DAYS + 1)) > 0
+    assert {p.forecaster_id for p in parse_failures(rec)} == {"llm_plain", "llm_context", "agent"}
+    now = datetime(2026, 10, 27, tzinfo=UTC)
+    assert [f.domain for f in source_freshness(rec, now)] == ["power"]
 
 
 def test_rerunning_the_schedule_changes_nothing(tmp_path) -> None:

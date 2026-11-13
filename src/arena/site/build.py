@@ -35,6 +35,7 @@ from arena.scoring.findings import findings, power_table
 from arena.scoring.stats import calibration_bins, expected_calibration_error, murphy
 from arena.site.charts import forest_svg, race_svg, reliability_svg, series_class
 from arena.site.methods_content import LIMITATIONS, PRINCIPLES
+from arena.site.ops_status import llm_usage, missed_days, parse_failures, source_freshness
 from arena.site.titles import FORECASTER_NAMES, domain_name, forecaster_name, plain_title
 from arena.sources.brightsky import ATTRIBUTION as WX_ATTRIBUTION
 from arena.sources.brightsky import LICENCE as WX_LICENCE
@@ -352,6 +353,7 @@ def build_site(
     clock: Clock,
     content_dir: Path | None = None,
     site_url: str = DEFAULT_SITE_URL,
+    llm_token_cap: int | None = None,
 ) -> SiteResult:
     """Render every page into `out_dir` (built aside, then moved into place)."""
     rec = load(ledger)
@@ -488,6 +490,12 @@ def build_site(
                 "skip_help": SKIP_HELP,
                 "streak": update_official_start(ledger, clock.now(), write=False),
                 "streak_needed": STREAK,
+                "missed": missed_days(ledger, clock.now().date()),
+                "usage": llm_usage(ledger, clock.now().date()),
+                "token_cap": llm_token_cap,
+                "parse": parse_failures(rec),
+                "fresh": source_freshness(rec, clock.now()),
+                "now": clock.now(),
             },
         ),
         "about.html": (

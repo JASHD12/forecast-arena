@@ -38,6 +38,28 @@
 {% if counts.voided %}<ul class="plain">{% for k, v in counts.voided.items() %}<li><strong>{{ v }}</strong> · <code>{{ k }}</code></li>{% endfor %}</ul>{% else %}<p class="note">None. A question is voided only when its official data never arrives or is later revised.</p>{% endif %}</section>
 </div>
 
+<div class="grid-cards">
+<section class="card" aria-labelledby="missed-title"><h2 id="missed-title">Missed days</h2>
+{% if missed %}<p><strong>{{ missed|length }}</strong> day(s) without a sealed batch: no forecasts were locked in, and nothing was added afterwards.</p>
+<ul class="plain">{% for d in missed[-10:]|reverse %}<li><span class="no">✗</span> {{ d }}</li>{% endfor %}</ul>{% else %}<p class="note">None. Every day since the first batch has a sealed batch.</p>{% endif %}</section>
+<section class="card" aria-labelledby="fresh-title"><h2 id="fresh-title">Source freshness</h2>
+{% if fresh %}<ul class="plain">{% for f in fresh %}<li>{% if f.stale(now) or f.overdue %}<span class="no">✗</span>{% else %}<span class="yes">✓</span>{% endif %} <strong>{{ dname(f.domain) }}</strong>: latest batch {{ f.last_batch }}; latest answer {{ f.last_resolved_at.strftime("%Y-%m-%d %H:%M UTC") if f.last_resolved_at else "none yet" }}{% if f.overdue %}; <span class="no">{{ f.overdue }} overdue</span>{% endif %}</li>{% endfor %}</ul>
+<p class="note">Overdue: more than a day past the time the answer should be available, and neither answered nor voided.</p>{% else %}<p class="note">No questions yet.</p>{% endif %}</section>
+</div>
+
+<div class="grid-cards">
+<section class="card" aria-labelledby="usage-title"><h2 id="usage-title">LLM usage (last 7 days)</h2>
+<div class="table-scroll" tabindex="0" role="region" aria-label="LLM usage per day"><table>
+<thead><tr><th scope="col">Day (UTC)</th><th scope="col" class="num">Requests</th><th scope="col" class="num">Input tokens</th><th scope="col" class="num">Output tokens</th><th scope="col" class="num">Total</th></tr></thead>
+<tbody>{% for u in usage %}<tr><th scope="row">{{ u.day }}</th><td class="num">{{ u.requests }}</td><td class="num">{{ "{:,}".format(u.input_tokens) }}</td><td class="num">{{ "{:,}".format(u.output_tokens) }}</td><td class="num">{{ "{:,}".format(u.total) }}{% if token_cap %} <span class="note">({{ "%.0f"|format(100 * u.total / token_cap) }}% of cap)</span>{% endif %}</td></tr>{% endfor %}</tbody></table></div>
+<p class="note">Summed from the run manifests in the ledger.{% if token_cap %} Hard daily cap: {{ "{:,}".format(token_cap) }} tokens; a call that could exceed it is skipped with <code>budget_exhausted</code>.{% endif %}</p></section>
+<section class="card" aria-labelledby="parse-title"><h2 id="parse-title">LLM parse failures</h2>
+{% if parse %}<div class="table-scroll" tabindex="0" role="region" aria-label="LLM parse failures"><table>
+<thead><tr><th scope="col">Forecaster</th><th scope="col" class="num">Forecasts</th><th scope="col" class="num">Parse failures</th><th scope="col" class="num">Rate</th><th scope="col" class="num">Other skips</th></tr></thead>
+<tbody>{% for p in parse %}<tr><th scope="row">{{ fname(p.forecaster_id) }}</th><td class="num">{{ p.forecasts }}</td><td class="num">{{ p.parse_failures }}</td><td class="num">{{ "%.1f%%"|format(100 * p.failure_rate) if p.failure_rate is not none else "–" }}</td><td class="num">{{ p.other_skips }}</td></tr>{% endfor %}</tbody></table></div>
+<p class="note">A parse failure is recorded as a skip after one repair attempt; it is never replaced by a guess.</p>{% else %}<p class="note">No LLM forecasts yet.</p>{% endif %}</section>
+</div>
+
 <h2>Latest runs</h2>
 {% if runs %}
 <div class="table-scroll" tabindex="0" role="region" aria-label="Latest runs"><table>

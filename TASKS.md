@@ -327,7 +327,7 @@ Keep the first line of each task in exactly this shape; the status script parses
 
 ## Phase 7 - Operations and monitoring
 
-- [ ] T080 · Status page (deps: T072, T033)
+- [x] T080 · Status page (deps: T072, T033)
   - Do: last runs, missed days, voids, parse failures, LLM usage, source freshness.
   - Done when: the page builds from the e2e ledger with all panels populated.
 - [x] T081 · Drift monitoring (deps: T056)

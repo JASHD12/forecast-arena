@@ -21,7 +21,11 @@ What to look at (a few minutes):
 1. The site's **Home** page: today's batch is there, and "ledger verification" says PASS.
 2. The **Status** page: latest runs `ok`; no growing count of voids or skips.
 3. The repository's **Actions** tab: the last morning and resolve runs are green.
-4. Open issues labelled `incident` (once health checks are live, T033).
+4. Open issues labelled `incident`. After every morning, resolve and real weekly run, the
+   health checks (`arena health check`: batch sealed before lock, nothing overdue, sources
+   fresh, LLM parse failures under 20%, ledger verify) run; a failed job or check opens one
+   issue titled "Forecast Arena incident: a job or health check failed" (or comments on
+   the open one), and the next healthy run closes it. The run summary shows the table.
 
 Manual runs (standing approval 6): Actions tab > workflow > Run workflow, **from `main`**
 (the `github-pages` environment only accepts deployments from `main`; a run started from

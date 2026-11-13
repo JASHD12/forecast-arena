@@ -128,7 +128,7 @@ Keep the first line of each task in exactly this shape; the status script parses
   - Do: the health checks and alert behaviour of section 12.
   - Done when: a deliberately failing dry run opens one `incident` issue and a following
     healthy run closes it.
-- [ ] T034 · Next-day verification (deps: T032)
+- [!] T034 · Next-day verification (deps: T032) WAIT(until=2026-11-14)
   - Do: at least one day after T032, confirm questions resolved, scores appeared, the day
     seal exists and verify passes. Fix anything found. If it is too early, mark this task
     `WAIT(until=<date>)`.

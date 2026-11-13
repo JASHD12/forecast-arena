@@ -63,6 +63,44 @@ def ledger() -> None:
     """Inspect, seal and verify the append-only ledger."""
 
 
+@main.group()
+def health() -> None:
+    """Health checks after every job and the incident issue (SPEC 12)."""
+
+
+@health.command("check")
+@click.option("--job", required=True, type=click.Choice(["morning", "resolve", "weekly"]))
+@click.option("--report", "report_path", type=click.Path(path_type=Path), default=None,
+              help="Also write the report as JSON here.")  # fmt: skip
+@click.option("--force-fail", is_flag=True, help="Add a failing check (dry-run tests only).")
+@click.pass_obj
+def health_check(obj: Ctx, job: str, report_path: Path | None, force_fail: bool) -> None:
+    """Run the health checks against the ledger; exit 1 if any fails."""
+    from arena.ops.health import run_checks
+
+    rep = run_checks(obj.ledger, job, obj.clock.now(), force_fail=force_fail)
+    click.echo(rep.markdown())
+    if report_path is not None:
+        report_path.write_text(rep.to_json(), encoding="utf-8")
+    sys.exit(0 if rep.ok else 1)
+
+
+@health.command("incident")
+@click.option("--report", "report_path", type=click.Path(path_type=Path), required=True)
+@click.option("--job-status", required=True, help="The workflow's job status.")
+@click.option("--run-url", required=True)
+@click.option("--repo", default=None, help="owner/name (default: the current repository).")
+def health_incident(report_path: Path, job_status: str, run_url: str, repo: str | None) -> None:
+    """Open, update or close the single `incident` issue (needs `gh` and a token)."""
+    import json as _json
+
+    from arena.ops.health import incident_body, sync_incident
+
+    report = _json.loads(report_path.read_text(encoding="utf-8")) if report_path.is_file() else None
+    healthy = job_status == "success" and report is not None and bool(report.get("ok"))
+    click.echo(sync_incident(healthy, incident_body(report, job_status, run_url), repo=repo))
+
+
 @ledger.command("verify")
 @click.option("--git", "with_git", is_flag=True, help="Also check commit times from history.")
 @click.pass_obj

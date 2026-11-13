@@ -15,6 +15,10 @@ on:
         description: "Do everything on a throwaway copy of the ledger; push and deploy nothing"
         type: boolean
         default: true
+      fail_health:
+        description: "Test only: add a failing health check (opens the incident issue)"
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -29,6 +33,7 @@ jobs:
     timeout-minutes: 45
     permissions:
       contents: write  # push to the ledger branch (built-in token)
+      issues: write  # open/update/close the `incident` issue (standing approval 5)
     outputs:
       dry_run: ${{ steps.mode.outputs.dry_run }}
     env:
@@ -93,10 +98,26 @@ jobs:
         uses: actions/upload-pages-artifact@v5
         with:
           path: site
+      - name: Health check (SPEC 12)
+        id: health
+        if: always()
+        continue-on-error: true
+        run: |
+          .venv/bin/arena health check --job morning --report health.json ${{ (github.event_name == 'workflow_dispatch' && inputs.fail_health) && '--force-fail' || '' }} | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: Open, update or close the incident issue
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          .venv/bin/arena health incident --report health.json --job-status "${{ job.status }}" \
+            --run-url "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+      - name: Fail the run when a health check failed
+        if: always() && steps.health.outcome == 'failure'
+        run: exit 1
 
   deploy:
     needs: run
-    if: needs.run.outputs.dry_run == 'false'
+    if: always() && needs.run.outputs.dry_run == 'false'  # deploy even when a health check failed
     runs-on: ubuntu-latest
     permissions:
       pages: write

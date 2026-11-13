@@ -13,9 +13,14 @@ on:
         description: "Do everything on a throwaway copy of the ledger; push nothing"
         type: boolean
         default: true
+      fail_health:
+        description: "Test only: add a failing health check (opens the incident issue)"
+        type: boolean
+        default: false
 
 permissions:
   contents: write  # push to the ledger branch only (built-in token)
+  issues: write  # open/update/close the `incident` issue (standing approval 5)
 
 concurrency:
   group: arena-ledger  # shared with morning and resolve: never two ledger writers
@@ -77,3 +82,19 @@ jobs:
           path: mlruns/drift-*.html
           if-no-files-found: ignore
           retention-days: 90
+      - name: Health check (SPEC 12)
+        id: health
+        if: always() && !(github.event_name == 'workflow_dispatch' && inputs.dry_run)
+        continue-on-error: true
+        run: |
+          .venv/bin/arena health check --job weekly --report health.json ${{ (github.event_name == 'workflow_dispatch' && inputs.fail_health) && '--force-fail' || '' }} | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: Open, update or close the incident issue
+        if: always() && !(github.event_name == 'workflow_dispatch' && inputs.dry_run)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          .venv/bin/arena health incident --report health.json --job-status "${{ job.status }}" \
+            --run-url "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+      - name: Fail the run when a health check failed
+        if: always() && !(github.event_name == 'workflow_dispatch' && inputs.dry_run) && steps.health.outcome == 'failure'
+        run: exit 1

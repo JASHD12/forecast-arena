@@ -487,6 +487,17 @@ Made by: agent
   stays 2.3.3 for Evidently). Installed by CI, the weekly and the deps workflows; tests
   skip without them, so `make setup` alone still works.
 
+## 2026-11-13 · Health checks and incident issue (T033)
+
+- `arena health check` implements the five SPEC 12 checks; "sources fresh" is measured by
+  each domain's latest question time (96 h for markets, which publishes on working days);
+  "overdue" means unresolved more than 5 days after `resolve_after` (longer than every
+  domain's grace period). The parse-failure rate is only judged from 5 LLM answers on.
+- One issue, deduplicated by its fixed title; the workflow token opens, comments on and
+  closes it via `gh` (standing approval 5). The weekly workflow checks only real runs (a
+  dry run has no ledger checkout). Pages still deploys when a check fails. A dispatch
+  input `fail_health` adds a failing check for testing the alert path.
+
 ## Proposals for the human
 
 Ideas outside the specification. The agent lists them here and does not build them.

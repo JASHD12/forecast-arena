@@ -521,6 +521,22 @@ Made by: agent
   the start takes effect; `Ledger.write_raw` refuses any second write.
 - Only completed days count (up to yesterday); the decision runs after every real job.
 
+## 2026-11-13 · Time-series benchmarks for power (T114)
+
+- New optional file `requirements-ts.txt` (statsmodels 0.15.0, chronos-forecasting 2.3.2
+  and their dependencies, including transformers), compiled with the lock, tracking, ML
+  and torch files as constraints, and installed by CI.
+- ETS, SARIMAX and Chronos-Bolt tiny are *local* benchmarks: each question is answered
+  from the same 28-day as-of context the live forecasters see, with no training on other
+  days and no calibration. They appear in the backtest table and model card only; they
+  are not live forecasters and not promotion candidates (adding them live would need a
+  SPEC 8 change).
+- Chronos weights are pinned to a revision. The Hub download uses plain HTTPS
+  (`HF_HUB_DISABLE_XET=1`), so only huggingface.co and us.aws.cdn.hf.co are needed.
+  CI tests use a fake pipeline and never download weights.
+- Alternatives: AutoGluon (far heavier); Chronos-2 or larger Bolt sizes (slower on CPU,
+  no need for a benchmark); statsforecast (one more library for the same models).
+
 ## Proposals for the human
 
 Ideas outside the specification. The agent lists them here and does not build them.

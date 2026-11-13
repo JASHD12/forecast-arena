@@ -42,6 +42,7 @@ move older "Done log" lines to `docs/progress-archive.md`.
 
 ## Done log
 
+- 2026-11-13 T114: ETS, SARIMAX and Chronos-Bolt tiny as local power benchmarks; one-year backtest card docs/models/power-ts.md (all three lose to the champion; Chronos best of them and beats persistence)
 - 2026-11-13 T085: explainer 07 (operations and monitoring) with real incidents
 - 2026-11-13 T080: Status page adds missed days, source freshness (latest batch/answer, overdue), LLM usage per day vs cap, LLM parse-failure rates; e2e now records usage like the CLI
 - 2026-11-13 T036: explainers 01 (ledger, forecast before truth) and 02 (power questions), ten Q&A each

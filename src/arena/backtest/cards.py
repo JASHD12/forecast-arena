@@ -123,3 +123,31 @@ neural network; gradient-boosted trees are the usual strong baseline on such tab
 def power_mlp_card(report_md: str, run_id: str) -> str:
     """Challenger card with the generated head-to-head backtest report appended."""
     return POWER_MLP_CARD + f"\n## Backtest (run `{run_id}`)\n\n" + report_md.split("\n", 2)[2]
+
+
+POWER_TS_CARD = """# Model card: power time-series benchmarks (ts_ets, ts_sarimax, ts_chronos)
+
+**What they are.** Three *local* benchmarks for the power champion. For each question they
+look only at the as-of context (the daily statistic on the last 28 known days) and forecast
+that statistic for the target day, then read P(YES) from the predictive distribution:
+
+- `ts_ets` (power-ets-r1): exponential smoothing with additive errors and additive weekly
+  seasonality (statsmodels `ETSModel`), Gaussian predictive.
+- `ts_sarimax` (power-sarimax-r1): SARIMA(1,0,0)(1,0,0)[7] with a constant (statsmodels
+  `SARIMAX`), Gaussian predictive.
+- `ts_chronos` (power-chronos-bolt-tiny-r1): Chronos-Bolt tiny, a 9M-parameter pretrained
+  time-series foundation model (Amazon, Apache-2.0), zero-shot on the same 28 values,
+  CPU, weights pinned to revision `a0e552de`; its nine predicted quantiles 0.1..0.9 are
+  interpolated into a CDF.
+
+**Role.** Benchmarks in the backtest table only; not live forecasters and not candidates
+for promotion. Nothing is trained on other days and nothing is calibrated afterwards.
+
+**Known limits.** 28 values is a short context, chosen so every model sees exactly what
+the live forecasters see. No calendar or holiday features, which the champion has.
+"""
+
+
+def power_ts_card(report_md: str, run_id: str) -> str:
+    """Benchmark card with the generated backtest report appended."""
+    return POWER_TS_CARD + f"\n## Backtest (run `{run_id}`)\n\n" + report_md.split("\n", 2)[2]

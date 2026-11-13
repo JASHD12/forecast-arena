@@ -418,7 +418,7 @@ CI jobs; core `make check` stays offline and fast.
   - Do: small MLP with pinball loss for power (CPU wheel, seeded); weekly candidate;
     backtest card published whatever the result.
   - Done when: deterministic unit test passes in the ml CI job; card committed.
-- [ ] T114 · Statistical and foundation-model benchmarks (deps: T111)
+- [x] T114 · Statistical and foundation-model benchmarks (deps: T111)
   - Do: statsmodels ETS/SARIMAX and a tiny pretrained time-series model (zero-shot, CPU,
     weights cached) as power benchmarks in the backtest table.
   - Done when: both appear in a committed backtest report with intervals.

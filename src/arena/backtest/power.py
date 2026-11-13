@@ -12,6 +12,15 @@ from arena.forecasters.baselines import BaseRate, Persistence
 from arena.forecasters.ml import MLForecaster
 from arena.forecasters.ml_power import PowerModel, train
 
+#: Challenger name -> forecaster id in the backtest report.
+CHALLENGER_IDS = {
+    "lgbm": "ml_lgbm",
+    "mlp": "ml_mlp",
+    "ets": "ts_ets",
+    "sarimax": "ts_sarimax",
+    "chronos": "ts_chronos",
+}
+
 NOTES = (
     "Features: calendar (weekday, season, German national holidays) and the last 28 days "
     "of daily price statistics from the as-of context only.",
@@ -41,8 +50,9 @@ def run(
     """Walk-forward from `first` to `last` (scored), with a warm-up before `first`.
 
     `challengers` adds challenger model families as extra forecasters on the same
-    questions: "lgbm" (LightGBM + Optuna, forecaster id `ml_lgbm`) and "mlp" (PyTorch
-    quantile network, `ml_mlp`)."""
+    questions: "lgbm" (LightGBM + Optuna, forecaster id `ml_lgbm`), "mlp" (PyTorch
+    quantile network, `ml_mlp`), and the local time-series benchmarks "ets", "sarimax"
+    and "chronos" (`ts_*`, see `forecasters/ts_bench.py`; no training)."""
     state: dict[str, PowerModel] = {}
 
     def refresher(key: str, fit: Callable[[date], PowerModel]) -> Callable[[str, date], Any]:
@@ -79,6 +89,13 @@ def run(
             g = MLForecaster({}, refresher("mlp", lambda c: train_torch(domain, c, folds=folds)))
             g.forecaster_id = "ml_mlp"
             out.append(g)
+        for method in ("ets", "sarimax", "chronos"):
+            if method in challengers:
+                from arena.forecasters.ts_bench import SeriesBenchmark
+
+                b = MLForecaster({"power": SeriesBenchmark(method)})
+                b.forecaster_id = CHALLENGER_IDS[method]
+                out.append(b)
         return out
 
     return walk_forward(

@@ -395,8 +395,11 @@ def report() -> None:
 
 
 @report.command("backtest-power")
-@click.option("--challenger", "challengers", multiple=True, type=click.Choice(["lgbm", "mlp"]),
-              help="Add a challenger model family (needs requirements-ml.txt).")  # fmt: skip
+@click.option("--challenger", "challengers", multiple=True,
+              type=click.Choice(["lgbm", "mlp", "ets", "sarimax", "chronos"]),
+              help="Add a challenger (ml/torch/ts requirements files).")  # fmt: skip
+@click.option("--card-type", type=click.Choice(["champion", "lgbm", "mlp", "ts"]),
+              default="champion", help="Which model card text to write with --card.")  # fmt: skip
 @click.option("--first", type=click.DateTime(["%Y-%m-%d"]), required=True)
 @click.option("--last", type=click.DateTime(["%Y-%m-%d"]), required=True)
 @click.option("--out", "out_dir", type=click.Path(path_type=Path), default=Path("backtests"))
@@ -414,6 +417,7 @@ def report_backtest_power(
     out_dir: Path,
     card: Path | None,
     challengers: tuple[str, ...] = (),
+    card_type: str = "champion",
 ) -> None:
     """Walk-forward power backtest from the SMARD cache (ARENA_CACHE_DIR); labelled backtest."""
     from arena.backtest import power as bt
@@ -429,10 +433,11 @@ def report_backtest_power(
     store = PowerHistory(client).store([PRICE_KEY], HISTORY_START, la + timedelta(days=2))
     run_id = f"power-{f.isoformat()}-{la.isoformat()}-{obj.clock.now():%Y%m%dT%H%M}"
     res = bt.run(PowerDomain(store), f, la, run_id=run_id, challengers=challengers)
-    names = ["base_rate", "persistence", "ml"] + [f"ml_{c}" for c in challengers]
+    ids = [bt.CHALLENGER_IDS[c] for c in challengers]
+    names = ["base_rate", "persistence", "ml", *ids]
     comps = [("ml", "base_rate"), ("ml", "persistence"), ("persistence", "base_rate")]
-    comps += [(f"ml_{c}", "ml") for c in challengers]
-    comps += [(f"ml_{c}", "base_rate") for c in challengers]
+    comps += [(c, "ml") for c in ids]
+    comps += [(c, "base_rate") for c in ids]
     text = markdown(f"Power backtest {f} to {la}", res.records, names, comps, bt.NOTES)
     path = BacktestStore(out_dir).write(
         run_id, res.records, {"domain": "power", "first": f, "last": la}
@@ -440,10 +445,12 @@ def report_backtest_power(
     (path / "report.md").write_text(text, encoding="utf-8")
     click.echo(text)
     if card is not None:
-        from arena.backtest.cards import power_card
+        from arena.backtest import cards
 
+        make = {"champion": cards.power_card, "lgbm": cards.power_lgbm_card,
+                "mlp": cards.power_mlp_card, "ts": cards.power_ts_card}[card_type]  # fmt: skip
         card.parent.mkdir(parents=True, exist_ok=True)
-        card.write_text(power_card(text, run_id), encoding="utf-8")
+        card.write_text(make(text, run_id), encoding="utf-8")
         click.echo(f"model card written: {card}")
 
 

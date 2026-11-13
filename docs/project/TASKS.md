@@ -565,7 +565,7 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
     becomes a pill; one header row on desktop, logo plus menu on phones.
   - Done when: `make a11y` passes with and without JavaScript; phone screenshot shows the
     headline on the first screen.
-- [ ] T186 · Home hero and recruiter page (deps: T185)
+- [x] T186 · Home hero and recruiter page (deps: T185)
   - Do: remove "joining soon"; BACKTEST card with the one-year electricity result from the
     model card; tech row; optional owner byline from `site_content/recruiters.md`;
     recruiter page with an honest authorship line and "five things worth 30 seconds".

@@ -644,3 +644,9 @@ ul.plain { list-style: none; padding: 0; margin: 0; display: grid; gap: .45rem; 
 }
 .rehearsal-note { background: var(--banner); color: var(--banner-fg); border-radius: 10px;
   padding: .6rem .9rem; }
+
+/* T186: home hero side column: live standings and the labelled backtest card */
+.hero-side { display: grid; gap: 1rem; position: relative; z-index: 1; }
+.bt-scope { color: #fde68a; border-color: rgba(253, 230, 138, .5); }
+.bt-card .st-foot { font-size: .82rem; color: var(--ink-muted); margin: .7rem 0 0; }
+.bt-card .st-foot strong { color: #fff; }

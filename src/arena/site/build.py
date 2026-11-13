@@ -41,7 +41,7 @@ from arena.scoring.core import Scored, clip, counts, load
 from arena.scoring.findings import findings, power_table
 from arena.scoring.stats import calibration_bins, expected_calibration_error, murphy
 from arena.site.api import ENDPOINTS, build_api
-from arena.site.cards_page import load_cards
+from arena.site.cards_page import headline_backtest, load_cards
 from arena.site.charts import forest_svg, race_svg, reliability_svg, series_class
 from arena.site.game import live_deck, practice_deck
 from arena.site.llm_obs import PRICE_SOURCE, load_spans, totals, traces_by_question, usage_rows
@@ -403,6 +403,23 @@ def eval_runs(evals_dir: Path | None) -> list[dict[str, Any]]:
     return sorted(runs, key=lambda r: str(r.get("created_at")), reverse=True)
 
 
+def json_validity_change(
+    runs: Sequence[dict[str, Any]], fid: str = "llm_plain"
+) -> dict[str, str] | None:
+    """First-try valid JSON of `fid` in the oldest and newest eval run, as percentages (T186).
+
+    Computed from the committed eval results, so the recruiter page never types it (I5).
+    """
+    vals = []
+    for r in sorted(runs, key=lambda r: str(r.get("created_at"))):
+        v = r.get("metrics", {}).get(fid, {}).get("json_valid_first_try")
+        if v is not None:
+            vals.append(v)
+    if len(vals) < 2:
+        return None
+    return {"before": f"{100 * vals[0]:.0f}%", "after": f"{100 * vals[-1]:.0f}%"}
+
+
 def official_start(ledger: Ledger) -> str | None:
     """The official start date if `meta/official_start.json` exists."""
     if not ledger.exists(layout.OFFICIAL_START_PATH):
@@ -561,6 +578,7 @@ def build_site(
                 "topics": domain_stats(rec),
                 "forecast_count": len(rec.forecasts),
                 "ml_live": any(f.forecaster_id == "ml" for f in rec.forecasts),
+                "backtest": headline_backtest(models_dir),
                 "days_live": len(batches),
                 "counts": counts(rec),
                 "verify_ok": rep.ok,
@@ -681,6 +699,7 @@ def build_site(
             {
                 "proofs": PROOFS,
                 "personal": read_content("recruiters.md"),
+                "json_change": json_validity_change(eval_runs(evals_dir)),
                 "k": {
                     "questions": len(rec.questions),
                     "forecasts": len(rec.forecasts),

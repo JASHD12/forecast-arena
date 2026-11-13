@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% from "macros.html" import page_head %}
 {% block content %}
-{{ page_head("For recruiters", "Forecast Arena in 60 seconds", "A live benchmark that asks whether AI agents beat classical machine learning at forecasting tomorrow, built end to end by one person, with every claim checkable.") }}
+{{ page_head("For recruiters", "Forecast Arena in 60 seconds", "A live benchmark that asks whether AI agents beat classical machine learning at forecasting tomorrow. Designed and directed by me, implemented together with an AI coding agent; every claim on this site is computed from the public record and can be checked.") }}
 <div class="kpis">
 <div class="kpi"><span class="kpi-n">{{ k.questions }}</span><span class="kpi-l">questions asked</span></div>
 <div class="kpi"><span class="kpi-n">{{ k.forecasts }}</span><span class="kpi-l">forecasts published before the answer</span></div>
@@ -12,6 +12,14 @@
 <p>Every day the system publishes yes/no questions about the near future from public data (electricity prices first), the evening before they lock. Baselines, a gradient-boosting model, LLM forecasters and two LLM agents each publish a probability <strong>before</strong> the answer exists, into an append-only, hash-chained public record. The next day the answers arrive and every forecast is scored with proper scoring rules. It runs entirely on GitHub Actions and Pages for about one US dollar a month of AI usage.</p>
 <p><strong>Measured so far:</strong> see the <a href="backtests.html">backtests</a> (a year of replayed past days, clearly labelled as not live), the <a href="evals.html">LLM evaluation</a> (it found and fixed a real bug) and the <a href="leaderboard.html">live leaderboard</a>, which says "too early to tell" until the statistics can decide.</p>
 </section>
+<section class="card" aria-labelledby="r-five"><h2 id="r-five">Five things worth 30 seconds</h2>
+<ol class="five">
+<li><a href="guide.html#verify"><strong>Verify the record yourself.</strong></a> One command re-checks every hash and that no forecast was written after its question locked.</li>
+<li><a href="backtests.html"><strong>A year of backtests.</strong></a> The champion model against baselines and challengers (LightGBM, a PyTorch network, Chronos, SARIMAX, ETS), losers included.</li>
+<li><a href="evals.html"><strong>The eval that caught a bug.</strong></a> A frozen golden set showed answers cut off by an output cap{% if json_change %}; first-try valid JSON went from {{ json_change.before }} to {{ json_change.after }}{% endif %}.</li>
+<li><a href="stack.html"><strong>The architecture.</strong></a> Live data with an as-of gateway against look-ahead, an append-only ledger, proper scoring, MLOps, CI-gated releases.</li>
+<li><a href="{{ repo_url }}/blob/main/src/arena/agent/forecaster.py"><strong>Read the agent loop.</strong></a> A tool-calling agent whose limits (calls, time, tokens) are enforced by the harness, not the prompt.</li>
+</ol></section>
 {% if personal %}<section class="card" aria-labelledby="r-me"><h2 id="r-me">About me</h2><div class="prose">{{ personal }}</div></section>{% endif %}
 <h2>What the postings ask for, and where to see it</h2>
 <div class="table-scroll" tabindex="0" role="region" aria-label="Skills and proof"><table class="proof">

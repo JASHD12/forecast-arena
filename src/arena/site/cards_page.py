@@ -83,3 +83,27 @@ def load_cards(models_dir: Path | None) -> list[dict[str, Any]]:
         out.append({"id": f"card-{stem}", "stem": stem, "title": title,
                     "html": render_card(body, title)})  # fmt: skip
     return out
+
+
+def headline_backtest(models_dir: Path | None, stem: str = "power") -> dict[str, Any] | None:
+    """The home page's BACKTEST card (T186), parsed from a committed model card.
+
+    Returns the Brier score of each forecaster in the card's first table, the paired
+    difference of `ml` against the base rate with its interval, and the period; None when
+    the card is missing or does not have that shape. Values are copied, never computed
+    here, so the home page and the card can never disagree (I5).
+    """
+    if models_dir is None or not (models_dir / f"{stem}.md").is_file():
+        return None
+    text = (models_dir / f"{stem}.md").read_text(encoding="utf-8")
+    rows = {m.group(1): m.group(3) for m in
+            re.finditer(r"^\| (\w+) \| (\d+) \| ([0-9.]+) \| \[", text, re.M)}  # fmt: skip
+    diff = re.search(r"^\| ml - base_rate \| ([-+0-9.]+) \| (\[[^\]]+\]) \| (yes|no)", text, re.M)
+    span = re.search(r"Batches (\S+) to (\S+) \((\d+) batch days\)", text)
+    if not rows.get("ml") or not rows.get("base_rate") or diff is None or span is None:
+        return None
+    return {
+        "rows": [(f, v, float(v)) for f, v in sorted(rows.items(), key=lambda kv: float(kv[1]))],
+        "diff": diff.group(1), "interval": diff.group(2), "supported": diff.group(3) == "yes",
+        "start": span.group(1), "end": span.group(2), "days": int(span.group(3)),
+    }  # fmt: skip

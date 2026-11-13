@@ -11,10 +11,11 @@
 <div class="hero-copy">
 <p class="kicker"><span class="pulse" aria-hidden="true"></span> Live benchmark · AI vs classical ML vs baselines</p>
 <h1 id="hero-title">Can AI predict tomorrow better than a simple model?</h1>
-<p>Every morning, LLM forecasters (including a tool-using agent){% if ml_live %}, gradient-boosted ML models{% endif %} and statistical baselines each publish a probability on real questions about tomorrow{% if not ml_live %}, with gradient-boosted ML models joining soon{% endif %}. The answers are locked in a tamper-evident public ledger <strong>before</strong> the facts exist, then scored against reality.</p>
+<p>Every day, statistical baselines{% if ml_live %}, a gradient-boosted ML model{% endif %} and Claude-based forecasters, including tool-using agents, each publish a probability on real questions about tomorrow. The answers are locked in a tamper-evident public ledger <strong>before</strong> the facts exist, then scored against reality.{% if not ml_live and backtest %} The ML model is proven in a one-year backtest first (right) and then joins the live board.{% endif %}</p>
 <p class="actions"><a class="btn" href="#today">See today's forecasts</a> <a class="btn btn-ghost" href="leaderboard.html">Leaderboard</a> <a class="btn btn-ghost" href="stack.html">Tech stack</a> <a class="btn btn-ghost" href="{{ repo_url }}">{{ icon("github") }} Code</a></p>
 <p class="trust">{{ "✓ Ledger verified" if verify_ok else "✗ Ledger check failed" }} · {{ forecast_count }} forecasts published · {{ days_live }} days with questions · {% if official_start %}official since {{ official_start }}{% else %}rehearsal phase{% endif %}</p>
 </div>
+<div class="hero-side">
 <aside class="standings" aria-labelledby="st-title">
 <h2 id="st-title">Standings <span class="st-scope">{{ "official" if official_start else "rehearsal" }}</span></h2>
 {% if board.rows %}
@@ -26,10 +27,19 @@
 {% else %}
 <p class="st-note">The lineup. Standings appear here as soon as the first answers arrive.</p>
 <ul class="lineup">
-{% for fid in ("base_rate", "persistence", "ml", "llm_plain", "llm_context", "agent") %}<li><span class="dot-key {{ series_class(fid) }}" aria-hidden="true"></span>{{ fname(fid) }}{% if is_ai(fid) %} <span class="label">AI</span>{% endif %}{% if fid == "ml" and not ml_live %} <span class="label">joining soon</span>{% endif %}</li>{% endfor %}
+{% for fid in ("base_rate", "persistence", "ml", "llm_plain", "llm_context", "agent") %}<li><span class="dot-key {{ series_class(fid) }}" aria-hidden="true"></span>{{ fname(fid) }}{% if is_ai(fid) %} <span class="label">AI</span>{% endif %}{% if fid == "ml" and not ml_live %} <span class="label">backtest only</span>{% endif %}</li>{% endfor %}
 </ul>
 {% endif %}
 </aside>
+{% if backtest %}<aside class="standings bt-card" aria-labelledby="bt-title">
+<h2 id="bt-title">One year of electricity <span class="st-scope bt-scope">backtest</span></h2>
+<p class="st-note">Past days replayed through the production code ({{ backtest.start }} to {{ backtest.end }}, {{ backtest.days }} days). Not the live record. Brier score, lower is better.</p>
+<ol class="st-list">
+{% for fid, v, x in backtest.rows %}<li><span class="st-rank">{{ loop.index }}</span><span class="st-name">{{ fname(fid) }}</span><span class="st-bar" aria-hidden="true"><span class="st-fill {{ series_class(fid) }}" style="width: {{ '%.1f'|format([x / 0.35, 1]|min * 100) }}%"></span></span><span class="st-val">{{ v }}</span></li>
+{% endfor %}</ol>
+<p class="st-foot">ML vs base rate: <strong>{{ backtest.diff }}</strong> {{ backtest.interval }}{% if backtest.supported %}, a supported difference{% endif %}. <a href="backtests.html">All model cards →</a></p>
+</aside>{% endif %}
+</div>
 </section>
 
 <div class="kpis">

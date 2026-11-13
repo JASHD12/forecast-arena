@@ -456,6 +456,24 @@ Made by: agent
 - The ensemble (T090) is not built yet: it depends on T057 (ml live), and AGENTS.md says
   never to skip ahead of unmet dependencies.
 
+## 2026-11-13 · Portfolio roadmap (owner approved)
+
+- Context: the owner wants the project to win AI/ML/DS working-student interviews in
+  Germany and approved `docs/ROADMAP.md` (Phase 10 in TASKS.md).
+- Decisions (owner): self-hosted JavaScript is allowed on the site (no cookies, no
+  storage, no third-party requests, pages work without it); add measured ML challengers
+  (LightGBM + Optuna + SHAP, a PyTorch network, statistical and foundation-model
+  benchmarks, conformal intervals), LLM engineering (RAG tool, LangGraph agent, a local
+  open-source LLM, tracing, an eval harness, an MCP server), recruiter, German and
+  dashboard pages, engineering breadth (FastAPI, Docker, kind, dbt, an Airflow DAG mirror)
+  and a public players' leaderboard with questions published the evening before.
+- This supersedes the 2026-11-12 entries that rejected JavaScript, PyTorch and SHAP.
+- Constraints that stay: zero extra cost (Haiku 5.5 under 150k tokens/day; everything
+  else free), I1-I8, and I5 applied strictly: nothing is named on the site that CI does
+  not run, and every challenger's measured result is published even when it loses.
+- The official record starts only after these changes are live (T110), so it is not
+  disturbed by version churn.
+
 ## Proposals for the human
 
 Ideas outside the specification. The agent lists them here and does not build them.

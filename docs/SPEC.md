@@ -420,6 +420,18 @@ Information sets (this table is shown on the Methods page):
   valid one per person per question wins; the panel forecast is the median when at least
   3 people answered. No names or emails enter the repository.
 
+### 8.8 Amendments (owner approved 2026-11-13, docs/ROADMAP.md)
+
+- Challengers: additional model families (LightGBM, a PyTorch network, statistical and
+  pretrained time-series benchmarks) compete in the weekly job; only the promoted model is
+  the live `ml` forecaster. Their backtests are published as model cards.
+- New forecasters: `agent_graph` (LangGraph agent with the same tools plus a retrieval
+  tool over past resolved questions) and `llm_local` (an open-source model run locally on
+  the CI runner, no API cost). Both follow the same output contract, sampling and skip
+  rules as the other LLM forecasters.
+- Players: members of the public submit forecasts through a published form CSV; each
+  player is ranked under a random id on the same questions and scoring rules.
+
 ## 9. LLM layer
 
 ### 9.1 Client
@@ -515,6 +527,10 @@ research-only disclaimer and data attributions.
 | About | From `site_content/about.md` and `site_content/legal.md`; placeholder until the human provides them |
 
 Rationales are labelled as AI-generated and possibly wrong.
+
+Amendment (owner approved 2026-11-13): the site may ship one self-hosted JavaScript file
+for progressive enhancement (game, search, sortable tables). No cookies, no storage, no
+third-party requests; every page stays usable without JavaScript.
 
 ## 12. Operations
 

@@ -392,3 +392,132 @@ Keep the first line of each task in exactly this shape; the status script parses
     every explainer exists; summarise state, open risks and suggested next steps in
     `PROGRESS.md`.
   - Done when: all of the above pass and the summary is written.
+
+## Phase 10 - Portfolio roadmap (owner approved 2026-11-13, docs/ROADMAP.md)
+
+Owner decisions: self-hosted JavaScript allowed; measured ML/LLM challengers; recruiter,
+German and dashboard pages; players' leaderboard. Zero extra cost; nothing is listed on the
+site that CI does not run (I5). Heavy extras use optional requirement files and their own
+CI jobs; core `make check` stays offline and fast.
+
+- [ ] T110 · Official-start gate (deps: T035)
+  - Do: `ARENA_OFFICIAL_START_NOT_BEFORE` (date); the official start is the later of the
+    5-clean-days rule and this date. Owner: not before Phases 1-2 and T160 are live.
+  - Done when: tests show the gate delays the start and never advances it.
+- [ ] T111 · Multi-candidate weekly promotion (deps: T056)
+  - Do: several candidate trainers per domain in `ops/weekly.py`; all scored on the same
+    window; best promoted only if not worse than the champion; summary lists every
+    candidate; Experiments shows the champion/challenger table.
+  - Done when: tests cover two candidates, a worse challenger and the summary table.
+- [ ] T112 · LightGBM + Optuna + SHAP challengers (deps: T111)
+  - Do: LightGBM quantile (power) and classifier (attention) on the existing features;
+    Optuna study (seeded, time-series CV with gap); SHAP TreeExplainer summary next to
+    permutation importance; backtest report and model card.
+  - Done when: unit tests on tiny data pass in the ml CI job; a backtest card is committed.
+- [ ] T113 · PyTorch quantile network challenger (deps: T111)
+  - Do: small MLP with pinball loss for power (CPU wheel, seeded); weekly candidate;
+    backtest card published whatever the result.
+  - Done when: deterministic unit test passes in the ml CI job; card committed.
+- [ ] T114 · Statistical and foundation-model benchmarks (deps: T111)
+  - Do: statsmodels ETS/SARIMAX and a tiny pretrained time-series model (zero-shot, CPU,
+    weights cached) as power benchmarks in the backtest table.
+  - Done when: both appear in a committed backtest report with intervals.
+- [ ] T115 · Conformal prediction intervals (deps: T045m)
+  - Do: conformalized quantile regression (rolling split-conformal) for power quantiles;
+    coverage before/after in the weekly summary and on Experiments.
+  - Done when: a test shows empirical coverage reaches the target on synthetic data.
+- [ ] T117 · Power analysis for the hypotheses (deps: T045f)
+  - Do: from daily paired Brier differences, days needed to detect a given gap at 80%
+    power; shown on Findings.
+  - Done when: tests check the formula against a hand calculation.
+- [ ] T118 · Test quality: property tests, coverage, schemas (deps: T001)
+  - Do: Hypothesis tests for canonical JSON, hash chain and scoring bounds; pytest-cov
+    figure in the CI job summary; schema checks on source responses.
+  - Done when: the new tests pass and CI prints coverage.
+- [ ] T120 · RAG tool: similar past questions (deps: T067)
+  - Do: local ONNX embeddings (fastembed), vector search over questions resolved before
+    asof (I3); agent tool `similar_past_questions`; prompt version v2.
+  - Done when: a leakage test proves unresolved or later questions are never returned.
+- [ ] T121 · LangGraph agent forecaster (deps: T120)
+  - Do: `agent_graph` (plan, retrieve, tools, critique, answer) via langchain-anthropic,
+    behind the existing budget guard; 1 question per domain per day.
+  - Done when: FakeLLM-scripted graph tests pass; caps hold in a test.
+- [ ] T122 · Open-source local LLM forecaster (deps: T063)
+  - Do: `llm_local`: small quantized model via llama-cpp-python on the runner CPU, same
+    contract as `llm_context`, time limit, skips on timeout. No API cost.
+  - Done when: tests with a fake backend pass; a dry-run dispatch records forecasts.
+- [ ] T123 · LLM tracing and observability page (deps: T067)
+  - Do: spans per LLM call (prompt version, model, tokens, latency, tools, repair) in
+    `agent_traces/`; trace panel on question pages; LLM page with usage and est. cost.
+  - Done when: tests cover span writing and the page with FakeLLM data.
+- [ ] T124 · LLM evaluation harness (deps: T123)
+  - Do: `arena eval run` on a frozen golden set; prompt A/B; Brier, calibration, JSON
+    validity, repair rate, cost; FakeLLM gate in CI; real runs by manual dispatch only.
+  - Done when: CI gate passes; results page labelled evaluation (I4).
+- [ ] T125 · MCP server over the benchmark (deps: T045i)
+  - Do: `arena mcp` (stdio, official SDK): list_questions, get_question, leaderboard,
+    read-only SQL.
+  - Done when: an SDK client test calls every tool; README documents it.
+- [ ] T130 · "Can you beat the AI?" game (deps: T045f)
+  - Do: `play.html` + Home teaser; `data/game.json`; self-hosted `static/app.js`; CSP;
+    session score in memory only.
+  - Done when: Playwright test plays one round; works as a page without JS.
+- [ ] T131 · Question page: data chart, trace, neighbours (deps: T130)
+  - Do: series chart from the morning snapshot with threshold and outcome; previous/next.
+  - Done when: tests cover the chart for each domain with fixtures.
+- [ ] T132 · Forecaster profile pages (deps: T130)
+  - Done when: one page per forecaster with history, calibration, best/worst calls.
+- [ ] T133 · Topic pages (deps: T130)
+  - Done when: one page per domain with source, licence, board and race.
+- [ ] T134 · Leaderboard heatmap, head-to-head, sortable tables (deps: T130)
+  - Done when: tests cover the matrices; a11y stays clean.
+- [ ] T135 · Backtests page (deps: T130)
+  - Do: render committed model cards under a permanent BACKTEST banner (I4).
+  - Done when: page exists and every number comes from the cards.
+- [ ] T136 · Experiments upgrade (deps: T111, T115)
+  - Done when: champion/challenger, conformal and importance views render from summaries.
+- [ ] T137 · Home and global polish (deps: T130)
+  - Do: lock countdown, archive search, theme toggle (no storage), og:image, sticky nav.
+  - Done when: Playwright check passes with and without JS.
+- [ ] T138 · Methods, Guide, Data depth and notebook (deps: T130)
+  - Do: worked scoring example, verification walkthrough, data dictionary,
+    `notebooks/explore.ipynb` executed in CI on the e2e export.
+  - Done when: the notebook runs in CI.
+- [ ] T139 · Static JSON API (deps: T130)
+  - Done when: `api/v1/*.json` and a schema page are built and tested.
+- [ ] T140 · For recruiters page (deps: T112, T113, T121, T125, T150, T152)
+  - Do: 60-second summary, measured results, requirement-to-proof table, print layout;
+    personal lines from `site_content/recruiters.md` (FILL IN guard).
+  - Done when: every technology named links to code CI runs.
+- [ ] T141 · German summary page and README section (deps: T140)
+  - Done when: `de.html` (lang="de") and the README section exist; H17 asks for proofreading.
+- [ ] T142 · README overhaul (deps: T140)
+  - Done when: badges, screenshots, generated results, skills list, Docker quickstart.
+- [ ] T143 · Streamlit dashboard (deps: T045i)
+  - Done when: `apps/dashboard` passes an AppTest smoke test in CI; linked only if
+    `ARENA_DASHBOARD_URL` is set (H19).
+- [ ] T150 · FastAPI service and Docker compose (deps: T045i)
+  - Done when: TestClient tests pass; the Docker image serves the API in CI.
+- [ ] T151 · Kubernetes manifests validated on kind in CI (deps: T150)
+  - Done when: a CI job applies `deploy/k8s/` to kind and smoke-tests the API.
+- [ ] T152 · dbt models over the open data (deps: T045i)
+  - Done when: `dbt build` (dbt-duckdb) with tests passes in CI; Data page reads marts.
+- [ ] T153 · Airflow DAG mirror of the schedule (deps: T030)
+  - Done when: a CI job imports the DAG with DagBag without errors.
+- [ ] T160 · Questions published the evening before (deps: T032)
+  - Do: generation at about 18:00 UTC on B-1; machine forecasts still in the morning;
+    changed templates get template_version 2; before the official start.
+  - Done when: e2e test covers the new timing; lock unchanged.
+- [ ] T161 · Player intake (deps: T160, T091)
+  - Do: per-player forecasts under random ids from the form CSV; pre-lock run; rules.
+  - Done when: tests cover late, duplicate and invalid rows.
+- [ ] T162 · Players' leaderboard and Play page (live) (deps: T161; needs: H15)
+  - Done when: a real pre-lock run ingests player rows, or WAIT.
+- [ ] T170 · Interview kit (deps: T140)
+  - Do: `docs/interview/`: pitch (EN/DE), system design walkthrough, 40 Q&A, STAR
+    stories, CV bullets from `arena report cv`.
+  - Done when: the files exist and every number is from the ledger or a card.
+- [ ] T171 · Honesty audit of the portfolio (deps: T140, T141, T142, T170)
+  - Do: every technology named on stack, recruiters, de and README is imported by code
+    CI runs; fix or remove anything that is not.
+  - Done when: the audit list is in `PROGRESS.md` with no open item.

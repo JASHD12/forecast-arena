@@ -112,3 +112,22 @@ Keep the first line of each item in exactly this shape; the status script parses
   - German law (DDG section 5) expects a full postal address in the Impressum, not only
     postcode and city. Add the street line in `site_content/imprint.md` and
     `site_content/privacy.md` (above "35390 Gießen"), or tell the agent.
+- [ ] H15 · Players' leaderboard: form, consent and privacy
+  - Create a Google Form (nickname, consent tick-box, one probability per question),
+    publish its responses as CSV and set the Actions variable `ARENA_PANEL_CSV_URL`.
+  - Write the consent text and extend `site_content/privacy.md` (nicknames are personal
+    data; ledger entries cannot be erased). The agent drafts both on request.
+  - Needed for T162.
+- [ ] H16 · Recruiter page details
+  - Put your degree, university, expected graduation, availability (hours/week, start
+    date), languages and LinkedIn URL into `site_content/recruiters.md`, or tell the agent.
+- [ ] H17 · Proofread the German page
+  - Ask a German speaker to read `site_content/de.md` / the "Auf Deutsch" page once it
+    exists (T141).
+- [ ] H18 · Repository presentation on GitHub
+  - Repo settings (owner only): description, website link, topics (e.g. forecasting,
+    machine-learning, llm, mlops, rag), and pin the repo on your profile.
+- [ ] H19 · Streamlit dashboard hosting (optional, free)
+  - After T143: create a free Streamlit Community Cloud account, deploy
+    `apps/dashboard/streamlit_app.py` from this repo, and set the Actions variable
+    `ARENA_DASHBOARD_URL` to its address.

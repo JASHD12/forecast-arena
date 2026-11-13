@@ -60,6 +60,8 @@ class Settings(BaseModel):
     #: T120: offer the agent the similar-past-questions tool (prompt v2); needs fastembed
     #: (requirements-rag.txt). Off by default; the workflows switch it on.
     agent_rag: bool = False
+    #: T121: run the LangGraph agent `agent_graph` (needs requirements-graph.txt).
+    agent_graph: bool = False
 
     panel_csv_url: str | None = None
     coingecko_api_key: SecretStr | None = None

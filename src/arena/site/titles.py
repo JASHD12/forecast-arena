@@ -21,6 +21,7 @@ FORECASTER_NAMES = {
     "llm_plain": "AI, question only",
     "llm_context": "AI with data",
     "agent": "AI agent with tools",
+    "agent_graph": "AI agent (LangGraph)",
     "ensemble": "Ensemble",
     "human_panel": "Human panel",
 }

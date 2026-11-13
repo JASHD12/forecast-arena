@@ -91,6 +91,7 @@ STACK_LIBRARIES = (
     ("optuna", "hyperparameter search for the LightGBM challenger (time-series folds)"),
     ("shap", "SHAP explanations of LightGBM models"),
     ("statsmodels", "ETS and SARIMAX benchmarks in the power backtest"),
+    ("langgraph", "the agent_graph forecaster's state machine (plan, retrieve, tools, critique)"),
     ("fastembed", "local ONNX text embeddings for the agent's similar-questions tool (RAG)"),
     ("chronos-forecasting", "Chronos-Bolt tiny (pretrained time-series model), backtest only"),
     ("mlflow-skinny", "experiment tracking of the weekly retraining (SQLite backend)"),
@@ -141,6 +142,11 @@ INFORMATION_SETS = (
         "daily sample (planned)",
     ),
     ("agent", "As llm_context, plus read-only tools", "daily sample (planned)"),
+    (
+        "agent_graph",
+        "As agent, run as a LangGraph graph: plan, retrieved evidence, tools, self-check",
+        "1 question per topic per day (planned)",
+    ),
 )
 
 
@@ -173,7 +179,7 @@ def _env() -> Environment:
     return env
 
 
-AI_FORECASTERS = frozenset({"llm_plain", "llm_context", "agent"})
+AI_FORECASTERS = frozenset({"llm_plain", "llm_context", "agent", "agent_graph"})
 
 
 def race_data(scored: Sequence[Scored]) -> dict[str, Any]:
@@ -285,7 +291,7 @@ def _rows(questions: Sequence[Question], rec: Any) -> tuple[list[dict[str, Any]]
                 "state": state,
             }
         )
-    order = ["base_rate", "persistence", "ml", "llm_plain", "llm_context", "agent"]
+    order = ["base_rate", "persistence", "ml", "llm_plain", "llm_context", "agent", "agent_graph"]
     ordered = [f for f in order if f in fids] + sorted(fids - set(order))
     return rows, ordered
 

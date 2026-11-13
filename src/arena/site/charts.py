@@ -79,6 +79,7 @@ SERIES_SLOTS = {
     "persistence": 5,
     "ensemble": 6,
     "human_panel": 7,
+    "agent_graph": 8,
 }
 RACE_W, RACE_H = 680, 300
 RACE_PAD = (16, 150, 30, 44)  # top, right, bottom, left

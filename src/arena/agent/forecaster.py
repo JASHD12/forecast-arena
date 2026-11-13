@@ -42,7 +42,7 @@ class AgentForecaster:
 
     forecaster_id = "agent"
     max_output_tokens = 400
-    prompt_files = ("agent_system", "agent_user", "agent_final", "repair")
+    prompt_files: tuple[str, ...] = ("agent_system", "agent_user", "agent_final", "repair")
 
     def __init__(
         self,

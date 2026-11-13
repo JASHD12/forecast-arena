@@ -555,6 +555,27 @@ Made by: agent
   missing while it is on, the run fails instead of silently dropping the tool (I6).
 - This is before the official start (T110 gate), so the record starts with v2.
 
+## 2026-11-13 · LangGraph agent `agent_graph` (T121)
+
+- A LangGraph `StateGraph` (plan -> retrieve -> research <-> tools -> critique, then
+  parse with one repair) over the project's own `LLMClient`. Deviation from the roadmap
+  text ("through langchain-anthropic"): a LangChain chat model would call the provider
+  itself, outside `GuardedLLM`/`BudgetGuard`, and would need its own handling of thinking
+  blocks. Keeping our client makes the daily caps hold by construction, keeps FakeLLM
+  tests, and saves a dependency. LangGraph does the orchestration only.
+- Same tools, output contract, skips and trace format as `agent`. The retrieve node
+  fetches the base rate and the similar past questions automatically (two calls on top
+  of the model's own tool budget). One question per topic per day: `daily_sample` with
+  n=1 is a subset of the agent's n=3 sample, so the two agents are compared on the same
+  questions (framework agent vs hand-written loop, same model and tools).
+- Not part of the headline common set (`COMMON_GROUP`, SPEC 10 unchanged): with one
+  question a day it would shrink that set. It is on the all-questions boards and has a
+  power-analysis pair against `agent`.
+- `langsmith` arrives as a LangGraph dependency; it sends nothing unless LangSmith
+  tracing is switched on with its own key, which is never set.
+- On in the morning workflow (`ARENA_AGENT_GRAPH`, default 1); a missing langgraph fails
+  the run (I6). Before the official start (T110 gate).
+
 ## Proposals for the human
 
 Ideas outside the specification. The agent lists them here and does not build them.

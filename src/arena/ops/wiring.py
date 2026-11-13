@@ -194,6 +194,20 @@ def build_forecasters(
         wiki=None if llm is not None else partial(wikipedia_summary, http),
     )
     out += [LLMPlain(client, n), LLMContext(client, n), agent]
+    if settings.agent_graph:
+        # No silent fallback: if langgraph is missing this raises and the run fails.
+        from arena.agent.graph import GraphAgentForecaster
+
+        out.append(
+            GraphAgentForecaster(
+                client,
+                max_tool_calls=settings.agent_max_tool_calls,
+                peers={"base_rate": out[0]},
+                news=agent.news,
+                wiki=agent.wiki,
+                retriever=retriever,
+            )
+        )
     return out, guard
 
 

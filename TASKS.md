@@ -438,7 +438,7 @@ CI jobs; core `make check` stays offline and fast.
   - Do: local ONNX embeddings (fastembed), vector search over questions resolved before
     asof (I3); agent tool `similar_past_questions`; prompt version v2.
   - Done when: a leakage test proves unresolved or later questions are never returned.
-- [ ] T121 · LangGraph agent forecaster (deps: T120)
+- [x] T121 · LangGraph agent forecaster (deps: T120)
   - Do: `agent_graph` (plan, retrieve, tools, critique, answer) via langchain-anthropic,
     behind the existing budget guard; 1 question per domain per day.
   - Done when: FakeLLM-scripted graph tests pass; caps hold in a test.

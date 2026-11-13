@@ -36,7 +36,7 @@ FRESH_WITHIN = timedelta(hours=36)
 FRESH_OVERRIDES = {"markets": timedelta(hours=96)}
 MAX_PARSE_FAILURE_RATE = 0.20
 MIN_LLM_ANSWERS = 5
-LLM_FORECASTERS = frozenset({"llm_plain", "llm_context", "agent"})
+LLM_FORECASTERS = frozenset({"llm_plain", "llm_context", "agent", "agent_graph"})
 INCIDENT_LABEL = "incident"
 INCIDENT_TITLE = "Forecast Arena incident: a job or health check failed"
 

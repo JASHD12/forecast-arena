@@ -476,7 +476,7 @@ CI jobs; core `make check` stays offline and fast.
   - Done when: one page per domain with source, licence, board and race.
 - [x] T134 · Leaderboard heatmap, head-to-head, sortable tables (deps: T130)
   - Done when: tests cover the matrices; a11y stays clean.
-- [ ] T135 · Backtests page (deps: T130)
+- [x] T135 · Backtests page (deps: T130)
   - Do: render committed model cards under a permanent BACKTEST banner (I4).
   - Done when: page exists and every number comes from the cards.
 - [ ] T136 · Experiments upgrade (deps: T111, T115)

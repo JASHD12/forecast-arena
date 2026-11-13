@@ -15,6 +15,7 @@ def test_empty_ledger_builds_every_page(tmp_path) -> None:
     assert res.pages == [
         "404.html",
         "about.html",
+        "backtests.html",
         "calibration.html",
         "data.html",
         "evals.html",

@@ -34,6 +34,7 @@ from arena.scoring.boards import MIN_DAYS, all_boards, official
 from arena.scoring.core import Scored, clip, counts, load
 from arena.scoring.findings import findings, power_table
 from arena.scoring.stats import calibration_bins, expected_calibration_error, murphy
+from arena.site.cards_page import load_cards
 from arena.site.charts import forest_svg, race_svg, reliability_svg, series_class
 from arena.site.game import live_deck, practice_deck
 from arena.site.llm_obs import PRICE_SOURCE, load_spans, totals, traces_by_question, usage_rows
@@ -415,6 +416,7 @@ def build_site(
     llm_token_cap: int | None = None,
     evals_dir: Path | None = None,
     golden_path: Path | None = None,
+    models_dir: Path | None = None,
 ) -> SiteResult:
     """Render every page into `out_dir` (built aside, then moved into place)."""
     rec = load(ledger)
@@ -587,6 +589,7 @@ def build_site(
             },
         ),
         "evals.html": ("LLM evals", {"runs": eval_runs(evals_dir)}),
+        "backtests.html": ("Backtests", {"cards": load_cards(models_dir)}),
         "forecasters/index.html": ("Forecasters", {"profiles": profiles}),
         "topics/index.html": ("Topics", {"topics": [topic(d, rec) for d in domains]}),
         "play.html": (

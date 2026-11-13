@@ -404,7 +404,7 @@ CI jobs; core `make check` stays offline and fast.
   - Do: `ARENA_OFFICIAL_START_NOT_BEFORE` (date); the official start is the later of the
     5-clean-days rule and this date. Owner: not before Phases 1-2 and T160 are live.
   - Done when: tests show the gate delays the start and never advances it.
-- [ ] T111 · Multi-candidate weekly promotion (deps: T056)
+- [x] T111 · Multi-candidate weekly promotion (deps: T056)
   - Do: several candidate trainers per domain in `ops/weekly.py`; all scored on the same
     window; best promoted only if not worse than the champion; summary lists every
     candidate; Experiments shows the champion/challenger table.

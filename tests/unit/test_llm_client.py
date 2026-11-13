@@ -117,6 +117,21 @@ def test_anthropic_tool_round_trip() -> None:
     }
 
 
+def test_anthropic_replays_thinking_blocks_unchanged() -> None:
+    """Regression (2026-11-13 morning run): a truncated turn whose thinking block has a
+    null field must be sent back exactly as received, or the API answers 400."""
+    content = [
+        {"type": "thinking", "thinking": "", "signature": "c2ln"},
+        {"type": "thinking", "thinking": "", "signature": None, "new_field": {"k": 1}},
+        {"type": "text", "text": '{"probability": 0.', "citations": None},
+    ]
+    llm, seen = anthropic_with(lambda r: message(content, stop="max_tokens"))
+    r = llm.complete("S", [UserText("go")], max_tokens=400, tools=[TOOL])
+    llm.complete("S", [UserText("go"), AssistantTurn(r), UserText("repair")],
+                 max_tokens=400, tools=[TOOL])  # fmt: skip
+    assert seen[1]["body"]["messages"][1] == {"role": "assistant", "content": content}
+
+
 def test_anthropic_refusal_and_errors() -> None:
     llm, _ = anthropic_with(lambda r: message([], stop="refusal"))
     with pytest.raises(LLMRefusal):

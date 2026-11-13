@@ -929,3 +929,12 @@ Ideas outside the specification. The agent lists them here and does not build th
 - Alternatives: nickname-derived ids (rejected: guessable from the nickname, personal
   data); HMAC with a secret salt (rejected: needs a new secret and players could not find
   themselves); replacing earlier records (rejected: I2).
+
+## 2026-11-13 Anthropic adapter re-sends content blocks exactly (bug fix)
+
+- Context: the first live morning run recorded `error` skips for every sampled `agent`
+  question: the API rejected the replayed assistant turn because a thinking block was
+  modified (our serializer dropped null fields).
+- Decision: re-send `block.to_dict()` (the SDK's exact wire form). This is a bug fix, not
+  tuning (I8): no prompt, model or threshold changes, and it was found from an API error,
+  not from any outcome; the version strings stay the same. The recorded skips remain.

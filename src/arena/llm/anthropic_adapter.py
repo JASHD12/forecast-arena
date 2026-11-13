@@ -118,6 +118,10 @@ class AnthropicLLM:
         calls = tuple(
             ToolCall(b.id, b.name, dict(b.input)) for b in msg.content if b.type == "tool_use"
         )
-        raw = [b.model_dump(exclude_none=True) for b in msg.content]
+        # Re-sent byte for byte in later turns: thinking blocks must come back unchanged
+        # (with tools, the API rejects a modified one). `to_dict()` keeps fields exactly as
+        # received, including nulls and fields this SDK version does not know;
+        # `model_dump(exclude_none=True)` dropped a null and broke the agent (2026-11-13).
+        raw = [b.to_dict() for b in msg.content]
         resp = LLMResponse(text, calls, str(msg.stop_reason), str(msg.model), usage, raw)
         return resp

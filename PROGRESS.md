@@ -17,6 +17,15 @@ move older "Done log" lines to `docs/progress-archive.md`.
 
 ## Open risks and surprises
 
+- **2026-11-13 live agent failed on all 3 sampled questions** (`error` skips: Anthropic
+  HTTP 400 "thinking blocks in the latest assistant message cannot be modified"). Cause:
+  the first answer hit the old 400-token cap, and the adapter re-sent the truncated turn
+  through `model_dump(exclude_none=True)`, which drops null fields; with tools in the
+  request the API checks those blocks. Fixed by re-sending `to_dict()` (exact wire form)
+  with a regression test; the skips stay in the ledger as recorded (I2, I6). Check the
+  2026-11-14 morning run: the agent should answer. Also: scheduled resolve runs start
+  hours late (11:21 UTC for 03:30), so a real resolve was dispatched at about 16:45 UTC.
+
 - **H10: GitHub Actions never starts a job.** Both attempts of the first CI run failed in
   seconds without a runner (account-level block). Nothing live (CI, Pages, scheduled jobs,
   dispatches) can run until the owner fixes it. Blocked on it: T002, T056, T074, T083.

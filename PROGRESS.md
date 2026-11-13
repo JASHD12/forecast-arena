@@ -14,7 +14,6 @@ move older "Done log" lines to `docs/progress-archive.md`.
 
 ## In progress
 
-- T033 health checks: code pushed; live alert test (failing dry run opens the incident, healthy run closes it) pending
 
 ## Open risks and surprises
 
@@ -43,6 +42,8 @@ move older "Done log" lines to `docs/progress-archive.md`.
 
 ## Done log
 
+- 2026-11-13 T033: health checks + incident issue live-tested: failing dry run 43396287940 opened issue #1, healthy dry run 43397819217 closed it
+- 2026-11-13 T118: Hypothesis property tests (round-trip, scoring bounds, any changed byte detected, late forecasts rejected) found a real bug: verify crashed on non-UTF-8 bytes -> now a LedgerError; pytest-cov in CI summary (87% coverage)
 - 2026-11-13 T117: power analysis (days needed to detect a 0.01/0.02 Brier gap at 80% power) on Findings
 - 2026-11-13 T113: PyTorch quantile MLP ties the champion in the 1-year power backtest (0.1927 vs 0.1930, diff -0.0003 [-0.0087, +0.0081], DM p=0.95): published honestly in docs/models/power-mlp.md
 - 2026-11-13 T115: conformalized quantile regression (CQR) for the power 80/90% bands in the weekly job and on Experiments; synthetic test restores 38% -> ~80% coverage

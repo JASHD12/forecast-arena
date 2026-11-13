@@ -66,12 +66,19 @@ class Ledger:
         path = self.abspath(rel)
         if not path.exists():
             return []
-        return list(_parse_lines(path.read_text(encoding="utf-8"), rel))
+        return list(_parse_lines(self._text(rel), rel))
+
+    def _text(self, rel: str) -> str:
+        """A ledger file as UTF-8 text; corrupted bytes are a LedgerError (so `verify`
+        reports them instead of crashing; found by a property test)."""
+        try:
+            return self.abspath(rel).read_text(encoding="utf-8")
+        except UnicodeDecodeError as exc:
+            raise LedgerError(f"{rel}: not valid UTF-8 ({exc.reason} at byte {exc.start})") from exc
 
     def read_json(self, rel: str) -> Record:
         """Parse and validate a single-record JSON file."""
-        text = self.abspath(rel).read_text(encoding="utf-8")
-        records = list(_parse_lines(text, rel))
+        records = list(_parse_lines(self._text(rel), rel))
         if len(records) != 1:
             raise LedgerError(f"{rel}: expected exactly one record")
         return records[0]

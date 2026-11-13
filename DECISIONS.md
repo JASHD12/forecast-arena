@@ -498,6 +498,15 @@ Made by: agent
   dry run has no ledger checkout). Pages still deploys when a check fails. A dispatch
   input `fail_health` adds a failing check for testing the alert path.
 
+## 2026-11-13 · Test quality (T118)
+
+- Hypothesis property tests and pytest-cov (dev dependencies only). The first property run
+  found that `ledger verify` crashed on a file with invalid UTF-8; such a file is now a
+  `LedgerError`, so verify reports it as a failure.
+- "Schema checks on source responses" already exist as strict parsers that raise on any
+  missing or malformed field (`parse_top`, `parse_weather`, `parse_daily`, the SMARD and
+  ECB parsers, each with tests); pandera was not added, to avoid a second validation layer.
+
 ## Proposals for the human
 
 Ideas outside the specification. The agent lists them here and does not build them.

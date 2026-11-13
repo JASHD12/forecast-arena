@@ -124,7 +124,7 @@ Keep the first line of each task in exactly this shape; the status script parses
     record the rehearsal start date in `PROGRESS.md` and `README.md`.
   - Done when: `arena ledger verify --git` passes on the real ledger and the Pages URL
     returns the Home page.
-- [ ] T033 · Health checks and incident issues (live) (deps: T032)
+- [x] T033 · Health checks and incident issues (live) (deps: T032)
   - Do: the health checks and alert behaviour of section 12.
   - Done when: a deliberately failing dry run opens one `incident` issue and a following
     healthy run closes it.
@@ -430,7 +430,7 @@ CI jobs; core `make check` stays offline and fast.
   - Do: from daily paired Brier differences, days needed to detect a given gap at 80%
     power; shown on Findings.
   - Done when: tests check the formula against a hand calculation.
-- [ ] T118 · Test quality: property tests, coverage, schemas (deps: T001)
+- [x] T118 · Test quality: property tests, coverage, schemas (deps: T001)
   - Do: Hypothesis tests for canonical JSON, hash chain and scoring bounds; pytest-cov
     figure in the CI job summary; schema checks on source responses.
   - Done when: the new tests pass and CI prints coverage.

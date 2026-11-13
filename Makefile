@@ -26,8 +26,10 @@ lint:
 	$(RUFF) format --check src tests scripts
 	$(PY) -m mypy src/arena
 
+PYTEST_ARGS ?=
+
 test:
-	$(PY) -m pytest tests/unit
+	$(PY) -m pytest tests/unit $(PYTEST_ARGS)
 
 e2e:
 	$(PY) -m pytest tests/e2e

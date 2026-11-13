@@ -39,6 +39,7 @@ from arena.site.game import live_deck, practice_deck
 from arena.site.llm_obs import PRICE_SOURCE, load_spans, totals, traces_by_question, usage_rows
 from arena.site.methods_content import LIMITATIONS, PRINCIPLES
 from arena.site.ops_status import llm_usage, missed_days, parse_failures, source_freshness
+from arena.site.profiles import profile
 from arena.site.qchart import chart_data, series_svg
 from arena.site.titles import FORECASTER_NAMES, domain_name, forecaster_name, plain_title
 from arena.sources.brightsky import ATTRIBUTION as WX_ATTRIBUTION
@@ -468,6 +469,10 @@ def build_site(
     )
     urows = usage_rows(load_spans(ledger))
     game = {"live": live_deck(rec), "practice": practice_deck(golden_path)}
+    info = {fid: (sees, cadence) for fid, sees, cadence in INFORMATION_SETS}
+    changelog = version_changelog(rec)
+    fids = sorted({f.forecaster_id for f in rec.forecasts} | {s.forecaster_id for s in rec.skips})
+    profiles = [profile(fid, rec, FORECASTER_NAMES, changelog, urows, info) for fid in fids]
     game_payload = json.dumps({**game, "names": FORECASTER_NAMES}, sort_keys=True)
     # A JSON data block is never executed; "</" is escaped so it cannot end the element.
     game_json = Markup(game_payload.replace("</", "<\\/"))
@@ -571,6 +576,7 @@ def build_site(
             },
         ),
         "evals.html": ("LLM evals", {"runs": eval_runs(evals_dir)}),
+        "forecasters/index.html": ("Forecasters", {"profiles": profiles}),
         "play.html": (
             "Can you beat the AI?",
             {
@@ -592,6 +598,7 @@ def build_site(
         shutil.rmtree(tmp)
     (tmp / "static").mkdir(parents=True)
     (tmp / "questions").mkdir()
+    (tmp / "forecasters").mkdir()
     (tmp / "data").mkdir(exist_ok=True)
     (tmp / "data" / "game.json").write_text(game_payload + "\n", encoding="utf-8")
     pages["data.html"] = (
@@ -663,6 +670,13 @@ def build_site(
             next_q=neighbours[q.question_id][1],
         )
         (tmp / "questions" / f"{q.question_id}.html").write_text(html_text, encoding="utf-8")
+    ftpl = env.get_template("forecaster.html")
+    for p in profiles:
+        html_text = ftpl.render(
+            title=forecaster_name(p["fid"]), page="forecasters/index.html",
+            **{**common, "root": "../"}, p=p,
+        )  # fmt: skip
+        (tmp / "forecasters" / f"{p['fid']}.html").write_text(html_text, encoding="utf-8")
     static = Path(__file__).parent / "static"
     for f in static.iterdir():
         shutil.copy(f, tmp / "static" / f.name)

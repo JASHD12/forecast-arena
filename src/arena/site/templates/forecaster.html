@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% from "macros.html" import page_head %}
+{% block content %}
+{{ page_head("Forecaster", fname(p.fid), p.sees or "One of the forecasters in the arena.") }}
+<div class="kpis">
+<div class="kpi"><span class="kpi-n">{{ p.n_forecasts }}</span><span class="kpi-l">forecasts published</span></div>
+<div class="kpi"><span class="kpi-n">{{ p.n }}</span><span class="kpi-l">scored (answer known)</span></div>
+<div class="kpi"><span class="kpi-n">{{ "%.3f"|format(p.brier) if p.brier is not none else "–" }}</span><span class="kpi-l">Brier score (lower is better)</span></div>
+{% if p.base_brier is defined %}<div class="kpi"><span class="kpi-n">{{ "%.3f"|format(p.base_brier) }}</span><span class="kpi-l">base rate on the same {{ p.n_same }} questions</span></div>{% endif %}
+</div>
+<p class="note">All scored questions, rehearsal included; whether a difference is real is decided on the <a href="{{ root }}leaderboard.html">leaderboard</a> with 95% intervals.{% if is_ai(p.fid) %} <span class="label">AI</span>{% endif %}</p>
+
+<div class="grid-cards">
+<section class="card" aria-labelledby="pf-what"><h2 id="pf-what">What it sees and when</h2>
+<p>{{ p.sees or "–" }}</p><p class="note">Answers: {{ p.cadence or "–" }}.{% if p.topics %} Topics so far: {% for t in p.topics %}{{ dname(t) }}{% if not loop.last %}, {% endif %}{% endfor %}.{% endif %}</p>
+{% if p.cards %}<p>Model cards: {% for label, path in p.cards %}<a href="{{ repo_url }}/blob/main/{{ path }}">{{ label }}</a>{% if not loop.last %} · {% endif %}{% endfor %}</p>{% endif %}
+</section>
+<section class="card" aria-labelledby="pf-ops"><h2 id="pf-ops">Reliability of the service</h2>
+{% if p.skips %}<ul class="plain">{% for k, v in p.skips.items() %}<li><strong>{{ v }}</strong> skipped: <code>{{ k }}</code></li>{% endfor %}</ul>{% else %}<p class="note">No skips recorded.</p>{% endif %}
+{% if p.usage %}<p>{{ p.usage.calls }} model calls, {{ "{:,}".format(p.usage.tokens) }} tokens{% if p.usage.cost is not none %}, estimated cost ${{ "%.4f"|format(p.usage.cost) }}{% endif %} (<a href="{{ root }}llm.html">details</a>).</p>{% endif %}
+</section>
+</div>
+
+<h2>Score over time</h2>
+{% if p.race %}<figure class="race-card">{{ p.race }}
+<figcaption class="note">Running average Brier score after each batch day{% if "base_rate" in p.race_rows and p.fid != "base_rate" %}, with the base rate on the same questions{% endif %}.</figcaption>
+<details class="faq"><summary>Data table</summary>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Score over time"><table>
+<thead><tr><th scope="col">Day</th>{% for fid in p.race_rows %}<th scope="col" class="num">{{ fname(fid) }}</th>{% endfor %}</tr></thead>
+<tbody>{% for d, v in p.race_rows[p.fid] %}{% set i = loop.index0 %}<tr><th scope="row">{{ d }}</th>{% for fid, pts in p.race_rows.items() %}<td class="num">{{ "%.3f"|format(pts[i][1]) if pts|length > i else "–" }}</td>{% endfor %}</tr>{% endfor %}</tbody></table></div></details>
+</figure>{% else %}<p class="empty">The chart appears after two days with answers.</p>{% endif %}
+
+<h2>Calibration</h2>
+{% if p.calibration %}<div class="cal-panel">{{ p.calibration.svg }}<p class="note">Expected calibration error {{ "%.3f"|format(p.calibration.ece) }}. Points on the diagonal mean "when it says 70%, it happens 70% of the time".</p></div>
+{% else %}<p class="empty">Calibration needs at least 10 scored forecasts.</p>{% endif %}
+
+<div class="grid-cards">
+<section class="card" aria-labelledby="pf-best"><h2 id="pf-best">Best calls</h2>
+{% if p.best %}<ol>{% for s in p.best %}<li><a href="{{ root }}questions/{{ s.question_id }}.html">{{ s.question_id }}</a>: said {{ "%.0f%%"|format(100 * s.probability) }}, answer {{ "YES" if s.outcome else "NO" }}</li>{% endfor %}</ol>{% else %}<p class="note">None yet.</p>{% endif %}</section>
+<section class="card" aria-labelledby="pf-worst"><h2 id="pf-worst">Worst calls</h2>
+{% if p.worst %}<ol>{% for s in p.worst %}<li><a href="{{ root }}questions/{{ s.question_id }}.html">{{ s.question_id }}</a>: said {{ "%.0f%%"|format(100 * s.probability) }}, answer {{ "YES" if s.outcome else "NO" }}</li>{% endfor %}</ol>{% else %}<p class="note">None yet.</p>{% endif %}</section>
+</div>
+
+<h2>Version history</h2>
+{% if p.versions %}<div class="table-scroll" tabindex="0" role="region" aria-label="Version history"><table>
+<thead><tr><th scope="col">In use since</th><th scope="col">Version</th></tr></thead>
+<tbody>{% for v in p.versions %}<tr><th scope="row">{{ v.since }}</th><td><code>{{ v.version }}</code></td></tr>{% endfor %}</tbody></table></div>
+{% else %}<p class="empty">No forecasts yet.</p>{% endif %}
+<p><a href="{{ root }}forecasters/index.html">All forecasters →</a></p>
+{% endblock %}

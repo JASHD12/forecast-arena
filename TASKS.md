@@ -470,7 +470,7 @@ CI jobs; core `make check` stays offline and fast.
 - [x] T131 · Question page: data chart, trace, neighbours (deps: T130)
   - Do: series chart from the morning snapshot with threshold and outcome; previous/next.
   - Done when: tests cover the chart for each domain with fixtures.
-- [ ] T132 · Forecaster profile pages (deps: T130)
+- [x] T132 · Forecaster profile pages (deps: T130)
   - Done when: one page per forecaster with history, calibration, best/worst calls.
 - [ ] T133 · Topic pages (deps: T130)
   - Done when: one page per domain with source, licence, board and race.

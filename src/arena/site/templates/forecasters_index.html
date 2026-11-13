@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% from "macros.html" import page_head %}
+{% block content %}
+{{ page_head("Who is forecasting", "Forecasters", "Baselines, a classical ML model, AI models with different information, an AI agent with tools, and an open model running on our own CPU. Each page shows what it sees, how it scored and how its versions changed.") }}
+<ul class="topics">
+{% for p in profiles %}<li><a href="{{ p.fid }}.html"><strong>{{ fname(p.fid) }}</strong></a>{% if is_ai(p.fid) %} <span class="label">AI</span>{% endif %}<br><span class="note">{{ p.sees or "–" }}</span><br><span class="muted">{{ p.n_forecasts }} forecasts{% if p.brier is not none %} · Brier {{ "%.3f"|format(p.brier) }} on {{ p.n }}{% endif %}</span></li>
+{% endfor %}</ul>
+{% endblock %}

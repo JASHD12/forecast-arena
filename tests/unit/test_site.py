@@ -20,6 +20,7 @@ def test_empty_ledger_builds_every_page(tmp_path) -> None:
         "evals.html",
         "experiments.html",
         "findings.html",
+        "forecasters/index.html",
         "guide.html",
         "imprint.html",
         "index.html",

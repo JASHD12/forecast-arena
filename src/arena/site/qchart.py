@@ -144,8 +144,9 @@ def series_svg(cd: ChartData) -> Markup:
         p.append(
             f'<line class="ref-line" x1="{left}" x2="{left + w}" y1="{ry:.1f}" y2="{ry:.1f}"/>'
         )
-        p.append(f'<text class="tick ref-label" x="{left + 6}" y="{ry - 5:.1f}" text-anchor="start">'
-                 f"{e(cd.reference[1])} {e(_fmt(cd.reference[0]))}</text>")  # fmt: skip
+        label = f"{e(cd.reference[1])} {e(_fmt(cd.reference[0]))}"
+        p.append(f'<text class="tick ref-label" x="{left + 6}" y="{ry - 5:.1f}" '
+                 f'text-anchor="start">{label}</text>')  # fmt: skip
     for i, (name, pts) in enumerate(cd.series):
         if not pts:
             continue

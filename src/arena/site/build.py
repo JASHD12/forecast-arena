@@ -30,7 +30,7 @@ from arena.models import Question, RunManifest
 from arena.ops.weekly import summaries as weekly_summaries
 from arena.scoring.boards import MIN_DAYS, all_boards, official
 from arena.scoring.core import Scored, clip, counts, load
-from arena.scoring.findings import findings
+from arena.scoring.findings import findings, power_table
 from arena.scoring.stats import calibration_bins, expected_calibration_error, murphy
 from arena.site.charts import forest_svg, race_svg, reliability_svg, series_class
 from arena.site.methods_content import LIMITATIONS, PRINCIPLES
@@ -466,6 +466,7 @@ def build_site(
                 "human": read_content("findings.md"),
                 "official_days": off_days,
                 "min_days": MIN_DAYS,
+                "power": power_table(rec.scored),
             },
         ),
         "methods.html": (

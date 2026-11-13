@@ -43,6 +43,7 @@ move older "Done log" lines to `docs/progress-archive.md`.
 
 ## Done log
 
+- 2026-11-13 T117: power analysis (days needed to detect a 0.01/0.02 Brier gap at 80% power) on Findings
 - 2026-11-13 T113: PyTorch quantile MLP ties the champion in the 1-year power backtest (0.1927 vs 0.1930, diff -0.0003 [-0.0087, +0.0081], DM p=0.95): published honestly in docs/models/power-mlp.md
 - 2026-11-13 T115: conformalized quantile regression (CQR) for the power 80/90% bands in the weekly job and on Experiments; synthetic test restores 38% -> ~80% coverage
 - 2026-11-13 T112: LightGBM + Optuna challenger beats the champion in the 1-year power backtest (Brier 0.1884 vs 0.1930, diff -0.0045 [-0.0069, -0.0021], DM p<0.001); card docs/models/power-lgbm.md

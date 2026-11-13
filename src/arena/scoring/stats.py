@@ -119,6 +119,25 @@ def diebold_mariano(
     return DMResult(stat, p, n, lags)
 
 
+def days_needed(
+    daily_diffs: Sequence[float], effect: float, *, alpha: float = 0.05, power: float = 0.8
+) -> int | None:
+    """Days of data needed to detect a mean daily Brier difference of `effect` with a
+    two-sided test at level `alpha` and the given power, from the observed day-to-day
+    standard deviation: n = ((z_{1-alpha/2} + z_power) * sd / effect)^2. Normal
+    approximation; None with fewer than 3 days or no variation."""
+    from scipy.stats import norm
+
+    d = np.asarray(daily_diffs, float)
+    if len(d) < 3 or effect <= 0:
+        return None
+    sd = float(d.std(ddof=1))
+    if sd <= 0:
+        return None
+    z = float(norm.ppf(1 - alpha / 2) + norm.ppf(power))
+    return math.ceil((z * sd / effect) ** 2)
+
+
 # ----- calibration (SPEC 10) ---------------------------------------------------------
 @dataclass(frozen=True)
 class Bin:

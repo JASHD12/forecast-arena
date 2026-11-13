@@ -6,6 +6,15 @@
 <div><strong>{{ official_days }} of {{ min_days }}</strong> official days needed before any hypothesis can be judged.</div>
 <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="{{ min_days }}" aria-valuenow="{{ official_days }}" aria-label="Official days"><span style="width: {{ '%.1f'|format([official_days / min_days, 1]|min * 100) }}%"></span></div>
 </div>
+{% if power %}
+<section class="card power-card" aria-labelledby="pw-title">
+<h2 id="pw-title">How long until we know?</h2>
+<p class="note">Statistical power analysis from the day-to-day spread of paired Brier differences seen so far (all days, rehearsal included). It estimates how many days are needed to detect a true gap of 0.01 or 0.02 in Brier score with 80% power at the 5% level. Planning numbers only; they decide nothing.</p>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Power analysis"><table>
+<thead><tr><th scope="col">Comparison</th><th scope="col" class="num">Days so far</th><th scope="col" class="num">Day-to-day spread</th><th scope="col" class="num">Days for a 0.02 gap</th><th scope="col" class="num">Days for a 0.01 gap</th></tr></thead>
+<tbody>{% for r in power %}<tr><th scope="row">{{ fname(r.a) }} vs {{ fname(r.b) }}</th><td class="num">{{ r.days }}</td><td class="num">{{ "%.4f"|format(r.sd) }}</td><td class="num">{{ r.need[0.02] if r.need[0.02] is not none else "–" }}</td><td class="num">{{ r.need[0.01] if r.need[0.01] is not none else "–" }}</td></tr>{% endfor %}</tbody></table></div>
+</section>
+{% endif %}
 <ol class="hyps">
 {% for f in findings %}
 <li class="hyp hyp-{{ f.status|replace(' ', '-') }}" aria-labelledby="h-{{ f.key }}">

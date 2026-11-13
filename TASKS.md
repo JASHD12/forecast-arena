@@ -426,7 +426,7 @@ CI jobs; core `make check` stays offline and fast.
   - Do: conformalized quantile regression (rolling split-conformal) for power quantiles;
     coverage before/after in the weekly summary and on Experiments.
   - Done when: a test shows empirical coverage reaches the target on synthetic data.
-- [ ] T117 · Power analysis for the hypotheses (deps: T045f)
+- [x] T117 · Power analysis for the hypotheses (deps: T045f)
   - Do: from daily paired Brier differences, days needed to detect a given gap at 80%
     power; shown on Findings.
   - Done when: tests check the formula against a hand calculation.

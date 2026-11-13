@@ -89,3 +89,18 @@ def test_diebold_mariano_known_cases() -> None:
     )
     expected = m / math.sqrt(var / 3) * math.sqrt((3 - 1) / 3)
     assert r is not None and abs(r.statistic - expected) < 1e-9
+
+
+def test_days_needed_matches_hand_calculation() -> None:
+    import math
+
+    from scipy.stats import norm
+
+    from arena.scoring.stats import days_needed
+
+    d = [0.02, -0.01, 0.03, 0.0, -0.02, 0.01]
+    sd = __import__("statistics").stdev(d)
+    z = norm.ppf(0.975) + norm.ppf(0.8)  # 1.96 + 0.84
+    assert days_needed(d, 0.01) == math.ceil((z * sd / 0.01) ** 2)
+    assert days_needed(d, 0.02) < days_needed(d, 0.01)  # bigger gaps need fewer days
+    assert days_needed(d[:2], 0.01) is None and days_needed([0.1] * 5, 0.01) is None

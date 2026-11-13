@@ -149,3 +149,50 @@ def _all_better(key: str, cs: list[Comparison], who: str) -> Finding:
     losses = [c.interval.excludes_zero and c.interval.estimate > 0 for c in cs]
     status = SUPPORTED if all(wins) else CONTRADICTED if any(losses) else UNDECIDED
     return Finding(key, HYPOTHESES[key], status, cs)
+
+
+#: Pairs whose comparison decides a hypothesis, then fallbacks while `ml` is not live.
+POWER_PAIRS = (
+    ("ml", "llm_context"),
+    ("agent", "ml"),
+    ("llm_context", "base_rate"),
+    ("agent", "base_rate"),
+    ("persistence", "base_rate"),
+)
+EFFECTS = (0.01, 0.02)
+
+
+def power_table(scored: Sequence[Scored]) -> list[dict[str, object]]:
+    """For each available pair: days observed, the day-to-day spread of the paired Brier
+    difference, and the days needed to detect a gap of 0.01 and 0.02 (80% power, 5%
+    level). Planning numbers only; they decide nothing."""
+    import statistics
+
+    from arena.scoring.core import clip
+    from arena.scoring.stats import days_needed
+
+    by: dict[tuple[str, str], Scored] = {(s.question_id, s.forecaster_id): s for s in scored}
+    qids = {s.question_id for s in scored}
+    out: list[dict[str, object]] = []
+    for a, b in POWER_PAIRS:
+        per_day: dict[object, list[float]] = {}
+        for q in qids:
+            sa, sb = by.get((q, a)), by.get((q, b))
+            if sa is None or sb is None:
+                continue
+            la = (clip(sa.probability) - sa.outcome) ** 2
+            lb = (clip(sb.probability) - sb.outcome) ** 2
+            per_day.setdefault(sa.batch_date, []).append(la - lb)
+        if len(per_day) < 3:
+            continue
+        daily = [statistics.fmean(v) for _, v in sorted(per_day.items())]
+        out.append(
+            {
+                "a": a,
+                "b": b,
+                "days": len(daily),
+                "sd": round(statistics.stdev(daily), 4),
+                "need": {e: days_needed(daily, e) for e in EFFECTS},
+            }
+        )
+    return out

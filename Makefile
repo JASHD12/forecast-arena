@@ -58,4 +58,4 @@ notebook: site-e2e  ## Execute notebooks/explore.ipynb on the e2e Parquet export
 
 dbt: site-e2e  ## dbt build over the e2e export (dbt in its own venv: .venv-dbt, requirements-dbt.txt)
 	test -x .venv-dbt/bin/dbt || (python3 -m venv .venv-dbt && .venv-dbt/bin/pip install -r requirements-dbt.txt)
-	cd analytics/dbt && ARENA_DATA_DIR=$(CURDIR)/_site_e2e/data ../../.venv-dbt/bin/dbt build --profiles-dir .
+	cd analytics/dbt && DBT_SEND_ANONYMOUS_USAGE_STATS=false ARENA_DATA_DIR=$(CURDIR)/_site_e2e/data ../../.venv-dbt/bin/dbt build --profiles-dir .

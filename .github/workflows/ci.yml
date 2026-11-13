@@ -109,7 +109,8 @@ jobs:
           python -m venv .venv-dbt
           .venv-dbt/bin/pip install -r requirements-dbt.txt
           cd analytics/dbt
-          ARENA_DATA_DIR="$GITHUB_WORKSPACE/_site_e2e/data" ../../.venv-dbt/bin/dbt build --profiles-dir .
+          DBT_SEND_ANONYMOUS_USAGE_STATS=false ARENA_DATA_DIR="$GITHUB_WORKSPACE/_site_e2e/data" \
+            ../../.venv-dbt/bin/dbt build --profiles-dir .
 
   kubernetes:
     # T151: apply deploy/k8s/ to a throwaway kind cluster and smoke-test it. Nothing is

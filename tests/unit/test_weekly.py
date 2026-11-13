@@ -185,3 +185,27 @@ def test_conformal_in_weekly_summary(tmp_path, dom) -> None:
         assert 0 <= d["raw80"] <= 1 and 0 <= d["conformal80"] <= 1
     (summary,) = summaries(led)
     assert summary["conformal"]["power"] == res.conformal
+
+
+def test_experiments_page_renders_every_view_from_real_summaries(tmp_path, dom) -> None:
+    """T136: champion/challenger (with tuned settings), timeline, importance, quantiles,
+    conformal and drift all render from summaries the weekly job wrote."""
+    pytest.importorskip("lightgbm")
+    from arena.forecasters.ml_power_lgbm import train_lgbm
+    from arena.site.build import build_site
+
+    led = Ledger(tmp_path / "l")
+    fams = {"hgb": trainer(dom),
+            "lgbm": lambda c: train_lgbm(dom, c, n_trials=2, folds=1)}  # fmt: skip
+    weekly(led, FixedClock(NOW), {"power": dom}, {"power": fams}, drift=True)
+    (s,) = summaries(led)
+    cands = {c["family"]: c for c in s["decisions"][0]["candidates"]}
+    assert set(cands) == {"hgb", "lgbm"} and cands["lgbm"]["params"]  # Optuna's best trial
+    res = build_site(led, tmp_path / "site", FixedClock(NOW))
+    page = (res.out_dir / "experiments.html").read_text()
+    for part in ("Model timeline", "Champion vs challengers", "Tuned settings",
+                 "What drives the electricity model", "Conformal prediction intervals",
+                 "Probabilistic accuracy"):  # fmt: skip
+        assert part in page, part
+    if s.get("drift"):
+        assert "Drift (" in page

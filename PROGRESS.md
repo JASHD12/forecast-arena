@@ -42,6 +42,7 @@ move older "Done log" lines to `docs/progress-archive.md`.
 
 ## Done log
 
+- 2026-11-13 T136: Experiments page adds a model timeline, tuned settings per candidate (Optuna best params now in the weekly summary) and a drift badge; test renders every view from summaries written by the real weekly job
 - 2026-11-13 T135: backtests.html renders every committed model card (safe Markdown subset with tables) under a permanent BACKTEST banner; linked from Status and forecaster profiles
 - 2026-11-13 T134: leaderboard skill-by-topic heatmap and head-to-head matrix (validated diverging palette, light/dark), sortable tables in app.js, Playwright sort check
 - 2026-11-13 T133: topic pages (source and verified terms, kinds of question with rules, per-topic boards and race, latest questions), linked from Home; fixed unencoded question links and macro context

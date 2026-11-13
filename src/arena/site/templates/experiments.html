@@ -2,6 +2,9 @@
 {% from "macros.html" import page_head %}
 {% block content %}
 {{ page_head("MLOps", "Experiments", "Champion/challenger retraining every Sunday, with promotion decisions, drift reports and feature importance, published to the public ledger.") }}
+{% if timeline %}<section class="card" aria-labelledby="tl-h"><h2 id="tl-h">Model timeline</h2>
+<p class="note">Which model has been the live <code>ml</code> forecaster for each topic, and when it changed. A version change is always visible here and in the forecasts' version strings.</p>
+<ol class="timeline">{% for t in timeline %}<li><time>{{ t.day }}</time><span><strong>{{ dname(t.domain) }}</strong>: {% if t.promoted %}<span class="yes">promoted</span> <code>{{ t.promoted }}</code>{% if t.family %} ({{ t.family }}){% endif %}{% else %}kept the current model{% endif %}. <span class="note">{{ t.reason }}</span></span></li>{% endfor %}</ol></section>{% endif %}
 <p>Every weekly retraining run, newest first. Each run trains a candidate model per domain, scores it next to the current model on the last 28 days of real questions, and promotes it only if it is not worse (rule in <code>src/arena/ops/weekly.py</code>). The runs are logged with MLflow to a file; this page shows the summaries that each run publishes to the public ledger.</p>
 {% if not runs %}<p class="empty">No weekly runs yet. The first runs on Sunday at 02:00 UTC.</p>{% endif %}
 {% for r in runs %}
@@ -13,8 +16,8 @@
 <h3>Champion vs challengers: {{ dname(d.domain) }} ({{ r.day }})</h3>
 <p class="note">Every candidate model family is scored on the same {{ d.n }} questions; the best is promoted only if it is not worse than the current champion.</p>
 <div class="table-scroll" tabindex="0" role="region" aria-label="Candidates {{ d.domain }} {{ r.day }}"><table>
-<thead><tr><th scope="col">Family</th><th scope="col">Version</th><th scope="col" class="num">Brier</th><th scope="col">Result</th></tr></thead>
-<tbody>{% for c in d.candidates|sort(attribute="family") %}<tr><th scope="row">{{ c.family }}{% if c.family == d.best_family %} <span class="label">best</span>{% endif %}</th><td><code>{{ c.version or "-" }}</code></td><td class="num">{{ "%.4f"|format(c.brier) if c.brier is not none else "-" }}</td><td>{% if c.error %}<span class="no">{{ c.error }}</span>{% elif c.version == d.promoted %}<span class="yes">promoted</span>{% else %}<span class="muted">not promoted</span>{% endif %}</td></tr>{% endfor %}</tbody></table></div>
+<thead><tr><th scope="col">Family</th><th scope="col">Version</th><th scope="col" class="num">Brier</th><th scope="col">Result</th><th scope="col">Tuned settings</th></tr></thead>
+<tbody>{% for c in d.candidates|sort(attribute="family") %}<tr><th scope="row">{{ c.family }}{% if c.family == d.best_family %} <span class="label">best</span>{% endif %}</th><td><code>{{ c.version or "-" }}</code></td><td class="num">{{ "%.4f"|format(c.brier) if c.brier is not none else "-" }}</td><td>{% if c.error %}<span class="no">{{ c.error }}</span>{% elif c.version == d.promoted %}<span class="yes">promoted</span>{% else %}<span class="muted">not promoted</span>{% endif %}</td><td>{% if c.params %}<code>{% for k, v in c.params.items() %}{{ k }}={{ v }}{% if not loop.last %}, {% endif %}{% endfor %}</code>{% else %}<span class="muted">defaults</span>{% endif %}</td></tr>{% endfor %}</tbody></table></div>
 {% endif %}{% endfor %}
 {% set imp = (r.importance or {}).get("power") if r.importance is defined else none %}
 {% if imp %}<h3>What drives the electricity model ({{ r.day }})</h3>
@@ -42,7 +45,7 @@
 <div class="table-scroll" tabindex="0" role="region" aria-label="Conformal coverage"><table>
 <thead><tr><th scope="col">Statistic</th><th scope="col" class="num">80% raw</th><th scope="col" class="num">80% conformal</th><th scope="col" class="num">margin (EUR/MWh)</th><th scope="col" class="num">90% raw</th><th scope="col" class="num">90% conformal</th><th scope="col" class="num">margin (EUR/MWh)</th></tr></thead>
 <tbody>{% for d in cf %}<tr><th scope="row">{{ d.stat }}</th><td class="num">{{ "%.2f"|format(d.raw80) }}</td><td class="num">{{ "%.2f"|format(d.conformal80) }}</td><td class="num">{{ "%+.1f"|format(d.margin80) }}</td><td class="num">{{ "%.2f"|format(d.raw90) }}</td><td class="num">{{ "%.2f"|format(d.conformal90) }}</td><td class="num">{{ "%+.1f"|format(d.margin90) }}</td></tr>{% endfor %}</tbody></table></div>{% endif %}
-{% if r.drift %}<h3>Drift ({{ r.day }})</h3>
+{% if r.drift %}<h3>Drift ({{ r.day }}){% set b = drift_badge(r.drift) %}{% if b %} <span class="label {{ 'label-warn' if b.alert else '' }}">{{ "⚠ " if b.alert else "✓ " }}{{ b.text }}</span>{% endif %}</h3>
 <p class="note">Computed with Evidently: share of drifted columns and per-column drift test p-values (current window vs. training reference). Small p-values mean the distribution changed.</p>
 <div class="table-scroll" tabindex="0" role="region" aria-label="Drift {{ r.day }}"><table>
 <thead><tr><th scope="col">Domain</th><th scope="col">Metric</th><th scope="col" class="num">Value</th></tr></thead>

@@ -342,6 +342,30 @@ def _question_chart(
     return {"svg": series_svg(cd), "data": cd}
 
 
+def model_timeline(runs: Sequence[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Every weekly decision per domain, newest first (promotions and keeps)."""
+    out = []
+    for r in runs:
+        if r.get("dry_run"):
+            continue
+        for d in r.get("decisions", []):
+            out.append({"day": r["day"], "domain": d["domain"], "promoted": d.get("promoted"),
+                        "family": d.get("best_family"), "reason": d.get("reason", "")})  # fmt: skip
+    return out
+
+
+def drift_badge(metrics: Sequence[dict[str, Any]]) -> dict[str, Any] | None:
+    """Share of drifted inputs from Evidently's drifted-columns metric, as a badge."""
+    for m in metrics:
+        if "DriftedColumnsCount" in str(m.get("metric")):
+            hit = re.search(r"share=([0-9.]+)", str(m.get("value")))
+            if hit:
+                share = float(hit.group(1))
+                return {"alert": share >= 0.5,
+                        "text": f"{share:.0%} of model inputs drifted"}  # fmt: skip
+    return None
+
+
 def eval_runs(evals_dir: Path | None) -> list[dict[str, Any]]:
     """Committed evaluation results (T124), newest first; fake CI-gate runs are skipped."""
     if evals_dir is None or not evals_dir.is_dir():
@@ -472,6 +496,7 @@ def build_site(
         rec.questions.values(), key=lambda q: (q.batch_date, q.question_id), reverse=True
     )
     urows = usage_rows(load_spans(ledger))
+    runs_w = weekly_summaries(ledger)
     game = {"live": live_deck(rec), "practice": practice_deck(golden_path)}
     info = {fid: (sees, cadence) for fid, sees, cadence in INFORMATION_SETS}
     mfids = sorted({s.forecaster_id for s in (off if off else rehearsal)})
@@ -562,7 +587,10 @@ def build_site(
                 "limitations": LIMITATIONS,
             },
         ),
-        "experiments.html": ("Experiments", {"runs": weekly_summaries(ledger)}),
+        "experiments.html": (
+            "Experiments",
+            {"runs": runs_w, "timeline": model_timeline(runs_w), "drift_badge": drift_badge},
+        ),
         "status.html": (
             "Status",
             {

@@ -479,7 +479,7 @@ CI jobs; core `make check` stays offline and fast.
 - [x] T135 · Backtests page (deps: T130)
   - Do: render committed model cards under a permanent BACKTEST banner (I4).
   - Done when: page exists and every number comes from the cards.
-- [ ] T136 · Experiments upgrade (deps: T111, T115)
+- [x] T136 · Experiments upgrade (deps: T111, T115)
   - Done when: champion/challenger, conformal and importance views render from summaries.
 - [ ] T137 · Home and global polish (deps: T130)
   - Do: lock countdown, archive search, theme toggle (no storage), og:image, sticky nav.

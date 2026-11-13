@@ -565,3 +565,5 @@ ul.plain { list-style: none; padding: 0; margin: 0; display: grid; gap: .45rem; 
 .hm-few, .hm-ci { font-size: .78em; opacity: .9; }
 .sortable th button { font: inherit; font-weight: 700; background: none; border: 0; color: inherit; cursor: pointer; padding: 0; }
 .sortable th button::after { content: " ↕"; color: var(--muted); }
+
+.label-warn { background: var(--banner); color: var(--banner-fg); }

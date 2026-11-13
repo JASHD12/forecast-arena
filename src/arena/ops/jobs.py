@@ -25,6 +25,7 @@ from arena.forecasters.base import Forecaster
 from arena.ledger import Ledger, layout
 from arena.ledger.manifest import RunRecorder, run_manifest
 from arena.ledger.seal import seal_batch, seal_pending_days
+from arena.llm import tracing
 from arena.models import Forecast, Question, Resolution, Skip, Void
 
 LOCK = time(9, 30)
@@ -181,11 +182,7 @@ def morning(
             res.written["forecasts"] = led.append(fpath, records)
             for r in records:
                 rec.count("forecasts" if isinstance(r, Forecast) else f"skips_{r.reason_code}")
-        traces = []
-        for f in forecasters:
-            lines = getattr(f, "trace_lines", None)
-            if callable(lines):
-                traces += [{"forecaster_id": f.forecaster_id, **x} for x in lines()]
+        traces = _trace_lines(forecasters, records)
         tpath = layout.agent_traces_path(batch)
         if traces and not led.exists(tpath):
             body = "".join(json.dumps(x, sort_keys=True, default=str) + "\n" for x in traces)
@@ -201,13 +198,42 @@ def morning(
     return res
 
 
+def _trace_lines(
+    forecasters: Sequence[Forecaster], records: Sequence[Forecast | Skip]
+) -> list[dict[str, Any]]:
+    """One line per (forecaster, question) that has an agent trace or LLM spans (T123):
+    the agent's tool trace if any, the outcome, and the spans of its model calls."""
+    lines: dict[tuple[str, str], dict[str, Any]] = {}
+    for f in forecasters:
+        tl = getattr(f, "trace_lines", None)
+        if callable(tl):
+            for x in tl():
+                lines[(f.forecaster_id, x["question_id"])] = {"forecaster_id": f.forecaster_id, **x}
+    outcome: dict[tuple[str, str], str] = {}
+    for r in records:
+        outcome[(r.forecaster_id, r.question_id)] = (
+            "forecast" if isinstance(r, Forecast) else r.reason_code
+        )
+    tracers: dict[int, Any] = {}
+    for f in forecasters:
+        t = getattr(getattr(f, "client", None), "tracer", None)
+        if t is not None:
+            tracers[id(t)] = t
+    for t in tracers.values():
+        for fid, qid in t.pairs():
+            new = {"forecaster_id": fid, "question_id": qid, "outcome": outcome.get((fid, qid), "")}
+            lines.setdefault((fid, qid), new)["spans"] = t.for_pair(fid, qid)
+    return [lines[k] for k in sorted(lines)]
+
+
 def _run_forecaster(
     f: Forecaster, q: Question, ctx: dict[str, Any], clock: Clock, rec: RunRecorder
 ) -> Forecast | Skip:
     """One forecast; any exception becomes an `error` skip, never a substitute number."""
     now = clock.now()
     try:
-        out = f.forecast(q, ctx, now)
+        with tracing.scope(f.forecaster_id, q.question_id, getattr(f, "prompt_version", "")):
+            out = f.forecast(q, ctx, now)
     except Exception as exc:
         rec.warn(f"{f.forecaster_id} failed on {q.question_id}: {_short(exc)}")
         try:

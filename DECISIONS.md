@@ -594,6 +594,21 @@ Made by: agent
 - Colour: the validated palette has 8 slots, all taken; `llm_local` shares slot 6 with
   the not yet active ensemble until T134 adds a validated ninth colour.
 
+## 2026-11-13 · LLM tracing and the LLM observability page (T123)
+
+- `TracingLLM` wraps every model client (outside `GuardedLLM`, so refused calls never
+  reach it and the cap logic is unchanged) and records one OpenTelemetry-shaped span per
+  call: forecaster, question, prompt version, model, tokens, latency, requested tools,
+  repair flag, error. No prompt or answer text. Scope comes from a context variable set
+  around each forecast in the morning job. Times come from the injected `Clock`, so runs
+  stay reproducible in tests.
+- Spans are written into the existing `agent_traces/YYYY/MM/DD.jsonl` (one line per
+  forecaster and question; already sealed with the day), not a new ledger family.
+- No OpenTelemetry SDK or collector: it would need a backend to send to (an account or
+  a service). The span shape matches OTel names so it could be exported later.
+- Cost on the site is an estimate from recorded tokens and a dated list price
+  (`site/llm_obs.py`); unknown models show "no price" rather than a guess.
+
 ## Proposals for the human
 
 Ideas outside the specification. The agent lists them here and does not build them.

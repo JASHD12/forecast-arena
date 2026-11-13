@@ -36,7 +36,9 @@ def run_schedule(root) -> Ledger:
     led = Ledger(root)
     clock = FixedClock(datetime.combine(FIRST, time(0), tzinfo=UTC))
     domains = [fixture_domain()]
-    forecasters, guard = build_forecasters(led, domains, SETTINGS, FIRST, llm=FakeLLM(answer))
+    forecasters, guard = build_forecasters(
+        led, domains, SETTINGS, FIRST, llm=FakeLLM(answer), clock=clock
+    )
 
     def attach(rec) -> None:  # as the CLI does: usage goes into the run manifest
         if guard is not None:
@@ -96,6 +98,16 @@ def test_five_days_offline(tmp_path) -> None:
     assert check_site(site.out_dir) == []
     home = (site.out_dir / "index.html").read_text()
     assert "base_rate" in home and "not advice" in home and "SMARD.de" in home
+    traces = [json.loads(x) for rel in led.list_files("agent_traces")
+              for x in led.read_bytes(rel).decode().splitlines()]  # fmt: skip
+    spans = [s for t in traces for s in t.get("spans", [])]
+    assert {t["forecaster_id"] for t in traces} == {"llm_plain", "llm_context", "agent"}
+    assert spans and all(s["model"] and s["question_id"] and s["duration_ms"] >= 0 for s in spans)
+    llm_page = (site.out_dir / "llm.html").read_text()
+    assert "Calls per day" in llm_page and "fake-model-1" in llm_page
+    traced = spans[0]["question_id"]
+    qpage = (site.out_dir / "questions" / f"{traced}.html").read_text()
+    assert "How the AI forecasters worked" in qpage
     status = (site.out_dir / "status.html").read_text()
     for panel in ("Missed days", "Source freshness", "LLM usage", "LLM parse failures"):
         assert panel in status, panel

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% from "macros.html" import page_head %}
+{% block content %}
+{{ page_head("Operations", "LLM observability", "Every call an AI forecaster made: how many, how many tokens, how long it took, how often an answer had to be repaired or was skipped, and what it cost by list price.") }}
+<div class="kpis">
+<div class="kpi"><span class="kpi-n">{{ "{:,}".format(total.calls) }}</span><span class="kpi-l">model calls</span></div>
+<div class="kpi"><span class="kpi-n">{{ "{:,}".format(total.input_tokens + total.output_tokens) }}</span><span class="kpi-l">tokens</span></div>
+<div class="kpi"><span class="kpi-n">{{ "$%.4f"|format(total.cost_usd) if total.cost_usd is not none else "–" }}</span><span class="kpi-l">estimated cost</span></div>
+</div>
+<p class="note">Estimated cost = recorded tokens × list price ({{ price_source }}). Output tokens include thinking tokens. The open model (<code>llm_local</code>) runs on the runner's CPU and costs nothing per call. This is an estimate, not an invoice.{% if total.unpriced %} {{ total.unpriced }} row(s) use a model with no price on file and are left out of the total.{% endif %}</p>
+
+<h2>Answers and skips per AI forecaster</h2>
+{% if parse %}<div class="table-scroll" tabindex="0" role="region" aria-label="Answers and skips"><table>
+<thead><tr><th scope="col">Forecaster</th><th scope="col" class="num">Forecasts</th><th scope="col" class="num">Parse failures</th><th scope="col" class="num">Rate</th><th scope="col" class="num">Other skips</th></tr></thead>
+<tbody>{% for p in parse %}<tr><th scope="row">{{ fname(p.forecaster_id) }}</th><td class="num">{{ p.forecasts }}</td><td class="num">{{ p.parse_failures }}</td><td class="num">{{ "%.1f%%"|format(100 * p.failure_rate) if p.failure_rate is not none else "–" }}</td><td class="num">{{ p.other_skips }}</td></tr>{% endfor %}</tbody></table></div>{% else %}<p class="empty">No AI forecasts yet.</p>{% endif %}
+
+<h2>Calls per day</h2>
+{% if rows %}<div class="table-scroll" tabindex="0" role="region" aria-label="Model calls per day"><table>
+<thead><tr><th scope="col">Day</th><th scope="col">Forecaster</th><th scope="col">Model</th><th scope="col" class="num">Calls</th><th scope="col" class="num">Repairs</th><th scope="col" class="num">Errors</th><th scope="col" class="num">Tokens in / out</th><th scope="col" class="num">Latency p50 / p95</th><th scope="col" class="num">Est. cost</th></tr></thead>
+<tbody>{% for r in rows %}<tr><th scope="row">{{ r.day }}</th><td>{{ fname(r.forecaster_id) }}</td><td><code>{{ r.model }}</code></td><td class="num">{{ r.calls }}</td><td class="num">{{ r.repairs }}</td><td class="num">{{ r.errors }}</td><td class="num">{{ "{:,}".format(r.input_tokens) }} / {{ "{:,}".format(r.output_tokens) }}</td><td class="num">{{ "%.1f s"|format(r.p50_ms / 1000) if r.p50_ms is not none else "–" }} / {{ "%.1f s"|format(r.p95_ms / 1000) if r.p95_ms is not none else "–" }}</td><td class="num">{{ "$%.4f"|format(r.cost_usd) if r.cost_usd is not none else "no price" }}</td></tr>{% endfor %}</tbody></table></div>
+{% else %}<p class="empty">No model calls recorded yet. Each call is traced from the next morning run on.</p>{% endif %}
+<p class="note">Source: the spans in <code>agent_traces/</code> on the public ledger branch (one per model call: model, prompt version, tokens, latency, requested tools, repair flag, error; no prompt or answer text). The daily token cap is enforced from the run manifests, see <a href="status.html">Status</a>.</p>
+{% endblock %}

@@ -23,6 +23,7 @@ def test_empty_ledger_builds_every_page(tmp_path) -> None:
         "imprint.html",
         "index.html",
         "leaderboard.html",
+        "llm.html",
         "methods.html",
         "privacy.html",
         "questions/index.html",

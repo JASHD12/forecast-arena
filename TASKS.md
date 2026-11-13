@@ -451,7 +451,7 @@ CI jobs; core `make check` stays offline and fast.
     passed when T122a was ready, so no dispatch could record forecasts).
   - Done when: the morning run of 2026-11-14 (or a dry-run dispatch before its lock)
     records llm_local forecasts or skips with a stated reason.
-- [ ] T123 · LLM tracing and observability page (deps: T067)
+- [x] T123 · LLM tracing and observability page (deps: T067)
   - Do: spans per LLM call (prompt version, model, tokens, latency, tools, repair) in
     `agent_traces/`; trace panel on question pages; LLM page with usage and est. cost.
   - Done when: tests cover span writing and the page with FakeLLM data.

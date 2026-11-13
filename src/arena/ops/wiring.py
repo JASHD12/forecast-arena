@@ -10,6 +10,7 @@ from typing import TYPE_CHECKING, Any
 
 from arena.agent.forecaster import AgentForecaster
 from arena.agent.tools import GdeltBackend, wikipedia_summary
+from arena.clock import Clock, SystemClock
 from arena.config import WEATHER_STATIONS, Settings
 from arena.domains.attention import AttentionDomain, titles_from_questions
 from arena.domains.base import AsOfStore, Domain
@@ -26,6 +27,7 @@ from arena.ledger import Ledger
 from arena.llm.budget import BudgetGuard, Caps, GuardedLLM, usage_from_manifests
 from arena.llm.client import LLMClient
 from arena.llm.factory import client_from_settings
+from arena.llm.tracing import Tracer, TracingLLM
 from arena.models import Question
 from arena.sources.brightsky import BrightSkyClient
 from arena.sources.coingecko import CoinGeckoClient
@@ -152,7 +154,7 @@ def build_domains(
     return out
 
 
-def _local_forecaster(settings: Settings, n: int) -> Forecaster:
+def _local_forecaster(settings: Settings, n: int, tracer: Tracer, clock: Clock) -> Forecaster:
     """`llm_local` on the CPU: no API cost, so it runs in dry runs too and is never wrapped
     by the API budget guard. If the library or the model cannot be loaded, the forecaster
     has no client and records `model_missing` skips (I6), and the other forecasters run."""
@@ -163,7 +165,7 @@ def _local_forecaster(settings: Settings, n: int) -> Forecaster:
         backend = local.llama_backend(local.model_path(settings.models_dir / "gguf"))
     except Exception as exc:  # ImportError, download or load failure
         return LLMLocal(None, n, missing=f"local model unavailable: {type(exc).__name__}: {exc}")
-    return LLMLocal(local.LlamaCppLLM(backend), n)
+    return LLMLocal(TracingLLM(local.LlamaCppLLM(backend), tracer, clock), n)
 
 
 def build_forecasters(
@@ -174,6 +176,7 @@ def build_forecasters(
     *,
     dry_run: bool = False,
     llm: LLMClient | None = None,
+    clock: Clock | None = None,
 ) -> tuple[list[Forecaster], BudgetGuard | None]:
     """Baselines over live history (filled with replayed history, SPEC 8.1) and the LLM
     forecasters behind the daily budget guard. Dry runs get no LLM client: their manifests
@@ -188,6 +191,10 @@ def build_forecasters(
     if client is not None and day is not None:
         guard = BudgetGuard(Caps.from_settings(settings), usage_from_manifests(ledger, day))
         client = GuardedLLM(client, guard)
+    tracer = Tracer()  # T123: one span per model call, written with the day's traces
+    clk = clock if clock is not None else SystemClock()
+    if client is not None:
+        client = TracingLLM(client, tracer, clk)
     n = settings.llm_questions_per_domain
     http = HttpClient(settings.user_agent())
     retriever = None
@@ -209,7 +216,7 @@ def build_forecasters(
     )
     out += [LLMPlain(client, n), LLMContext(client, n), agent]
     if settings.llm_local:
-        out.append(_local_forecaster(settings, n))
+        out.append(_local_forecaster(settings, n, tracer, clk))
     if settings.agent_graph:
         # No silent fallback: if langgraph is missing this raises and the run fails.
         from arena.agent.graph import GraphAgentForecaster

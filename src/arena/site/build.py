@@ -34,6 +34,7 @@ from arena.scoring.core import Scored, clip, counts, load
 from arena.scoring.findings import findings, power_table
 from arena.scoring.stats import calibration_bins, expected_calibration_error, murphy
 from arena.site.charts import forest_svg, race_svg, reliability_svg, series_class
+from arena.site.llm_obs import PRICE_SOURCE, load_spans, totals, traces_by_question, usage_rows
 from arena.site.methods_content import LIMITATIONS, PRINCIPLES
 from arena.site.ops_status import llm_usage, missed_days, parse_failures, source_freshness
 from arena.site.titles import FORECASTER_NAMES, domain_name, forecaster_name, plain_title
@@ -426,6 +427,7 @@ def build_site(
     archive = sorted(
         rec.questions.values(), key=lambda q: (q.batch_date, q.question_id), reverse=True
     )
+    urows = usage_rows(load_spans(ledger))
     pages: dict[str, tuple[str, dict[str, Any]]] = {
         "index.html": (
             "Home",
@@ -516,6 +518,15 @@ def build_site(
                 "now": clock.now(),
             },
         ),
+        "llm.html": (
+            "LLM observability",
+            {
+                "rows": urows,
+                "total": totals(urows),
+                "price_source": PRICE_SOURCE,
+                "parse": parse_failures(rec),
+            },
+        ),
         "about.html": (
             "About",
             {"about": read_content("about.md"), "legal": read_content("legal.md")},
@@ -561,6 +572,7 @@ def build_site(
     )
     (tmp / "feed.xml").write_text(feed, encoding="utf-8")
     qtpl = env.get_template("question.html")
+    qtraces = traces_by_question(ledger)
     for q in rec.questions.values():
         fs = sorted(
             (f for f in rec.forecasts if f.question_id == q.question_id),
@@ -580,6 +592,7 @@ def build_site(
             skips=sk,
             resolution=rec.resolutions.get(q.question_id),
             void=rec.voids.get(q.question_id),
+            traces=qtraces.get(q.question_id, []),
         )
         (tmp / "questions" / f"{q.question_id}.html").write_text(html_text, encoding="utf-8")
     static = Path(__file__).parent / "static"

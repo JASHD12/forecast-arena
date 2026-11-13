@@ -28,6 +28,15 @@
 <p class="note">AI-generated text, published unedited. It may be wrong and is not advice.</p>
 {% for f in rats %}<div class="rationale"><p><strong>{{ fname(f.forecaster_id) }}</strong> <span class="label">AI</span> <span class="muted">({{ f.forecaster_version }})</span></p><p>{{ f.rationale }}</p></div>{% endfor %}{% endif %}
 
+{% if traces %}<h2>How the AI forecasters worked</h2>
+<p class="note">Every model call and tool call, as traced at forecast time. No prompt or answer text is stored here.</p>
+{% for t in traces %}<details class="faq"><summary><strong>{{ fname(t.forecaster_id) }}</strong>: {{ t.outcome|replace("_", " ") or "–" }}{% if t.graph_path %} · steps: {{ t.graph_path|join(" → ") }}{% endif %}</summary>
+{% if t.tool_calls %}<p>Tool calls:</p><ul class="plain">{% for c in t.tool_calls %}<li>{% if c.ok %}<span class="yes">✓</span>{% else %}<span class="no">✗</span>{% endif %} <code>{{ c.tool }}</code>{% if c.sources %} · {{ c.sources|length }} source(s){% endif %}{% if c.error %} <span class="note">({{ c.error }})</span>{% endif %}</li>{% endfor %}</ul>{% endif %}
+{% if t.spans %}<div class="table-scroll" tabindex="0" role="region" aria-label="Model calls"><table>
+<thead><tr><th scope="col">#</th><th scope="col">Model</th><th scope="col" class="num">Tokens in / out</th><th scope="col" class="num">Time</th><th scope="col">Asked for tools</th><th scope="col">Note</th></tr></thead>
+<tbody>{% for s in t.spans %}<tr><th scope="row">{{ s.seq + 1 }}</th><td><code>{{ s.model }}</code></td><td class="num">{{ s.input_tokens }} / {{ s.output_tokens }}</td><td class="num">{{ "%.1f s"|format(s.duration_ms / 1000) }}</td><td>{{ s.tools_requested|join(", ") or "–" }}</td><td>{% if s.repair %}repair request{% endif %}{% if s.error %}<span class="no">{{ s.error }}</span>{% endif %}</td></tr>{% endfor %}</tbody></table></div>{% endif %}
+</details>{% endfor %}{% endif %}
+
 <h2>Rules and evidence</h2>
 <div class="table-scroll" tabindex="0" role="region" aria-label="Rules and evidence"><table class="kv"><tbody>
 <tr><th scope="row">Resolution rule</th><td>{{ q.resolution_rule }}</td></tr>

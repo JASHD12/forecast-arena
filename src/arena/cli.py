@@ -326,7 +326,7 @@ def daily_morning(obj: Ctx, push: bool) -> None:
     remote = _sync(obj, push)
     domains = build_domains(obj.settings, obj.clock.now(), ledger=obj.ledger)
     forecasters, guard = build_forecasters(
-        obj.ledger, domains, obj.settings, obj.day, dry_run=obj.dry_run
+        obj.ledger, domains, obj.settings, obj.day, dry_run=obj.dry_run, clock=obj.clock
     )
 
     def attach(rec: object) -> None:

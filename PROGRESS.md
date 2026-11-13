@@ -15,6 +15,37 @@ move older "Done log" lines to `docs/progress-archive.md`.
 ## In progress
 
 
+## Honesty audit (T171, 2026-11-13)
+
+Every technology named on `stack.html`, `recruiters.html`, `de.html` and `README.md`,
+with the code that uses it and the workflow that runs that code. Status: no open item.
+
+| Technology | Used in | Run by |
+|---|---|---|
+| Python, mypy, ruff, Hypothesis, pydantic, click, Jinja2 | `src/arena`, `tests` | CI `check` (`make check`) |
+| DuckDB, Parquet, pandas | `analytics/sql.py` (Parquet via DuckDB `COPY`), `notebooks/explore.ipynb` | CI `check`; notebook in CI `a11y` (`make notebook`) |
+| dbt (dbt-duckdb) | `analytics/dbt/` | CI `dbt` |
+| scikit-learn, numpy, scipy, joblib | `forecasters/ml_power.py`, registry | CI `check`; weekly |
+| LightGBM, Optuna, SHAP | `forecasters/ml_power_lgbm.py`, `ops/explain.py` | CI `check` (requirements-ml); weekly |
+| PyTorch | `forecasters/ml_power_torch.py` | CI `check` (requirements-torch); weekly |
+| statsmodels, Chronos-Bolt | `forecasters/ts_bench.py` | CI `check` (Chronos through a fake pipeline); the real model in the committed backtest card only, labelled "backtest only" |
+| MLflow, Evidently | `ops/weekly.py`, `ops/drift.py` | CI `check` (requirements-tracking); weekly |
+| Claude (anthropic SDK) | `llm/anthropic_adapter.py` | CI with mocked HTTP; real calls in morning, llm-eval |
+| LangGraph | `agent/graph.py` | CI `check`; morning |
+| fastembed (ONNX) | `agent/retrieval.py` | CI `check`; morning |
+| llama.cpp (llama-cpp-python), Qwen GGUF | `llm/local.py` | CI with a fake backend; real runtime built in the morning workflow (first live forecasts: T122b) |
+| MCP | `mcp_server.py` | CI `check` (SDK client) |
+| FastAPI, uvicorn | `api/app.py` | CI `check` (TestClient); CI `docker` smoke test |
+| Docker | `Dockerfile`, `compose.yaml` | CI `docker` |
+| Kubernetes (kind) | `deploy/k8s/` | CI `kubernetes` |
+| Airflow | `orchestration/airflow/` | CI `airflow` (DagBag) |
+| Streamlit | `apps/dashboard/` | CI `check` (AppTest) |
+| Chromium, axe (Playwright) | `tools/a11y/` | CI `a11y` |
+
+Fixed in this audit: `stack.html` said the Parquet files were "ready for pandas, Polars,
+Spark or DuckDB"; the project uses neither Polars nor Spark, so it now names only the
+readers the notebook really uses.
+
 ## Open risks and surprises
 
 - **2026-11-13 live agent failed on all 3 sampled questions** (`error` skips: Anthropic
@@ -51,6 +82,7 @@ move older "Done log" lines to `docs/progress-archive.md`.
 
 ## Done log
 
+- 2026-11-13 T171: honesty audit of stack, recruiters, de and README (table in PROGRESS.md); removed the Polars/Spark wording from stack.html; no open item
 - 2026-11-13 T170: docs/interview/ (pitch EN/DE, system design, 40 Q&A, 6 STAR stories, CV/LinkedIn text); every figure checked against the generated docs/interview/numbers.md (cards, evals, live ledger via arena report cv)
 - 2026-11-13 T161: players intake (form CSV -> players/B.jsonl at 09:00/09:15 UTC, random-code pseudonyms, consent, latest row before the run, never replaced); tests cover late, duplicate and invalid rows; live once H15 is done
 - 2026-11-13 T160: evening job (18:00/19:30 UTC on B-1, evening.yml) publishes the next batch's questions as template v2; morning only fills missed domains (v1) and forecasts; lock unchanged; e2e covers it; Methods lists template versions
@@ -80,7 +112,6 @@ move older "Done log" lines to `docs/progress-archive.md`.
 - 2026-11-13 T121: agent_graph, a LangGraph state machine (plan, retrieve, research/tools, critique, answer) over the guarded client; 1 question per topic per day; caps test; on in morning.yml
 - 2026-11-13 T120: RAG tool similar_past_questions (fastembed bge-small ONNX, cosine), only questions resolved before asof (leakage test); agent prompt v2; on in the morning workflow
 - 2026-11-13 T114: ETS, SARIMAX and Chronos-Bolt tiny as local power benchmarks; one-year backtest card docs/models/power-ts.md (all three lose to the champion; Chronos best of them and beats persistence)
-- 2026-11-13 T085: explainer 07 (operations and monitoring) with real incidents
 
 ## Session summaries
 

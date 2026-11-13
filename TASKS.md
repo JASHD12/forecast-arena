@@ -522,7 +522,7 @@ CI jobs; core `make check` stays offline and fast.
   - Do: `docs/interview/`: pitch (EN/DE), system design walkthrough, 40 Q&A, STAR
     stories, CV bullets from `arena report cv`.
   - Done when: the files exist and every number is from the ledger or a card.
-- [ ] T171 · Honesty audit of the portfolio (deps: T140, T141, T142, T170)
+- [x] T171 · Honesty audit of the portfolio (deps: T140, T141, T142, T170)
   - Do: every technology named on stack, recruiters, de and README is imported by code
     CI runs; fix or remove anything that is not.
   - Done when: the audit list is in `PROGRESS.md` with no open item.

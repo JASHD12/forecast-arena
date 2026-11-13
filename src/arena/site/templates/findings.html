@@ -2,6 +2,7 @@
 {% from "macros.html" import page_head %}
 {% block content %}
 {{ page_head("The research question", "Findings", "Four hypotheses, written down before any data was collected and never changed. Each is judged only by the official record, and only when a 95% interval excludes zero.") }}
+{% if not official_start %}<p class="rehearsal-note" role="note"><strong>Rehearsal phase.</strong> The official record starts automatically after five clean days in a row; until then results are shown but don't count towards headline scores.</p>{% endif %}
 <div class="progress-card">
 <div><strong>{{ official_days }} of {{ min_days }}</strong> official days needed before any hypothesis can be judged.</div>
 <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="{{ min_days }}" aria-valuenow="{{ official_days }}" aria-label="Official days"><span style="width: {{ '%.1f'|format([official_days / min_days, 1]|min * 100) }}%"></span></div>

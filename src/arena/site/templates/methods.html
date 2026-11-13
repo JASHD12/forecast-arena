@@ -35,6 +35,8 @@
 <p>A template's meaning never changes once questions use it; a change is a new version, and old questions keep theirs. The version is the last part of every question id.</p>
 <div class="table-scroll" tabindex="0" role="region" aria-label="Template versions (scrolls sideways on small screens)"><table><thead><tr><th scope="col">Batches</th><th scope="col">Topic</th><th scope="col">Template</th><th scope="col">Version</th><th scope="col">What it means</th></tr></thead>
 <tbody>{% for r in template_changelog %}<tr><td>{{ r.since }}{% if r.until != r.since %} to {{ r.until }}{% endif %}</td><td>{{ r.domain }}</td><td><code>{{ r.template }}</code></td><td>v{{ r.version }}</td><td>{{ r.note }}</td></tr>{% else %}<tr><td colspan="5" class="muted">No questions yet.</td></tr>{% endfor %}</tbody></table></div>
+<h2 id="official-start">Rehearsal and the official start</h2>
+<p>The first days are a rehearsal: results are shown but don't count towards headline scores. The official record starts automatically after five clean days in a row (a successful morning run, no failed job or health check, the day sealed), and not before a date fixed in advance, so early changes never enter it.{% if official_start %} It started on {{ official_start }}.{% endif %}</p>
 <h2>Limits</h2>
 <p>Git timestamps are evidence, not cryptographic proof. The public branch history, the hash chain and the GitHub Actions run logs together make silent edits detectable by anyone who has cloned the ledger branch.</p>
 <ul>{% for l in limitations %}<li>{{ l }}</li>{% endfor %}</ul>

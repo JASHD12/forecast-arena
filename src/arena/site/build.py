@@ -60,17 +60,26 @@ from arena.sources.smard import ATTRIBUTION as SMARD_ATTRIBUTION
 from arena.sources.smard import LICENCE as SMARD_LICENCE
 from arena.sources.wikimedia import ATTRIBUTION as WIKI_ATTRIBUTION
 
+#: T185: the primary links a first-time visitor needs; everything else is under "More".
 NAV: tuple[tuple[str, str], ...] = (
     ("index.html", "Home"),
-    ("recruiters.html", "For recruiters"),
-    ("play.html", "Play"),
     ("questions/index.html", "Questions"),
     ("leaderboard.html", "Leaderboard"),
-    ("calibration.html", "Calibration"),
-    ("findings.html", "Findings"),
-    ("guide.html", "Guide"),
-    ("methods.html", "Methods"),
+    ("play.html", "Play"),
+    ("guide.html", "How it works"),
     ("stack.html", "Tech stack"),
+    ("recruiters.html", "For recruiters"),
+)
+NAV_MORE: tuple[tuple[str, str], ...] = (
+    ("findings.html", "Findings"),
+    ("calibration.html", "Calibration"),
+    ("backtests.html", "Backtests"),
+    ("experiments.html", "Experiments"),
+    ("evals.html", "LLM evals"),
+    ("llm.html", "LLM observability"),
+    ("data.html", "Open data and SQL"),
+    ("api.html", "JSON API"),
+    ("methods.html", "Methods"),
     ("status.html", "Status"),
     ("about.html", "About"),
 )
@@ -514,6 +523,7 @@ def build_site(
     rehearsal_boards = all_boards(rehearsal, domains)
     common = {
         "nav": NAV,
+        "nav_more": NAV_MORE,
         "root": "",
         "attributions": ATTRIBUTIONS,
         "built_at": clock.now().strftime("%Y-%m-%d %H:%M UTC"),

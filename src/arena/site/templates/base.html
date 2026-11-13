@@ -26,13 +26,15 @@
 <header class="site-header"{% if page_lang|default('en') != 'en' %} lang="en"{% endif %}><div class="wrap">
 <a class="skip" href="#main">Skip to content</a>
 <a class="brand" href="{{ root }}index.html"><svg viewBox="0 0 32 32" aria-hidden="true" focusable="false"><circle cx="16" cy="16" r="14" fill="none" stroke="#9ea4ff" stroke-width="3"/><circle cx="16" cy="16" r="8" fill="none" stroke="#f08bcf" stroke-width="3"/><circle cx="16" cy="16" r="3" fill="#ffffff"/></svg>Forecast Arena</a>
+{% if not official_start %}<a class="phase-pill" href="{{ root }}methods.html#official-start" title="The official record starts automatically after five clean days in a row; until then results are shown but don't count towards headline scores.">Rehearsal</a>{% endif %}
+<button type="button" class="theme-toggle" hidden>Theme: auto</button>
 <nav aria-label="Main"><ul>
 {% for href, name in nav %}<li><a href="{{ root }}{{ href }}"{% if href == page %} aria-current="page"{% endif %}>{{ name }}</a></li>
-{% endfor %}</ul></nav>
-<button type="button" class="theme-toggle" hidden>Theme: auto</button>
+{% endfor %}</ul>
+<details class="nav-more"><summary{% if page in nav_more|map('first') %} class="is-current"{% endif %}>More</summary><ul>
+{% for href, name in nav_more %}<li><a href="{{ root }}{{ href }}"{% if href == page %} aria-current="page"{% endif %}>{{ name }}</a></li>
+{% endfor %}</ul></details></nav>
 </div></header>
-{% if not official_start %}<aside class="banner" aria-label="Rehearsal notice"><div class="wrap"><strong>Rehearsal phase.</strong>
-The official record starts automatically after five clean days in a row; until then results are shown but don't count towards headline scores.</div></aside>{% endif %}
 <main id="main"><div class="wrap">
 {% block content %}{% endblock %}
 </div></main>

@@ -559,7 +559,7 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
     `<details>`; status paragraph replaced by a link.
   - Done when: `scripts/readme_sections.py --check` passes; the first screen on GitHub
     shows pitch, picture and stack.
-- [ ] T185 · Site header and rehearsal notice (deps: T137)
+- [x] T185 · Site header and rehearsal notice (deps: T137)
   - Do: six primary links plus a "More" disclosure with every other page (including
     Backtests, Experiments, LLM evals, LLM observability, Data and API); rehearsal band
     becomes a pill; one header row on desktop, logo plus menu on phones.

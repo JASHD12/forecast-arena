@@ -34,6 +34,7 @@ from arena.scoring.boards import MIN_DAYS, all_boards, official
 from arena.scoring.core import Scored, clip, counts, load
 from arena.scoring.findings import findings, power_table
 from arena.scoring.stats import calibration_bins, expected_calibration_error, murphy
+from arena.site.api import ENDPOINTS, build_api
 from arena.site.cards_page import load_cards
 from arena.site.charts import forest_svg, race_svg, reliability_svg, series_class
 from arena.site.game import live_deck, practice_deck
@@ -619,6 +620,7 @@ def build_site(
         ),
         "evals.html": ("LLM evals", {"runs": eval_runs(evals_dir)}),
         "backtests.html": ("Backtests", {"cards": load_cards(models_dir)}),
+        "api.html": ("JSON API", {"endpoints": ENDPOINTS}),
         "forecasters/index.html": ("Forecasters", {"profiles": profiles}),
         "topics/index.html": ("Topics", {"topics": [topic(d, rec) for d in domains]}),
         "play.html": (
@@ -727,6 +729,10 @@ def build_site(
             **{**common, "root": "../"}, p=p,
         )  # fmt: skip
         (tmp / "forecasters" / f"{p['fid']}.html").write_text(html_text, encoding="utf-8")
+    head_all = [b for b in (headline if off else rehearsal_boards)
+                if b.kind == "all" and b.domain == "overall"]  # fmt: skip
+    build_api(tmp, rec, head_all[0] if head_all else None, "official" if off else "rehearsal",
+              clock.now(), question_href)  # fmt: skip
     ttpl = env.get_template("topic.html")
     scope = "official record" if off else "rehearsal days"
     for dom in domains:

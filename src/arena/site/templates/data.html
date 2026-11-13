@@ -10,6 +10,7 @@
 <ul class="filelist">{% for f in files %}<li><a href="data/{{ f }}" download><code>{{ f }}</code></a></li>{% endfor %}</ul>
 <p class="note">Licence: the forecasts and outcomes are this project's own data; source data stays under its source's terms (see the credits below). Read them with, for example: <code>duckdb -c "SELECT * FROM 'forecasts.parquet' LIMIT 5"</code> or <code>pandas.read_parquet("forecasts.parquet")</code>.</p>
 
+<p>Prefer JSON? The same data is available as a small static <a href="api.html">JSON API</a> with schemas.</p>
 <h2>Data dictionary</h2>
 <p class="note">Every column of every file. Probabilities are stored exactly as published; scores clip them to [0.01, 0.99]. Voided questions have no resolution row.</p>
 {% for table, cols in dictionary.items() %}<h3><code>{{ table }}.parquet</code></h3>

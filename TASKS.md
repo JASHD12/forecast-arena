@@ -488,7 +488,7 @@ CI jobs; core `make check` stays offline and fast.
   - Do: worked scoring example, verification walkthrough, data dictionary,
     `notebooks/explore.ipynb` executed in CI on the e2e export.
   - Done when: the notebook runs in CI.
-- [ ] T139 · Static JSON API (deps: T130)
+- [x] T139 · Static JSON API (deps: T130)
   - Done when: `api/v1/*.json` and a schema page are built and tested.
 - [ ] T140 · For recruiters page (deps: T112, T113, T121, T125, T150, T152)
   - Do: 60-second summary, measured results, requirement-to-proof table, print layout;

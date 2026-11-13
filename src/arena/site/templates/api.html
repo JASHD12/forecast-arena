@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% from "macros.html" import page_head %}
+{% block content %}
+{{ page_head("Open data", "JSON API", "The same data as the site, as static JSON files: no key, no sign-up, rebuilt after every job. Each file has a JSON Schema generated from the code that writes it.") }}
+<div class="table-scroll" tabindex="0" role="region" aria-label="Endpoints"><table>
+<thead><tr><th scope="col">File</th><th scope="col">What it holds</th><th scope="col">Schema</th></tr></thead>
+<tbody>{% for name, what in endpoints %}<tr><th scope="row"><a href="api/v1/{{ name }}.json"><code>api/v1/{{ name }}.json</code></a></th><td>{{ what }}</td><td><a href="api/v1/schema/{{ name }}.schema.json"><code>{{ name }}.schema.json</code></a></td></tr>{% endfor %}</tbody></table></div>
+<h2>Example</h2>
+<pre class="sql" tabindex="0" aria-label="Example request"><code>curl -s {{ site_url }}api/v1/leaderboard.json | python -m json.tool</code></pre>
+<p class="note">Fields and their meaning are in the schemas and the <a href="data.html">data dictionary</a>. The leaderboard file states its scope (official record or rehearsal) and carries the same "too early to tell" label as the site; the comparison with intervals is decided on the <a href="leaderboard.html">leaderboard</a>. For bulk analysis use the Parquet files.</p>
+{% endblock %}

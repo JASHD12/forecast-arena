@@ -778,6 +778,21 @@ Made by: agent
   the dbt definitions without making dbt a dependency of the daily jobs. A unit test
   checks that the marts agree with the scoring code (clipping included).
 
+## 2026-11-13 · Airflow DAGs mirroring the jobs (T153)
+
+- `orchestration/airflow/arena_dag.py`: three Airflow 3 DAGs (morning, resolve, weekly)
+  that run exactly the CLI commands and the UTC schedules of the GitHub Actions
+  workflows, sharing one pool so only one job writes the ledger (like the shared
+  concurrency group). The morning run times out at the 09:30 lock as a second guard;
+  the lock itself is enforced inside `arena daily morning`.
+- Validated, not deployed: a CI job installs Airflow 3.4.0 with Airflow's official
+  constraints file in its own virtual environment and parses the DAGs with DagBag
+  (no import errors; task order, schedules and pool checked). A unit test in the main
+  suite checks that every DAG command also runs in the matching workflow. Production
+  scheduling stays on GitHub Actions (free; a hosted Airflow would cost money).
+- API taken from the installed package (`airflow.sdk.DAG`, the standard provider's
+  `BashOperator`, `airflow.models.dagbag.DagBag`), as recorded in SOURCES.
+
 ## Proposals for the human
 
 Ideas outside the specification. The agent lists them here and does not build them.

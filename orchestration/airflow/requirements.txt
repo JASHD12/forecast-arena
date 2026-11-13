@@ -1,0 +1,6 @@
+# Airflow for validating orchestration/airflow (T153) in CI only. Install in its own
+# virtual environment with Airflow's official constraints file for the Python version:
+#   pip install -r orchestration/airflow/requirements.txt \
+#     --constraint https://raw.githubusercontent.com/apache/airflow/constraints-3.4.0/constraints-3.12.txt
+apache-airflow==3.4.0
+apache-airflow-providers-standard==1.21.0

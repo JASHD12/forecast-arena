@@ -112,6 +112,26 @@ jobs:
           DBT_SEND_ANONYMOUS_USAGE_STATS=false ARENA_DATA_DIR="$GITHUB_WORKSPACE/_site_e2e/data" \
             ../../.venv-dbt/bin/dbt build --profiles-dir .
 
+  airflow:
+    # T153: parse the DAGs with Airflow's DagBag and check their shape. Airflow lives in
+    # its own virtual environment with Airflow's official constraints; nothing is deployed.
+    needs: check
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Install Airflow (official constraints) and check the DAGs
+        env:
+          AIRFLOW_HOME: ${{ runner.temp }}/airflow
+        run: |
+          python -m venv .venv-airflow
+          .venv-airflow/bin/pip install -r orchestration/airflow/requirements.txt \
+            --constraint https://raw.githubusercontent.com/apache/airflow/constraints-3.4.0/constraints-3.12.txt
+          .venv-airflow/bin/python orchestration/airflow/check_dags.py
+
   kubernetes:
     # T151: apply deploy/k8s/ to a throwaway kind cluster and smoke-test it. Nothing is
     # hosted; this only proves the manifests and the image work on Kubernetes.

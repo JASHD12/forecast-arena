@@ -467,7 +467,7 @@ CI jobs; core `make check` stays offline and fast.
   - Do: `play.html` + Home teaser; `data/game.json`; self-hosted `static/app.js`; CSP;
     session score in memory only.
   - Done when: Playwright test plays one round; works as a page without JS.
-- [ ] T131 · Question page: data chart, trace, neighbours (deps: T130)
+- [x] T131 · Question page: data chart, trace, neighbours (deps: T130)
   - Do: series chart from the morning snapshot with threshold and outcome; previous/next.
   - Done when: tests cover the chart for each domain with fixtures.
 - [ ] T132 · Forecaster profile pages (deps: T130)

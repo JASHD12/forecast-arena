@@ -670,6 +670,20 @@ Made by: agent
 - `make a11y` also plays one round per deck in Chromium, checks the no-JavaScript
   fallback and fails on any request that leaves the site.
 
+## 2026-11-13 · Question page data chart (T131)
+
+- The chart is drawn from the morning snapshot (`snapshots/<domain>/.../morning_context`),
+  so it shows exactly the as-of data the forecasters had, plus the observed value once
+  resolved. Server-side SVG with a title, a description and a data table (no script).
+- Per domain: power (the asked daily statistic, threshold), weather (the asked variable;
+  both cities for duels, no threshold line), attention (daily views, threshold), markets
+  and crypto (the rate or price series only: those questions are about changes, so no
+  level threshold or observed level is drawn, which would mislead).
+- The trace panel (T123) and previous/next links within the same topic complete the page.
+  The retrieved similar questions (T120) are not shown: the tool's results are not
+  stored (only call metadata), and recomputing them at build time could differ from what
+  the agent saw.
+
 ## Proposals for the human
 
 Ideas outside the specification. The agent lists them here and does not build them.

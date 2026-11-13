@@ -23,6 +23,17 @@
 {% else %}<p class="empty">No forecasts were recorded for this question.</p>{% endif %}
 {% if skips %}<p class="note">Skipped: {% for s in skips %}{{ fname(s.forecaster_id) }} (<code>{{ s.reason_code }}</code>){% if not loop.last %}, {% endif %}{% endfor %}. A skip is recorded instead of a guess.</p>{% endif %}
 
+{% if chart %}<section class="card" aria-labelledby="qc-h">
+<h2 id="qc-h">The data at forecast time</h2>
+{{ chart.svg }}
+<p class="note">{{ chart.data.title }} ({{ chart.data.unit }}), as the forecasters saw it in the morning{% if chart.data.reference %}; dashed line: {{ chart.data.reference[1] }}{% endif %}{% if chart.data.observed is not none %}; ringed dot: the observed value on {{ chart.data.target_day }}{% endif %}.</p>
+<details class="faq"><summary>Data table</summary>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Chart data"><table>
+<thead><tr><th scope="col">Day</th>{% for name, _ in chart.data.series %}<th scope="col" class="num">{{ name }}</th>{% endfor %}</tr></thead>
+<tbody>{% set first = chart.data.series[0][1] %}{% for d, _ in first %}{% set i = loop.index0 %}<tr><th scope="row">{{ d }}</th>{% for _, pts in chart.data.series %}<td class="num">{{ pts[i][1] if pts|length > i else "–" }}</td>{% endfor %}</tr>{% endfor %}
+{% if chart.data.observed is not none %}<tr><th scope="row">{{ chart.data.target_day }} (observed)</th><td class="num">{{ chart.data.observed }}</td></tr>{% endif %}</tbody></table></div>
+</details></section>{% endif %}
+
 {% set rats = forecasts|selectattr("rationale")|list %}
 {% if rats %}<h2>Reasoning</h2>
 <p class="note">AI-generated text, published unedited. It may be wrong and is not advice.</p>
@@ -46,6 +57,8 @@
 {% if resolution %}<tr><th scope="row">Evidence</th><td><a href="{{ resolution.evidence.source_url }}">source</a>, snapshot sha256 <code>{{ resolution.evidence.snapshot_sha256[:16] }}</code></td></tr>{% endif %}
 <tr><th scope="row">Id</th><td><code>{{ q.question_id }}</code></td></tr>
 </tbody></table></div>
+
+<nav class="qnav" aria-label="Neighbouring questions">{% if prev_q %}<a href="{{ prev_q.question_id }}.html" rel="prev">← {{ prev_q.batch_date }}: {{ prev_q.template|replace("_", " ") }}</a>{% endif %}{% if next_q %}<a href="{{ next_q.question_id }}.html" rel="next">{{ next_q.batch_date }}: {{ next_q.template|replace("_", " ") }} →</a>{% endif %}</nav>
 
 <details class="faq"><summary>All forecasts with versions and timestamps</summary>
 <div class="table-scroll" tabindex="0" role="region" aria-label="All forecasts"><table>

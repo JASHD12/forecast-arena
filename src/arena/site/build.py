@@ -5,6 +5,7 @@ Every number on the site is computed here from the ledger by code (integrity rul
 
 from __future__ import annotations
 
+import gzip
 import html
 import json
 import re
@@ -38,6 +39,7 @@ from arena.site.game import live_deck, practice_deck
 from arena.site.llm_obs import PRICE_SOURCE, load_spans, totals, traces_by_question, usage_rows
 from arena.site.methods_content import LIMITATIONS, PRINCIPLES
 from arena.site.ops_status import llm_usage, missed_days, parse_failures, source_freshness
+from arena.site.qchart import chart_data, series_svg
 from arena.site.titles import FORECASTER_NAMES, domain_name, forecaster_name, plain_title
 from arena.sources.brightsky import ATTRIBUTION as WX_ATTRIBUTION
 from arena.sources.brightsky import LICENCE as WX_LICENCE
@@ -316,6 +318,24 @@ def _runs(ledger: Ledger, limit: int = 20) -> list[RunManifest]:
         if isinstance(rec, RunManifest):
             out.append(rec)
     return sorted(out, key=lambda r: r.started_at, reverse=True)[:limit]
+
+
+def _question_chart(
+    ledger: Ledger, snaps: dict[tuple[str, date], dict[str, Any]], q: Question, res: Any
+) -> dict[str, Any] | None:
+    """Chart (SVG and table rows) from the morning snapshot of the question's batch."""
+    key = (q.domain, q.batch_date)
+    if key not in snaps:
+        rel = f"{layout.snapshot_dir(q.domain, q.batch_date)}/morning_context.json.gz"
+        snaps[key] = (json.loads(gzip.decompress(ledger.read_bytes(rel)))
+                      if ledger.exists(rel) else {})  # fmt: skip
+    ctx = snaps[key].get(q.question_id)
+    if not isinstance(ctx, dict):
+        return None
+    cd = chart_data(q, ctx, None if res is None else res.observed_value)
+    if cd is None or not any(pts for _, pts in cd.series):
+        return None
+    return {"svg": series_svg(cd), "data": cd}
 
 
 def eval_runs(evals_dir: Path | None) -> list[dict[str, Any]]:
@@ -608,6 +628,16 @@ def build_site(
     (tmp / "feed.xml").write_text(feed, encoding="utf-8")
     qtpl = env.get_template("question.html")
     qtraces = traces_by_question(ledger)
+    ordered = sorted(rec.questions.values(), key=lambda q: (q.domain, q.batch_date, q.question_id))
+    neighbours = {
+        q.question_id: (
+            ordered[i - 1] if i > 0 and ordered[i - 1].domain == q.domain else None,
+            ordered[i + 1] if i + 1 < len(ordered) and ordered[i + 1].domain == q.domain
+            else None,
+        )
+        for i, q in enumerate(ordered)
+    }  # fmt: skip
+    snaps: dict[tuple[str, date], dict[str, Any]] = {}
     for q in rec.questions.values():
         fs = sorted(
             (f for f in rec.forecasts if f.question_id == q.question_id),
@@ -628,6 +658,9 @@ def build_site(
             resolution=rec.resolutions.get(q.question_id),
             void=rec.voids.get(q.question_id),
             traces=qtraces.get(q.question_id, []),
+            chart=_question_chart(ledger, snaps, q, res_q),
+            prev_q=neighbours[q.question_id][0],
+            next_q=neighbours[q.question_id][1],
         )
         (tmp / "questions" / f"{q.question_id}.html").write_text(html_text, encoding="utf-8")
     static = Path(__file__).parent / "static"

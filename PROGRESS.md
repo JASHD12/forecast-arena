@@ -42,6 +42,7 @@ move older "Done log" lines to `docs/progress-archive.md`.
 
 ## Done log
 
+- 2026-11-13 T131: question page chart from the morning snapshot (per-domain series, threshold, observed value, data table) and previous/next links
 - 2026-11-13 T130: play.html "Can you beat the AI?" (live + practice decks, in-memory score), self-hosted app.js, CSP on every page, Playwright round test in make a11y, home teaser, nav link
 - 2026-11-13 T125: arena mcp, read-only MCP server (official SDK 2.3.0): list_questions, get_question, leaderboard, run_sql (single SELECT, DuckDB external access off); stdio test; README setup
 - 2026-11-13 T124 follow-up: first real evals showed 400-token cap truncating thinking answers; cap now from settings (workflow default 1024) and in every LLM version string

@@ -533,3 +533,13 @@ ul.plain { list-style: none; padding: 0; margin: 0; display: grid; gap: .45rem; 
 .play-teaser { border-left: 4px solid var(--accent); }
 .game [hidden] { display: none !important; }
 .game-mini { width: auto; min-width: 14rem; max-width: 22rem; }
+
+/* Question page data chart and neighbours (T131) */
+.qchart { width: 100%; height: auto; display: block; }
+.qchart .qline { fill: none; stroke: var(--c); stroke-width: 2; }
+.qchart .qdot { fill: var(--c); }
+.qchart .qobs { fill: var(--surface); stroke: var(--fg); stroke-width: 2.5; }
+.qchart .ref-line { stroke: var(--muted); stroke-width: 1.5; stroke-dasharray: 5 4; }
+.qnav { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin: 1.25rem 0; }
+.qchart .grid { stroke: var(--line); stroke-width: 1; }
+.qchart .tick { fill: var(--muted); font-size: 11px; }

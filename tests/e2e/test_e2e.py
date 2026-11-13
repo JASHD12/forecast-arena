@@ -108,6 +108,8 @@ def test_five_days_offline(tmp_path) -> None:
     traced = spans[0]["question_id"]
     qpage = (site.out_dir / "questions" / f"{traced}.html").read_text()
     assert "How the AI forecasters worked" in qpage
+    assert "The data at forecast time" in qpage and 'class="qchart"' in qpage
+    assert 'rel="next"' in qpage or 'rel="prev"' in qpage
     status = (site.out_dir / "status.html").read_text()
     for panel in ("Missed days", "Source freshness", "LLM usage", "LLM parse failures"):
         assert panel in status, panel

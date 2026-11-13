@@ -46,6 +46,7 @@ jobs:
         run: |
           make setup
           .venv/bin/pip install -r requirements-tracking.txt -r requirements-ml.txt
+          .venv/bin/pip install -r requirements-torch.txt
       - name: Restore cached source data (SMARD history, Wikimedia top lists)
         uses: actions/cache@v6
         with:

@@ -213,6 +213,10 @@ def weekly_setup(
             from arena.forecasters import ml_power_lgbm
 
             fams["lgbm"] = lambda cut: ml_power_lgbm.train_lgbm(pdom, cut, n_trials=20, folds=2)
+        if importlib.util.find_spec("torch"):
+            from arena.forecasters import ml_power_torch
+
+            fams["mlp"] = lambda cut: ml_power_torch.train_torch(pdom, cut, folds=2)
         trainers["power"] = fams
     if not only or "attention" in only:
         adom = AttentionDomain(WikimediaClient(http, cache_dir=settings.cache_dir))

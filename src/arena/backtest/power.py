@@ -41,7 +41,8 @@ def run(
     """Walk-forward from `first` to `last` (scored), with a warm-up before `first`.
 
     `challengers` adds challenger model families as extra forecasters on the same
-    questions: "lgbm" (LightGBM + Optuna, forecaster id `ml_lgbm`)."""
+    questions: "lgbm" (LightGBM + Optuna, forecaster id `ml_lgbm`) and "mlp" (PyTorch
+    quantile network, `ml_mlp`)."""
     state: dict[str, PowerModel] = {}
 
     def refresher(key: str, fit: Callable[[date], PowerModel]) -> Callable[[str, date], Any]:
@@ -72,6 +73,12 @@ def run(
             )  # fmt: skip
             f.forecaster_id = "ml_lgbm"
             out.append(f)
+        if "mlp" in challengers:
+            from arena.forecasters.ml_power_torch import train_torch
+
+            g = MLForecaster({}, refresher("mlp", lambda c: train_torch(domain, c, folds=folds)))
+            g.forecaster_id = "ml_mlp"
+            out.append(g)
         return out
 
     return walk_forward(

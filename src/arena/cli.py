@@ -323,7 +323,7 @@ def report() -> None:
 
 
 @report.command("backtest-power")
-@click.option("--challenger", "challengers", multiple=True, type=click.Choice(["lgbm"]),
+@click.option("--challenger", "challengers", multiple=True, type=click.Choice(["lgbm", "mlp"]),
               help="Add a challenger model family (needs requirements-ml.txt).")  # fmt: skip
 @click.option("--first", type=click.DateTime(["%Y-%m-%d"]), required=True)
 @click.option("--last", type=click.DateTime(["%Y-%m-%d"]), required=True)

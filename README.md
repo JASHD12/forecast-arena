@@ -14,7 +14,7 @@ append-only, hash-chained ledger. When the official data arrives, every forecast
 **[Live site](https://jashd12.github.io/forecast-arena/)** ·
 **[60-second tour](https://jashd12.github.io/forecast-arena/recruiters.html)** ·
 **[Status](https://jashd12.github.io/forecast-arena/status.html)** ·
-[Architecture](#how-it-works) · [Reproduce it](#reproduce-it)
+[Code tour](docs/CODE_TOUR.md) · [Architecture](#how-it-works) · [Reproduce it](#reproduce-it)
 
 [![The home page](docs/img/home.png)](https://jashd12.github.io/forecast-arena/)
 

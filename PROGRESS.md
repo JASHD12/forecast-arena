@@ -14,6 +14,14 @@ move older "Done log" lines to `docs/progress-archive.md`.
   until the owner chooses a date (T110).
 - Live site URL: https://jashd12.github.io/forecast-arena/
 
+## Phase 11 (owner approved 2026-11-13 evening)
+
+- Review plan approved; tasks T180-T192 in TASKS.md. First evening run dispatched by hand
+  at 19:29 UTC (scheduled one had not started): 6 power questions for 2026-11-14, all
+  `-v2`, lock 09:30 unchanged, `ledger verify` passes. T180 (due-gate, frequent crons)
+  pushed; it waits for 2026-11-14 to show a batch sealed before the lock without help.
+  A one-shot check at 05:45 UTC dispatches the morning run if no batch seal exists.
+
 ## Session summary (2026-11-13, evening)
 
 - Done and pushed: T142 (README), T160 (evening publication, `evening.yml` from 18:00

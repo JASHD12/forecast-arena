@@ -7,8 +7,11 @@ name: players
 
 on:
   schedule:
-    - cron: "0 9 * * *"    # 09:00 UTC
-    - cron: "15 9 * * *"   # 09:15 UTC (second chance; adds only what is not written yet)
+    # T180: only shortly before the 09:30 UTC lock (a written player forecast is never
+    # replaced); the gate refuses runs before 08:30 or after the lock.
+    - cron: "40 8 * * *"
+    - cron: "0 9 * * *"
+    - cron: "15 9 * * *"
   workflow_dispatch:
     inputs:
       dry_run:
@@ -24,7 +27,43 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  gate:
+    # T180: GitHub starts scheduled runs hours late, so the job is scheduled often and this
+    # small job decides from the clock and the ledger whether a run has anything to do.
+    # Manual dispatches are always due.
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      due: ${{ steps.manual.outputs.due || steps.sched.outputs.due }}
+    steps:
+      - name: Manual runs are always due
+        id: manual
+        if: github.event_name != 'schedule'
+        run: echo "due=true" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@v7
+        if: github.event_name == 'schedule'
+        with:
+          ref: stable
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        if: github.event_name == 'schedule'
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements-*.txt
+      - name: Install pinned dependencies
+        if: github.event_name == 'schedule'
+        run: make setup
+      - name: Is the players job due?
+        id: sched
+        if: github.event_name == 'schedule'
+        env:
+          ARENA_LEDGER_REMOTE: https://github.com/${{ github.repository }}.git
+        run: .venv/bin/arena schedule due --job players --sync
+
   run:
+    needs: gate
+    if: needs.gate.outputs.due == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:

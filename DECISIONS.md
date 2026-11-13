@@ -938,3 +938,21 @@ Ideas outside the specification. The agent lists them here and does not build th
 - Decision: re-send `block.to_dict()` (the SDK's exact wire form). This is a bug fix, not
   tuning (I8): no prompt, model or threshold changes, and it was found from an API error,
   not from any outcome; the version strings stay the same. The recorded skips remain.
+
+## 2026-11-13 Frequent scheduled runs behind a due-gate (T180)
+
+- Context: on the first live day GitHub started every scheduled run about 8 hours late:
+  both morning runs (05:30, 07:00) started after the 09:30 lock, so the batch exists only
+  because of a manual run; the 18:00 evening run had not started by 19:29.
+- Decision: schedule morning hourly 00:15-08:15 UTC, evening hourly 16:00-23:00, resolve
+  every 3 hours, players at 08:40/09:00/09:15. A small `gate` job runs
+  `arena schedule due --job <job> --sync` (pure function of clock and ledger) and the
+  real job runs only when there is work; manual dispatches always run. Gate-only runs
+  write nothing to the ledger. The lock and every job's own rules are unchanged.
+- Consequence: forecasts can be made earlier than 05:30 (as early as 00:15) when GitHub is
+  on time. That is still before the lock (I1) and the time is recorded on every forecast;
+  the information set is whatever was public then (I3). With the shared concurrency
+  group, a newer queued run can replace an older pending one; the frequent schedule makes
+  that harmless.
+- Alternatives: an external scheduler calling `workflow_dispatch` (needs an account,
+  human item); moving the lock (rejected: SPEC and the noon auction).

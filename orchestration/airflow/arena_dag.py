@@ -11,6 +11,8 @@ Mapping (UTC):
                   writes nothing), and the DAG run times out at the lock as a second guard.
 - arena_resolve   03:30, 12:30, 16:30, 20:30: resolve -> verify -> site -> health.
 - arena_weekly    Sunday 02:00: weekly retraining -> health -> official start.
+These are the intended times. Airflow starts runs on time; GitHub Actions can start
+scheduled runs hours late, so the workflows run more often behind a due-gate (T180).
 All four share one pool slot ("arena_ledger") so only one job writes the ledger at a time,
 like the shared concurrency group in GitHub Actions.
 """

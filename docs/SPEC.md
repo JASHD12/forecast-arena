@@ -94,6 +94,13 @@ Branches:
 Daily timeline (all times UTC; jobs are scheduled more than once and are idempotent,
 because scheduled workflows can start late):
 
+The times below are the intended times. GitHub Actions can start scheduled runs hours
+late (on 2026-11-13 by about 8 hours), so each job is scheduled many times and a gate
+(`arena schedule due`, T180) lets the first run that has work do it: morning hourly from
+00:15 to 08:15 (work until the batch is sealed or the lock passes), evening hourly from
+16:00 to 23:00 (until the next batch's questions exist), players at 08:40, 09:00 and
+09:15 (only from 08:30 until the lock), resolve every 3 hours (no gate; idempotent).
+
 | Time | Job | What happens |
 |---|---|---|
 | 18:00, 19:30 (day before) | evening | Publish the next batch's questions (template version 2, T160), push, rebuild site. No forecasts. |

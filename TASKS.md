@@ -526,3 +526,70 @@ CI jobs; core `make check` stays offline and fast.
   - Do: every technology named on stack, recruiters, de and README is imported by code
     CI runs; fix or remove anything that is not.
   - Done when: the audit list is in `PROGRESS.md` with no open item.
+
+## Phase 11 - First impression and reliability (owner approved 2026-11-13)
+
+Source: the review plan of 2026-11-13 (scheduled jobs start hours late; repo and site
+first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the rest.
+
+- [!] T180 · Schedule hardening: due-gate and frequent crons (deps: T160) WAIT(until=2026-11-14)
+  - Do: `arena schedule due --job <job>` (pure function of clock and ledger: due / too
+    early / already done); every scheduled workflow runs it first and skips the rest when
+    not due; morning hourly 00:15-08:15 UTC, evening hourly 16:00-23:00, resolve every
+    3 h, players only 08:30 to the lock; SPEC 4, Status note, Airflow mirror, DECISIONS.
+  - Done when: unit tests cover each job at each hour and ledger state; a dry-run dispatch
+    of each workflow passes; a later day's batch is sealed before 09:30 with no manual run.
+- [ ] T181 · Live proof of the 2026-11-13 fixes (deps: T180, T122b)
+  - Do: from the ledger: `agent` answers (no `error` skips), `agent_graph` and
+    `llm_local` forecasts or reasoned skips, evening questions are v2, morning added none.
+  - Done when: the findings are in PROGRESS.md (fix and record any failure first).
+- [ ] T182 · Live-site smoke check (deps: T180)
+  - Do: `make smoke-site` (Playwright: key pages load, no console errors, site built
+    under 26 h ago); run it as a step after deploy in `resolve.yml`.
+  - Done when: the step is green on a real resolve run.
+- [ ] T183 · Clean repository root (deps: T171)
+  - Do: requirements files to `requirements/`; TASKS, PROGRESS, HUMAN_TODO, DECISIONS,
+    KICKOFF_PROMPTS, START_HERE to `docs/project/` (update AGENTS.md, CLAUDE.md text
+    references, `scripts/status.py`, Makefile, workflows, Dockerfile, tests).
+  - Done when: root shows code and README first; `make check`, CI and a dry-run of each
+    scheduled workflow pass.
+- [ ] T184 · README first screen (deps: T183)
+  - Do: pitch, live-site and 60-second-tour links, one image, five generated "what this
+    shows" bullets, Mermaid architecture, generated tech row; detail tables in
+    `<details>`; status paragraph replaced by a link.
+  - Done when: `scripts/readme_sections.py --check` passes; the first screen on GitHub
+    shows pitch, picture and stack.
+- [ ] T185 · Site header and rehearsal notice (deps: T137)
+  - Do: six primary links plus a "More" disclosure with every other page (including
+    Backtests, Experiments, LLM evals, LLM observability, Data and API); rehearsal band
+    becomes a pill; one header row on desktop, logo plus menu on phones.
+  - Done when: `make a11y` passes with and without JavaScript; phone screenshot shows the
+    headline on the first screen.
+- [ ] T186 · Home hero and recruiter page (deps: T185)
+  - Do: remove "joining soon"; BACKTEST card with the one-year electricity result from the
+    model card; tech row; optional owner byline from `site_content/recruiters.md`;
+    recruiter page with an honest authorship line and "five things worth 30 seconds".
+  - Done when: tests check the backtest card values against `docs/models/power.md` and
+    that "built end to end by one person" is gone; screenshots reviewed.
+- [ ] T187 · Code tour and entry-file refactor (deps: T183)
+  - Do: `docs/CODE_TOUR.md`; split `site/build.py` into page modules and `cli.py` into a
+    `cli/` package; remove `# fmt: skip` and let ruff format the code (separate commit).
+  - Done when: tests pass and the offline site build is byte-identical before and after.
+- [ ] T188 · Coverage floor and badges (deps: T187)
+  - Done when: CI fails under the current coverage; README shows coverage and test count.
+- [ ] T192 · Schedule delay on the Status page (deps: T180)
+  - Do: record the scheduled time and the start time of each real run (manifest) and show
+    the median delay per job on the Status page.
+  - Done when: a unit test covers the delay computation; the Status page shows it.
+- [ ] T189 · Empty states and home details (deps: T186)
+  - Do: Experiments and LLM pages show labelled backtest or evaluation results until live
+    data exists; stronger home stat; "agent trace of the day" card; share preview check.
+  - Done when: no page shows a bare "nothing yet"; a11y passes.
+- [ ] T190 · Structured outputs and prompt caching (deps: T124)
+  - Do: `output_config.format` for the Claude forecasters as a new contract version,
+    compared with parse-and-repair in the eval harness; cache the shared system prompt and
+    show cache hits on the LLM observability page.
+  - Done when: an eval result file compares both contracts; cache hits appear in traces.
+- [ ] T191 · Polars notebook section and OpenTelemetry export (deps: T138, T123)
+  - Done when: the notebook runs in CI with a Polars section; spans export as OTLP JSON
+    validated by a test; the stack page names both only after that.

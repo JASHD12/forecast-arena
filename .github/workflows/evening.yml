@@ -7,8 +7,8 @@ name: evening
 
 on:
   schedule:
-    - cron: "0 18 * * *"   # 18:00 UTC
-    - cron: "30 19 * * *"  # 19:30 UTC (second chance: schedules can start late)
+    # T180: hourly from 16:00 to 23:00 UTC; the gate lets only the first run publish.
+    - cron: "0 16-23 * * *"
   workflow_dispatch:
     inputs:
       dry_run:
@@ -24,7 +24,43 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  gate:
+    # T180: GitHub starts scheduled runs hours late, so the job is scheduled often and this
+    # small job decides from the clock and the ledger whether a run has anything to do.
+    # Manual dispatches are always due.
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      due: ${{ steps.manual.outputs.due || steps.sched.outputs.due }}
+    steps:
+      - name: Manual runs are always due
+        id: manual
+        if: github.event_name != 'schedule'
+        run: echo "due=true" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@v7
+        if: github.event_name == 'schedule'
+        with:
+          ref: stable
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        if: github.event_name == 'schedule'
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements-*.txt
+      - name: Install pinned dependencies
+        if: github.event_name == 'schedule'
+        run: make setup
+      - name: Is the evening job due?
+        id: sched
+        if: github.event_name == 'schedule'
+        env:
+          ARENA_LEDGER_REMOTE: https://github.com/${{ github.repository }}.git
+        run: .venv/bin/arena schedule due --job evening --sync
+
   run:
+    needs: gate
+    if: needs.gate.outputs.due == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:

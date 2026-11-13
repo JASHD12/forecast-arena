@@ -321,6 +321,36 @@ def _push(obj: Ctx, remote: str | None, job: str, day: date) -> None:
     click.echo(f"ledger pushed: {sha}" if sha else "ledger: nothing to push")
 
 
+@main.group()
+def schedule() -> None:
+    """Gate for scheduled runs, which GitHub can start hours late (T180)."""
+
+
+@schedule.command("due")
+@click.option("--job", required=True, type=click.Choice(["evening", "morning", "players"]))
+@click.option("--sync", is_flag=True, help="Check out the ledger branch first (in Actions).")
+@click.pass_obj
+def schedule_due(obj: Ctx, job: str, sync: bool) -> None:
+    """Print whether JOB has work to do now; write `due=true|false` to $GITHUB_OUTPUT."""
+    import os
+
+    from arena.ops.schedule import is_due
+
+    if sync:
+        remote = obj.settings.ledger_remote
+        if not remote:
+            raise click.UsageError("--sync needs ARENA_LEDGER_REMOTE")
+        from arena.ledger.gitsync import ensure_checkout
+
+        ensure_checkout(remote, obj.ledger.root)
+    d = is_due(job, obj.clock.now(), obj.ledger)
+    click.echo(f"{job}: {'due' if d.due else 'not due'} ({d.reason})")
+    out = os.environ.get("GITHUB_OUTPUT")
+    if out:
+        with open(out, "a", encoding="utf-8") as fh:
+            fh.write(f"due={'true' if d.due else 'false'}\n")
+
+
 @daily.command("evening")
 @click.option("--push", is_flag=True, help="Sync with and push to the ledger branch.")
 @click.pass_obj

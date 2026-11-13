@@ -7,10 +7,9 @@ name: resolve
 
 on:
   schedule:
-    - cron: "30 12 * * *"
-    - cron: "30 16 * * *"
-    - cron: "30 20 * * *"
-    - cron: "30 3 * * *"
+    # Every 3 hours (T180: GitHub has started these runs up to 8 hours late; resolving is
+    # idempotent, so more chances cost nothing but a short run).
+    - cron: "30 */3 * * *"
   workflow_dispatch:
     inputs:
       dry_run:

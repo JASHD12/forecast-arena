@@ -348,7 +348,7 @@ Keep the first line of each task in exactly this shape; the status script parses
 - [!] T084b · Dependency hygiene: open an issue with the outdated pins (deps: T084a; needs: H11) BLOCKED(needs H11)
   - Do: let the monthly workflow open or update one issue listing outdated pins.
   - Done when: a dispatch opens the issue once and a second dispatch updates it.
-- [ ] T085 · Explainer 07 (deps: T080)
+- [x] T085 · Explainer 07 (deps: T080)
   - Do: `docs/explainers/07-operations-and-monitoring.md`.
   - Done when: the file exists in the required format.
 

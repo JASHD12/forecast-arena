@@ -96,3 +96,16 @@ Older "Done log" lines moved from PROGRESS.md (newest first).
 - 2026-11-13 T036: explainers 01 (ledger, forecast before truth) and 02 (power questions), ten Q&A each
 - 2026-11-13 T080: Status page adds missed days, source freshness (latest batch/answer, overdue), LLM usage per day vs cap, LLM parse-failure rates; e2e now records usage like the CLI
 - 2026-11-13 T085: explainer 07 (operations and monitoring) with real incidents
+
+## Resolved risks (moved from PROGRESS.md on 2026-11-13)
+
+- **H10: GitHub Actions never starts a job.** Both attempts of the first CI run failed in
+  seconds without a runner (account-level block). Nothing live (CI, Pages, scheduled jobs,
+  dispatches) can run until the owner fixes it. Blocked on it: T002, T056, T074, T083.
+- **The `site/` ignore rule hid `src/arena/site/` until commit e99c540**: the site
+  package (T029, T072-T074) existed only in the sandbox and was never linted. Fixed by
+  anchoring the rule; a fresh clone now passes `make check` (verified).
+- **DECISIONS.md lost nine entries** to a scripted edit whose anchor had been removed;
+  restored the same day (note in the file). Edits now assert their anchors.
+- Two commits reached `main` with a failing check (lint at T024/T025, one test at T073),
+  each fixed in the next commit. Commits are now chained on `make check` passing.

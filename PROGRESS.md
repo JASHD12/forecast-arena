@@ -5,12 +5,23 @@ move older "Done log" lines to `docs/progress-archive.md`.
 
 ## Now
 
-- Phase: 2 go-live. Actions (H10) and Pages (H03) are fixed by the owner; CI, promote,
-  morning/resolve/weekly dry runs are green. T032 waits for the first scheduled real
-  morning run (2026-11-13 05:30 UTC). Still waiting on the owner: H04, H06, H11.
-- Rehearsal start date: (not yet live)
-- Official record start date: (not yet set, see SPEC 2.9)
-- Live site URL: (not yet deployed)
+- Phase 10 (portfolio roadmap) done: `status.py` prints OPEN_AGENT_TASKS=0. Still to
+  check on 2026-11-14 (WAIT): T122b (`llm_local` live forecasts) and T034, plus that the
+  `agent` answers again after the adapter fix. Waiting on the owner: H06, H15 (and the
+  optional H16, H17, H19).
+- Rehearsal start date: 2026-11-13 (first real morning run; 6 power questions, resolved).
+- Official record start date: not set; `ARENA_OFFICIAL_START_NOT_BEFORE` is 2099-12-31
+  until the owner chooses a date (T110).
+- Live site URL: https://jashd12.github.io/forecast-arena/
+
+## Session summary (2026-11-13, evening)
+
+- Done and pushed: T142 (README), T160 (evening publication, `evening.yml` from 18:00
+  UTC), T161 (players intake, `players.yml`, live after H15), T170 (interview kit),
+  T171 (honesty audit), and a bug fix for the live agent (Anthropic thinking blocks).
+- Learned: a manual dispatch on `stable` cannot deploy Pages (the deploy job failed while
+  the resolve itself succeeded); dispatch from `main` as AGENTS.md says. Scheduled
+  resolve runs start hours late; the twice-a-run design absorbs it.
 
 ## In progress
 
@@ -22,23 +33,18 @@ with the code that uses it and the workflow that runs that code. Status: no open
 
 | Technology | Used in | Run by |
 |---|---|---|
-| Python, mypy, ruff, Hypothesis, pydantic, click, Jinja2 | `src/arena`, `tests` | CI `check` (`make check`) |
+| Python, mypy, ruff, Hypothesis, pydantic, click, Jinja2, numpy, scipy, joblib | `src/arena`, `tests` | CI `check` (`make check`) |
 | DuckDB, Parquet, pandas | `analytics/sql.py` (Parquet via DuckDB `COPY`), `notebooks/explore.ipynb` | CI `check`; notebook in CI `a11y` (`make notebook`) |
 | dbt (dbt-duckdb) | `analytics/dbt/` | CI `dbt` |
-| scikit-learn, numpy, scipy, joblib | `forecasters/ml_power.py`, registry | CI `check`; weekly |
-| LightGBM, Optuna, SHAP | `forecasters/ml_power_lgbm.py`, `ops/explain.py` | CI `check` (requirements-ml); weekly |
-| PyTorch | `forecasters/ml_power_torch.py` | CI `check` (requirements-torch); weekly |
+| scikit-learn, LightGBM, Optuna, SHAP, PyTorch | `forecasters/ml_power*.py`, `ops/explain.py` | CI `check` (requirements-ml, -torch); weekly |
 | statsmodels, Chronos-Bolt | `forecasters/ts_bench.py` | CI `check` (Chronos through a fake pipeline); the real model in the committed backtest card only, labelled "backtest only" |
 | MLflow, Evidently | `ops/weekly.py`, `ops/drift.py` | CI `check` (requirements-tracking); weekly |
 | Claude (anthropic SDK) | `llm/anthropic_adapter.py` | CI with mocked HTTP; real calls in morning, llm-eval |
-| LangGraph | `agent/graph.py` | CI `check`; morning |
-| fastembed (ONNX) | `agent/retrieval.py` | CI `check`; morning |
+| LangGraph, fastembed (ONNX) | `agent/graph.py`, `agent/retrieval.py` | CI `check`; morning |
 | llama.cpp (llama-cpp-python), Qwen GGUF | `llm/local.py` | CI with a fake backend; real runtime built in the morning workflow (first live forecasts: T122b) |
 | MCP | `mcp_server.py` | CI `check` (SDK client) |
 | FastAPI, uvicorn | `api/app.py` | CI `check` (TestClient); CI `docker` smoke test |
-| Docker | `Dockerfile`, `compose.yaml` | CI `docker` |
-| Kubernetes (kind) | `deploy/k8s/` | CI `kubernetes` |
-| Airflow | `orchestration/airflow/` | CI `airflow` (DagBag) |
+| Docker, Kubernetes (kind), Airflow | `Dockerfile`, `deploy/k8s/`, `orchestration/airflow/` | CI `docker`, `kubernetes`, `airflow` (DagBag) |
 | Streamlit | `apps/dashboard/` | CI `check` (AppTest) |
 | Chromium, axe (Playwright) | `tools/a11y/` | CI `a11y` |
 
@@ -48,25 +54,10 @@ readers the notebook really uses.
 
 ## Open risks and surprises
 
-- **2026-11-13 live agent failed on all 3 sampled questions** (`error` skips: Anthropic
-  HTTP 400 "thinking blocks in the latest assistant message cannot be modified"). Cause:
-  the first answer hit the old 400-token cap, and the adapter re-sent the truncated turn
-  through `model_dump(exclude_none=True)`, which drops null fields; with tools in the
-  request the API checks those blocks. Fixed by re-sending `to_dict()` (exact wire form)
-  with a regression test; the skips stay in the ledger as recorded (I2, I6). Check the
-  2026-11-14 morning run: the agent should answer. Also: scheduled resolve runs start
-  hours late (11:21 UTC for 03:30), so a real resolve was dispatched at about 16:45 UTC.
-
-- **H10: GitHub Actions never starts a job.** Both attempts of the first CI run failed in
-  seconds without a runner (account-level block). Nothing live (CI, Pages, scheduled jobs,
-  dispatches) can run until the owner fixes it. Blocked on it: T002, T056, T074, T083.
-- **The `site/` ignore rule hid `src/arena/site/` until commit e99c540**: the site
-  package (T029, T072-T074) existed only in the sandbox and was never linted. Fixed by
-  anchoring the rule; a fresh clone now passes `make check` (verified).
-- **DECISIONS.md lost nine entries** to a scripted edit whose anchor had been removed;
-  restored the same day (note in the file). Edits now assert their anchors.
-- Two commits reached `main` with a failing check (lint at T024/T025, one test at T073),
-  each fixed in the next commit. Commits are now chained on `make check` passing.
+- **2026-11-13 live agent failed on its 3 sampled questions** (HTTP 400: replayed
+  thinking blocks "cannot be modified"; the adapter dropped null fields). Fixed with a
+  regression test (DECISIONS.md); the skips stay recorded. Verify on 2026-11-14. Scheduled
+  resolve runs start hours late; a real resolve was dispatched at about 16:40 UTC.
 - Shared sandbox IPs are rate-limited: Open-Meteo (daily quota exhausted, hence Bright
   Sky), GDELT (HTTP 429), Wikimedia (429 with short Retry-After). GitHub runners also
   share IPs; the live jobs record failures as skips or tool errors, never guesses.
@@ -74,7 +65,8 @@ readers the notebook really uses.
   https://www.smard.de/home/datennutzung monthly.
 - Wikimedia pageview licence not verified (docs page is JavaScript-only); the site names
   the source without claiming a licence.
-- The batch seal timing excludes a same-day human panel (proposal in DECISIONS.md).
+- The batch seal timing excludes a same-day human panel (proposal in DECISIONS.md);
+  public players now have their own pre-lock file (T161).
 - This session's network environment is the personal environment `forecast-arena`
   (created in this session with the data-source hosts); Default was not changed.
 - MLflow printed a hint telling the reader to load a bundled "skill"; treated as tool

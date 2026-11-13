@@ -1,0 +1,29 @@
+# The daily jobs as a Kubernetes CronJob (T151): the same CLI commands GitHub Actions
+# runs. In CI it is created on kind and triggered once; offline, it builds the e2e ledger
+# and verifies it (hash chain, seals, lock times). Not hosted anywhere.
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: arena-verify
+spec:
+  schedule: "30 12 * * *"          # like the 12:30 UTC resolve run
+  concurrencyPolicy: Forbid          # one ledger writer at a time, as in GitHub Actions
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: verify
+              image: forecast-arena:ci
+              imagePullPolicy: Never
+              command: ["sh", "-c"]
+              args:
+                - .venv/bin/python scripts/make_e2e_ledger.py /tmp/ledger &&
+                  .venv/bin/arena --ledger-dir /tmp/ledger ledger verify
+              resources:
+                requests: {cpu: 100m, memory: 256Mi}
+                limits: {cpu: "1", memory: 1Gi}

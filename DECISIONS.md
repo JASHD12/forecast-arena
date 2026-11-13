@@ -746,6 +746,18 @@ Made by: agent
   and curl checks four endpoints, including that a DROP statement gets 400.
 - `requirements-api.txt` (uvicorn; FastAPI was already pinned through MLflow).
 
+## 2026-11-13 · Kubernetes manifests validated on kind (T151)
+
+- `deploy/k8s/`: a Deployment and Service for the read-only API (probes on /health,
+  resource limits, no privilege escalation) and a CronJob mirroring the 12:30 UTC
+  resolve slot with `concurrencyPolicy: Forbid` (one ledger writer, as in Actions).
+- A CI job creates a throwaway kind cluster (helm/kind-action v1, version checked from
+  the action's tags: v1.15.2, default kind v0.33.0), loads the image, applies the
+  manifests, waits for the rollout, curls the API through the Service and runs the
+  CronJob once (offline e2e ledger + `ledger verify`).
+- Stated everywhere as "validated in CI, not hosted": production scheduling stays on
+  GitHub Actions (free); a hosted cluster would cost money (S1, owner rule).
+
 ## Proposals for the human
 
 Ideas outside the specification. The agent lists them here and does not build them.

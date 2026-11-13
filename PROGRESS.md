@@ -42,6 +42,7 @@ move older "Done log" lines to `docs/progress-archive.md`.
 
 ## Done log
 
+- 2026-11-13 T151: deploy/k8s (API Deployment+Service, CronJob) applied to a kind cluster in CI with API smoke test and one CronJob run; validated, not hosted
 - 2026-11-13 T150: FastAPI read-only REST API (arena api) reusing the JSON API models and the locked DuckDB; TestClient tests; Docker image serves it in CI (curl smoke test); compose.yaml
 - 2026-11-13 T143: Streamlit dashboard over the open Parquet (filters, Brier, running chart, calibration, skips), AppTest smoke test in CI, site link only when ARENA_DASHBOARD_URL is set (H19)
 - 2026-11-13 T139: static JSON API api/v1/{questions,latest,leaderboard}.json with JSON Schemas generated from pydantic models, api.html, validated in tests

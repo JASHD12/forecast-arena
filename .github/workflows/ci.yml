@@ -88,6 +88,40 @@ jobs:
           test "$(curl -s -o /dev/null -w '%{http_code}' 'http://127.0.0.1:8000/sql?q=DROP%20TABLE%20skips')" = 400
           docker logs arena-api | tail -5
 
+  kubernetes:
+    # T151: apply deploy/k8s/ to a throwaway kind cluster and smoke-test it. Nothing is
+    # hosted; this only proves the manifests and the image work on Kubernetes.
+    needs: check
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      - name: Build the image
+        run: docker build -t forecast-arena:ci .
+      - uses: helm/kind-action@v1
+        with:
+          cluster_name: arena
+      - name: Load the image into kind and apply the manifests
+        run: |
+          kind load docker-image forecast-arena:ci --name arena
+          kubectl apply -f deploy/k8s/
+          kubectl rollout status deployment/arena-api --timeout=300s
+      - name: Smoke-test the API through the Service
+        run: |
+          kubectl port-forward service/arena-api 8000:80 >/tmp/pf.log 2>&1 &
+          for i in $(seq 1 30); do curl -fsS http://127.0.0.1:8000/health && break; sleep 2; done
+          curl -fsS "http://127.0.0.1:8000/leaderboard" | python3 -c "import json,sys; d=json.load(sys.stdin); assert d['rows'], d"
+      - name: Run the CronJob once and check it succeeds
+        run: |
+          kubectl create job verify-once --from=cronjob/arena-verify
+          kubectl wait --for=condition=complete job/verify-once --timeout=300s
+          kubectl logs job/verify-once | tail -3
+      - name: Show cluster state on failure
+        if: failure()
+        run: |
+          kubectl get all
+          kubectl describe pods | tail -60
+
   audit:
     # Vulnerability report for the pinned dependencies. Non-blocking: findings appear in
     # the job summary and are fixed through normal commits, never automatically.

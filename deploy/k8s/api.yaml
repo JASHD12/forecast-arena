@@ -1,0 +1,51 @@
+# Forecast Arena read-only REST API on Kubernetes (T151). Validated in CI on a throwaway
+# kind cluster; NOT hosted anywhere. Production scheduling is GitHub Actions.
+# The image is the repository's Dockerfile (loaded into kind as forecast-arena:ci). The
+# pod serves the offline end-to-end ledger; to serve the real record, mount a clone of
+# the `ledger` branch and point --ledger-dir at it.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: arena-api
+  labels: {app: arena-api}
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: arena-api}
+  template:
+    metadata:
+      labels: {app: arena-api}
+    spec:
+      containers:
+        - name: api
+          image: forecast-arena:ci
+          imagePullPolicy: Never
+          command: ["sh", "-c"]
+          args:
+            - .venv/bin/python scripts/make_e2e_ledger.py /tmp/ledger &&
+              .venv/bin/arena --ledger-dir /tmp/ledger api --host 0.0.0.0 --port 8000
+          ports:
+            - containerPort: 8000
+          readinessProbe:
+            httpGet: {path: /health, port: 8000}
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            httpGet: {path: /health, port: 8000}
+            initialDelaySeconds: 60
+            periodSeconds: 20
+          resources:
+            requests: {cpu: 100m, memory: 256Mi}
+            limits: {cpu: "1", memory: 1Gi}
+          securityContext:
+            allowPrivilegeEscalation: false
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: arena-api
+spec:
+  selector: {app: arena-api}
+  ports:
+    - port: 80
+      targetPort: 8000

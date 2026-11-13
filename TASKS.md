@@ -503,7 +503,7 @@ CI jobs; core `make check` stays offline and fast.
     `ARENA_DASHBOARD_URL` is set (H19).
 - [x] T150 · FastAPI service and Docker compose (deps: T045i)
   - Done when: TestClient tests pass; the Docker image serves the API in CI.
-- [ ] T151 · Kubernetes manifests validated on kind in CI (deps: T150)
+- [x] T151 · Kubernetes manifests validated on kind in CI (deps: T150)
   - Done when: a CI job applies `deploy/k8s/` to kind and smoke-tests the API.
 - [ ] T152 · dbt models over the open data (deps: T045i)
   - Done when: `dbt build` (dbt-duckdb) with tests passes in CI; Data page reads marts.

@@ -910,3 +910,22 @@ Ideas outside the specification. The agent lists them here and does not build th
 - Alternatives: run forecasters in the evening too (rejected: less data, and it changes
   every forecaster's information set); move the lock (rejected: the task says lock
   unchanged, and the lock must stay before the noon auction).
+
+## 2026-11-13 Public players' intake (T161)
+
+- Context: the players' leaderboard needs people's forecasts in the record, with the same
+  forecast-before-lock guarantee as the machines, without collecting personal data.
+- Decision: a `players` job (09:00 and 09:15 UTC, `players.yml`) reads the published form
+  CSV (`ARENA_PLAYERS_CSV_URL`) and appends to a new ledger family `players/B.jsonl`. It
+  cannot go into `forecasts/B.jsonl`, which the batch seal makes immutable at about
+  05:30. Each player is `player_` + 8 hex of SHA-256 of a random player code (no
+  nicknames or emails are read); consent must be `yes`. The latest valid row submitted
+  before the run counts; once written, a forecast is never replaced (append-only), so a
+  change of mind after the first intake does not count. `ledger verify` checks these
+  forecasts against the lock like any other, and `verify --git` checks their commits.
+  The scoring loader reads only `forecasts/`, so players never enter the machine boards
+  (I4-style separation); T162 adds their own board, with at least 10 resolved answers
+  before a player is ranked.
+- Alternatives: nickname-derived ids (rejected: guessable from the nickname, personal
+  data); HMAC with a secret salt (rejected: needs a new secret and players could not find
+  themselves); replacing earlier records (rejected: I2).

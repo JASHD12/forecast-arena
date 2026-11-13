@@ -70,6 +70,8 @@ class Settings(BaseModel):
     models_dir: Path = Path("models_cache")
 
     panel_csv_url: str | None = None
+    #: T161: published CSV of the public players' form (H15); intake is off when unset.
+    players_csv_url: str | None = None
     coingecko_api_key: SecretStr | None = None
     domains: tuple[str, ...] = ("power",)
 
@@ -88,6 +90,7 @@ class Settings(BaseModel):
         "llm_base_url",
         "llm_effort",
         "panel_csv_url",
+        "players_csv_url",
         "coingecko_api_key",
         "official_start_not_before",
         "dashboard_url",

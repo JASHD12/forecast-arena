@@ -23,6 +23,7 @@ from typing import Any
 from arena.clock import Clock
 from arena.domains.base import Domain
 from arena.forecasters.base import Forecaster
+from arena.forecasters.players import PlayerIntake
 from arena.ledger import Ledger, layout
 from arena.ledger.manifest import RunRecorder, run_manifest
 from arena.ledger.seal import seal_batch, seal_pending_days
@@ -246,6 +247,58 @@ def evening(
             _, new_qs = _generate(led, batch, clock, domains, rec, deadline)
             if new_qs:
                 res.written["questions"] = led.append(layout.questions_path(batch), new_qs)
+        res.warnings = list(rec.warnings)
+    return res
+
+
+def players(
+    ledger: Ledger,
+    batch: date,
+    clock: Clock,
+    intake: PlayerIntake | None,
+    *,
+    dry_run: bool = False,
+    lock: time = LOCK,
+) -> JobResult:
+    """Write the public players' forecasts for `batch` before its lock (T161).
+
+    Runs shortly before the lock (09:00 and 09:15 UTC). Refused at or after the lock
+    (integrity rule I1: nothing is ever backdated). Without a configured form CSV it
+    records that and writes nothing. Forecasts already in `players/B.jsonl` stay as they
+    are; a later run only adds new players and questions.
+    """
+    from arena.forecasters.players import select, to_forecasts
+
+    res = JobResult("players", batch)
+    with _maybe_dry(ledger, dry_run) as led, run_manifest(led, "players", batch, clock,
+                                                         dry_run=dry_run) as rec:  # fmt: skip
+        now = clock.now()
+        deadline = batch_lock(batch, lock)
+        qs = [q for q in led.read(layout.questions_path(batch)) if isinstance(q, Question)]
+        if intake is None:
+            rec.warn("no players CSV configured (ARENA_PLAYERS_CSV_URL); nothing to do")
+        elif now.date() != batch:
+            rec.warn(f"batch {batch} is not today's UTC date ({now.date()}); refused")
+        elif now >= deadline:
+            res.late = True
+            rec.count("late_runs")
+            rec.warn(f"late run: {now.isoformat()} is at or after lock {deadline.isoformat()}")
+        elif not qs:
+            rec.warn(f"no questions for {batch}; nothing to do")
+        else:
+            for reason, n in sorted(intake.rejected.items()):
+                rec.count(f"rejected_{reason}", n)
+            winners, dropped = select(intake, qs, now)
+            for reason, n in sorted(dropped.items()):
+                rec.count(f"dropped_{reason}", n)
+            path = layout.players_path(batch)
+            fresh = to_forecasts(winners, now, (r.record_id for r in led.read(path)))
+            if fresh and clock.now() < deadline:
+                res.written["player_forecasts"] = led.append(path, fresh)
+                rec.count("players", len({f.forecaster_id for f in fresh}))
+            elif fresh:
+                res.late = True
+                rec.warn("lock passed during intake; nothing written")
         res.warnings = list(rec.warnings)
     return res
 

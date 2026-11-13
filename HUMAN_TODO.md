@@ -113,10 +113,14 @@ Keep the first line of each item in exactly this shape; the status script parses
     postcode and city. Add the street line in `site_content/imprint.md` and
     `site_content/privacy.md` (above "35390 Gießen"), or tell the agent.
 - [ ] H15 · Players' leaderboard: form, consent and privacy
-  - Create a Google Form (nickname, consent tick-box, one probability per question),
-    publish its responses as CSV and set the Actions variable `ARENA_PANEL_CSV_URL`.
-  - Write the consent text and extend `site_content/privacy.md` (nicknames are personal
-    data; ledger entries cannot be erased). The agent drafts both on request.
+  - Create a Google Form whose published response CSV has exactly the columns
+    `code,question_id,probability,submitted_at,consent` (one row per answer; `code` is a
+    random player code of 12-64 letters, digits, `_` or `-`; `consent` is `yes` when the
+    consent box is ticked; `submitted_at` in ISO 8601 with a UTC offset). Do not ask for
+    names or emails. Set the Actions variable `ARENA_PLAYERS_CSV_URL` to the CSV link
+    (the `players` workflow reads it at 09:00 and 09:15 UTC; see `src/arena/forecasters/players.py`).
+  - Write the consent text and extend `site_content/privacy.md` (a player code links a
+    person to their forecasts; ledger entries cannot be erased). The agent drafts both on request.
   - Needed for T162.
 - [ ] H16 · Recruiter page details
   - Put your degree, university, expected graduation, availability (hours/week, start

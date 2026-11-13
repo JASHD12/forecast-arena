@@ -1,0 +1,74 @@
+name: players
+
+# T161: write the public players' forecasts for today's batch shortly before the 09:30 UTC
+# lock, from the published form CSV (Actions variable ARENA_PLAYERS_CSV_URL, H15). Without
+# that variable the job records "not configured" and writes nothing. Scheduled runs use
+# the stable branch; dry_run works on a throwaway copy of the ledger and pushes nothing.
+
+on:
+  schedule:
+    - cron: "0 9 * * *"    # 09:00 UTC
+    - cron: "15 9 * * *"   # 09:15 UTC (second chance; adds only what is not written yet)
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Do everything on a throwaway copy of the ledger; push nothing"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: arena-ledger  # shared with the other ledger writers
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write  # push to the ledger branch (built-in token)
+    env:
+      ARENA_CONTACT: ${{ vars.ARENA_CONTACT }}
+      ARENA_LEDGER_REMOTE: https://github.com/${{ github.repository }}.git
+      ARENA_PLAYERS_CSV_URL: ${{ vars.ARENA_PLAYERS_CSV_URL }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && github.ref || 'stable' }}
+          persist-credentials: false  # the ledger push sets its own header; avoid a duplicate
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements-*.txt
+      - name: Install pinned dependencies
+        run: make setup
+      - name: Mode
+        id: mode
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.dry_run }}" = "true" ]; then
+            echo "dry_run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "dry_run=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Let git push the ledger branch with the built-in token
+        env:
+          TOKEN: ${{ github.token }}
+        run: |
+          header=$(printf 'x-access-token:%s' "$TOKEN" | base64 -w0)
+          echo "::add-mask::$header"
+          git config --global http.https://github.com/.extraheader "AUTHORIZATION: basic $header"
+          git config --global user.name forecast-arena-bot
+          git config --global user.email forecast-arena-bot@users.noreply.github.com
+      - name: players intake
+        run: |
+          if [ "${{ steps.mode.outputs.dry_run }}" = "true" ]; then
+            .venv/bin/arena --dry-run daily players --push
+          else
+            .venv/bin/arena daily players --push
+          fi
+      - name: Verify the ledger
+        if: steps.mode.outputs.dry_run == 'false'
+        run: .venv/bin/arena ledger verify --git

@@ -342,6 +342,28 @@ def daily_evening(obj: Ctx, push: bool) -> None:
     _push(obj, remote, "evening", batch)
 
 
+@daily.command("players")
+@click.option("--push", is_flag=True, help="Sync with and push to the ledger branch.")
+@click.pass_obj
+def daily_players(obj: Ctx, push: bool) -> None:
+    """Public players' forecasts for --date from the form CSV, before the lock (T161)."""
+    from arena.forecasters.players import parse_players_csv
+    from arena.ops.jobs import players
+    from arena.sources.http import HttpClient
+
+    remote = _sync(obj, push)
+    intake = None
+    url = obj.settings.players_csv_url
+    if url:
+        body = HttpClient(obj.settings.user_agent()).get(url).body
+        intake = parse_players_csv(body.decode("utf-8-sig"))
+    result = players(obj.ledger, obj.day, obj.clock, intake, dry_run=obj.dry_run)
+    click.echo(result.line())
+    for w in result.warnings:
+        click.echo(f"warning: {w}")
+    _push(obj, remote, "players", obj.day)
+
+
 @daily.command("morning")
 @click.option("--push", is_flag=True, help="Sync with and push to the ledger branch.")
 @click.pass_obj

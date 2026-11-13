@@ -41,7 +41,8 @@ def verify_git(ledger: Ledger) -> list[str]:
             errors.append(f"batch {batch}: sealed but has no questions")
             continue
         lock = min(q.lock_time for q in questions)
-        paths = [layout.questions_path(batch), layout.forecasts_path(batch), rel]
+        paths = [layout.questions_path(batch), layout.forecasts_path(batch),
+                 layout.players_path(batch), rel]  # fmt: skip
         commits = commits_touching(repo, paths)
         if not any(rel in _changed(repo, sha) for sha, _ in commits):
             errors.append(f"batch {batch}: seal {rel} is not committed")

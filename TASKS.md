@@ -513,7 +513,7 @@ CI jobs; core `make check` stays offline and fast.
   - Do: generation at about 18:00 UTC on B-1; machine forecasts still in the morning;
     changed templates get template_version 2; before the official start.
   - Done when: e2e test covers the new timing; lock unchanged.
-- [ ] T161 · Player intake (deps: T160, T091)
+- [x] T161 · Player intake (deps: T160, T091)
   - Do: per-player forecasts under random ids from the form CSV; pre-lock run; rules.
   - Done when: tests cover late, duplicate and invalid rows.
 - [ ] T162 · Players' leaderboard and Play page (live) (deps: T161; needs: H15)

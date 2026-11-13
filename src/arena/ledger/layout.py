@@ -9,12 +9,15 @@ FAMILIES: dict[str, frozenset[str]] = {
     "questions": frozenset({"question"}),
     "forecasts": frozenset({"forecast", "skip"}),
     "resolutions": frozenset({"resolution", "void"}),
+    #: T161: public players' forecasts, one file per batch, written before the lock and
+    #: after the batch seal (which covers only the machine forecasts).
+    "players": frozenset({"forecast"}),
 }
 
 GENESIS_CHAIN = "0" * 64
 
 _DATED_JSONL = re.compile(
-    r"^(questions|forecasts|resolutions|agent_traces)/(\d{4})/(\d{2})/(\d{2})\.jsonl$"
+    r"^(questions|forecasts|resolutions|players|agent_traces)/(\d{4})/(\d{2})/(\d{2})\.jsonl$"
 )
 _RUN = re.compile(r"^runs/(\d{4})/(\d{2})/(\d{2})-[a-z0-9_]+-\d+\.json$")
 _HEALTH = re.compile(r"^health/(\d{4})/(\d{2})/(\d{2})-[a-z0-9_]+-\d+\.json$")
@@ -35,6 +38,11 @@ def questions_path(batch: date) -> str:
 def forecasts_path(batch: date) -> str:
     """Forecasts and skips of a batch."""
     return f"forecasts/{_ymd(batch)}.jsonl"
+
+
+def players_path(batch: date) -> str:
+    """Public players' forecasts for a batch (T161)."""
+    return f"players/{_ymd(batch)}.jsonl"
 
 
 def resolutions_path(written_on: date) -> str:

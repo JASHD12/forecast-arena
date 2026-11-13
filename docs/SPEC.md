@@ -98,6 +98,7 @@ because scheduled workflows can start late):
 |---|---|---|
 | 18:00, 19:30 (day before) | evening | Publish the next batch's questions (template version 2, T160), push, rebuild site. No forecasts. |
 | 05:30, 07:00 | morning | Generate questions for any domain the evening job did not cover (template version 1), snapshot as-of inputs, run all forecasters, append, seal, push, rebuild site. |
+| 09:00, 09:15 | players | Write the public players' forecasts from the form CSV (T161). |
 | 09:30 | (lock) | Batch lock time for every question created that morning. |
 | 12:30, 16:30, 20:30, 03:30 | resolve | Resolve whatever has become resolvable, seal finished days, rescore, rebuild and deploy the site, run health checks. |
 | Sunday 02:00 | weekly | Retrain models, drift report, promote models by rule. |
@@ -160,6 +161,7 @@ Layout on the `ledger` branch:
 questions/YYYY/MM/DD.jsonl        by batch date
 forecasts/YYYY/MM/DD.jsonl        by batch date (includes skips)
 resolutions/YYYY/MM/DD.jsonl      by the UTC date the resolution was written (includes voids)
+players/YYYY/MM/DD.jsonl          public players' forecasts of the batch, before lock (T161)
 snapshots/<domain>/YYYY/MM/DD/    compressed as-of inputs and resolution evidence
 agent_traces/YYYY/MM/DD.jsonl     compact tool-call logs for the agent forecaster
 runs/YYYY/MM/DD-<job>-<n>.json    run manifests
@@ -437,7 +439,11 @@ Information sets (this table is shown on the Methods page):
   generates a domain the evening job missed, as version 1, so a batch never mixes two
   versions of one domain.
 - Players: members of the public submit forecasts through a published form CSV; each
-  player is ranked under a random id on the same questions and scoring rules.
+  player is ranked under a random id on the same questions and scoring rules. Intake
+  (T161): a `players` job at 09:00 and 09:15 UTC writes one forecast per player and
+  question into `players/B.jsonl` (its own ledger family, after the batch seal, before
+  the lock); the latest valid row submitted before the run counts; a written forecast is
+  never replaced. Player forecasts never enter the machine forecasters' boards.
 
 ## 9. LLM layer
 

@@ -25,9 +25,9 @@ jobs:
       - name: Install pinned dependencies
         run: |
           make setup
-          .venv/bin/pip install -r requirements-tracking.txt -r requirements-ml.txt
-          .venv/bin/pip install -r requirements-torch.txt
-          .venv/bin/pip install -r requirements-ts.txt -r requirements-rag.txt -r requirements-graph.txt -r requirements-mcp.txt -r requirements-dashboard.txt -r requirements-api.txt
+          .venv/bin/pip install -r requirements/tracking.txt -r requirements/ml.txt
+          .venv/bin/pip install -r requirements/torch.txt
+          .venv/bin/pip install -r requirements/ts.txt -r requirements/rag.txt -r requirements/graph.txt -r requirements/mcp.txt -r requirements/dashboard.txt -r requirements/api.txt
       - name: make check (with test coverage)
         run: |
           set -o pipefail
@@ -65,7 +65,7 @@ jobs:
         run: make a11y
       - name: Run the analysis notebook on the e2e export (T138)
         run: |
-          .venv/bin/pip install -r requirements-nb.txt
+          .venv/bin/pip install -r requirements/nb.txt
           make notebook
 
   docker:
@@ -107,7 +107,7 @@ jobs:
       - name: dbt build (models and tests)
         run: |
           python -m venv .venv-dbt
-          .venv-dbt/bin/pip install -r requirements-dbt.txt
+          .venv-dbt/bin/pip install -r requirements/dbt.txt
           cd analytics/dbt
           DBT_SEND_ANONYMOUS_USAGE_STATS=false ARENA_DATA_DIR="$GITHUB_WORKSPACE/_site_e2e/data" \
             ../../.venv-dbt/bin/dbt build --profiles-dir .
@@ -185,6 +185,6 @@ jobs:
           {
             echo "## Dependency vulnerability audit"
             echo '```'
-            pip-audit -r requirements-lock.txt -r requirements-tracking.txt -r requirements-ml.txt -r requirements-ts.txt -r requirements-rag.txt -r requirements-graph.txt -r requirements-mcp.txt -r requirements-nb.txt -r requirements-dashboard.txt -r requirements-api.txt --progress-spinner off 2>&1 || true
+            pip-audit -r requirements/lock.txt -r requirements/tracking.txt -r requirements/ml.txt -r requirements/ts.txt -r requirements/rag.txt -r requirements/graph.txt -r requirements/mcp.txt -r requirements/nb.txt -r requirements/dashboard.txt -r requirements/api.txt --progress-spinner off 2>&1 || true
             echo '```'
           } | tee -a "$GITHUB_STEP_SUMMARY"

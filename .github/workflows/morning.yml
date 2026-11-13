@@ -52,7 +52,7 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
-          cache-dependency-path: requirements-*.txt
+          cache-dependency-path: requirements/*.txt
       - name: Install pinned dependencies
         if: github.event_name == 'schedule'
         run: make setup
@@ -101,16 +101,16 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip  # keeps the llama-cpp-python wheel built from source (T122)
-          cache-dependency-path: requirements-*.txt
+          cache-dependency-path: requirements/*.txt
       - name: Install pinned dependencies
         run: |
           make setup
-          .venv/bin/pip install -r requirements-rag.txt -r requirements-graph.txt
+          .venv/bin/pip install -r requirements/rag.txt -r requirements/graph.txt
       - name: Install the local LLM runtime (llm_local; a failure only skips llm_local)
         continue-on-error: true
         env:
           CMAKE_ARGS: "-DGGML_NATIVE=OFF"  # portable build, so the cached wheel fits any runner
-        run: .venv/bin/pip install -r requirements-local.txt
+        run: .venv/bin/pip install -r requirements/local.txt
       - name: Restore cached model weights (Qwen2.5-1.5B-Instruct GGUF, pinned revision)
         uses: actions/cache@v6
         with:

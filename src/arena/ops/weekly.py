@@ -1,6 +1,6 @@
 """The weekly job (SPEC 12): retrain, compare, promote by rule, model card, run summary.
 
-Promotion rule (documented on the model cards and in DECISIONS.md):
+Promotion rule (documented on the model cards and in docs/project/DECISIONS.md):
 1. Window = the 28 batch days ending `LAG_DAYS` before today (their outcomes are known).
 2. A candidate is trained with its cut-off before the window and scored on the window's
    real questions through the production question, context and resolver code. The

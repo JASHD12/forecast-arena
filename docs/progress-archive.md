@@ -1,6 +1,6 @@
 # Progress archive
 
-Older "Done log" lines moved from PROGRESS.md (newest first).
+Older "Done log" lines moved from docs/project/PROGRESS.md (newest first).
 
 - 2026-11-12 T029: static site v1 (Home, Methods, Status, About), disclaimer/attribution on every page, light/dark, link check
 - 2026-11-12 T028: scoring v1 (clip, Brier, log, skill vs base_rate, counts), property tests, `arena score show`
@@ -32,8 +32,8 @@ Older "Done log" lines moved from PROGRESS.md (newest first).
 - 2026-11-13 T032: first real batch (6 power questions, 18 forecasts incl. Claude Haiku 5.5) on the ledger at 08:27 UTC, before the 09:30 lock; verify --git PASS; rehearsal start 2026-11-13. Both morning schedules were skipped by GitHub; dispatched by hand from `stable` (run 43393206918)
 - 2026-11-13 fix: agent repair step re-sent the model's reply (two assistant turns in a row -> API 400 on thinking blocks); regression test; workflows default ARENA_LLM_EFFORT=low so thinking does not use the 400-token answer budget
 - 2026-11-13 T111: weekly job trains several candidate families per domain, promotes the best only if not worse than the champion; candidates table on Experiments
-- 2026-11-13 Phase 0: roadmap tasks T110-T171 in TASKS.md, H15-H19, decisions, SPEC 8.8/11 amendments; scheduled resume every 5 h (trig_016b95iyHSuR6B44xPaAgDPF)
-- 2026-11-13 owner approved docs/ROADMAP.md (portfolio roadmap v2); next session starts with its Phase 0 (add tasks T110+ to TASKS.md), then Phase 1
+- 2026-11-13 Phase 0: roadmap tasks T110-T171 in docs/project/TASKS.md, H15-H19, decisions, SPEC 8.8/11 amendments; scheduled resume every 5 h (trig_016b95iyHSuR6B44xPaAgDPF)
+- 2026-11-13 owner approved docs/ROADMAP.md (portfolio roadmap v2); next session starts with its Phase 0 (add tasks T110+ to docs/project/TASKS.md), then Phase 1
 - 2026-11-12 T045m: pinball loss + interval coverage in weekly job; forest plot, podium, architecture, About
 - 2026-11-12 site round 4 (owner request): leaderboard podium + forest plot (CIs), architecture diagram (methods/stack/about), About page with author card and skills grid
 - 2026-11-12 H05 published (owner details: name, 35390 Gießen, e-mail, Hesse/HBDI); H14 open for street address
@@ -97,7 +97,7 @@ Older "Done log" lines moved from PROGRESS.md (newest first).
 - 2026-11-13 T080: Status page adds missed days, source freshness (latest batch/answer, overdue), LLM usage per day vs cap, LLM parse-failure rates; e2e now records usage like the CLI
 - 2026-11-13 T085: explainer 07 (operations and monitoring) with real incidents
 
-## Resolved risks (moved from PROGRESS.md on 2026-11-13)
+## Resolved risks (moved from docs/project/PROGRESS.md on 2026-11-13)
 
 - **H10: GitHub Actions never starts a job.** Both attempts of the first CI run failed in
   seconds without a runner (account-level block). Nothing live (CI, Pages, scheduled jobs,
@@ -105,7 +105,7 @@ Older "Done log" lines moved from PROGRESS.md (newest first).
 - **The `site/` ignore rule hid `src/arena/site/` until commit e99c540**: the site
   package (T029, T072-T074) existed only in the sandbox and was never linted. Fixed by
   anchoring the rule; a fresh clone now passes `make check` (verified).
-- **DECISIONS.md lost nine entries** to a scripted edit whose anchor had been removed;
+- **docs/project/DECISIONS.md lost nine entries** to a scripted edit whose anchor had been removed;
   restored the same day (note in the file). Edits now assert their anchors.
 - Two commits reached `main` with a failing check (lint at T024/T025, one test at T073),
   each fixed in the next commit. Commits are now chained on `make check` passing.

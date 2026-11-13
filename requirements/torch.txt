@@ -1,5 +1,5 @@
 # CPU-only PyTorch for the neural challenger (T113). Installed by CI and the weekly
-# workflow on top of requirements-lock.txt; the CPU wheel avoids GPU libraries.
+# workflow on top of requirements/lock.txt; the CPU wheel avoids GPU libraries.
 --index-url https://download.pytorch.org/whl/cpu
 --extra-index-url https://pypi.org/simple
 torch==2.15.0+cpu

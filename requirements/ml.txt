@@ -1,5 +1,5 @@
 # Extra pins for the ML challengers (LightGBM, Optuna, SHAP), installed by CI and the weekly
-# workflow on top of requirements-lock.txt and requirements-tracking.txt (DECISIONS.md,
+# workflow on top of requirements/lock.txt and requirements/tracking.txt (docs/project/DECISIONS.md,
 # "Portfolio roadmap"). Compatible with both: compiled with them as constraints.
 alembic==1.20.1
 cloudpickle==3.1.2

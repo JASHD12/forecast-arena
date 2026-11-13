@@ -287,7 +287,7 @@ Grace: 72 hours.
 | `wetter_than` | Precipitation on D at {A} > at {B}? | none (ties, including two dry days, are NO) | 30 common days for the degeneracy check |
 
 The last four rows were added on 2026-11-12 at the owner's request, before the official
-record (DECISIONS.md, "More interesting weather questions"). City duels are fixed pairs:
+record (docs/project/DECISIONS.md, "More interesting weather questions"). City duels are fixed pairs:
 Berlin vs Munich and Hamburg vs Frankfurt.
 
 Void when more than 2 hourly observations of D are missing for the variable.
@@ -594,7 +594,7 @@ third-party requests; every page stays usable without JavaScript.
 ## 14. Repository layout
 
 ```
-AGENTS.md  CLAUDE.md  TASKS.md  PROGRESS.md  HUMAN_TODO.md  DECISIONS.md  README.md
+AGENTS.md  CLAUDE.md  docs/project/TASKS.md  docs/project/PROGRESS.md  docs/project/HUMAN_TODO.md  docs/project/DECISIONS.md  README.md
 docs/        SPEC.md  SOURCES.md  RUNBOOK.md  METHODS.md  explainers/  schemas/
 src/arena/   config.py  clock.py  models.py  cli.py
              ledger/  sources/  domains/  forecasters/  llm/  scoring/  site/  ops/

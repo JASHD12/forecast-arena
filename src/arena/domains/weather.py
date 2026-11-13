@@ -3,13 +3,13 @@
 Target: Berlin calendar day D = B+1. Lock B 09:30 UTC. Resolve after D+1 06:00 UTC.
 Grace 72 hours. Void when more than 2 hourly observations of D are missing.
 
-Interpretation (DECISIONS.md, "Weather templates"):
+Interpretation (docs/project/DECISIONS.md, "Weather templates"):
 - Daily values use the hour-ending records of the Berlin day (01:00 ... 24:00 local).
 - Daily maximum = highest hourly temperature reading; daily precipitation = sum of the
   hourly totals. Both rounded half-up to 0.1 (DWD precision) before comparison.
 - Observations only from DWD observation sources, never from forecasts; values filled in
   from another station count as missing.
-- Templates added 2026-11-12 on the owner's request (DECISIONS.md, "More interesting
+- Templates added 2026-11-12 on the owner's request (docs/project/DECISIONS.md, "More interesting
   weather questions"), before the official record: `frost_day` (daily minimum below
   0.0 °C, the DWD "Frosttag"), `gust_gt` (highest hourly maximum gust above an adaptive
   threshold, only at stations that report gusts), and the city duels `warmer_than`

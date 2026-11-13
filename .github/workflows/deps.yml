@@ -2,7 +2,7 @@ name: deps
 
 # Monthly list of outdated pins (report only: no automatic upgrades or merges).
 # The report goes to the job summary. Opening an issue with it needs the owner's approval
-# (HUMAN_TODO.md H11; task T084b).
+# (docs/project/HUMAN_TODO.md H11; task T084b).
 
 on:
   schedule:
@@ -24,7 +24,7 @@ jobs:
       - name: Install the pinned dependencies
         run: |
           make setup
-          .venv/bin/pip install -r requirements-tracking.txt -r requirements-ml.txt
+          .venv/bin/pip install -r requirements/tracking.txt -r requirements/ml.txt
       - name: Outdated pins report
         run: |
           {

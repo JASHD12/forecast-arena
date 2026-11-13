@@ -42,14 +42,14 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
-          cache-dependency-path: requirements-*.txt
+          cache-dependency-path: requirements/*.txt
       - name: Install pinned dependencies
         run: make setup
       - name: Install the local LLM runtime
         if: inputs.local
         env:
           CMAKE_ARGS: "-DGGML_NATIVE=OFF"
-        run: .venv/bin/pip install -r requirements-local.txt
+        run: .venv/bin/pip install -r requirements/local.txt
       - name: Restore cached model weights
         if: inputs.local
         uses: actions/cache@v6

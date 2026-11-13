@@ -27,7 +27,7 @@ answer is genuinely uncertain. The exact resolution rule is stored with the ques
 **5. What is live today and what is not?**
 Electricity questions run live every day with the baselines and the LLM forecasters. The
 gradient-boosted model, the other topics, the ensemble and the players' leaderboard are
-built and tested, and switch on as their tasks complete. The site and `TASKS.md` say which.
+built and tested, and switch on as their tasks complete. The site and `docs/project/TASKS.md` say which.
 
 ## Integrity
 

@@ -1,6 +1,6 @@
 """The ledger as SQL tables (DuckDB) and as open-data Parquet files.
 
-Owner request 2026-11-12 (DECISIONS.md "Open data and SQL analytics"). Everything is
+Owner request 2026-11-12 (docs/project/DECISIONS.md "Open data and SQL analytics"). Everything is
 derived from the ledger by code (I5); the site shows each query next to its result so a
 reader can rerun it. These analyses are exploratory; the headline results stay on the
 leaderboard (SPEC 10), which is computed by `arena.scoring`.

@@ -1,4 +1,4 @@
-# DECISIONS.md - design decisions
+# docs/project/DECISIONS.md - design decisions
 
 One entry per decision a reviewer might question. Newest first.
 
@@ -50,7 +50,7 @@ Made by: agent
 ## 2026-11-12 - Lock file format
 Context: AGENTS.md 6 asks for dependencies pinned by a lock file. The first session ran in a
 cloud sandbox where PyPI was not reachable, so `uv lock` could not resolve.
-Decision: `requirements-lock.txt` with exact `==` pins of the packages already installed in
+Decision: `requirements/lock.txt` with exact `==` pins of the packages already installed in
 that sandbox. `make setup` installs from it with uv (if present) or pip.
 Alternatives: `uv.lock` (preferred long term; regenerate once network is available and
 switch `make setup` to `uv sync`); no lock (rejected: breaks reproducibility).
@@ -262,7 +262,7 @@ model; if not worse, the same recipe is refitted with the latest outcomes and pr
 so runs are logged to a SQLite file (`mlruns/mlflow.db`, still file-backed, no server).
 The database is mutable and therefore not on the append-only ledger; each run's JSON
 summary is written to `models/weekly/` on the ledger instead. MLflow (`mlflow-skinny`
-with SQLAlchemy and Alembic) is pinned in `requirements-tracking.txt`, installed by the
+with SQLAlchemy and Alembic) is pinned in `requirements/tracking.txt`, installed by the
 weekly workflow and CI, not by `make setup`.
 Made by: agent
 
@@ -276,7 +276,7 @@ Made by: agent
 
 ## 2026-11-12 - Drift report with Evidently, metrics on the ledger, HTML as an artifact
 Context: SPEC 12 asks for a weekly Evidently drift report published on the site.
-Decision: Evidently 0.7.23 (pinned with pandas 2.3.3 in `requirements-tracking.txt`; it
+Decision: Evidently 0.7.23 (pinned with pandas 2.3.3 in `requirements/tracking.txt`; it
 does not import with pandas 3) compares the power features and the model's median
 prediction on the 28-day window with the year before. Its telemetry dependency is
 disabled with `DO_NOT_TRACK` in code and in the workflow. The full HTML report is ~4 MB
@@ -459,7 +459,7 @@ Made by: agent
 ## 2026-11-13 · Portfolio roadmap (owner approved)
 
 - Context: the owner wants the project to win AI/ML/DS working-student interviews in
-  Germany and approved `docs/ROADMAP.md` (Phase 10 in TASKS.md).
+  Germany and approved `docs/ROADMAP.md` (Phase 10 in docs/project/TASKS.md).
 - Decisions (owner): self-hosted JavaScript is allowed on the site (no cookies, no
   storage, no third-party requests, pages work without it); add measured ML challengers
   (LightGBM + Optuna + SHAP, a PyTorch network, statistical and foundation-model
@@ -482,8 +482,8 @@ Made by: agent
   0.1/0.5/0.9). Features, calibration and question logic are the champion's, so only the
   learner differs. It is promoted only if it is not worse than the champion on the same
   recent questions (T111). SHAP (TreeExplainer) explains it when it is the champion.
-- New optional dependencies in `requirements-ml.txt` (lightgbm, optuna, shap), compiled
-  with `requirements-lock.txt` and `requirements-tracking.txt` as constraints (pandas
+- New optional dependencies in `requirements/ml.txt` (lightgbm, optuna, shap), compiled
+  with `requirements/lock.txt` and `requirements/tracking.txt` as constraints (pandas
   stays 2.3.3 for Evidently). Installed by CI, the weekly and the deps workflows; tests
   skip without them, so `make setup` alone still works.
 
@@ -523,7 +523,7 @@ Made by: agent
 
 ## 2026-11-13 · Time-series benchmarks for power (T114)
 
-- New optional file `requirements-ts.txt` (statsmodels 0.15.0, chronos-forecasting 2.3.2
+- New optional file `requirements/ts.txt` (statsmodels 0.15.0, chronos-forecasting 2.3.2
   and their dependencies, including transformers), compiled with the lock, tracking, ML
   and torch files as constraints, and installed by CI.
 - ETS, SARIMAX and Chronos-Bolt tiny are *local* benchmarks: each question is answered
@@ -651,7 +651,7 @@ Made by: agent
   a local file fails, `SET` is refused).
 - The leaderboard tool scores every resolved question, rehearsal included, and says so;
   the site's headline boards keep the official-record rule.
-- Installed by CI (`requirements-mcp.txt`); tested in-process and over a real stdio
+- Installed by CI (`requirements/mcp.txt`); tested in-process and over a real stdio
   subprocess with the SDK's own client.
 
 ## 2026-11-13 · The game and the first JavaScript (T130)
@@ -722,7 +722,7 @@ Made by: agent
   committed without outputs and executed in CI (`make notebook`, nbclient) on the offline
   e2e export, which is fixture data, so no fixture result is ever committed or published.
   Polars from the roadmap was left out: it is not a project dependency and nothing is
-  listed that the code does not use. New pins in `requirements-nb.txt`.
+  listed that the code does not use. New pins in `requirements/nb.txt`.
 
 ## 2026-11-13 · Streamlit dashboard (T143)
 
@@ -733,7 +733,7 @@ Made by: agent
 - Tested in CI with Streamlit's `AppTest` on the offline e2e export (renders, filters).
   Hosting (for example Streamlit Community Cloud) needs an account, so it is the
   owner's step (H19). The site links to it only when `ARENA_DASHBOARD_URL` is set.
-- Pins in `requirements-dashboard.txt`; `apps/` is now linted.
+- Pins in `requirements/dashboard.txt`; `apps/` is now linted.
 
 ## 2026-11-13 · REST API and Docker compose (T150)
 
@@ -744,7 +744,7 @@ Made by: agent
 - Read-only snapshot loaded at start; no writes, no auth needed, nothing hosted: it runs
   locally (`docker compose up`) and in CI, where the image serves the offline e2e ledger
   and curl checks four endpoints, including that a DROP statement gets 400.
-- `requirements-api.txt` (uvicorn; FastAPI was already pinned through MLflow).
+- `requirements/api.txt` (uvicorn; FastAPI was already pinned through MLflow).
 
 ## 2026-11-13 · Kubernetes manifests validated on kind (T151)
 
@@ -769,7 +769,7 @@ Made by: agent
   resolved forecast) and two marts (daily scores; forecaster x topic). Tests: unique and
   not-null ids, accepted values (domains, outcomes, skip reasons), a foreign key from
   forecasts to questions. `dbt build` runs in CI on the e2e export (21 of 21 pass).
-- dbt runs in its own virtual environment (`requirements-dbt.txt`): dbt-common needs
+- dbt runs in its own virtual environment (`requirements/dbt.txt`): dbt-common needs
   python-dateutil<3 while the main pins use 4.x. DuckDB is pinned to the same 1.5.6, so
   both read the same files. This file is left out of the combined pip-audit, because the
   combined resolution would conflict by design.

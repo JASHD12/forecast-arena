@@ -1,5 +1,5 @@
-"""Crypto domain (owner request 2026-11-12, DECISIONS.md "Crypto domain"): daily moves of
-five major coins in USD, from CoinGecko's daily prices.
+"""Crypto domain (owner request 2026-11-12, docs/project/DECISIONS.md "Crypto domain"):
+daily moves of five major coins in USD, from CoinGecko's daily prices.
 
 P0 = the CoinGecko price stamped 00:00 UTC on the target day D (= B+1), P1 = the price
 stamped 00:00 UTC on D+1. Both are unknown at the 09:30 UTC lock on B. The move of day D

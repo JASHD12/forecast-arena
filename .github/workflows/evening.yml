@@ -47,7 +47,7 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
-          cache-dependency-path: requirements-*.txt
+          cache-dependency-path: requirements/*.txt
       - name: Install pinned dependencies
         if: github.event_name == 'schedule'
         run: make setup
@@ -83,7 +83,7 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
-          cache-dependency-path: requirements-*.txt
+          cache-dependency-path: requirements/*.txt
       - name: Install pinned dependencies
         run: make setup
       - name: Restore cached source data

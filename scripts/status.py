@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Print the state of the backlog.
 
-Reads TASKS.md and HUMAN_TODO.md from the repository root and prints, as KEY=VALUE lines:
+Reads docs/project/TASKS.md and docs/project/HUMAN_TODO.md and prints, as KEY=VALUE
+lines:
 
   DONE                 tasks ticked [x]
   OPEN                 tasks still [ ]
@@ -83,14 +84,17 @@ def parse_human_done(text: str) -> set[str]:
 
 
 def main() -> int:
-    tasks_path = ROOT / "TASKS.md"
-    human_path = ROOT / "HUMAN_TODO.md"
+    tasks_path = ROOT / "docs/project/TASKS.md"
+    human_path = ROOT / "docs/project/HUMAN_TODO.md"
     if not tasks_path.exists():
-        print("ERROR=TASKS.md not found", file=sys.stderr)
+        print("ERROR=docs/project/TASKS.md not found", file=sys.stderr)
         return 2
     tasks = parse_tasks(tasks_path.read_text(encoding="utf-8"))
     if not tasks:
-        print("ERROR=no tasks parsed from TASKS.md (check the line format)", file=sys.stderr)
+        print(
+            "ERROR=no tasks parsed from docs/project/TASKS.md (check the line format)",
+            file=sys.stderr,
+        )
         return 2
     human_done = (
         parse_human_done(human_path.read_text(encoding="utf-8")) if human_path.exists() else set()

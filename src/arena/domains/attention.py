@@ -8,8 +8,8 @@ and articles used in the previous 3 batches. A seeded sample takes 2 from ranks 
 2 from ranks 51-200.
 
 K = views on R x the median ratio views(t+3)/views(t) over the top-200 articles of the
-90 days before, from top lists only (see DECISIONS.md "Attention threshold"). An article
-missing from the top list of t+3 gets that list's lowest view count as an upper bound.
+90 days before, from top lists only (see docs/project/DECISIONS.md "Attention threshold").
+An article missing from the top list of t+3 gets that list's lowest view count as an upper bound.
 """
 
 from __future__ import annotations

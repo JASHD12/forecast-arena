@@ -1,7 +1,7 @@
 # Extra pins for the time-series benchmarks (T114: statsmodels ETS/SARIMAX, Chronos-Bolt),
 # installed by CI on top of the lock, tracking, ml and torch files (torch comes from
-# requirements-torch.txt). Compiled with all of them as constraints.
-# huggingface-hub is held below 2 so that fastembed (requirements-rag.txt) fits beside it.
+# requirements/torch.txt). Compiled with all of them as constraints.
+# huggingface-hub is held below 2 so that fastembed (requirements/rag.txt) fits beside it.
 accelerate==1.15.0
 annotated-doc==0.0.6
 annotated-types==0.8.0

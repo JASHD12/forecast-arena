@@ -1,4 +1,5 @@
-"""CoinGecko daily crypto prices (owner request 2026-11-12, DECISIONS.md "Crypto domain").
+"""CoinGecko daily crypto prices (owner request 2026-11-12, docs/project/DECISIONS.md,
+"Crypto domain").
 
 Verified on 2026-11-12 (docs/SOURCES.md), from docs.coingecko.com:
 - Demo API root ``https://api.coingecko.com/api/v3``; key in the header
@@ -12,7 +13,8 @@ Verified on 2026-11-12 (docs/SOURCES.md), from docs.coingecko.com:
   link to coingecko.com).
 
 The API key is optional in code (tests and a one-off local check run keyless); the live
-jobs need it (HUMAN_TODO.md H12), because the keyless API is not meant for scheduled use.
+jobs need it (docs/project/HUMAN_TODO.md H12), because the keyless API is not meant for
+scheduled use.
 """
 
 from __future__ import annotations

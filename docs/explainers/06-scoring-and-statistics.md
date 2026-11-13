@@ -69,7 +69,7 @@ Code: `src/arena/scoring/` (`core.py`, `stats.py`, `boards.py`, `findings.py`).
   resolution changes; computing them from facts keeps the ledger append-only and simple.
 - **A strict common set over all five group members from day one**: before `ml` and the
   LLM forecasters are live it would be empty; the board instead uses the active members
-  and lists them (DECISIONS.md).
+  and lists them (docs/project/DECISIONS.md).
 
 ## Ten questions you will be asked
 

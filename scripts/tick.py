@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Tick a task in TASKS.md: `python scripts/tick.py T001`."""
+"""Tick a task in docs/project/TASKS.md: `python scripts/tick.py T001`."""
 
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ ROOT = Path(__file__).resolve().parent.parent
 
 def main() -> int:
     """Replace `- [ ] Txxx ·` with `- [x] Txxx ·` for each id given."""
-    path = ROOT / "TASKS.md"
+    path = ROOT / "docs/project/TASKS.md"
     text = path.read_text(encoding="utf-8")
     for tid in sys.argv[1:]:
         old = f"- [ ] {tid} ·"

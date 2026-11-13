@@ -12,13 +12,14 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
-COPY requirements-lock.txt requirements-api.txt pyproject.toml README.md LICENSE Makefile ./
+COPY requirements/lock.txt requirements/api.txt ./requirements/
+COPY pyproject.toml README.md LICENSE Makefile ./
 COPY src ./src
 COPY tests ./tests
 COPY scripts ./scripts
 RUN python -m venv .venv \
-    && .venv/bin/pip install -r requirements-lock.txt \
-    && .venv/bin/pip install -r requirements-api.txt \
+    && .venv/bin/pip install -r requirements/lock.txt \
+    && .venv/bin/pip install -r requirements/api.txt \
     && .venv/bin/pip install --no-deps -e .
 
 EXPOSE 8000

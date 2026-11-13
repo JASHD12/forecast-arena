@@ -1,6 +1,6 @@
 # dbt for analytics/dbt (T152). Installed in its OWN virtual environment (dbt needs
 # python-dateutil<3, the main pins use 4.x); duckdb is pinned to the same version as
-# requirements-lock.txt so both read the same Parquet files.
+# requirements/lock.txt so both read the same Parquet files.
 agate==1.9.1
 annotated-types==0.8.0
 attrs==26.1.0

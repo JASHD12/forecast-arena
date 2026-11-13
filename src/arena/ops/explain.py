@@ -1,6 +1,6 @@
 """Model explainability for the weekly job: permutation feature importance.
 
-Owner request 2026-11-12 (DECISIONS.md "Explainability"). For the promoted power model,
+Owner request 2026-11-12 (docs/project/DECISIONS.md "Explainability"). For the promoted power model,
 the median quantile regressor of the daily mean price is evaluated on the weekly window's
 target days; each feature column is shuffled `REPEATS` times and the increase in mean
 absolute error is its importance (scikit-learn `permutation_importance`, fixed seed).

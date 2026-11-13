@@ -1,9 +1,9 @@
-# TASKS.md - backlog
+# docs/project/TASKS.md - backlog
 
 Work top to bottom. `python scripts/status.py` prints the next ready task.
 
 Legend: `[ ]` open, `[x]` done, `[!]` blocked or waiting (reason appended, see AGENTS.md 2.4).
-`deps:` tasks that must be done first. `needs:` items in HUMAN_TODO.md the human must tick.
+`deps:` tasks that must be done first. `needs:` items in docs/project/HUMAN_TODO.md the human must tick.
 `(live)` marks tasks that change the public pipeline: be extra careful and verify after.
 Section numbers refer to docs/SPEC.md. Every task also requires `make check` to pass.
 
@@ -121,7 +121,7 @@ Keep the first line of each task in exactly this shape; the status script parses
   - Do: trigger a real morning run; confirm the ledger branch holds today's questions,
     forecasts and batch seal committed before lock; confirm the site is reachable at the
     Pages URL; write "Daily operations" and "If something breaks" in `docs/RUNBOOK.md`;
-    record the rehearsal start date in `PROGRESS.md` and `README.md`.
+    record the rehearsal start date in `docs/project/PROGRESS.md` and `README.md`.
   - Done when: `arena ledger verify --git` passes on the real ledger and the Pages URL
     returns the Home page.
 - [x] T033 · Health checks and incident issues (live) (deps: T032)
@@ -335,7 +335,7 @@ Keep the first line of each task in exactly this shape; the status script parses
     published under the Status page.
   - Done when: the weekly dry run produces the report from fixture data.
 - [x] T082 · Experiment summary (deps: T056)
-  - Do: export MLflow run summaries to a page linked from Status; record in `DECISIONS.md`
+  - Do: export MLflow run summaries to a page linked from Status; record in `docs/project/DECISIONS.md`
     whether a remote tracking server is worth a human item (default: no).
   - Done when: the page lists at least the fixture runs.
 - [x] T083 · Dockerfile (deps: T027)
@@ -368,7 +368,7 @@ Keep the first line of each task in exactly this shape; the status script parses
 - [ ] T093 · Enable the ensemble (live) (deps: T090, T068)
   - Do: enable once the activation threshold is met on the real ledger.
   - Done when: the ensemble appears on the leaderboard, or `WAIT(until=<date>)` with the
-    current count recorded in `PROGRESS.md`.
+    current count recorded in `docs/project/PROGRESS.md`.
 
 ## Phase 9 - Finish
 
@@ -390,7 +390,7 @@ Keep the first line of each task in exactly this shape; the status script parses
 - [ ] T104 · Final audit (deps: T100, T101, T102, T103, T085, T075, T069, T058, T047, T036)
   - Do: run verify on the real ledger, the full check suite and the link check; confirm
     every explainer exists; summarise state, open risks and suggested next steps in
-    `PROGRESS.md`.
+    `docs/project/PROGRESS.md`.
   - Done when: all of the above pass and the summary is written.
 
 ## Phase 10 - Portfolio roadmap (owner approved 2026-11-13, docs/ROADMAP.md)
@@ -525,7 +525,7 @@ CI jobs; core `make check` stays offline and fast.
 - [x] T171 · Honesty audit of the portfolio (deps: T140, T141, T142, T170)
   - Do: every technology named on stack, recruiters, de and README is imported by code
     CI runs; fix or remove anything that is not.
-  - Done when: the audit list is in `PROGRESS.md` with no open item.
+  - Done when: the audit list is in `docs/project/PROGRESS.md` with no open item.
 
 ## Phase 11 - First impression and reliability (owner approved 2026-11-13)
 
@@ -542,7 +542,7 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
 - [ ] T181 · Live proof of the 2026-11-13 fixes (deps: T180, T122b)
   - Do: from the ledger: `agent` answers (no `error` skips), `agent_graph` and
     `llm_local` forecasts or reasoned skips, evening questions are v2, morning added none.
-  - Done when: the findings are in PROGRESS.md (fix and record any failure first).
+  - Done when: the findings are in docs/project/PROGRESS.md (fix and record any failure first).
 - [ ] T182 · Live-site smoke check (deps: T180)
   - Do: `make smoke-site` (Playwright: key pages load, no console errors, site built
     under 26 h ago); run it as a step after deploy in `resolve.yml`.

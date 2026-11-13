@@ -5,7 +5,7 @@ unknown at the 09:30 UTC lock (fixings are published around 16:00 CET). Question
 created only when B is a publication day. Target date = the day of F1. Resolve after
 16:00 UTC on that day. Grace 96 hours.
 
-Interpretation (DECISIONS.md "Markets templates"): log returns from the published
+Interpretation (docs/project/DECISIONS.md "Markets templates"): log returns from the published
 four-decimal rates, rounded to 6 decimals before comparing; `absmove_gt` threshold = the
 median absolute log return between consecutive fixings over the last 60 returns, rounded
 half-up to 0.0001; `up` degeneracy uses the last 250 returns.

@@ -1,4 +1,4 @@
-# PROGRESS.md - state between sessions
+# docs/project/PROGRESS.md - state between sessions
 
 The agent keeps this file current. Newest information first. Keep it under 120 lines;
 move older "Done log" lines to `docs/progress-archive.md`.
@@ -16,7 +16,7 @@ move older "Done log" lines to `docs/progress-archive.md`.
 
 ## Phase 11 (owner approved 2026-11-13 evening)
 
-- Review plan approved; tasks T180-T192 in TASKS.md. First evening run dispatched by hand
+- Review plan approved; tasks T180-T192 in docs/project/TASKS.md. First evening run dispatched by hand
   at 19:29 UTC (scheduled one had not started): 6 power questions for 2026-11-14, all
   `-v2`, lock 09:30 unchanged, `ledger verify` passes. T180 (due-gate, frequent crons)
   pushed; it waits for 2026-11-14 to show a batch sealed before the lock without help.
@@ -64,7 +64,7 @@ readers the notebook really uses.
 
 - **2026-11-13 live agent failed on its 3 sampled questions** (HTTP 400: replayed
   thinking blocks "cannot be modified"; the adapter dropped null fields). Fixed with a
-  regression test (DECISIONS.md); the skips stay recorded. Verify on 2026-11-14. Scheduled
+  regression test (docs/project/DECISIONS.md); the skips stay recorded. Verify on 2026-11-14. Scheduled
   resolve runs start hours late; a real resolve was dispatched at about 16:40 UTC.
 - Shared sandbox IPs are rate-limited: Open-Meteo (daily quota exhausted, hence Bright
   Sky), GDELT (HTTP 429), Wikimedia (429 with short Retry-After). GitHub runners also
@@ -73,7 +73,7 @@ readers the notebook really uses.
   https://www.smard.de/home/datennutzung monthly.
 - Wikimedia pageview licence not verified (docs page is JavaScript-only); the site names
   the source without claiming a licence.
-- The batch seal timing excludes a same-day human panel (proposal in DECISIONS.md);
+- The batch seal timing excludes a same-day human panel (proposal in docs/project/DECISIONS.md);
   public players now have their own pre-lock file (T161).
 - This session's network environment is the personal environment `forecast-arena`
   (created in this session with the data-source hosts); Default was not changed.
@@ -82,7 +82,8 @@ readers the notebook really uses.
 
 ## Done log
 
-- 2026-11-13 T171: honesty audit of stack, recruiters, de and README (table in PROGRESS.md); removed the Polars/Spark wording from stack.html; no open item
+- 2026-11-13 T183: repo root cleaned: requirements/ and docs/project/ (references, AGENTS.md, CLAUDE.md, scripts, Makefile, workflows, Dockerfile updated)
+- 2026-11-13 T171: honesty audit of stack, recruiters, de and README (table in docs/project/PROGRESS.md); removed the Polars/Spark wording from stack.html; no open item
 - 2026-11-13 T170: docs/interview/ (pitch EN/DE, system design, 40 Q&A, 6 STAR stories, CV/LinkedIn text); every figure checked against the generated docs/interview/numbers.md (cards, evals, live ledger via arena report cv)
 - 2026-11-13 T161: players intake (form CSV -> players/B.jsonl at 09:00/09:15 UTC, random-code pseudonyms, consent, latest row before the run, never replaced); tests cover late, duplicate and invalid rows; live once H15 is done
 - 2026-11-13 T160: evening job (18:00/19:30 UTC on B-1, evening.yml) publishes the next batch's questions as template v2; morning only fills missed domains (v1) and forecasts; lock unchanged; e2e covers it; Methods lists template versions

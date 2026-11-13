@@ -3,7 +3,7 @@
 Target: delivery day D = B+1 in Europe/Berlin (23, 24 or 25 hours). Lock B 09:30 UTC.
 Resolve after B 12:30 UTC. Grace 30 hours.
 
-Interpretation choices (see DECISIONS.md, "Power templates"):
+Interpretation choices (see docs/project/DECISIONS.md, "Power templates"):
 - Thresholds are rounded to whole EUR/MWh (half-up). Comparisons use the values as
   published (two decimals); statistics of the day are rounded to two decimals first.
 - Percentiles use linear interpolation between order statistics (the "type 7" rule).

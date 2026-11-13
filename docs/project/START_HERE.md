@@ -7,14 +7,14 @@ start it, and check in briefly. Read this page fully before you start; it takes 
 
 | File | Who reads it | Purpose |
 |---|---|---|
-| `START_HERE.md` | you | This guide |
-| `KICKOFF_PROMPTS.md` | you | The exact text to paste to start the agent |
-| `HUMAN_TODO.md` | you and the agent | The few things only you can do |
+| `docs/project/START_HERE.md` | you | This guide |
+| `docs/project/KICKOFF_PROMPTS.md` | you | The exact text to paste to start the agent |
+| `docs/project/HUMAN_TODO.md` | you and the agent | The few things only you can do |
 | `AGENTS.md` | the agent | Operating manual: session protocol, rules, safety rails |
 | `CLAUDE.md` | Claude Code | Imports `AGENTS.md`; lists the approvals **you** are giving |
 | `docs/SPEC.md` | the agent (and you) | What gets built, in full detail |
-| `TASKS.md` | the agent | 76 ordered tasks, each with a pass/fail check |
-| `PROGRESS.md`, `DECISIONS.md` | the agent writes, you read | State and reasoning between sessions |
+| `docs/project/TASKS.md` | the agent | 76 ordered tasks, each with a pass/fail check |
+| `docs/project/PROGRESS.md`, `docs/project/DECISIONS.md` | the agent writes, you read | State and reasoning between sessions |
 | `scripts/status.py` | both | Prints what is open, ready, blocked, and next |
 | `.claude/settings.json` | Claude Code | Optional hard blocks on destructive commands |
 
@@ -34,7 +34,7 @@ Be realistic about three things.
 
 ## One-time setup
 
-1. Do items **H01, H02 and H03** in `HUMAN_TODO.md`, and tick them.
+1. Do items **H01, H02 and H03** in `docs/project/HUMAN_TODO.md`, and tick them.
 2. **Read `CLAUDE.md`.** The "standing approvals" in it are permissions you are giving the
    agent in your name: pushing to `main`, and committing automation that publishes the site
    and uses your LLM key inside GitHub. Remove any you do not want; the agent will then
@@ -51,7 +51,7 @@ legal text), H06 (human panel). The agent keeps working on other tasks until the
 
 These instructions are for Claude Code, checked against its documentation in November
 2026. Features change, so confirm on the linked pages. For another agent, use prompt C in
-`KICKOFF_PROMPTS.md`; how it runs unattended will differ.
+`docs/project/KICKOFF_PROMPTS.md`; how it runs unattended will differ.
 
 ### Option A - one long local session (simplest)
 
@@ -59,7 +59,7 @@ These instructions are for Claude Code, checked against its documentation in Nov
    `claude --permission-mode auto`
    In auto mode a separate safety classifier reviews actions instead of asking you each
    time. It lowers risk; it does not remove it.
-2. Paste prompt A from `KICKOFF_PROMPTS.md`. It uses `/goal`, which makes the agent start
+2. Paste prompt A from `docs/project/KICKOFF_PROMPTS.md`. It uses `/goal`, which makes the agent start
    a new turn by itself until the goal is met, instead of stopping after each step.
 3. Leave the terminal open and stop the computer from sleeping.
 
@@ -72,7 +72,7 @@ desktop app, tick "Auto-continue when limits reset" on the limit card instead.
 
 Claude Code can run a saved prompt in the cloud on a schedule (the docs call these
 scheduled tasks, formerly routines). Create one for this repository with prompt B from
-`KICKOFF_PROMPTS.md`, every five or six hours. Before relying on it, check three things in
+`docs/project/KICKOFF_PROMPTS.md`, every five or six hours. Before relying on it, check three things in
 the current docs: your plan's daily run allowance, the minimum interval, and whether the
 task may push straight to `main` (if it can only open pull requests, someone has to merge
 them, which defeats the purpose).
@@ -84,7 +84,7 @@ keep A, once you trust it.
 
 ## Your daily check (five minutes)
 
-1. Read the top of `PROGRESS.md`.
+1. Read the top of `docs/project/PROGRESS.md`.
 2. Run `python scripts/status.py`. Look at `NEEDS_HUMAN` and `BLOCKED`.
 3. Open the live site once it exists.
 4. Look for open issues labelled `incident` in the repository.
@@ -100,8 +100,8 @@ If something looks wrong, tell the agent in plain words. It records the correcti
 | "Press enter to continue" after the computer slept | Press Enter. |
 | Automatic continuing stopped after repeated limit hits | Send any message, for example `continue per AGENTS.md`. |
 | Your weekly limit is reached | It will not resume by itself. Wait for the weekly reset, then paste prompt A again. |
-| `OPEN_AGENT_TASKS=0` but tasks remain | Everything left is waiting for you or for a date. Tick what you have done in `HUMAN_TODO.md` and paste prompt A again. |
-| A task is marked `BLOCKED(permission: ...)` | The safety system refused something. Read the entry in `HUMAN_TODO.md`; approve it in a normal session if you agree. |
+| `OPEN_AGENT_TASKS=0` but tasks remain | Everything left is waiting for you or for a date. Tick what you have done in `docs/project/HUMAN_TODO.md` and paste prompt A again. |
+| A task is marked `BLOCKED(permission: ...)` | The safety system refused something. Read the entry in `docs/project/HUMAN_TODO.md`; approve it in a normal session if you agree. |
 | Terminal was closed | Start Claude Code again in the folder and paste prompt A. Nothing is lost; the state is in the files. |
 
 ## What to expect, and when

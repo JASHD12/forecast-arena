@@ -10,10 +10,10 @@ export OMP_NUM_THREADS ?= 1
 
 setup:  ## Create .venv and install pinned dependencies
 	@if uv --version >/dev/null 2>&1; then \
-		uv venv $(VENV) && uv pip install --python $(VENV)/bin/python -r requirements-lock.txt && \
+		uv venv $(VENV) && uv pip install --python $(VENV)/bin/python -r requirements/lock.txt && \
 		uv pip install --python $(VENV)/bin/python --no-deps -e . ; \
 	else \
-		python3 -m venv $(VENV) && $(VENV)/bin/pip install -r requirements-lock.txt && \
+		python3 -m venv $(VENV) && $(VENV)/bin/pip install -r requirements/lock.txt && \
 		$(VENV)/bin/pip install --no-deps -e . ; \
 	fi
 
@@ -53,9 +53,9 @@ a11y: site-e2e  ## axe-core accessibility lint (needs Node and tools/a11y depend
 	NODE_PATH=tools/a11y/node_modules node tools/a11y/check.js _site_e2e
 	NODE_PATH=tools/a11y/node_modules node tools/a11y/play.js _site_e2e
 
-notebook: site-e2e  ## Execute notebooks/explore.ipynb on the e2e Parquet export (needs requirements-nb.txt)
+notebook: site-e2e  ## Execute notebooks/explore.ipynb on the e2e Parquet export (needs requirements/nb.txt)
 	$(PY) scripts/run_notebook.py notebooks/explore.ipynb _site_e2e/data
 
-dbt: site-e2e  ## dbt build over the e2e export (dbt in its own venv: .venv-dbt, requirements-dbt.txt)
-	test -x .venv-dbt/bin/dbt || (python3 -m venv .venv-dbt && .venv-dbt/bin/pip install -r requirements-dbt.txt)
+dbt: site-e2e  ## dbt build over the e2e export (dbt in its own venv: .venv-dbt, requirements/dbt.txt)
+	test -x .venv-dbt/bin/dbt || (python3 -m venv .venv-dbt && .venv-dbt/bin/pip install -r requirements/dbt.txt)
 	cd analytics/dbt && DBT_SEND_ANONYMOUS_USAGE_STATS=false ARENA_DATA_DIR=$(CURDIR)/_site_e2e/data ../../.venv-dbt/bin/dbt build --profiles-dir .

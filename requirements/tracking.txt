@@ -1,6 +1,6 @@
 # Extra pins for the weekly job: MLflow tracking (SQLite file store, no server) and the
 # Evidently drift report (telemetry disabled via DO_NOT_TRACK). Installed only by the
-# weekly workflow and CI, on top of requirements-lock.txt (see DECISIONS.md).
+# weekly workflow and CI, on top of requirements/lock.txt (see docs/project/DECISIONS.md).
 alembic==1.20.1
 annotated-doc==0.0.6
 appdirs==1.4.4

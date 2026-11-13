@@ -31,7 +31,7 @@ other repository, no merging of pull requests, no account creation, no spending.
 
 Do not retry it in another form and do not look for an equivalent route. Mark the task
 blocked as described in `AGENTS.md` section 2.4, write the exact command and the reason
-into `HUMAN_TODO.md`, and continue with the next ready task.
+into `docs/project/HUMAN_TODO.md`, and continue with the next ready task.
 
 ## Paths you must not create or edit
 

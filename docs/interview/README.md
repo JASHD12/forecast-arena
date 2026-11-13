@@ -17,7 +17,7 @@ really does; when in doubt, the code and `docs/SPEC.md` win.
 
 This repository was built by an AI coding agent working unattended under the owner's
 direction, with the owner setting goals, approving changes and doing every human-only
-step (`AGENTS.md`, `HUMAN_TODO.md`). Say so if asked; it is a strength when you can
+step (`AGENTS.md`, `docs/project/HUMAN_TODO.md`). Say so if asked; it is a strength when you can
 explain every design decision, and the explainers in `docs/explainers/` and this kit are
 there so that you can. Use "we" or "the system" where "I" would overstate your part.
 

@@ -62,4 +62,4 @@ new correcting records.
 | Site not updated | The Pages deploy job failed | Re-run the workflow from `main`; Settings > Pages must have source "GitHub Actions". "Branch ... is not allowed to deploy to github-pages" means it was started from another branch. |
 | `promote` fails ("not an ancestor") | `stable` diverged from `main` | Investigate; never force-push `stable`. |
 | LLM forecasters show `budget_exhausted` | The daily caps were reached (150000 tokens/day in the workflows: the owner's ~$1/month ceiling) | Expected behaviour (SPEC 9.4). Raise caps only deliberately, via Actions variables, and only with the owner's agreement on cost. |
-| LLM forecasters show `model_missing` | No key or model configured | H04 in HUMAN_TODO.md. |
+| LLM forecasters show `model_missing` | No key or model configured | H04 in docs/project/HUMAN_TODO.md. |

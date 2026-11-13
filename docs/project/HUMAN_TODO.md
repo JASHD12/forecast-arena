@@ -1,4 +1,4 @@
-# HUMAN_TODO.md - things only you can do
+# docs/project/HUMAN_TODO.md - things only you can do
 
 Tick an item (`[x]`) when it is done. The agent reads this file at the start of every
 session and unblocks the tasks that were waiting. The agent may add items at the bottom.
@@ -56,12 +56,12 @@ Keep the first line of each item in exactly this shape; the status script parses
   - A second market domain with an equity index, only if you find a data source whose
     terms clearly allow it.
   - A remote experiment-tracking server.
-  - Record your answer in `DECISIONS.md`.
+  - Record your answer in `docs/project/DECISIONS.md`.
 
 ## Recurring
 
 - [ ] H09 · Review (about five minutes a day at first, then twice a week)
-  - Read the top of `PROGRESS.md`. Open the live site. Skim the latest commits.
+  - Read the top of `docs/project/PROGRESS.md`. Open the live site. Skim the latest commits.
   - Check for open issues labelled `incident`.
   - Read each new file in `docs/explainers/`. You will be asked about this in interviews.
   - Leave this item unticked; it never finishes.

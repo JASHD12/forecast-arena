@@ -7,7 +7,7 @@
   Tuesday is 3). The return is modelled as a Student t with 5 degrees of freedom scaled to
   that variance.
 - `up`: 0.5 (H3 is the null test; no direction model is used unless a backtest shows skill
-  with an interval excluding zero, DECISIONS.md "Markets direction").
+  with an interval excluding zero, docs/project/DECISIONS.md "Markets direction").
 
 Features come only from the context (`fixings` known before the batch day's fixing).
 """

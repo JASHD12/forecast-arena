@@ -201,7 +201,7 @@ make setup
 make check
 ```
 
-`make setup` creates `.venv` with the pinned dependencies from `requirements-lock.txt`.
+`make setup` creates `.venv` with the pinned dependencies from `requirements/lock.txt`.
 `make check` runs the linter, the unit tests and an offline end-to-end run of five
 simulated days through the real job code on recorded data. It needs no network and no
 API keys.
@@ -239,7 +239,7 @@ git clone --branch ledger --single-branch https://github.com/JASHD12/forecast-ar
 ```
 
 ```bash
-.venv/bin/pip install -r requirements-mcp.txt
+.venv/bin/pip install -r requirements/mcp.txt
 ```
 
 ```bash
@@ -286,8 +286,8 @@ comparison is "too early to tell".
 ## How it was built
 
 The project was specified by its owner (`docs/SPEC.md`) and built by an AI coding agent
-following an operating manual (`AGENTS.md`), task by task (`TASKS.md`), with every design
-decision logged in `DECISIONS.md` and the agent's state in `PROGRESS.md`. The explainers in
+following an operating manual (`AGENTS.md`), task by task (`docs/project/TASKS.md`), with every design
+decision logged in `docs/project/DECISIONS.md` and the agent's state in `docs/project/PROGRESS.md`. The explainers in
 `docs/explainers/` describe each component and the questions it should be able to answer.
 
 ## Documentation
@@ -301,7 +301,7 @@ decision logged in `DECISIONS.md` and the agent's state in `PROGRESS.md`. The ex
 - [Explainers](docs/explainers/README.md)
 - [Human panel setup](docs/PANEL_SETUP.md)
 - [Demo script](docs/DEMO.md)
-- [Design decisions](DECISIONS.md)
+- [Design decisions](docs/project/DECISIONS.md)
 
 ## Licence
 

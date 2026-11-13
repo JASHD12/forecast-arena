@@ -4,8 +4,8 @@ paired Brier differences with day-block intervals.
 Colours: a diverging blue (better) / red (worse) scale around a neutral gray, three steps
 per arm, derived from the dataviz reference palette's diverging pair and checked for text
 contrast (every step >= 5:1 with its text colour in light and dark mode; see
-DECISIONS.md). The sign and the number are always printed in the cell, so colour is never
-the only cue. Display only: verdicts stay on the boards (SPEC 10 wording rules).
+docs/project/DECISIONS.md). The sign and the number are always printed in the cell, so
+colour is never the only cue. Display only: verdicts stay on the boards (SPEC 10 wording rules).
 """
 
 from __future__ import annotations

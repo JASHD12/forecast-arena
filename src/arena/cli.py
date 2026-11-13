@@ -31,7 +31,7 @@ class Ctx:
 
 
 def _not_yet(task: str) -> None:
-    click.echo(f"not implemented yet (see {task} in TASKS.md)", err=True)
+    click.echo(f"not implemented yet (see {task} in docs/project/TASKS.md)", err=True)
     sys.exit(2)
 
 
@@ -762,7 +762,7 @@ def api_command(obj: Ctx, host: str, port: int) -> None:
 @main.command("mcp")
 @click.pass_obj
 def mcp_command(obj: Ctx) -> None:
-    """Serve the ledger read-only over MCP on stdio (needs requirements-mcp.txt)."""
+    """Serve the ledger read-only over MCP on stdio (needs requirements/mcp.txt)."""
     from arena.mcp_server import build_server
 
     build_server(obj.ledger).run("stdio")

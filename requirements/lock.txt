@@ -1,6 +1,6 @@
 # Exact pins for the runtime and development environment.
-# Regenerate with `uv pip compile pyproject.toml --extra dev -o requirements-lock.txt`
-# when changing dependencies (see DECISIONS.md, 2026-11-12 "Lock file format").
+# Regenerate with `uv pip compile pyproject.toml --extra dev -o requirements/lock.txt`
+# when changing dependencies (see docs/project/DECISIONS.md, 2026-11-12 "Lock file format").
 annotated-types==0.8.0
 anthropic==2.8.0
 anyio==4.16.0

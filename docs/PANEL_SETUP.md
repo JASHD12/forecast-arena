@@ -54,7 +54,7 @@ token,question_id,probability,submitted_at
 1. Publish the response sheet as CSV (a public link that returns the CSV text).
 2. In the GitHub repository: Settings > Secrets and variables > Actions > Variables, add
    `ARENA_PANEL_CSV_URL` with that link.
-3. Tick H06 in `HUMAN_TODO.md`.
+3. Tick H06 in `docs/project/HUMAN_TODO.md`.
 
 ## 5. Rules the system applies
 
@@ -69,4 +69,4 @@ token,question_id,probability,submitted_at
 Today the morning run seals the batch the first time it runs (about 05:30 UTC), and that
 is also when the questions appear. Panel answers given between 05:30 and the 09:30 lock
 therefore cannot be added to the sealed batch. Options are listed under "Proposals" in
-`DECISIONS.md`; the panel goes live (T092) only after this is decided.
+`docs/project/DECISIONS.md`; the panel goes live (T092) only after this is decided.

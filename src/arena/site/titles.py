@@ -1,4 +1,4 @@
-"""Plain-language titles for questions (owner request 2026-11-12, DECISIONS.md).
+"""Plain-language titles for questions (owner request 2026-11-12, docs/project/DECISIONS.md).
 
 A title is a short, friendly headline computed from the question's template and
 parameters at site-build time. It is display only: it is not stored in the ledger, is not

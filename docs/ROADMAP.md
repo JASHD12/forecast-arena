@@ -24,7 +24,7 @@ What current German postings ask for (searched 2026-11-12):
   ([Pergolux](https://www.arbeitnow.com/jobs/companies/pergolux/working-student-analytics-engineer-berlin-127740),
   [aijobs.net listings](https://aijobs.net/job/werkstudent-data-engineer-mwd-munchen-bayern-deutschland-285815/)).
 
-Owner decisions (2026-11-12/13; record in `DECISIONS.md`, tick matching `HUMAN_TODO.md`
+Owner decisions (2026-11-12/13; record in `docs/project/DECISIONS.md`, tick matching `docs/project/HUMAN_TODO.md`
 items): self-hosted JavaScript allowed; add RAG, PyTorch, LightGBM + Optuna + SHAP,
 conformal + ensemble; German page, recruiter page, Streamlit dashboard, players'
 leaderboard; "more advanced" additions below.
@@ -50,17 +50,17 @@ wait for CI + `promote` before the next push.
 
 ## Phase 0 - Bookkeeping
 
-- Add this roadmap to `TASKS.md` as "Phase 10 - Portfolio roadmap" (`T110...`, existing
+- Add this roadmap to `docs/project/TASKS.md` as "Phase 10 - Portfolio roadmap" (`T110...`, existing
   line format with deps / Do / Done when) so `scripts/status.py` drives it.
-- `DECISIONS.md`: "Portfolio roadmap (owner approved)"; supersedes the 2026-11-12 entries
+- `docs/project/DECISIONS.md`: "Portfolio roadmap (owner approved)"; supersedes the 2026-11-12 entries
   that rejected PyTorch/SHAP/JavaScript. `docs/SPEC.md`: amend section 8 (challengers, new
   forecasters, RAG tool, players) and section 11 (self-hosted JS, no storage, no
   third-party requests).
 - **T110 Official-start gate:** when building T035 add `ARENA_OFFICIAL_START_NOT_BEFORE`.
   The official record must not start until Phases 1-2 and the Phase 6 timing change are
   live (keeps it free of version churn). The 5-clean-days rule stays.
-- Heavy dependencies: one optional file per extra (`requirements-ml.txt`,
-  `requirements-llm.txt`, `requirements-api.txt`, ...), separate cached CI jobs, unit tests
+- Heavy dependencies: one optional file per extra (`requirements/ml.txt`,
+  `requirements/llm.txt`, `requirements/api.txt`, ...), separate cached CI jobs, unit tests
   with tiny data, fakes and `pytest.importorskip`. Core `make check` stays fast and offline.
 
 ## Phase 1 - Finish the live core (existing tasks)
@@ -206,10 +206,10 @@ chart keeps a table view; `make a11y` stays at 0 serious/critical.
 - **T170** `docs/interview/`: 2-minute pitch (English and German), system-design
   walkthrough, 40 likely questions with honest answers (leakage, calibration, why boosting
   beat or lost to the network, RAG design, eval design, cost control), STAR stories from
-  real incidents in `PROGRESS.md`, CV bullets and LinkedIn project text (from
+  real incidents in `docs/project/PROGRESS.md`, CV bullets and LinkedIn project text (from
   `arena report cv`), a blog-post draft for the owner to publish.
 
-## Human items to add to HUMAN_TODO.md
+## Human items to add to docs/project/HUMAN_TODO.md
 
 Personal details for the recruiter page (degree, university, availability, LinkedIn);
 German proofreading; repo description, topics and pinning; Streamlit Community Cloud deploy

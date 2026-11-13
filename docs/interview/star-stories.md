@@ -1,6 +1,6 @@
 # STAR stories (Situation, Task, Action, Result)
 
-Real incidents from this project, recorded in `PROGRESS.md`, `DECISIONS.md` and the git
+Real incidents from this project, recorded in `docs/project/PROGRESS.md`, `docs/project/DECISIONS.md` and the git
 history. Tell them in about 90 seconds each. Be ready for "what would you do differently".
 
 ## 1. The eval harness caught a silent truncation
@@ -56,7 +56,7 @@ history. Tell them in about 90 seconds each. Be ready for "what would you do dif
 - **Task.** Unblock CI, scheduled jobs and Pages, which the whole project depends on.
 - **Action.** Jobs failed before any step ran, so the workflow files were not the
   cause; it was an account-level block (the Actions budget and a billing lock). I wrote
-  exact steps for the account owner in `HUMAN_TODO.md` instead of trying workarounds. Meanwhile I kept working on tasks that
+  exact steps for the account owner in `docs/project/HUMAN_TODO.md` instead of trying workarounds. Meanwhile I kept working on tasks that
   only needed the offline test suite.
 - **Result.** Once the account setting was fixed, the same commit went green with no code
   change. Lesson: separate "my bug" from "my platform" quickly, and keep work flowing.

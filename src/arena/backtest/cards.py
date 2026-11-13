@@ -76,3 +76,28 @@ forecaster with news search is the comparison this domain exists for (hypothesis
 def attention_card(report_md: str, run_id: str) -> str:
     """Model card text with the generated backtest report appended."""
     return ATTENTION_CARD + f"\n## Backtest (run `{run_id}`)\n\n" + report_md.split("\n", 2)[2]
+
+
+POWER_LGBM_CARD = """# Model card: power LightGBM challenger (power-lgbq-r1)
+
+**What it is.** The same probabilistic model as the power champion (`power-gbq`): 13
+quantile regressors per daily price statistic, the predicted distribution read off at the
+question's threshold, Platt-calibrated on out-of-fold predictions. Only the learner
+differs: LightGBM (objective `quantile`) with hyperparameters tuned by Optuna (TPE, seed 0,
+20 trials; two time-series folds with a 7-day gap; mean pinball loss at 0.1/0.5/0.9).
+
+**Role.** A challenger in the weekly champion/challenger job (`arena.ops.weekly`): it
+becomes the live `ml` model only if it scores at least as well as the champion on the same
+recent questions. SHAP (TreeExplainer) explains it when it is promoted.
+
+**Inputs.** Identical to the champion: calendar features and the last 28 days of daily
+price statistics from the as-of context only.
+
+**Known limits.** Same as the champion. The tuning objective (pinball loss of the daily
+mean) is a proxy for the Brier score of the yes/no questions.
+"""
+
+
+def power_lgbm_card(report_md: str, run_id: str) -> str:
+    """Challenger card with the generated head-to-head backtest report appended."""
+    return POWER_LGBM_CARD + f"\n## Backtest (run `{run_id}`)\n\n" + report_md.split("\n", 2)[2]

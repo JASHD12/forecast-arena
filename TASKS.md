@@ -409,7 +409,7 @@ CI jobs; core `make check` stays offline and fast.
     window; best promoted only if not worse than the champion; summary lists every
     candidate; Experiments shows the champion/challenger table.
   - Done when: tests cover two candidates, a worse challenger and the summary table.
-- [ ] T112 · LightGBM + Optuna + SHAP challengers (deps: T111)
+- [x] T112 · LightGBM + Optuna + SHAP challengers (deps: T111)
   - Do: LightGBM quantile (power) and classifier (attention) on the existing features;
     Optuna study (seeded, time-series CV with gap); SHAP TreeExplainer summary next to
     permutation importance; backtest report and model card.

@@ -14,7 +14,8 @@ move older "Done log" lines to `docs/progress-archive.md`.
 
 ## In progress
 
-- T112 LightGBM + Optuna + SHAP: code, tests and CI wiring pushed; waiting for the one-year power backtest with `--challenger lgbm` to write the model card, then tick
+- T113 PyTorch challenger: code pushed; one-year backtest running for its model card
+- T033 health checks: code pushed; live alert test (failing dry run opens the incident, healthy run closes it) pending
 
 ## Open risks and surprises
 
@@ -43,6 +44,7 @@ move older "Done log" lines to `docs/progress-archive.md`.
 
 ## Done log
 
+- 2026-11-13 T112: LightGBM + Optuna challenger beats the champion in the 1-year power backtest (Brier 0.1884 vs 0.1930, diff -0.0045 [-0.0069, -0.0021], DM p<0.001); card docs/models/power-lgbm.md
 - 2026-11-13 T032: first real batch (6 power questions, 18 forecasts incl. Claude Haiku 5.5) on the ledger at 08:27 UTC, before the 09:30 lock; verify --git PASS; rehearsal start 2026-11-13. Both morning schedules were skipped by GitHub; dispatched by hand from `stable` (run 43393206918)
 - 2026-11-13 fix: agent repair step re-sent the model's reply (two assistant turns in a row -> API 400 on thinking blocks); regression test; workflows default ARENA_LLM_EFFORT=low so thinking does not use the 400-token answer budget
 - 2026-11-13 T111: weekly job trains several candidate families per domain, promotes the best only if not worse than the champion; candidates table on Experiments

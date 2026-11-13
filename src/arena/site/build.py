@@ -102,6 +102,7 @@ STACK_LIBRARIES = (
     ("shap", "SHAP explanations of LightGBM models"),
     ("statsmodels", "ETS and SARIMAX benchmarks in the power backtest"),
     ("llama-cpp-python", "runs the open-weights model of llm_local on the CPU (morning job)"),
+    ("streamlit", "the interactive dashboard (apps/dashboard), smoke-tested with AppTest in CI"),
     ("nbclient", "executes the analysis notebook (pandas + DuckDB on the open data) in CI"),
     ("mcp", "official MCP SDK: the read-only `arena mcp` server over the ledger"),
     ("langgraph", "the agent_graph forecaster's state machine (plan, retrieve, tools, critique)"),
@@ -443,6 +444,7 @@ def build_site(
     evals_dir: Path | None = None,
     golden_path: Path | None = None,
     models_dir: Path | None = None,
+    dashboard_url: str | None = None,
 ) -> SiteResult:
     """Render every page into `out_dir` (built aside, then moved into place)."""
     rec = load(ledger)
@@ -493,6 +495,7 @@ def build_site(
         "dname": domain_name,
         "site_url": site_url.rstrip("/") + "/",
         "repo_url": DEFAULT_REPO_URL,
+        "dashboard_url": dashboard_url,
     }
     archive = sorted(
         rec.questions.values(), key=lambda q: (q.batch_date, q.question_id), reverse=True

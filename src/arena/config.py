@@ -36,6 +36,8 @@ class Settings(BaseModel):
     contact: str | None = Field(None, description="Contact for the HTTP User-Agent")
     repo_url: str = DEFAULT_REPO_URL
     site_url: str = DEFAULT_SITE_URL
+    #: T143: public URL of the Streamlit dashboard; the site links to it only when set (H19).
+    dashboard_url: str | None = None
     ledger_dir: Path = Path("_ledger")
     ledger_remote: str | None = Field(None, description="Git remote of the ledger branch")
     cache_dir: Path = Path("data_cache")
@@ -88,6 +90,7 @@ class Settings(BaseModel):
         "panel_csv_url",
         "coingecko_api_key",
         "official_start_not_before",
+        "dashboard_url",
         mode="before",
     )
     @classmethod

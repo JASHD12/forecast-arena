@@ -498,7 +498,7 @@ CI jobs; core `make check` stays offline and fast.
   - Done when: `de.html` (lang="de") and the README section exist; H17 asks for proofreading.
 - [ ] T142 · README overhaul (deps: T140)
   - Done when: badges, screenshots, generated results, skills list, Docker quickstart.
-- [ ] T143 · Streamlit dashboard (deps: T045i)
+- [x] T143 · Streamlit dashboard (deps: T045i)
   - Done when: `apps/dashboard` passes an AppTest smoke test in CI; linked only if
     `ARENA_DASHBOARD_URL` is set (H19).
 - [ ] T150 · FastAPI service and Docker compose (deps: T045i)

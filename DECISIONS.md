@@ -724,6 +724,17 @@ Made by: agent
   Polars from the roadmap was left out: it is not a project dependency and nothing is
   listed that the code does not use. New pins in `requirements-nb.txt`.
 
+## 2026-11-13 · Streamlit dashboard (T143)
+
+- `apps/dashboard/streamlit_app.py`: topic and forecaster filters, Brier by forecaster, a
+  running-average chart, a calibration table and skips, computed with DuckDB and pandas
+  from the four open Parquet files. It reads `ARENA_DATA_DIR` (local) or
+  `ARENA_DATA_URL` (default: the published site's data folder), so it needs no secret.
+- Tested in CI with Streamlit's `AppTest` on the offline e2e export (renders, filters).
+  Hosting (for example Streamlit Community Cloud) needs an account, so it is the
+  owner's step (H19). The site links to it only when `ARENA_DASHBOARD_URL` is set.
+- Pins in `requirements-dashboard.txt`; `apps/` is now linted.
+
 ## Proposals for the human
 
 Ideas outside the specification. The agent lists them here and does not build them.

@@ -22,8 +22,8 @@ setup-offline:  ## Like setup, but reuse already-installed system packages (no n
 	$(VENV)/bin/pip install --no-deps --no-build-isolation --no-index -e .
 
 lint:
-	$(RUFF) check src tests scripts
-	$(RUFF) format --check src tests scripts
+	$(RUFF) check src tests scripts apps
+	$(RUFF) format --check src tests scripts apps
 	$(PY) -m mypy src/arena
 
 PYTEST_ARGS ?=

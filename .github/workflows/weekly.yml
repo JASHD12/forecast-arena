@@ -35,6 +35,7 @@ jobs:
       # once the roadmap's model and timing changes are live.
       ARENA_OFFICIAL_START_NOT_BEFORE: ${{ vars.ARENA_OFFICIAL_START_NOT_BEFORE || '2099-12-31' }}
       ARENA_CONTACT: ${{ vars.ARENA_CONTACT }}
+      ARENA_DASHBOARD_URL: ${{ vars.ARENA_DASHBOARD_URL }}  # T143: site links the dashboard only when set (H19)
       ARENA_LEDGER_REMOTE: https://github.com/${{ github.repository }}.git
       MLFLOW_DISABLE_AGENT_HINT: "1"
       DO_NOT_TRACK: "1"            # Evidently / iterative-telemetry off

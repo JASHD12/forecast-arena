@@ -42,6 +42,7 @@ move older "Done log" lines to `docs/progress-archive.md`.
 
 ## Done log
 
+- 2026-11-13 T143: Streamlit dashboard over the open Parquet (filters, Brier, running chart, calibration, skips), AppTest smoke test in CI, site link only when ARENA_DASHBOARD_URL is set (H19)
 - 2026-11-13 T139: static JSON API api/v1/{questions,latest,leaderboard}.json with JSON Schemas generated from pydantic models, api.html, validated in tests
 - 2026-11-13 T138: worked scoring example (Methods), verification walkthrough (Guide), data dictionary (Data), notebooks/explore.ipynb executed in CI on the e2e export
 - 2026-11-13 T137: lock countdown, archive search, theme toggle (no storage), og:image, sticky header; app.js on every page; Playwright checks with and without JS

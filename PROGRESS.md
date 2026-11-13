@@ -43,6 +43,7 @@ move older "Done log" lines to `docs/progress-archive.md`.
 
 ## Done log
 
+- 2026-11-13 owner approved docs/ROADMAP.md (portfolio roadmap v2); next session starts with its Phase 0 (add tasks T110+ to TASKS.md), then Phase 1
 - 2026-11-12 T045m: pinball loss + interval coverage in weekly job; forest plot, podium, architecture, About
 - 2026-11-12 site round 4 (owner request): leaderboard podium + forest plot (CIs), architecture diagram (methods/stack/about), About page with author card and skills grid
 - 2026-11-12 H05 published (owner details: name, 35390 Gießen, e-mail, Hesse/HBDI); H14 open for street address

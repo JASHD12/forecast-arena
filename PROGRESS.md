@@ -43,6 +43,7 @@ move older "Done log" lines to `docs/progress-archive.md`.
 
 ## Done log
 
+- 2026-11-13 T111: weekly job trains several candidate families per domain, promotes the best only if not worse than the champion; candidates table on Experiments
 - 2026-11-13 Phase 0: roadmap tasks T110-T171 in TASKS.md, H15-H19, decisions, SPEC 8.8/11 amendments; scheduled resume every 5 h (trig_016b95iyHSuR6B44xPaAgDPF)
 - 2026-11-13 owner approved docs/ROADMAP.md (portfolio roadmap v2); next session starts with its Phase 0 (add tasks T110+ to TASKS.md), then Phase 1
 - 2026-11-12 T045m: pinball loss + interval coverage in weekly job; forest plot, podium, architecture, About

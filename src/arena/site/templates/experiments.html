@@ -9,6 +9,13 @@
 <div class="table-scroll" tabindex="0" role="region" aria-label="Weekly run {{ r.day }}"><table>
 <thead><tr><th scope="col">Domain</th><th scope="col">Window</th><th scope="col" class="num">Questions</th><th scope="col" class="num">Candidate Brier</th><th scope="col" class="num">Current Brier</th><th scope="col">Decision</th></tr></thead>
 <tbody>{% for d in r.decisions %}<tr><th scope="row">{{ d.domain }}</th><td>{{ d.window_first }} to {{ d.window_last }}</td><td class="num">{{ d.n }}</td><td class="num">{{ "%.4f"|format(d.brier_candidate) if d.brier_candidate is not none else "-" }}</td><td class="num">{{ "%.4f"|format(d.brier_current) if d.brier_current is not none else "-" }}</td><td>{{ d.reason }}</td></tr>{% endfor %}</tbody></table></div>
+{% for d in r.decisions %}{% if d.candidates and d.candidates|length > 1 %}
+<h3>Champion vs challengers: {{ dname(d.domain) }} ({{ r.day }})</h3>
+<p class="note">Every candidate model family is scored on the same {{ d.n }} questions; the best is promoted only if it is not worse than the current champion.</p>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Candidates {{ d.domain }} {{ r.day }}"><table>
+<thead><tr><th scope="col">Family</th><th scope="col">Version</th><th scope="col" class="num">Brier</th><th scope="col">Result</th></tr></thead>
+<tbody>{% for c in d.candidates|sort(attribute="family") %}<tr><th scope="row">{{ c.family }}{% if c.family == d.best_family %} <span class="label">best</span>{% endif %}</th><td><code>{{ c.version or "-" }}</code></td><td class="num">{{ "%.4f"|format(c.brier) if c.brier is not none else "-" }}</td><td>{% if c.error %}<span class="no">{{ c.error }}</span>{% elif c.version == d.promoted %}<span class="yes">promoted</span>{% else %}<span class="muted">not promoted</span>{% endif %}</td></tr>{% endfor %}</tbody></table></div>
+{% endif %}{% endfor %}
 {% set imp = (r.importance or {}).get("power") if r.importance is defined else none %}
 {% if imp %}<h3>What drives the electricity model ({{ r.day }})</h3>
 <p class="note">Permutation feature importance (scikit-learn): how much the mean absolute error of the median forecast of tomorrow's average price (EUR/MWh) grows when one input is shuffled, averaged over 10 shuffles (± one standard deviation), on the evaluation window.</p>

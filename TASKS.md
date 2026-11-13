@@ -434,7 +434,7 @@ CI jobs; core `make check` stays offline and fast.
   - Do: Hypothesis tests for canonical JSON, hash chain and scoring bounds; pytest-cov
     figure in the CI job summary; schema checks on source responses.
   - Done when: the new tests pass and CI prints coverage.
-- [ ] T120 · RAG tool: similar past questions (deps: T067)
+- [x] T120 · RAG tool: similar past questions (deps: T067)
   - Do: local ONNX embeddings (fastembed), vector search over questions resolved before
     asof (I3); agent tool `similar_past_questions`; prompt version v2.
   - Done when: a leakage test proves unresolved or later questions are never returned.

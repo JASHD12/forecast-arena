@@ -91,6 +91,7 @@ STACK_LIBRARIES = (
     ("optuna", "hyperparameter search for the LightGBM challenger (time-series folds)"),
     ("shap", "SHAP explanations of LightGBM models"),
     ("statsmodels", "ETS and SARIMAX benchmarks in the power backtest"),
+    ("fastembed", "local ONNX text embeddings for the agent's similar-questions tool (RAG)"),
     ("chronos-forecasting", "Chronos-Bolt tiny (pretrained time-series model), backtest only"),
     ("mlflow-skinny", "experiment tracking of the weekly retraining (SQLite backend)"),
     ("evidently", "data-drift reports on model inputs"),

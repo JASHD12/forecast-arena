@@ -57,6 +57,9 @@ class Settings(BaseModel):
     llm_max_tokens_per_day: int = Field(400_000, ge=0)
     llm_max_output_tokens: int = Field(400, ge=1)
     agent_max_tool_calls: int = Field(4, ge=0)
+    #: T120: offer the agent the similar-past-questions tool (prompt v2); needs fastembed
+    #: (requirements-rag.txt). Off by default; the workflows switch it on.
+    agent_rag: bool = False
 
     panel_csv_url: str | None = None
     coingecko_api_key: SecretStr | None = None

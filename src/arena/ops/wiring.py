@@ -176,11 +176,20 @@ def build_forecasters(
         client = GuardedLLM(client, guard)
     n = settings.llm_questions_per_domain
     http = HttpClient(settings.user_agent())
+    retriever = None
+    if settings.agent_rag and client is not None:
+        # No silent fallback: if fastembed is missing this raises and the run fails.
+        from arena.agent.retrieval import FastEmbedder, PastQuestions
+
+        embedder = FastEmbedder(cache_dir=settings.cache_dir / "fastembed")
+        retriever = PastQuestions.from_ledger(ledger, embedder)
     agent = AgentForecaster(
         client,
         per_domain=n,
         max_tool_calls=settings.agent_max_tool_calls,
         peers={"base_rate": out[0]},
+        retriever=retriever,
+        prompt_version="v2" if retriever is not None else "v1",
         news=None if llm is not None else GdeltBackend(http),
         wiki=None if llm is not None else partial(wikipedia_summary, http),
     )

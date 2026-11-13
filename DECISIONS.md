@@ -537,6 +537,24 @@ Made by: agent
 - Alternatives: AutoGluon (far heavier); Chronos-2 or larger Bolt sizes (slower on CPU,
   no need for a benchmark); statsforecast (one more library for the same models).
 
+## 2026-11-13 · RAG tool: similar past questions (T120)
+
+- The agent gets one more read-only tool, `similar_past_questions(k, same_domain)`, with
+  prompt version v2 for the agent only (`agent_system_v2` adds one paragraph; the other
+  v2 files are copies of v1). llm_plain and llm_context keep v1. The forecaster version
+  shows `prompt-v2` and `rag-<embedder>`, so the change is visible on the site.
+- Embeddings: fastembed with BAAI/bge-small-en-v1.5 (ONNX, CPU, no API cost), cached in
+  `data_cache/fastembed`. The index is rebuilt in memory at each morning run from the
+  ledger (a few thousand short texts embed in seconds), so there is no separate index
+  file that could drift from the ledger. The roadmap's Parquet/DuckDB index file was
+  therefore not needed.
+- Leakage rule (I3): only questions whose first resolution was recorded strictly before
+  the forecast time, and that are not voided out of scoring, can be returned; open
+  questions are never indexed; the question itself is excluded. Covered by a test.
+- Switched on in the morning workflow (`ARENA_AGENT_RAG`, default 1). If fastembed is
+  missing while it is on, the run fails instead of silently dropping the tool (I6).
+- This is before the official start (T110 gate), so the record starts with v2.
+
 ## Proposals for the human
 
 Ideas outside the specification. The agent lists them here and does not build them.

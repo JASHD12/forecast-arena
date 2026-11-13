@@ -13,9 +13,9 @@ from __future__ import annotations
 import time as _time
 from collections.abc import Callable, Mapping, Sequence
 from datetime import datetime
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from arena.agent.tools import TOOL_SPECS, NewsBackend, ToolBox
+from arena.agent.tools import SIMILAR_SPEC, TOOL_SPECS, NewsBackend, ToolBox
 from arena.forecasters.base import Forecaster
 from arena.forecasters.llm import daily_sample, render_context
 from arena.llm import prompts
@@ -32,6 +32,9 @@ from arena.llm.client import (
 )
 from arena.llm.parse import ParseError, parse_answer
 from arena.models import Forecast, Question, Skip
+
+if TYPE_CHECKING:
+    from arena.agent.retrieval import PastQuestions
 
 
 class AgentForecaster:
@@ -53,6 +56,7 @@ class AgentForecaster:
         wiki: Callable[[str, str], dict[str, str]] | None = None,
         monotonic: Callable[[], float] = _time.monotonic,
         prompt_version: str = prompts.PROMPT_VERSION,
+        retriever: PastQuestions | None = None,
     ) -> None:
         self.client = client
         self.per_domain = per_domain
@@ -63,6 +67,9 @@ class AgentForecaster:
         self.wiki = wiki
         self.monotonic = monotonic
         self.prompt_version = prompt_version
+        #: The RAG tool is offered only with a retriever (prompt v2 describes it).
+        self.retriever = retriever
+        self.tools = (*TOOL_SPECS, SIMILAR_SPEC) if retriever is not None else TOOL_SPECS
         self.sample: set[str] | None = None
         self.traces: dict[str, dict[str, Any]] = {}
 
@@ -74,7 +81,20 @@ class AgentForecaster:
         """Model id, prompt version and tool limits."""
         model = self.client.model if self.client is not None else "none"
         fp = prompts.fingerprint(self.prompt_files, self.prompt_version)
-        return f"{model}|prompt-{self.prompt_version}-{fp}|tools-{self.max_tool_calls}"
+        rag = f"|rag-{self.retriever.embedder.name}" if self.retriever is not None else ""
+        return f"{model}|prompt-{self.prompt_version}-{fp}|tools-{self.max_tool_calls}{rag}"
+
+    def _similar(self, q: Question, asof: datetime) -> Callable[[int, bool], dict[str, Any]] | None:
+        """The RAG tool bound to this question and forecast time (I3: asof filter)."""
+        r = self.retriever
+        if r is None:
+            return None
+
+        def run(k: int, same_domain: bool) -> dict[str, Any]:
+            return r.tool_result(q.text, asof, k=k, exclude=q.question_id,
+                                 domain=q.domain if same_domain else None)  # fmt: skip
+
+        return run
 
     def _skip(self, q: Question, reason: str, detail: str, asof: datetime) -> Skip:
         return Skip(
@@ -111,6 +131,7 @@ class AgentForecaster:
             probabilities=self._peer_probabilities(q, ctx, asof),
             news=self.news,
             wiki=self.wiki,
+            similar=self._similar(q, asof),
             max_calls=self.max_tool_calls,
             time_limit=self.time_limit,
             monotonic=self.monotonic,
@@ -131,7 +152,7 @@ class AgentForecaster:
                 # then rejects for modified thinking blocks (seen live on 2026-11-13).
                 turns = [*turns, UserText(repair)]
                 resp = self.client.complete(
-                    system, turns, max_tokens=self.max_output_tokens, tools=TOOL_SPECS
+                    system, turns, max_tokens=self.max_output_tokens, tools=self.tools
                 )
                 usage = usage + resp.usage
                 answer = parse_answer(resp.text)
@@ -171,7 +192,7 @@ class AgentForecaster:
         assert self.client is not None
         while True:
             resp = self.client.complete(
-                system, turns, max_tokens=self.max_output_tokens, tools=TOOL_SPECS
+                system, turns, max_tokens=self.max_output_tokens, tools=self.tools
             )
             usage = usage + resp.usage
             turns.append(AssistantTurn(resp))
@@ -182,7 +203,7 @@ class AgentForecaster:
             if box.calls_left <= 0 or box.time_left() <= 0:
                 turns.append(UserText(prompts.load("agent_final", self.prompt_version)))
                 resp = self.client.complete(
-                    system, turns, max_tokens=self.max_output_tokens, tools=TOOL_SPECS
+                    system, turns, max_tokens=self.max_output_tokens, tools=self.tools
                 )
                 usage = usage + resp.usage
                 turns.append(AssistantTurn(resp))

@@ -50,6 +50,7 @@ jobs:
       ARENA_LLM_MAX_TOKENS_PER_DAY: ${{ vars.ARENA_LLM_MAX_TOKENS_PER_DAY || '150000' }}  # owner: keep cost under ~$1/month on Haiku 5.5
       ARENA_LLM_BASE_URL: ${{ vars.ARENA_LLM_BASE_URL }}
       ARENA_LLM_API_KEY: ${{ secrets.ARENA_LLM_API_KEY }}
+      ARENA_AGENT_RAG: ${{ vars.ARENA_AGENT_RAG || '1' }}  # T120: similar-past-questions tool (local embeddings, no API cost)
       OMP_NUM_THREADS: "2"
     steps:
       - uses: actions/checkout@v7
@@ -60,7 +61,9 @@ jobs:
         with:
           python-version: "3.12"
       - name: Install pinned dependencies
-        run: make setup
+        run: |
+          make setup
+          .venv/bin/pip install -r requirements-rag.txt
       - name: Restore cached source data
         uses: actions/cache@v6
         with:

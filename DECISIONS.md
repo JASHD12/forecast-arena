@@ -654,6 +654,22 @@ Made by: agent
 - Installed by CI (`requirements-mcp.txt`); tested in-process and over a real stdio
   subprocess with the SDK's own client.
 
+## 2026-11-13 · The game and the first JavaScript (T130)
+
+- One self-hosted `static/app.js` (vanilla, no dependencies) for `play.html` only, per the
+  SPEC 11 amendment. The game data is embedded as a JSON data block (never executed),
+  so the page works from `file://` and under `script-src 'self'`; `data/game.json` is
+  also written for other consumers. Without JavaScript the page shows a static table of
+  resolved questions and every forecast.
+- Decks: live resolved questions with every forecaster's published probability; and a
+  practice deck of 60 past days from the golden evaluation set against the base rate,
+  labelled practice everywhere (not a record, not a score). Scores stay in memory.
+- CSP meta on every page: `default-src 'self'; script-src 'self'; style-src 'self'
+  'unsafe-inline'` (a few templates use inline style attributes for bar widths). The
+  accessibility checker injects axe with Playwright's `bypassCSP`, a test-only setting.
+- `make a11y` also plays one round per deck in Chromium, checks the no-JavaScript
+  fallback and fails on any request that leaves the site.
+
 ## Proposals for the human
 
 Ideas outside the specification. The agent lists them here and does not build them.

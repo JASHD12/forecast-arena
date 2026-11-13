@@ -26,6 +26,7 @@ def test_empty_ledger_builds_every_page(tmp_path) -> None:
         "leaderboard.html",
         "llm.html",
         "methods.html",
+        "play.html",
         "privacy.html",
         "questions/index.html",
         "stack.html",
@@ -39,7 +40,7 @@ def test_empty_ledger_builds_every_page(tmp_path) -> None:
         assert "Bundesnetzagentur | SMARD.de" in text
         assert "Rehearsal" in text
         assert 'name="viewport"' in text
-        assert "<script" not in text
+        assert "<script" not in text or page == "play.html"  # only the game uses app.js
     css = (res.out_dir / "static" / "style.css").read_text()
     assert "prefers-color-scheme: dark" in css
 

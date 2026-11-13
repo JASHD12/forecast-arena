@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% from "macros.html" import page_head %}
+{% block content %}
+{{ page_head("Play", "Can you beat the AI?", "Give your own probability for real questions, then see the answer and how your score compares with the AI, the ML model and the base rate. Lower Brier score is better; 0.25 is what a coin-flip 50% always earns.") }}
+<div id="game" class="game" data-root="{{ root }}" hidden>
+<div class="game-decks" role="group" aria-label="Choose questions">
+<button type="button" class="deck" data-deck="live" aria-pressed="true">Live record ({{ live_n }})</button>
+<button type="button" class="deck" data-deck="practice" aria-pressed="false">Practice: past days ({{ practice_n }})</button>
+</div>
+<p class="note game-deck-note" data-for="practice" hidden>Practice questions are past days from the evaluation set, against the base rate only. They are not part of any record or score.</p>
+<section class="card game-card" aria-labelledby="game-q">
+<p class="label game-topic"></p>
+<h2 id="game-q" class="game-title"></h2>
+<details class="faq"><summary>Exact rule</summary><p class="game-rule"></p></details>
+<div class="game-series"></div>
+<label class="game-label" for="game-p">Your probability that the answer is YES: <output id="game-out" for="game-p">50%</output></label>
+<input id="game-p" type="range" min="1" max="99" step="1" value="50">
+<div class="game-actions"><button type="button" class="btn game-lock">Lock in my forecast</button>
+<button type="button" class="btn game-next" hidden>Next question</button></div>
+<div class="game-reveal" aria-live="polite"></div>
+</section>
+<section class="card" aria-labelledby="game-score-h"><h2 id="game-score-h">Your session</h2>
+<div class="game-score" aria-live="polite"><p class="empty">Play a question to see your score.</p></div>
+<p class="note">Your answers stay in this browser tab. Nothing is stored or sent anywhere.</p></section>
+</div>
+<script type="application/json" id="game-data">{{ game_json }}</script>
+<noscript><p class="note">The game needs JavaScript. Without it, here are the resolved questions and what each forecaster said.</p></noscript>
+<div class="game-static">
+<h2>Resolved questions</h2>
+{% if live %}<div class="table-scroll" tabindex="0" role="region" aria-label="Resolved questions"><table>
+<thead><tr><th scope="col">Question</th><th scope="col">Answer</th><th scope="col">Forecasts (P of YES)</th></tr></thead>
+<tbody>{% for g in live %}<tr><th scope="row"><a href="{{ g.url }}">{{ g.title }}</a></th><td>{{ "YES" if g.outcome else "NO" }}</td><td>{% for fid, p in g.forecasts.items() %}{{ fname(fid) }} {{ "%.0f%%"|format(100 * p) }}{% if not loop.last %} · {% endif %}{% endfor %}</td></tr>{% endfor %}</tbody></table></div>
+{% else %}<p class="empty">No question has been answered yet. The first answers arrive the day after the first forecasts.</p>{% endif %}
+</div>
+<script src="{{ root }}static/app.js" defer></script>
+{% endblock %}

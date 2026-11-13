@@ -276,6 +276,7 @@ def site_build(obj: Ctx, out_dir: Path, check_links: bool) -> None:
         site_url=obj.settings.site_url,
         llm_token_cap=obj.settings.llm_max_tokens_per_day,
         evals_dir=Path("evals/results"),
+        golden_path=Path("evals/golden/power-2026-10.jsonl"),
     )
     click.echo(f"site built: {len(res.pages)} pages in {res.out_dir}")
     if check_links:

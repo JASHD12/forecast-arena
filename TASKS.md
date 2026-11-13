@@ -463,7 +463,7 @@ CI jobs; core `make check` stays offline and fast.
   - Do: `arena mcp` (stdio, official SDK): list_questions, get_question, leaderboard,
     read-only SQL.
   - Done when: an SDK client test calls every tool; README documents it.
-- [ ] T130 · "Can you beat the AI?" game (deps: T045f)
+- [x] T130 · "Can you beat the AI?" game (deps: T045f)
   - Do: `play.html` + Home teaser; `data/game.json`; self-hosted `static/app.js`; CSP;
     session score in memory only.
   - Done when: Playwright test plays one round; works as a page without JS.

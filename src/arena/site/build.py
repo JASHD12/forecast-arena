@@ -34,6 +34,7 @@ from arena.scoring.core import Scored, clip, counts, load
 from arena.scoring.findings import findings, power_table
 from arena.scoring.stats import calibration_bins, expected_calibration_error, murphy
 from arena.site.charts import forest_svg, race_svg, reliability_svg, series_class
+from arena.site.game import live_deck, practice_deck
 from arena.site.llm_obs import PRICE_SOURCE, load_spans, totals, traces_by_question, usage_rows
 from arena.site.methods_content import LIMITATIONS, PRINCIPLES
 from arena.site.ops_status import llm_usage, missed_days, parse_failures, source_freshness
@@ -47,6 +48,7 @@ from arena.sources.wikimedia import ATTRIBUTION as WIKI_ATTRIBUTION
 
 NAV: tuple[tuple[str, str], ...] = (
     ("index.html", "Home"),
+    ("play.html", "Play"),
     ("questions/index.html", "Questions"),
     ("leaderboard.html", "Leaderboard"),
     ("calibration.html", "Calibration"),
@@ -389,6 +391,7 @@ def build_site(
     site_url: str = DEFAULT_SITE_URL,
     llm_token_cap: int | None = None,
     evals_dir: Path | None = None,
+    golden_path: Path | None = None,
 ) -> SiteResult:
     """Render every page into `out_dir` (built aside, then moved into place)."""
     rec = load(ledger)
@@ -444,6 +447,10 @@ def build_site(
         rec.questions.values(), key=lambda q: (q.batch_date, q.question_id), reverse=True
     )
     urows = usage_rows(load_spans(ledger))
+    game = {"live": live_deck(rec), "practice": practice_deck(golden_path)}
+    game_payload = json.dumps({**game, "names": FORECASTER_NAMES}, sort_keys=True)
+    # A JSON data block is never executed; "</" is escaped so it cannot end the element.
+    game_json = Markup(game_payload.replace("</", "<\\/"))
     pages: dict[str, tuple[str, dict[str, Any]]] = {
         "index.html": (
             "Home",
@@ -544,6 +551,15 @@ def build_site(
             },
         ),
         "evals.html": ("LLM evals", {"runs": eval_runs(evals_dir)}),
+        "play.html": (
+            "Can you beat the AI?",
+            {
+                "live": game["live"],
+                "live_n": len(game["live"]),
+                "practice_n": len(game["practice"]),
+                "game_json": game_json,
+            },
+        ),
         "about.html": (
             "About",
             {"about": read_content("about.md"), "legal": read_content("legal.md")},
@@ -556,6 +572,8 @@ def build_site(
         shutil.rmtree(tmp)
     (tmp / "static").mkdir(parents=True)
     (tmp / "questions").mkdir()
+    (tmp / "data").mkdir(exist_ok=True)
+    (tmp / "data" / "game.json").write_text(game_payload + "\n", encoding="utf-8")
     pages["data.html"] = (
         "Open data & SQL",
         {"files": export_parquet(con, tmp / "data"), "results": run_queries(con)},

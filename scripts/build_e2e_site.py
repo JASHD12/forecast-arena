@@ -29,6 +29,7 @@ def main() -> int:
             out.resolve(),
             FixedClock(datetime(2026, 10, 27, tzinfo=UTC)),
             site_url=out.resolve().as_uri() + "/",  # offline: the 404 page's <base> is local
+            golden_path=Path(__file__).resolve().parents[1] / "evals/golden/power-2026-10.jsonl",
         )
     print(f"built {len(res.pages)} pages into {res.out_dir}")
     return 0

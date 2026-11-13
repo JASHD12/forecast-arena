@@ -25,7 +25,8 @@ function pages(dir) {
   const browser = await chromium.launch();
   let serious = 0;
   for (const [w, scheme] of [[1200, 'light'], [390, 'dark']]) {
-    const ctx = await browser.newContext({ viewport: { width: w, height: 900 }, colorScheme: scheme });
+    // bypassCSP: the pages' CSP (script-src 'self') would block injecting axe itself.
+    const ctx = await browser.newContext({ viewport: { width: w, height: 900 }, colorScheme: scheme, bypassCSP: true });
     for (const file of list) {
       const page = await ctx.newPage();
       await page.goto('file://' + file);

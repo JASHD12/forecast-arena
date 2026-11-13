@@ -41,6 +41,8 @@ class _Refs(HTMLParser):
     def __init__(self) -> None:
         super().__init__()
         self.loaded: list[str] = []
+        self.scripts: list[tuple[str, str]] = []
+        self.handlers: list[str] = []
 
     def handle_starttag(self, tag, attrs):
         a = dict(attrs)
@@ -49,7 +51,9 @@ class _Refs(HTMLParser):
         if tag == "link" and a.get("rel") in ("stylesheet", "icon", "preload") and a.get("href"):
             self.loaded.append(a["href"])
         if tag == "script":
-            self.loaded.append("<script>")
+            kind = "src" if a.get("src") else a.get("type", "inline")
+            self.scripts.append((kind, a.get("src") or ""))
+        self.handlers += [k for k in a if k.startswith("on")]
 
 
 def test_new_pages_exist_and_are_linked_from_every_page(tmp_path) -> None:
@@ -63,16 +67,28 @@ def test_new_pages_exist_and_are_linked_from_every_page(tmp_path) -> None:
         assert "AI disclosure" in text and "not advice" in text, page
 
 
-def test_no_third_party_requests_no_scripts_no_cookies(tmp_path) -> None:
+def test_no_third_party_requests_scripts_only_self_hosted(tmp_path) -> None:
+    """SPEC 11 amendment: one self-hosted script, data blocks only, no inline code or
+    handlers, nothing from another origin, and a CSP on every page."""
     _, res = _site(tmp_path)
     for page in res.out_dir.rglob("*.html"):
+        text = page.read_text()
         p = _Refs()
-        p.feed(page.read_text())
+        p.feed(text)
         for ref in p.loaded:
-            assert ref != "<script>", f"script in {page}"
             assert not re.match(r"^(https?:)?//", ref), f"{page} loads {ref}"
+        for kind, src in p.scripts:
+            assert kind in ("src", "application/json"), f"inline script in {page}"
+            if kind == "src":
+                assert src.endswith("static/app.js"), f"{page} loads script {src}"
+        assert not p.handlers, f"inline event handlers {p.handlers} in {page}"
+        assert "Content-Security-Policy" in text and "script-src 'self'" in text, page
     css = (res.out_dir / "static" / "style.css").read_text()
     assert "@import" not in css and "url(http" not in css and "fonts.g" not in css
+    js = (res.out_dir / "static" / "app.js").read_text()
+    for banned in ("fetch(", "XMLHttpRequest", "localStorage", "sessionStorage", "cookie",
+                   "indexedDB", "http://", "https://"):  # fmt: skip
+        assert banned not in js, banned
 
 
 def test_legal_pages_pending_until_owner_writes_them(tmp_path) -> None:

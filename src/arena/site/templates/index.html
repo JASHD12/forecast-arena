@@ -62,6 +62,12 @@
 {% endfor %}</ul>
 {% else %}<p class="empty">No questions yet. The first batch is written by the morning run (05:30 UTC) and locks at 09:30 UTC.</p>{% endif %}
 
+<section class="card play-teaser" aria-labelledby="play-title">
+<h2 id="play-title">Can you beat the AI?</h2>
+<p>Give your own probability for real questions, see the answer, and compare your score with the AI, the ML model and the base rate. Nothing is stored.</p>
+<p><a class="btn btn-accent" href="play.html">Play a round</a></p>
+</section>
+
 <div class="section-head"><h2>The race</h2><span class="note">{{ race_scope|capitalize }}; running average Brier score, lower is better.</span></div>
 {% if race.days %}
 <figure class="race-card">

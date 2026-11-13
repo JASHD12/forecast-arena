@@ -51,3 +51,4 @@ site-e2e:  ## Build the site from the offline e2e run into _site_e2e/ (link-chec
 
 a11y: site-e2e  ## axe-core accessibility lint (needs Node and tools/a11y dependencies)
 	NODE_PATH=tools/a11y/node_modules node tools/a11y/check.js _site_e2e
+	NODE_PATH=tools/a11y/node_modules node tools/a11y/play.js _site_e2e

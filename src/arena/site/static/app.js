@@ -142,8 +142,37 @@
     setDeck(state.deck);
   }
 
+  // Sortable tables (T134): header buttons sort by the cell's data-sort or its text.
+  function initSortable(table) {
+    var heads = table.querySelectorAll('thead th');
+    heads.forEach(function (th, col) {
+      var b = el('button', { type: 'button' }, th.textContent);
+      th.textContent = ''; th.appendChild(b);
+      b.addEventListener('click', function () {
+        var asc = th.getAttribute('aria-sort') !== 'ascending';
+        heads.forEach(function (h) { h.removeAttribute('aria-sort'); });
+        th.setAttribute('aria-sort', asc ? 'ascending' : 'descending');
+        var tb = table.tBodies[0];
+        var rows = Array.prototype.slice.call(tb.rows);
+        var key = function (r) {
+          var c = r.cells[col]; var v = c.getAttribute('data-sort');
+          if (v === null) v = c.textContent.trim();
+          var n = parseFloat(v);
+          return v === '' ? null : (isNaN(n) ? v.toLowerCase() : n);
+        };
+        rows.sort(function (x, y) {
+          var a = key(x), b = key(y);
+          if (a === null) return 1; if (b === null) return -1;
+          return (a < b ? -1 : a > b ? 1 : 0) * (asc ? 1 : -1);
+        });
+        rows.forEach(function (r) { tb.appendChild(r); });
+      });
+    });
+  }
+
   document.addEventListener('DOMContentLoaded', function () {
     var g = document.getElementById('game');
     if (g) initGame(g);
+    document.querySelectorAll('table.sortable').forEach(initSortable);
   });
 })();

@@ -37,6 +37,7 @@ from arena.scoring.stats import calibration_bins, expected_calibration_error, mu
 from arena.site.charts import forest_svg, race_svg, reliability_svg, series_class
 from arena.site.game import live_deck, practice_deck
 from arena.site.llm_obs import PRICE_SOURCE, load_spans, totals, traces_by_question, usage_rows
+from arena.site.matrices import MIN_N, head_to_head, heatmap
 from arena.site.methods_content import LIMITATIONS, PRINCIPLES
 from arena.site.ops_status import llm_usage, missed_days, parse_failures, source_freshness
 from arena.site.profiles import profile
@@ -471,6 +472,7 @@ def build_site(
     urows = usage_rows(load_spans(ledger))
     game = {"live": live_deck(rec), "practice": practice_deck(golden_path)}
     info = {fid: (sees, cadence) for fid, sees, cadence in INFORMATION_SETS}
+    mfids = sorted({s.forecaster_id for s in (off if off else rehearsal)})
     changelog = version_changelog(rec)
     fids = sorted({f.forecaster_id for f in rec.forecasts} | {s.forecaster_id for s in rec.skips})
     profiles = [profile(fid, rec, FORECASTER_NAMES, changelog, urows, info) for fid in fids]
@@ -503,7 +505,15 @@ def build_site(
         ),
         "leaderboard.html": (
             "Leaderboard",
-            {"headline": headline, "rehearsal": rehearsal_boards, "official_days": off_days},
+            {
+                "headline": headline,
+                "rehearsal": rehearsal_boards,
+                "official_days": off_days,
+                "heat": heatmap(off if off else rehearsal, mfids, domains),
+                "h2h": head_to_head(off if off else rehearsal, mfids),
+                "matrix_scope": "official record" if off else "rehearsal days",
+                "min_n": MIN_N,
+            },
         ),
         "calibration.html": (
             "Calibration",

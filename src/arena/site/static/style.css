@@ -543,3 +543,25 @@ ul.plain { list-style: none; padding: 0; margin: 0; display: grid; gap: .45rem; 
 .qnav { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin: 1.25rem 0; }
 .qchart .grid { stroke: var(--line); stroke-width: 1; }
 .qchart .tick { fill: var(--muted); font-size: 11px; }
+
+/* Leaderboard matrices (T134): diverging blue (better) / red (worse) around the palette's
+   neutral gray; three steps per arm; every step >= 5:1 with its text colour. */
+:root {
+  --hm-n: #f0efec; --hm-b1: #b5cbe5; --hm-b2: #83aee0; --hm-b3: #5290da;
+  --hm-r1: #ecbdbb; --hm-r2: #e99492; --hm-r3: #e66a69; --hm-ink: #10162a;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --hm-n: #383835; --hm-b1: #384c61; --hm-b2: #385c84; --hm-b3: #396ba7;
+    --hm-r1: #644442; --hm-r2: #864d4c; --hm-r3: #a95756; --hm-ink: #ffffff;
+  }
+}
+.heatmap td.hm, .heatmap td.hm-n { color: var(--hm-ink); font-variant-numeric: tabular-nums; }
+.heatmap td { border: 2px solid var(--surface); }
+.hm-n { background: var(--hm-n); }
+.hm-b1 { background: var(--hm-b1); } .hm-b2 { background: var(--hm-b2); } .hm-b3 { background: var(--hm-b3); }
+.hm-r1 { background: var(--hm-r1); } .hm-r2 { background: var(--hm-r2); } .hm-r3 { background: var(--hm-r3); }
+.hm-self { color: var(--muted); text-align: center; }
+.hm-few, .hm-ci { font-size: .78em; opacity: .9; }
+.sortable th button { font: inherit; font-weight: 700; background: none; border: 0; color: inherit; cursor: pointer; padding: 0; }
+.sortable th button::after { content: " ↕"; color: var(--muted); }

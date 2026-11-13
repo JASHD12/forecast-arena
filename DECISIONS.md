@@ -684,6 +684,22 @@ Made by: agent
   stored (only call metadata), and recomputing them at build time could differ from what
   the agent saw.
 
+## 2026-11-13 · Leaderboard matrices and sortable tables (T134)
+
+- Skill-by-topic heatmap and a head-to-head matrix (row minus column, paired Brier
+  differences with day-block 95% intervals, coloured only when the interval excludes
+  zero). Display only; the boards and their wording rules stay the verdict (SPEC 10).
+  Cells with fewer than 10 questions stay gray and say "few" or "–".
+- Colours: the diverging blue/red pair and neutral grays of the dataviz reference
+  palette (light #f0efec, dark #383835), three steps per arm mixed from the neutral
+  towards each pole; contrast checked with the palette validator's WCAG function: every
+  step is at least 5:1 against its text colour (#10162a in light, #ffffff in dark). The
+  sign and the number are printed in every cell, so colour is never the only cue.
+- Sorting is progressive (buttons added by app.js, `aria-sort` set); without JavaScript
+  the tables are complete, just unsorted. Checked in Chromium by `make a11y`.
+- Not done here: the cost-vs-accuracy scatter for LLMs from the roadmap; the LLM page
+  already shows cost per forecaster next to the scores (proposal for later).
+
 ## Proposals for the human
 
 Ideas outside the specification. The agent lists them here and does not build them.

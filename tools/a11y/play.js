@@ -37,6 +37,18 @@ function fail(msg) { console.error('FAIL ' + msg); process.exitCode = 1; }
   if (errors.length) fail('page errors: ' + errors.join('; '));
   if (outside.length) fail('requests outside the site: ' + outside.join(', '));
 
+  const lb = await ctx.newPage();
+  await lb.goto('file://' + path.join(root, 'leaderboard.html'));
+  const sortBtn = lb.locator('table.sortable thead th button').nth(1);
+  if (await sortBtn.count()) {
+    await sortBtn.click();
+    const sorted = await lb.locator('table.sortable thead th').nth(1).getAttribute('aria-sort');
+    if (sorted !== 'ascending') fail('leaderboard: sort did not set aria-sort');
+    else console.log('ok   leaderboard: sortable heatmap');
+  } else {
+    console.log('skip leaderboard: no sortable table in this build');
+  }
+
   const noJs = await browser.newContext({ javaScriptEnabled: false });
   const p2 = await noJs.newPage();
   await p2.goto(url);

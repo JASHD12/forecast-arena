@@ -19,6 +19,24 @@
 </figure>
 </section>
 {% endif %}
+{% if heat.fids %}
+<section aria-labelledby="hm-title">
+<div class="section-head"><h2 id="hm-title">Skill by topic</h2><span class="note">{{ matrix_scope|capitalize }}</span></div>
+<p class="note">Brier skill against the base rate on the questions both answered: +0.10 means 10% lower (better) Brier score than the base rate, negative means worse. Blue is better, red is worse, gray is within ±0.02 or fewer than {{ min_n }} questions (marked "few"). Display only; whether a difference is real is decided by the intervals below.</p>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Skill by topic"><table class="heatmap sortable">
+<thead><tr><th scope="col">Forecaster</th>{% for d in heat.domains %}<th scope="col" class="num">{{ dname(d) }}</th>{% endfor %}</tr></thead>
+<tbody>{% for f in heat.fids %}<tr><th scope="row"><a href="{{ root }}forecasters/{{ f }}.html">{{ fname(f) }}</a></th>{% for d in heat.domains %}{% set c = heat.cells[f][d] %}<td class="num hm {{ c.tone }}" data-sort="{{ c.skill if c.skill is not none else '' }}">{% if c.skill is none %}–{% else %}{{ "%+.2f"|format(c.skill) }}{% if c.few %} <span class="hm-few">few</span>{% endif %}<span class="sr-only"> on {{ c.n }} questions</span>{% endif %}</td>{% endfor %}</tr>{% endfor %}</tbody></table></div>
+</section>
+{% endif %}
+{% if h2h.fids|length > 1 %}
+<section aria-labelledby="h2h-title">
+<div class="section-head"><h2 id="h2h-title">Head to head</h2><span class="note">{{ matrix_scope|capitalize }}</span></div>
+<p class="note">Each cell: Brier score of the row minus the column on the questions both answered, with its 95% day-block interval. Negative (blue) means the row forecaster did better. Coloured only when the interval excludes zero; gray means the data cannot tell them apart yet. Pairs with fewer than {{ min_n }} shared questions are left out.</p>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Head to head"><table class="heatmap h2h">
+<thead><tr><th scope="col">Row minus column</th>{% for b in h2h.fids %}<th scope="col" class="num">{{ fname(b) }}</th>{% endfor %}</tr></thead>
+<tbody>{% for a in h2h.fids %}<tr><th scope="row">{{ fname(a) }}</th>{% for b in h2h.fids %}{% set c = h2h.cells[a][b] %}{% if c is none %}<td class="hm-self" aria-label="same forecaster">·</td>{% elif c.diff is none %}<td class="num hm-n">–<span class="sr-only"> only {{ c.n }} shared questions</span></td>{% else %}<td class="num hm {{ c.tone }}">{{ "%+.3f"|format(c.diff) }}<br><span class="hm-ci">[{{ "%+.3f"|format(c.lo) }}, {{ "%+.3f"|format(c.hi) }}]</span>{% if c.excludes_zero %}<span class="sr-only"> interval excludes zero</span>{% endif %}</td>{% endif %}{% endfor %}</tr>{% endfor %}</tbody></table></div>
+</section>
+{% endif %}
 {% macro boards(list, note, suffix="") %}
 {% for b in list %}
 <h3>{{ "Same questions for everyone" if b.kind == "common" else "All questions" }} · {{ "All topics" if b.domain == "overall" else dname(b.domain) }}{{ suffix }}</h3>
@@ -35,4 +53,5 @@
 <h2>Rehearsal scores</h2>
 {{ boards(rehearsal, "Rehearsal days, shown for transparency and not part of the official record") }}
 {% endif %}
+<script src="{{ root }}static/app.js" defer></script>
 {% endblock %}

@@ -42,7 +42,8 @@ def test_empty_ledger_builds_every_page(tmp_path) -> None:
         assert "Bundesnetzagentur | SMARD.de" in text
         assert "Rehearsal" in text
         assert 'name="viewport"' in text
-        assert "<script" not in text or page == "play.html"  # only the game uses app.js
+        # only the game and the sortable leaderboard use app.js
+        assert "<script" not in text or page in ("play.html", "leaderboard.html")
     css = (res.out_dir / "static" / "style.css").read_text()
     assert "prefers-color-scheme: dark" in css
 

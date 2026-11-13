@@ -1,5 +1,9 @@
 # Forecast Arena
 
+[![CI](https://github.com/JASHD12/forecast-arena/actions/workflows/ci.yml/badge.svg)](https://github.com/JASHD12/forecast-arena/actions/workflows/ci.yml)
+[![Live site](https://img.shields.io/badge/live-site-3b3fc4)](https://jashd12.github.io/forecast-arena/)
+[![Licence: MIT](https://img.shields.io/badge/licence-MIT-informational)](LICENSE)
+
 A live, public benchmark in which different kinds of forecasters (simple baselines, a
 classical ML model, LLMs with and without data, an LLM agent with tools) predict
 tomorrow's real-world outcomes and are scored against what actually happens.
@@ -17,6 +21,76 @@ was written on 2026-11-13 (rehearsal start date: 2026-11-13). The first days are
 shown, but excluded from headline scores. The official record starts automatically after
 five consecutive clean days (SPEC 2.9). Electricity prices are live first; weather,
 Wikipedia attention and exchange rates follow once each has passed its next-day checks.
+
+## At a glance
+
+| Home | Play | Leaderboard |
+|---|---|---|
+| ![Home page](docs/img/home.png) | ![Can you beat the AI?](docs/img/play.png) | ![Leaderboard heatmap](docs/img/leaderboard.png) |
+
+*Screenshots of the offline demo build (fixture data, not the live record).*
+
+## Results so far
+
+<!-- results:start -->
+All numbers below are **backtests**: past days replayed through the production code, not the live record. Lower Brier is better; always saying 50% scores 0.25. Generated from the model cards in `docs/models/`.
+
+**Electricity: champion vs baselines** (2025-11-01 to 2026-10-31, 365 days)
+
+| Forecaster | n | Brier | 95% interval | Log score |
+|---|---|---|---|---|
+| base_rate | 2190 | 0.2466 | [0.2424, 0.2510] | 0.6860 |
+| persistence | 2190 | 0.2205 | [0.2107, 0.2302] | 0.6327 |
+| ml | 2190 | 0.1930 | [0.1818, 0.2043] | 0.5683 |
+
+**Electricity: LightGBM challenger** (2025-11-01 to 2026-10-31, 365 days)
+
+| Forecaster | n | Brier | 95% interval | Log score |
+|---|---|---|---|---|
+| base_rate | 2190 | 0.2466 | [0.2424, 0.2510] | 0.6860 |
+| persistence | 2190 | 0.2205 | [0.2107, 0.2302] | 0.6327 |
+| ml | 2190 | 0.1930 | [0.1818, 0.2043] | 0.5683 |
+| ml_lgbm | 2190 | 0.1884 | [0.1773, 0.1997] | 0.5584 |
+
+**Electricity: time-series benchmarks** (2025-11-01 to 2026-10-31, 365 days)
+
+| Forecaster | n | Brier | 95% interval | Log score |
+|---|---|---|---|---|
+| base_rate | 2190 | 0.2466 | [0.2424, 0.2510] | 0.6860 |
+| persistence | 2190 | 0.2205 | [0.2107, 0.2302] | 0.6327 |
+| ml | 2190 | 0.1930 | [0.1818, 0.2043] | 0.5683 |
+| ts_ets | 2190 | 0.2441 | [0.2263, 0.2616] | 0.7466 |
+| ts_sarimax | 2190 | 0.2279 | [0.2181, 0.2377] | 0.6607 |
+| ts_chronos | 2190 | 0.2142 | [0.2040, 0.2243] | 0.6227 |
+<!-- results:end -->
+
+## Skills shown, and where the code is
+
+<!-- skills:start -->
+| Skill | In this project | Code |
+|---|---|---|
+| Python, typing, testing | Typed package, mypy, hundreds of unit tests, property-based tests, offline end-to-end run on every push | `src/arena`<br>`tests`<br>`Makefile` |
+| SQL, DuckDB, Parquet | Open data as Parquet; analytics SQL with DuckDB, shown with its queries | `src/arena/analytics/sql.py` |
+| dbt | Staging and mart models with tests (unique, not null, accepted values, foreign keys), built in CI | `analytics/dbt` |
+| scikit-learn, calibration | Gradient-boosted quantile regression turned into calibrated probabilities | `src/arena/forecasters/ml_power.py` |
+| LightGBM, Optuna, SHAP | Challenger tuned with time-ordered cross-validation; SHAP explanations | `src/arena/forecasters/ml_power_lgbm.py`<br>`src/arena/ops/explain.py` |
+| PyTorch | Quantile neural network trained with pinball loss; measured against the champion | `src/arena/forecasters/ml_power_torch.py` |
+| Time-series models | ETS, SARIMAX (statsmodels) and a pretrained Chronos-Bolt model as benchmarks | `src/arena/forecasters/ts_bench.py` |
+| MLOps: MLflow, Evidently, champion/challenger | Weekly retraining with a written promotion rule, run tracking and drift reports | `src/arena/ops/weekly.py`<br>`src/arena/ops/drift.py` |
+| Statistics | Proper scoring rules, day-block bootstrap, Diebold-Mariano test, power analysis, conformal prediction | `src/arena/scoring`<br>`src/arena/ops/explain.py` |
+| LLM APIs, prompts, structured output | Versioned prompts, strict JSON answers with one repair, hard daily cost caps | `src/arena/forecasters/llm.py`<br>`src/arena/llm` |
+| Agents and tool use | Tool-calling agent with call and time limits and prompt-injection-safe tool output | `src/arena/agent/forecaster.py`<br>`src/arena/agent/tools.py` |
+| RAG, embeddings | Local ONNX embeddings, similarity search over past questions with a no-leakage rule | `src/arena/agent/retrieval.py` |
+| LangGraph | The agent as a state machine (plan, retrieve, tools, critique) behind the same caps | `src/arena/agent/graph.py` |
+| Open-weight models (llama.cpp) | A 1.5B model on the CI runner's CPU, same contract as the API model, no API cost | `src/arena/llm/local.py` |
+| LLM evals and tracing | Frozen golden set, prompt A/B, JSON validity and cost; one span per model call | `src/arena/evals`<br>`src/arena/llm/tracing.py` |
+| MCP | Read-only MCP server so AI assistants can query the benchmark | `src/arena/mcp_server.py` |
+| REST and JSON APIs | FastAPI service and a static JSON API with schemas generated from pydantic models | `src/arena/api/app.py`<br>`src/arena/site/api.py` |
+| Docker, Kubernetes, Airflow | Image built and API smoke-tested in CI; manifests applied to a kind cluster; DAGs parsed by Airflow (validated in CI, not hosted) | `Dockerfile`<br>`deploy/k8s`<br>`orchestration/airflow` |
+| CI/CD on GitHub Actions | Scheduled jobs, promotion to a stable branch after green CI, incident issues | `.github/workflows` |
+| Data integrity | Append-only ledger with a daily hash chain; anyone can verify it | `src/arena/ledger` |
+| Dashboards and frontend | Streamlit dashboard; static site with an accessible game, checked in Chromium | `apps/dashboard`<br>`src/arena/site`<br>`tools/a11y` |
+<!-- skills:end -->
 
 ## Using it
 
@@ -137,6 +211,15 @@ Other entry points:
 | `make a11y` | accessibility lint of that site (needs Node.js and `npm ci` in `tools/a11y`) |
 | `.venv/bin/arena --help` | the command-line interface (jobs, ledger, site, reports) |
 | `.venv/bin/arena report backtest-power --first 2025-11-01 --last 2026-10-31` | power backtest (after `arena data backfill`) |
+
+### Quickstart with Docker
+
+```bash
+docker compose up --build
+```
+
+Then open <http://localhost:8000/docs> for the read-only REST API (it serves the offline
+end-to-end ledger; the comment in `compose.yaml` shows how to serve the real record).
 
 LLM forecasters only call a real provider inside GitHub Actions, with hard daily caps;
 locally and in tests they use a scripted fake.

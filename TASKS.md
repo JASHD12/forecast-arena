@@ -496,7 +496,7 @@ CI jobs; core `make check` stays offline and fast.
   - Done when: every technology named links to code CI runs.
 - [x] T141 · German summary page and README section (deps: T140)
   - Done when: `de.html` (lang="de") and the README section exist; H17 asks for proofreading.
-- [ ] T142 · README overhaul (deps: T140)
+- [x] T142 · README overhaul (deps: T140)
   - Done when: badges, screenshots, generated results, skills list, Docker quickstart.
 - [x] T143 · Streamlit dashboard (deps: T045i)
   - Done when: `apps/dashboard` passes an AppTest smoke test in CI; linked only if

@@ -878,3 +878,15 @@ Ideas outside the specification. The agent lists them here and does not build th
      probabilities about named listed shares could also count as an "investment
      recommendation" under the EU Market Abuse Regulation (Art. 20), with disclosure
      duties; get legal advice before ever doing it.
+
+## 2026-11-13 README results and skills are generated (T142)
+
+- Context: T142 asks for a results table and a skills list in the README; hand-typed numbers
+  would drift from the model cards (I5).
+- Decision: `scripts/readme_sections.py` rewrites two marker blocks from `docs/models/*.md`
+  (backtests, labelled as such) and from `arena.site.recruiters.PROOFS`; a unit test runs
+  `--check`, so `make check` fails if the README is stale. No live numbers are in the README
+  yet (the official record has not started). Screenshots are of the offline demo build and
+  say so.
+- Alternatives: `arena report cv` output pasted by hand (drifts); live leaderboard in the
+  README (empty until the official start; the site already shows it).

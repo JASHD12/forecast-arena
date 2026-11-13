@@ -700,6 +700,18 @@ Made by: agent
 - Not done here: the cost-vs-accuracy scatter for LLMs from the roadmap; the LLM page
   already shows cost per forecaster next to the scores (proposal for later).
 
+## 2026-11-13 · Home and global polish (T137)
+
+- `app.js` now loads on every page (deferred, self-hosted, CSP `script-src 'self'`) for:
+  a countdown to the 09:30 UTC lock from the visitor's own clock, a search box on the
+  question archive, and a theme toggle (auto/light/dark) kept in memory only, so it
+  resets on every page load: remembering it would need storage, which the site does
+  not use. Without JavaScript: a static lock sentence, no box, no toggle.
+- The CSS dark tokens now apply under `prefers-color-scheme: dark` unless
+  `data-theme="light"`, and always under `data-theme="dark"`.
+- Sticky header; a 1200x630 `og:image` (`static/og.png`, rendered once from an HTML card
+  with Playwright) with an absolute URL.
+
 ## Proposals for the human
 
 Ideas outside the specification. The agent lists them here and does not build them.

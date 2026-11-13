@@ -170,9 +170,73 @@
     });
   }
 
+  // Theme toggle (T137): auto -> light -> dark, in memory only (no storage).
+  function initTheme(btn) {
+    var modes = ['auto', 'light', 'dark'], i = 0;
+    btn.hidden = false;
+    btn.addEventListener('click', function () {
+      i = (i + 1) % modes.length;
+      if (modes[i] === 'auto') document.documentElement.removeAttribute('data-theme');
+      else document.documentElement.setAttribute('data-theme', modes[i]);
+      btn.textContent = 'Theme: ' + modes[i];
+    });
+  }
+
+  // Countdown to the next daily lock (T137), from the visitor's own clock.
+  function initCountdown(node) {
+    var hm = (node.getAttribute('data-lock-utc') || '09:30').split(':');
+    function tick() {
+      var now = new Date();
+      var lock = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(),
+        Number(hm[0]), Number(hm[1])));
+      var past = now >= lock;
+      if (past) lock = new Date(lock.getTime() + 864e5);
+      var mins = Math.max(0, Math.round((lock - now) / 6e4));
+      var h = Math.floor(mins / 60), m = mins % 60;
+      node.textContent = '';
+      node.appendChild(document.createTextNode(past
+        ? "Today's forecasts are locked. The next lock is in "
+        : "Today's forecasts lock in "));
+      node.appendChild(el('strong', {}, h + ' h ' + m + ' min'));
+      node.appendChild(document.createTextNode(' (' + hm.join(':') + ' UTC).'));
+    }
+    tick();
+    setInterval(tick, 30000);
+  }
+
+  // Archive search (T137): filters the question list in place.
+  function initSearch(input) {
+    var label = input.closest('.qsearch'), count = document.querySelector('.qsearch-count');
+    label.hidden = false; count.hidden = false;
+    var items = Array.prototype.slice.call(document.querySelectorAll('.qlist li'));
+    function run() {
+      var words = input.value.toLowerCase().split(/\s+/).filter(Boolean), shown = 0;
+      items.forEach(function (li) {
+        var t = li.textContent.toLowerCase();
+        var ok = words.every(function (w) { return t.indexOf(w) >= 0; });
+        li.hidden = !ok; if (ok) shown += 1;
+      });
+      document.querySelectorAll('.qlist').forEach(function (ul) {
+        var any = Array.prototype.some.call(ul.children, function (li) { return !li.hidden; });
+        ul.hidden = !any;
+        var head = ul.previousElementSibling;
+        if (head && head.classList.contains('day-head')) head.hidden = !any;
+      });
+      count.textContent = shown + ' of ' + items.length + ' questions shown';
+    }
+    input.addEventListener('input', run);
+    run();
+  }
+
   document.addEventListener('DOMContentLoaded', function () {
     var g = document.getElementById('game');
     if (g) initGame(g);
     document.querySelectorAll('table.sortable').forEach(initSortable);
+    var t = document.querySelector('.theme-toggle');
+    if (t) initTheme(t);
+    var c = document.querySelector('.lock-countdown');
+    if (c) initCountdown(c);
+    var s = document.getElementById('qsearch');
+    if (s) initSearch(s);
   });
 })();

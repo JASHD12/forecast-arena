@@ -49,7 +49,36 @@ function fail(msg) { console.error('FAIL ' + msg); process.exitCode = 1; }
     console.log('skip leaderboard: no sortable table in this build');
   }
 
+  const home = await ctx.newPage();
+  await home.goto('file://' + path.join(root, 'index.html'));
+  const cd = await home.locator('.lock-countdown').textContent();
+  if (!/lock(s|ed)[^]*\d+ h \d+ min/.test(cd)) fail('countdown not running: ' + cd);
+  else console.log('ok   home: lock countdown');
+  const tg = home.locator('.theme-toggle');
+  if (!(await tg.isVisible())) fail('theme toggle hidden with JavaScript');
+  await tg.click();
+  if ((await home.evaluate(() => document.documentElement.getAttribute('data-theme'))) !== 'light') fail('theme toggle did not set light');
+  await tg.click();
+  const bg = await home.evaluate(() => getComputedStyle(document.body).backgroundColor);
+  if ((await home.evaluate(() => document.documentElement.getAttribute('data-theme'))) !== 'dark') fail('theme toggle did not set dark');
+  else console.log('ok   theme toggle: auto -> light -> dark (' + bg + ')');
+  const qs = await ctx.newPage();
+  await qs.goto('file://' + path.join(root, 'questions', 'index.html'));
+  const total = await qs.locator('.qlist li').count();
+  await qs.locator('#qsearch').fill('zzzz-no-match');
+  if ((await qs.locator('.qlist li:visible').count()) !== 0) fail('search did not filter');
+  await qs.locator('#qsearch').fill('');
+  if ((await qs.locator('.qlist li:visible').count()) !== total) fail('search did not reset');
+  else console.log('ok   archive search filters ' + total + ' questions');
+
   const noJs = await browser.newContext({ javaScriptEnabled: false });
+  const n1 = await noJs.newPage();
+  await n1.goto('file://' + path.join(root, 'index.html'));
+  if (await n1.locator('.theme-toggle').isVisible()) fail('toggle visible without JavaScript');
+  if (!/09:30 UTC/.test(await n1.locator('.lock-countdown').textContent())) fail('static lock text missing');
+  await n1.goto('file://' + path.join(root, 'questions', 'index.html'));
+  if (await n1.locator('#qsearch').isVisible()) fail('search visible without JavaScript');
+  console.log('ok   without JavaScript: static lock text, no toggle, no search box');
   const p2 = await noJs.newPage();
   await p2.goto(url);
   if (await p2.locator('#game').isVisible()) fail('game shown without JavaScript');

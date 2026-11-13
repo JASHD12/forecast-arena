@@ -16,6 +16,10 @@
 <title>{{ title }} - Forecast Arena</title>
 <link rel="icon" href="{{ root }}static/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="{{ root }}static/style.css">
+<meta property="og:image" content="{{ site_url }}static/og.png">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<script src="{{ root }}static/app.js" defer></script>
 <link rel="alternate" type="application/atom+xml" title="Forecast Arena: daily questions" href="{{ root }}feed.xml">
 </head>
 <body>
@@ -25,6 +29,7 @@
 <nav aria-label="Main"><ul>
 {% for href, name in nav %}<li><a href="{{ root }}{{ href }}"{% if href == page %} aria-current="page"{% endif %}>{{ name }}</a></li>
 {% endfor %}</ul></nav>
+<button type="button" class="theme-toggle" hidden>Theme: auto</button>
 </div></header>
 {% if not official_start %}<aside class="banner" aria-label="Rehearsal notice"><div class="wrap"><strong>Rehearsal phase.</strong>
 The official record starts automatically after five clean days in a row; until then results are shown but don't count towards headline scores.</div></aside>{% endif %}

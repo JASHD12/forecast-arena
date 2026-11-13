@@ -7,6 +7,8 @@
 {% for d in domains %}<a href="topic-{{ d }}.html" class="filter{% if current == d %} active{% endif %}"{% if current == d %} aria-current="page"{% endif %}><span class="chip chip-{{ d }}">{{ dname(d) }}</span></a>{% endfor %}
 </nav>
 {% if archive %}
+<label class="qsearch" hidden>Search these questions <input type="search" id="qsearch" placeholder="e.g. Berlin, peak, 80" autocomplete="off"></label>
+<p class="note qsearch-count" aria-live="polite" hidden></p>
 {% for batch, qs in archive|groupby("batch_date")|reverse %}
 <h2 class="day-head">{{ batch.strftime("%A %d %B %Y") }} <span class="muted">· {{ qs|length }} questions</span></h2>
 <ul class="qlist">

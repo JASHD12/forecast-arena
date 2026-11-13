@@ -32,5 +32,4 @@
 <tbody>{% for g in live %}<tr><th scope="row"><a href="{{ g.url }}">{{ g.title }}</a></th><td>{{ "YES" if g.outcome else "NO" }}</td><td>{% for fid, p in g.forecasts.items() %}{{ fname(fid) }} {{ "%.0f%%"|format(100 * p) }}{% if not loop.last %} · {% endif %}{% endfor %}</td></tr>{% endfor %}</tbody></table></div>
 {% else %}<p class="empty">No question has been answered yet. The first answers arrive the day after the first forecasts.</p>{% endif %}
 </div>
-<script src="{{ root }}static/app.js" defer></script>
 {% endblock %}

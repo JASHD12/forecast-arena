@@ -47,7 +47,7 @@
 <h2>MLOps</h2>
 <ul class="checks">
 <li><strong>Model registry</strong> with versioned artefacts and model cards; promotions are new records, never overwrites.</li>
-<li><strong>Weekly champion/challenger retraining</strong> with a written promotion rule, tracked in <strong>MLflow</strong>.</li>
+<li><strong>Weekly champion/challenger retraining</strong> with a written promotion rule, tracked in <strong>MLflow</strong>: for electricity, scikit-learn gradient boosting competes with a <strong>LightGBM</strong> challenger whose hyperparameters are tuned by <strong>Optuna</strong> on time-series folds; <strong>SHAP</strong> explains the LightGBM model when it wins.</li>
 <li><strong>Data-drift monitoring</strong> with <strong>Evidently</strong>.</li>
 <li><strong>Probabilistic forecast evaluation:</strong> pinball (quantile) loss and empirical coverage of the 80% and 90% prediction intervals for the electricity model's 13-quantile distributions, with quantile rearrangement against crossing.</li>
 <li><strong>Explainability:</strong> permutation feature importance (scikit-learn) for the promoted electricity model, published with every weekly run on <a href="experiments.html">Experiments</a>.</li>

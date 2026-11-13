@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
+import importlib.util
 from collections.abc import Callable, Sequence
 from datetime import date, datetime, timedelta
 from functools import partial
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from arena.agent.forecaster import AgentForecaster
 from arena.agent.tools import GdeltBackend, wikipedia_summary
@@ -32,6 +33,9 @@ from arena.sources.ecb import EcbClient
 from arena.sources.http import HttpClient
 from arena.sources.smard import FILTERS, SmardClient, berlin_day_bounds
 from arena.sources.wikimedia import WikimediaClient
+
+if TYPE_CHECKING:
+    from arena.ops.weekly import TrainerSpec
 
 #: Days of history a live power domain loads: replay window (200) + longest template
 #: window (60) + margin.
@@ -186,7 +190,7 @@ def build_forecasters(
 
 def weekly_setup(
     settings: Settings, now: datetime, only: Sequence[str] = ()
-) -> tuple[dict[str, Domain], dict[str, Callable[[date], Any]], dict[str, Callable[[Any], str]]]:
+) -> tuple[dict[str, Domain], dict[str, TrainerSpec], dict[str, Callable[[Any], str]]]:
     """Domains, trainers and card writers for the weekly job (power and attention)."""
     from arena.backtest.cards import ATTENTION_CARD, POWER_CARD
     from arena.domains.power_history import HISTORY_START, PowerHistory
@@ -194,7 +198,7 @@ def weekly_setup(
 
     http = HttpClient(settings.user_agent())
     domains: dict[str, Domain] = {}
-    trainers: dict[str, Callable[[date], Any]] = {}
+    trainers: dict[str, TrainerSpec] = {}
     today = berlin_date(now)
     if not only or "power" in only:
         client = SmardClient(http, cache_dir=settings.cache_dir)
@@ -202,13 +206,27 @@ def weekly_setup(
             PowerHistory(client).store([PRICE_KEY], HISTORY_START, today + timedelta(days=1))
         )
         domains["power"] = pdom
-        trainers["power"] = lambda cut: ml_power.train(pdom, cut, folds=2, max_iter=100)
+        fams: dict[str, Callable[[date], Any]] = {
+            "hgb": lambda cut: ml_power.train(pdom, cut, folds=2, max_iter=100)
+        }
+        if importlib.util.find_spec("lightgbm") and importlib.util.find_spec("optuna"):
+            from arena.forecasters import ml_power_lgbm
+
+            fams["lgbm"] = lambda cut: ml_power_lgbm.train_lgbm(pdom, cut, n_trials=20, folds=2)
+        trainers["power"] = fams
     if not only or "attention" in only:
         adom = AttentionDomain(WikimediaClient(http, cache_dir=settings.cache_dir))
         domains["attention"] = adom
-        trainers["attention"] = lambda cut: ml_attention.train(
-            adom, cut - timedelta(days=65), cut - timedelta(days=5)
-        )
+        afams: dict[str, Callable[[date], Any]] = {
+            "hgb": lambda cut: ml_attention.train(
+                adom, cut - timedelta(days=65), cut - timedelta(days=5)
+            )
+        }
+        if importlib.util.find_spec("lightgbm"):
+            afams["lgbm"] = lambda cut: ml_attention.train_lgbm(
+                adom, cut - timedelta(days=65), cut - timedelta(days=5)
+            )
+        trainers["attention"] = afams
 
     def card(text: str) -> Callable[[Any], str]:
         return lambda d: (

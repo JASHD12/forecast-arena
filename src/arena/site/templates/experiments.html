@@ -23,7 +23,14 @@
 <ul class="bars bars-wide imp" aria-label="Feature importance">
 {% for f in imp %}<li><span class="who"><code>{{ f.feature }}</code></span><span class="track" aria-hidden="true"><span class="fill" style="width: {{ '%.1f'|format([[f.mae_increase / top, 0]|max, 1]|min * 100) }}%"></span></span><span class="val">{{ "%+.2f"|format(f.mae_increase) }}</span><span class="score">± {{ "%.2f"|format(f.std) }}</span></li>
 {% endfor %}</ul>{% endif %}
-{% set qd = (r.quantile_diagnostics or {}).get("power") if r.quantile_diagnostics is defined else none %}
+{% set sh = (r.shap or {}).get("power") if r.shap is defined else none %}
+{% if sh %}<h3>SHAP explanation of the electricity model ({{ r.day }})</h3>
+<p class="note">Mean absolute SHAP value per input (EUR/MWh) for the median forecast of tomorrow's average price, from SHAP's TreeExplainer on the promoted LightGBM model: how far, on average, each input moves a single prediction away from the model's average prediction.</p>
+{% set stop = sh[0].mean_abs_shap if sh[0].mean_abs_shap > 0 else 1 %}
+<ul class="bars bars-wide imp" aria-label="SHAP values">
+{% for f in sh %}<li><span class="who"><code>{{ f.feature }}</code></span><span class="track" aria-hidden="true"><span class="fill" style="width: {{ '%.1f'|format([f.mean_abs_shap / stop, 1]|min * 100) }}%"></span></span><span class="val">{{ "%.2f"|format(f.mean_abs_shap) }}</span></li>
+{% endfor %}</ul>{% endif %}
+{% set qd =(r.quantile_diagnostics or {}).get("power") if r.quantile_diagnostics is defined else none %}
 {% if qd %}<h3>Probabilistic accuracy of the electricity model ({{ r.day }})</h3>
 <p class="note">The model predicts a full distribution (13 quantiles) for each daily price statistic. Pinball loss scores that distribution (EUR/MWh, lower is better; about half the CRPS). Coverage shows how often the real value fell inside the central 80% and 90% bands: a well-calibrated model is close to 0.80 and 0.90.</p>
 <div class="table-scroll" tabindex="0" role="region" aria-label="Quantile diagnostics"><table>

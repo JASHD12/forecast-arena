@@ -14,7 +14,7 @@ move older "Done log" lines to `docs/progress-archive.md`.
 
 ## In progress
 
-(nothing)
+- T112 LightGBM + Optuna + SHAP: code, tests and CI wiring pushed; waiting for the one-year power backtest with `--challenger lgbm` to write the model card, then tick
 
 ## Open risks and surprises
 

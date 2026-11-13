@@ -17,7 +17,7 @@ from __future__ import annotations
 import hashlib
 import math
 import statistics
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field
 from datetime import date, timedelta
 from typing import Any
@@ -68,16 +68,18 @@ class AttentionModel:
     """Fitted classifier plus calibration."""
 
     train_end: date
-    clf: HistGradientBoostingClassifier | None = None
+    clf: Any = None
     calib: LogisticRegression | None = None
     n_train: int = 0
     n_calib: int = 0
     base_rate: float = 0.5
+    #: Model family in the version string; challengers (e.g. LightGBM) use their own.
+    family: str = FAMILY
 
     @property
     def version(self) -> str:
         """Family, revision and training cut-off."""
-        return f"{FAMILY}-r{REVISION}-{self.train_end.isoformat()}"
+        return f"{self.family}-r{REVISION}-{self.train_end.isoformat()}"
 
     def raw(self, x: list[float]) -> float:
         """Uncalibrated P(YES)."""
@@ -168,9 +170,16 @@ def train(
     fold_days: int = 14,
     gap_days: int = 3,
     max_iter: int = 150,
+    fit: Callable[[list[list[float]], list[int]], Any] | None = None,
+    family: str = FAMILY,
 ) -> AttentionModel:
     """Fit on reference days up to `last_ref` (labels need R+3 <= cut-off, the caller
     chooses `last_ref` accordingly); calibrate on out-of-fold predictions."""
+    if fit is None:
+
+        def fit(x: list[list[float]], y: list[int]) -> Any:
+            return _fit(x, y, max_iter)
+
     rows = training_rows(domain, first_ref, last_ref)
     if len(set(rows.y)) < 2:
         raise ValueError("training rows need both outcomes")
@@ -182,13 +191,14 @@ def train(
         te = [i for i, d in enumerate(rows.ref) if f_start <= d <= f_end]
         if len(tr) < 200 or not te or len({rows.y[i] for i in tr}) < 2:
             continue
-        clf = _fit([rows.x[i] for i in tr], [rows.y[i] for i in tr], max_iter)
+        clf = fit([rows.x[i] for i in tr], [rows.y[i] for i in tr])
         ps = clf.predict_proba(np.asarray([rows.x[i] for i in te]))[:, 1]
         raw += [math.log(max(p, 1e-4) / max(1 - p, 1e-4)) for p in ps]
         ys += [rows.y[i] for i in te]
     model = AttentionModel(
         train_end=last_ref,
-        clf=_fit(rows.x, rows.y, max_iter),
+        clf=fit(rows.x, rows.y),
+        family=family,
         n_train=len(rows.y),
         base_rate=sum(rows.y) / len(rows.y),
     )
@@ -196,3 +206,32 @@ def train(
         model.calib = LogisticRegression().fit([[v] for v in raw], ys)
         model.n_calib = len(ys)
     return model
+
+
+LGBM_FAMILY = "attention-lgbc"
+
+
+def fit_lgbm(x: list[list[float]], y: list[int], seed: int = 0) -> Any:
+    """LightGBM classifier with fixed, conservative settings (challenger; T112). No
+    hyperparameter search here: attention training is the slowest weekly job."""
+    from lightgbm import LGBMClassifier
+
+    return LGBMClassifier(
+        n_estimators=200,
+        learning_rate=0.05,
+        num_leaves=15,
+        min_child_samples=40,
+        reg_lambda=1.0,
+        random_state=seed,
+        deterministic=True,
+        force_row_wise=True,
+        n_jobs=1,
+        verbose=-1,
+    ).fit(np.asarray(x), np.asarray(y))
+
+
+def train_lgbm(
+    domain: AttentionDomain, first_ref: date, last_ref: date, **kw: Any
+) -> AttentionModel:
+    """The attention model with LightGBM instead of histogram gradient boosting."""
+    return train(domain, first_ref, last_ref, fit=fit_lgbm, family=LGBM_FAMILY, **kw)

@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable, Sequence
 from datetime import date, timedelta
+from typing import Any
 
 from arena.backtest.harness import BacktestResult, walk_forward
 from arena.domains.power import PowerDomain
@@ -33,23 +35,49 @@ def run(
     warmup_days: int = 120,
     folds: int = 2,
     max_iter: int = 100,
+    challengers: Sequence[str] = (),
+    lgbm_trials: int = 20,
 ) -> BacktestResult:
-    """Walk-forward from `first` to `last` (scored), with a warm-up before `first`."""
+    """Walk-forward from `first` to `last` (scored), with a warm-up before `first`.
+
+    `challengers` adds challenger model families as extra forecasters on the same
+    questions: "lgbm" (LightGBM + Optuna, forecaster id `ml_lgbm`)."""
     state: dict[str, PowerModel] = {}
 
-    def refresh(domain_name: str, day: date) -> PowerModel | None:
-        if domain_name != "power":
+    def refresher(key: str, fit: Callable[[date], PowerModel]) -> Callable[[str, date], Any]:
+        def refresh(domain_name: str, day: date) -> PowerModel | None:
+            if domain_name != "power":
+                return None
+            cur = state.get(key)
+            if cur is None or (day - cur.train_end).days > retrain_days:
+                state[key] = fit(day - timedelta(days=1))
+                return state[key]
             return None
-        cur = state.get("m")
-        if cur is None or (day - cur.train_end).days > retrain_days:
-            state["m"] = train(domain, day - timedelta(days=1), folds=folds, max_iter=max_iter)
-            return state["m"]
-        return None
+
+        return refresh
+
+    def forecasters(h: Any) -> list[Any]:
+        out: list[Any] = [
+            BaseRate(h),
+            Persistence(h),
+            MLForecaster({}, refresher("ml", lambda c: train(domain, c, folds=folds,
+                                                             max_iter=max_iter))),
+        ]  # fmt: skip
+        if "lgbm" in challengers:
+            from arena.forecasters.ml_power_lgbm import train_lgbm
+
+            f = MLForecaster(
+                {}, refresher("lgbm", lambda c: train_lgbm(domain, c, n_trials=lgbm_trials,
+                                                           folds=folds))
+            )  # fmt: skip
+            f.forecaster_id = "ml_lgbm"
+            out.append(f)
+        return out
 
     return walk_forward(
         run_id,
         domain,
-        lambda h: [BaseRate(h), Persistence(h), MLForecaster({}, refresh)],
+        forecasters,
         first - timedelta(days=warmup_days),
         last,
         warmup=warmup_days,

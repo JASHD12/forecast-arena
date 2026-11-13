@@ -13,6 +13,7 @@ from __future__ import annotations
 from datetime import date
 from typing import Any
 
+import numpy as np
 from sklearn.inspection import permutation_importance
 
 from arena.domains.power import PowerDomain
@@ -95,3 +96,30 @@ def power_quantile_diagnostics(
             }
         )
     return out
+
+
+def power_shap(domain: PowerDomain, model: Any, first: date, last: date) -> list[dict[str, Any]]:
+    """Top features by mean |SHAP value| (EUR/MWh) of the median regressor of the daily
+    mean price on the window's target days, from SHAP's TreeExplainer. Only for tree models
+    SHAP supports exactly (the LightGBM family); [] otherwise or if SHAP is missing."""
+    from arena.forecasters.ml_power_lgbm import FAMILY as LGBM_FAMILY
+
+    if getattr(model, "family", None) != LGBM_FAMILY:
+        return []
+    try:
+        import shap
+    except ImportError:
+        return []
+    models = getattr(model, "models", {})
+    if not models.get("mean"):
+        return []
+    x, _, _ = training_rows(domain.all_days(), first, last)
+    if len(x) < MIN_ROWS:
+        return []
+    est = models["mean"][len(models["mean"]) // 2]
+    values = np.asarray(shap.TreeExplainer(est).shap_values(x))
+    mean_abs = np.abs(values).mean(axis=0)
+    rows: list[dict[str, Any]] = [{"feature": FEATURE_NAMES[i], "mean_abs_shap": round(float(v), 4)}
+            for i, v in enumerate(mean_abs)]  # fmt: skip
+    rows.sort(key=lambda d: float(d["mean_abs_shap"]), reverse=True)
+    return rows[:TOP]

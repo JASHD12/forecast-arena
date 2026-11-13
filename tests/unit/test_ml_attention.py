@@ -62,3 +62,17 @@ def test_transient_unpublished_list_is_not_remembered() -> None:
     first = top_trajectory(src, "de.wikipedia", "X", date(2026, 11, 1), days=1)
     second = top_trajectory(src, "de.wikipedia", "X", date(2026, 11, 1), days=1)
     assert first[-1]["views"] is None and second[-1]["views"] == 500
+
+
+def test_lightgbm_classifier_challenger(dom) -> None:
+    pytest.importorskip("lightgbm")
+    from arena.forecasters.ml_attention import LGBM_FAMILY, train_lgbm
+
+    model = train_lgbm(dom, date(2026, 10, 15), date(2026, 11, 3), folds=1, fold_days=7)
+    assert model.version.startswith(f"{LGBM_FAMILY}-r1-2026-11-03")
+    b = date(2026, 11, 8)
+    asof = datetime.combine(b, time(5, 30), tzinfo=UTC)
+    f = MLForecaster({"attention": model})
+    for q in dom.generate_questions(b, asof):
+        out = f.forecast(q, dom.context(q, asof), asof)
+        assert isinstance(out, Forecast) and 0 < out.probability < 1

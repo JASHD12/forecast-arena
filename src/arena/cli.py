@@ -323,6 +323,8 @@ def report() -> None:
 
 
 @report.command("backtest-power")
+@click.option("--challenger", "challengers", multiple=True, type=click.Choice(["lgbm"]),
+              help="Add a challenger model family (needs requirements-ml.txt).")  # fmt: skip
 @click.option("--first", type=click.DateTime(["%Y-%m-%d"]), required=True)
 @click.option("--last", type=click.DateTime(["%Y-%m-%d"]), required=True)
 @click.option("--out", "out_dir", type=click.Path(path_type=Path), default=Path("backtests"))
@@ -334,7 +336,12 @@ def report() -> None:
 )
 @click.pass_obj
 def report_backtest_power(
-    obj: Ctx, first: object, last: object, out_dir: Path, card: Path | None
+    obj: Ctx,
+    first: object,
+    last: object,
+    out_dir: Path,
+    card: Path | None,
+    challengers: tuple[str, ...] = (),
 ) -> None:
     """Walk-forward power backtest from the SMARD cache (ARENA_CACHE_DIR); labelled backtest."""
     from arena.backtest import power as bt
@@ -349,14 +356,12 @@ def report_backtest_power(
     client = SmardClient(HttpClient(obj.settings.user_agent()), cache_dir=obj.settings.cache_dir)
     store = PowerHistory(client).store([PRICE_KEY], HISTORY_START, la + timedelta(days=2))
     run_id = f"power-{f.isoformat()}-{la.isoformat()}-{obj.clock.now():%Y%m%dT%H%M}"
-    res = bt.run(PowerDomain(store), f, la, run_id=run_id)
-    text = markdown(
-        f"Power backtest {f} to {la}",
-        res.records,
-        ["base_rate", "persistence", "ml"],
-        [("ml", "base_rate"), ("ml", "persistence"), ("persistence", "base_rate")],
-        bt.NOTES,
-    )
+    res = bt.run(PowerDomain(store), f, la, run_id=run_id, challengers=challengers)
+    names = ["base_rate", "persistence", "ml"] + [f"ml_{c}" for c in challengers]
+    comps = [("ml", "base_rate"), ("ml", "persistence"), ("persistence", "base_rate")]
+    comps += [(f"ml_{c}", "ml") for c in challengers]
+    comps += [(f"ml_{c}", "base_rate") for c in challengers]
+    text = markdown(f"Power backtest {f} to {la}", res.records, names, comps, bt.NOTES)
     path = BacktestStore(out_dir).write(
         run_id, res.records, {"domain": "power", "first": f, "last": la}
     )

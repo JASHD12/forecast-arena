@@ -24,7 +24,7 @@ jobs:
       - name: Install the pinned dependencies
         run: |
           make setup
-          .venv/bin/pip install -r requirements-tracking.txt
+          .venv/bin/pip install -r requirements-tracking.txt -r requirements-ml.txt
       - name: Outdated pins report
         run: |
           {

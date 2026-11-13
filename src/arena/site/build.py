@@ -85,6 +85,9 @@ STACK_LIBRARIES = (
     ("jinja2", "static site generation"),
     ("click", "command-line interface for every job"),
     ("joblib", "model artefacts in the registry"),
+    ("lightgbm", "challenger gradient-boosting models (quantile regression, classification)"),
+    ("optuna", "hyperparameter search for the LightGBM challenger (time-series folds)"),
+    ("shap", "SHAP explanations of LightGBM models"),
     ("mlflow-skinny", "experiment tracking of the weekly retraining (SQLite backend)"),
     ("evidently", "data-drift reports on model inputs"),
 )

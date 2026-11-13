@@ -25,7 +25,7 @@ jobs:
       - name: Install pinned dependencies
         run: |
           make setup
-          .venv/bin/pip install -r requirements-tracking.txt
+          .venv/bin/pip install -r requirements-tracking.txt -r requirements-ml.txt
       - name: make check
         run: make check
 
@@ -73,12 +73,12 @@ jobs:
       - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
-      - name: pip-audit of requirements-lock.txt and requirements-tracking.txt
+      - name: pip-audit of the lock, tracking and ML requirement files
         run: |
           python -m pip install pip-audit==2.10.1
           {
             echo "## Dependency vulnerability audit"
             echo '```'
-            pip-audit -r requirements-lock.txt -r requirements-tracking.txt --progress-spinner off 2>&1 || true
+            pip-audit -r requirements-lock.txt -r requirements-tracking.txt -r requirements-ml.txt --progress-spinner off 2>&1 || true
             echo '```'
           } | tee -a "$GITHUB_STEP_SUMMARY"

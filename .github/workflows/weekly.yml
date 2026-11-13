@@ -45,7 +45,7 @@ jobs:
       - name: Install pinned dependencies and the tracking extras
         run: |
           make setup
-          .venv/bin/pip install -r requirements-tracking.txt
+          .venv/bin/pip install -r requirements-tracking.txt -r requirements-ml.txt
       - name: Restore cached source data (SMARD history, Wikimedia top lists)
         uses: actions/cache@v6
         with:

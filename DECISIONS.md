@@ -474,6 +474,19 @@ Made by: agent
 - The official record starts only after these changes are live (T110), so it is not
   disturbed by version churn.
 
+## 2026-11-13 · LightGBM + Optuna + SHAP challenger (T112)
+
+- The power `ml` forecaster gets a second candidate family in the weekly job:
+  LightGBM quantile regressors (`power-lgbq`) with hyperparameters tuned by Optuna (TPE,
+  seed 0, 20 trials, two time-series folds with a 7-day gap, mean pinball loss at
+  0.1/0.5/0.9). Features, calibration and question logic are the champion's, so only the
+  learner differs. It is promoted only if it is not worse than the champion on the same
+  recent questions (T111). SHAP (TreeExplainer) explains it when it is the champion.
+- New optional dependencies in `requirements-ml.txt` (lightgbm, optuna, shap), compiled
+  with `requirements-lock.txt` and `requirements-tracking.txt` as constraints (pandas
+  stays 2.3.3 for Evidently). Installed by CI, the weekly and the deps workflows; tests
+  skip without them, so `make setup` alone still works.
+
 ## Proposals for the human
 
 Ideas outside the specification. The agent lists them here and does not build them.

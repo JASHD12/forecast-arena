@@ -17,7 +17,7 @@ from __future__ import annotations
 
 import hashlib
 import math
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field
 from datetime import UTC, date, datetime, time, timedelta
 from typing import Any
@@ -91,15 +91,19 @@ class PowerModel:
     """Fitted quantile models per statistic plus a calibration map."""
 
     train_end: date
-    models: dict[str, list[HistGradientBoostingRegressor]] = field(default_factory=dict)
+    models: dict[str, list[Any]] = field(default_factory=dict)
     calib: LogisticRegression | None = None
     n_train: int = 0
     n_calib: int = 0
+    #: Model family in the version string; challengers (e.g. LightGBM) use their own.
+    family: str = MODEL_FAMILY
+    #: Hyperparameters chosen by tuning, if any (shown on the model card).
+    params: dict[str, Any] = field(default_factory=dict)
 
     @property
     def version(self) -> str:
         """Identifies the artefact: family, revision and training cut-off."""
-        return f"{MODEL_FAMILY}-r{MODEL_REVISION}-{self.train_end.isoformat()}"
+        return f"{self.family}-r{MODEL_REVISION}-{self.train_end.isoformat()}"
 
     def quantiles(self, stat: str, x: list[float]) -> list[float]:
         """Predicted quantiles of a statistic."""
@@ -185,9 +189,21 @@ def train(
     fold_days: int = 60,
     gap_days: int = 7,
     max_iter: int = 150,
+    fitter: Callable[[np.ndarray, np.ndarray], list[Any]] | None = None,
+    family: str = MODEL_FAMILY,
+    params: dict[str, Any] | None = None,
 ) -> PowerModel:
     """Fit on targets up to `train_end`; calibrate on out-of-fold predictions of the real
-    questions in the last `folds` x `fold_days` days (expanding window, `gap_days` gap)."""
+    questions in the last `folds` x `fold_days` days (expanding window, `gap_days` gap).
+
+    `fitter(x, y)` returns one fitted regressor per level in QUANTILES (default: the
+    histogram gradient boosting of `fit_quantiles`); `family` names the model in its
+    version, so a challenger family never collides with the champion's artefacts."""
+    if fitter is None:
+
+        def fitter(x: np.ndarray, y: np.ndarray) -> list[Any]:
+            return fit_quantiles(x, y, max_iter=max_iter)
+
     daily = domain.all_days()
     daily = {d: v for d, v in daily.items() if d <= train_end}
     if not daily:
@@ -201,7 +217,7 @@ def train(
         if len(x) < 200:
             continue
         fold_model = PowerModel(
-            train_end=f_start, models={s: fit_quantiles(x, y[s], max_iter=max_iter) for s in STATS}
+            train_end=f_start, models={s: fitter(x, y[s]) for s in STATS}, family=family
         )
         b = f_start - timedelta(days=1)
         while b < f_end:
@@ -216,7 +232,9 @@ def train(
     model = PowerModel(
         train_end=train_end,
         n_train=len(targets),
-        models={s: fit_quantiles(x, y[s], max_iter=max_iter) for s in STATS},
+        models={s: fitter(x, y[s]) for s in STATS},
+        family=family,
+        params=dict(params or {}),
     )
     if len(set(ys)) == 2 and len(ys) >= 50:
         model.calib = LogisticRegression(C=1.0).fit([[_logit(p)] for p in raw], ys)

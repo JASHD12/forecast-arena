@@ -33,6 +33,17 @@
 </tbody></table></div>
 <p>So a forecaster only beats the coin flip if its average stays below 0.25, and it only beats the base rate if it is lower than the base rate's average on the same questions.</p>
 
+<h2 id="verify">Check it yourself in five commands</h2>
+<p>You do not have to trust this site. With Python 3.12, <code>git</code> and <code>make</code>:</p>
+<ol class="steps-plain">
+<li>Get the code: <code>git clone {{ repo_url }}.git</code>, then <code>cd forecast-arena</code> and <code>make setup</code>.</li>
+<li>Get the public record: <code>git clone --branch ledger --single-branch {{ repo_url }}.git _ledger</code>.</li>
+<li>Recompute every file hash, seal and lock time: <code>.venv/bin/arena --ledger-dir _ledger ledger verify</code>. It prints PASS or the exact problem.</li>
+<li>Check from the Git history that each day's forecasts were committed before their lock: <code>.venv/bin/arena --ledger-dir _ledger ledger verify --git</code>.</li>
+<li>Rebuild this whole site from the record and compare: <code>.venv/bin/arena --ledger-dir _ledger site build --out my_site</code>.</li>
+</ol>
+<p class="note">The Git check is strong evidence, not proof: commit times are set by the committer. Together with the hash chain, public clones and the GitHub Actions logs, a silent edit would be visible.</p>
+
 <h2 id="faq">Frequently asked questions</h2>
 <details class="faq"><summary>Why only yes/no questions?</summary><p>They can be scored fairly and simply, and they make different kinds of forecasters directly comparable.</p></details>
 <details class="faq"><summary>Why does it say "too early to tell"?</summary><p>Differences between forecasters are only called real when a 95% interval excludes zero, which needs at least 30 official days. Until then the honest answer is that we don't know yet.</p></details>

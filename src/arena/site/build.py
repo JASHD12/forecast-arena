@@ -21,8 +21,8 @@ from jinja2 import Environment, PackageLoader, select_autoescape
 from markupsafe import Markup
 
 from arena.agent.tools import GDELT_ATTRIBUTION
+from arena.analytics.sql import COLUMN_DOCS, column_types, export_parquet, run_queries
 from arena.analytics.sql import connect as sql_connect
-from arena.analytics.sql import export_parquet, run_queries
 from arena.clock import Clock
 from arena.config import DEFAULT_REPO_URL, DEFAULT_SITE_URL
 from arena.ledger import Ledger, layout
@@ -101,6 +101,7 @@ STACK_LIBRARIES = (
     ("shap", "SHAP explanations of LightGBM models"),
     ("statsmodels", "ETS and SARIMAX benchmarks in the power backtest"),
     ("llama-cpp-python", "runs the open-weights model of llm_local on the CPU (morning job)"),
+    ("nbclient", "executes the analysis notebook (pandas + DuckDB on the open data) in CI"),
     ("mcp", "official MCP SDK: the read-only `arena mcp` server over the ledger"),
     ("langgraph", "the agent_graph forecaster's state machine (plan, retrieve, tools, critique)"),
     ("fastembed", "local ONNX text embeddings for the agent's similar-questions tool (RAG)"),
@@ -647,7 +648,12 @@ def build_site(
     (tmp / "data" / "game.json").write_text(game_payload + "\n", encoding="utf-8")
     pages["data.html"] = (
         "Open data & SQL",
-        {"files": export_parquet(con, tmp / "data"), "results": run_queries(con)},
+        {
+            "files": export_parquet(con, tmp / "data"),
+            "results": run_queries(con),
+            "dictionary": COLUMN_DOCS,
+            "types": column_types(),
+        },
     )
     for name, (title, ctx) in pages.items():
         root = "../" if "/" in name else ""

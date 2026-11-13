@@ -712,6 +712,18 @@ Made by: agent
 - Sticky header; a 1200x630 `og:image` (`static/og.png`, rendered once from an HTML card
   with Playwright) with an absolute URL.
 
+## 2026-11-13 · Methods, Guide, Data depth and the notebook (T138)
+
+- Methods: a worked scoring example (made-up forecasts, real arithmetic) that shows one
+  overconfident miss outweighing two good calls. Guide: a five-command verification
+  walkthrough. Data: a data dictionary generated from `analytics/sql.py` (a test fails
+  if a column is undocumented).
+- `notebooks/explore.ipynb` uses pandas and DuckDB on the open Parquet files. It is
+  committed without outputs and executed in CI (`make notebook`, nbclient) on the offline
+  e2e export, which is fixture data, so no fixture result is ever committed or published.
+  Polars from the roadmap was left out: it is not a project dependency and nothing is
+  listed that the code does not use. New pins in `requirements-nb.txt`.
+
 ## Proposals for the human
 
 Ideas outside the specification. The agent lists them here and does not build them.

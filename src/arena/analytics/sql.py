@@ -92,6 +92,38 @@ ORDER BY skips DESC, forecaster_id""",
 )
 
 
+#: Data dictionary (T138): every column of every exported table, in plain words.
+COLUMN_DOCS: dict[str, dict[str, str]] = {
+    "questions": {
+        "question_id": "Unique id: domain-template-entity-target date-template version",
+        "domain": "Topic: power, weather, attention, markets or crypto",
+        "template": "The question rule it was made from, e.g. mean_gt",
+        "entity": "What it is about, e.g. DE_LU (the electricity zone) or a city",
+        "batch_date": "Day the question was asked (UTC); forecasts lock 09:30 UTC that day",
+        "target_date": "Day the question is about",
+        "threshold": "The number in the question (empty when the question compares two days)",
+        "text": "The full question as published",
+    },
+    "forecasts": {
+        "question_id": "Which question",
+        "forecaster_id": "Who answered, e.g. base_rate, ml, llm_context, agent",
+        "forecaster_version": "Exact model and prompt version that produced it",
+        "probability": "Published probability of YES, between 0 and 1 (raw, not clipped)",
+        "created_at": "When it was written; always before the question's lock time",
+    },
+    "resolutions": {
+        "question_id": "Which question",
+        "outcome": "1 = YES, 0 = NO (the first recorded resolution)",
+        "observed_value": "The measured value the outcome was computed from",
+    },
+    "skips": {
+        "question_id": "Which question",
+        "forecaster_id": "Who did not answer",
+        "reason_code": "Why: not_sampled, budget_exhausted, parse_failure, model_missing, error",
+    },
+}
+
+
 def _insert(con: duckdb.DuckDBPyConnection, table: str, rows: list[tuple[Any, ...]]) -> None:
     """Insert rows; an empty ledger simply leaves the table empty."""
     if rows:
@@ -162,3 +194,13 @@ def export_parquet(con: duckdb.DuckDBPyConnection, out_dir: Path) -> list[str]:
         con.execute(f"COPY {name} TO '{path.as_posix()}' (FORMAT parquet, COMPRESSION zstd)")
         names.append(path.name)
     return names
+
+
+def column_types() -> dict[str, dict[str, str]]:
+    """SQL type of every column, from `TABLES` (for the data dictionary)."""
+    out: dict[str, dict[str, str]] = {}
+    for table, cols in TABLES.items():
+        for part in cols.split(","):
+            name, typ = part.strip().split(" ", 1)
+            out.setdefault(table, {})[name] = typ
+    return out

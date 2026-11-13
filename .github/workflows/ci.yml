@@ -63,6 +63,10 @@ jobs:
           npx playwright install --with-deps chromium
       - name: Accessibility lint (fails on serious or critical issues)
         run: make a11y
+      - name: Run the analysis notebook on the e2e export (T138)
+        run: |
+          .venv/bin/pip install -r requirements-nb.txt
+          make notebook
 
   docker:
     needs: check
@@ -92,6 +96,6 @@ jobs:
           {
             echo "## Dependency vulnerability audit"
             echo '```'
-            pip-audit -r requirements-lock.txt -r requirements-tracking.txt -r requirements-ml.txt -r requirements-ts.txt -r requirements-rag.txt -r requirements-graph.txt -r requirements-mcp.txt --progress-spinner off 2>&1 || true
+            pip-audit -r requirements-lock.txt -r requirements-tracking.txt -r requirements-ml.txt -r requirements-ts.txt -r requirements-rag.txt -r requirements-graph.txt -r requirements-mcp.txt -r requirements-nb.txt --progress-spinner off 2>&1 || true
             echo '```'
           } | tee -a "$GITHUB_STEP_SUMMARY"

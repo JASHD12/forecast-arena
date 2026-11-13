@@ -484,7 +484,7 @@ CI jobs; core `make check` stays offline and fast.
 - [x] T137 · Home and global polish (deps: T130)
   - Do: lock countdown, archive search, theme toggle (no storage), og:image, sticky nav.
   - Done when: Playwright check passes with and without JS.
-- [ ] T138 · Methods, Guide, Data depth and notebook (deps: T130)
+- [x] T138 · Methods, Guide, Data depth and notebook (deps: T130)
   - Do: worked scoring example, verification walkthrough, data dictionary,
     `notebooks/explore.ipynb` executed in CI on the e2e export.
   - Done when: the notebook runs in CI.

@@ -10,6 +10,18 @@
 <tbody>{% for k, name, rule, code in principles %}<tr><th scope="row">{{ k }} {{ name }}</th><td>{{ rule }}</td><td><code>{{ code }}</code></td></tr>{% endfor %}</tbody></table></div>
 <h2>Scoring</h2>
 <p>Brier and log scores on probabilities clipped to [0.01, 0.99]; skill against the base rate on shared questions; calibration diagrams with expected calibration error and the Murphy decomposition; 95% day-block bootstrap intervals for every score and paired difference. A difference is called supported only when its interval excludes zero.</p>
+<section class="card" aria-labelledby="worked-h"><h2 id="worked-h">A worked example</h2>
+<p>Three questions, two forecasters (made-up numbers, real arithmetic). Outcome 1 = YES, 0 = NO; Brier = (p − outcome)², averaged.</p>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Worked scoring example"><table>
+<thead><tr><th scope="col">Question</th><th scope="col" class="num">Outcome</th><th scope="col" class="num">Base rate p</th><th scope="col" class="num">Brier</th><th scope="col" class="num">Model p</th><th scope="col" class="num">Brier</th></tr></thead>
+<tbody>
+<tr><th scope="row">A</th><td class="num">1</td><td class="num">0.50</td><td class="num">0.2500</td><td class="num">0.80</td><td class="num">0.0400</td></tr>
+<tr><th scope="row">B</th><td class="num">0</td><td class="num">0.60</td><td class="num">0.3600</td><td class="num">0.30</td><td class="num">0.0900</td></tr>
+<tr><th scope="row">C</th><td class="num">0</td><td class="num">0.40</td><td class="num">0.1600</td><td class="num">0.995 → clipped 0.99</td><td class="num">0.9801</td></tr>
+<tr><th scope="row">Mean</th><td></td><td></td><td class="num">0.2567</td><td></td><td class="num">0.3700</td></tr>
+</tbody></table></div>
+<p>The model was better on A and B, but one overconfident miss (C) makes its average worse than the base rate: skill = 1 − 0.3700 / 0.2567 = −0.44. Clipping to 0.99 keeps a single answer from being infinitely bad on the log score, but confident mistakes still cost a lot. With three questions no interval could exclude zero, so the site would say "too early to tell".</p>
+</section>
 <h2>Forecasters</h2>
 <div class="table-scroll" tabindex="0" role="region" aria-label="Table (scrolls sideways on small screens)"><table>
 <thead><tr><th scope="col">Id</th><th scope="col">Sees</th><th scope="col">Answers</th></tr></thead>

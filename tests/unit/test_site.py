@@ -114,3 +114,13 @@ def test_experiments_page_lists_weekly_runs(tmp_path) -> None:
     assert "2026-11-10" in page and "power" in page and "first model" in page
     assert 'href="experiments.html"' in (res.out_dir / "status.html").read_text()
     assert check_site(res.out_dir) == []
+
+
+def test_data_dictionary_documents_every_exported_column() -> None:
+    from arena.analytics.sql import COLUMN_DOCS, TABLES, column_types
+
+    types = column_types()
+    assert set(COLUMN_DOCS) == set(TABLES)
+    for table in TABLES:
+        assert set(COLUMN_DOCS[table]) == set(types[table]), table
+        assert all(len(v) > 10 for v in COLUMN_DOCS[table].values())

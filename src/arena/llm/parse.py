@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import math
 from dataclasses import dataclass
+from typing import Any
 
 from arena.models import MAX_RATIONALE_WORDS
 
@@ -59,3 +60,17 @@ def parse_answer(text: str) -> Answer:
 
 def _no_constants(name: str) -> float:
     raise ParseError(f"non-finite constant {name}")
+
+
+#: The answer contract as JSON Schema: the local model's grammar (T122) and the Claude
+#: structured-output format (T190) both use it.
+ANSWER_SCHEMA: dict[str, Any] = {
+    "type": "object",
+    "properties": {
+        "probability": {"type": "number", "minimum": 0, "maximum": 1},
+        "rationale": {"type": "string", "maxLength": 600},
+        "key_factors": {"type": "array", "items": {"type": "string"}, "maxItems": 5},
+    },
+    "required": ["probability", "rationale", "key_factors"],
+    "additionalProperties": False,
+}

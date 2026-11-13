@@ -44,6 +44,8 @@ class Span:
     model: str
     input_tokens: int = 0
     output_tokens: int = 0
+    cache_read_tokens: int = 0
+    cache_write_tokens: int = 0
     tools_requested: list[str] = field(default_factory=list)
     stop_reason: str = ""
     repair: bool = False
@@ -141,6 +143,8 @@ class TracingLLM:
                 duration_ms=ms,
                 input_tokens=resp.usage.input_tokens,
                 output_tokens=resp.usage.output_tokens,
+                cache_read_tokens=resp.usage.cache_read_tokens,
+                cache_write_tokens=resp.usage.cache_write_tokens,
                 tools_requested=[c.name for c in resp.tool_calls],
                 stop_reason=resp.stop_reason,
             )

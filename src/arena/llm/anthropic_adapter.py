@@ -5,8 +5,17 @@ Written against the current API documentation (checked 2026-11-12, docs/SOURCES.
 blocks of type `text`, `thinking` and `tool_use`; `stop_reason` in end_turn, max_tokens,
 stop_sequence, tool_use, pause_turn, refusal; `usage.input_tokens/output_tokens`.
 Current models reject sampling parameters (`temperature` etc.), so none are sent and the
-forecast records "provider default". Server-side refusal fallbacks are deliberately not
-enabled: a forecast must be attributable to exactly one model id.
+forecast records "provider default".
+
+T190 (checked 2026-11-13 against the Claude API skill docs): `cache=True` sends top-level
+`cache_control={"type": "ephemeral"}` (automatic prompt caching; minimum cacheable prefix
+on Claude Haiku 5.5 is 512 tokens) and reads `usage.cache_read_input_tokens` /
+`cache_creation_input_tokens`. `structured=True` sends `output_config.format` with the
+answer JSON Schema on calls without tools, so the answer is schema-valid by construction;
+it changes the output contract, so it is part of `sampling()` and of forecaster versions.
+
+Server-side refusal fallbacks are deliberately not enabled: a forecast must be
+attributable to exactly one model id.
 """
 
 from __future__ import annotations
@@ -28,6 +37,7 @@ from arena.llm.client import (
     Usage,
     UserText,
 )
+from arena.llm.parse import ANSWER_SCHEMA
 
 #: Pinned so that only ARENA_* settings configure the client (an ambient
 #: ANTHROPIC_BASE_URL is ignored).
@@ -48,9 +58,13 @@ class AnthropicLLM:
         timeout: float = 60.0,
         max_retries: int = 2,
         effort: str | None = None,
+        cache: bool = False,
+        structured: bool = False,
     ) -> None:
         self.model = model
         self.effort = effort
+        self.cache = cache
+        self.structured = structured
         self.client = client or anthropic.Anthropic(
             base_url=BASE_URL, api_key=api_key, timeout=timeout, max_retries=max_retries
         )
@@ -60,6 +74,8 @@ class AnthropicLLM:
         is recorded when one is configured."""
         out: dict[str, Any] = {"temperature": "provider default (not sent)"}
         out["effort"] = self.effort or "provider default (not sent)"
+        out["output_format"] = "json_schema" if self.structured else "text"
+        out["prompt_cache"] = "auto" if self.cache else "off"
         return out
 
     @staticmethod
@@ -98,8 +114,15 @@ class AnthropicLLM:
             "system": system,
             "messages": self.to_messages(turns),
         }
+        output_config: dict[str, Any] = {}
         if self.effort:
-            kwargs["output_config"] = {"effort": self.effort}
+            output_config["effort"] = self.effort
+        if self.structured and not tools:
+            output_config["format"] = {"type": "json_schema", "schema": ANSWER_SCHEMA}
+        if output_config:
+            kwargs["output_config"] = output_config
+        if self.cache:
+            kwargs["cache_control"] = {"type": "ephemeral"}
         if tools:
             kwargs["tools"] = [
                 {"name": t.name, "description": t.description, "input_schema": t.input_schema}
@@ -111,7 +134,14 @@ class AnthropicLLM:
             raise LLMError(f"anthropic HTTP {exc.status_code}: {exc.message}") from exc
         except anthropic.APIConnectionError as exc:
             raise LLMError(f"anthropic connection error: {exc}") from exc
-        usage = Usage(1, int(msg.usage.input_tokens), int(msg.usage.output_tokens))
+        u = msg.usage
+        usage = Usage(
+            1,
+            int(u.input_tokens),
+            int(u.output_tokens),
+            int(getattr(u, "cache_read_input_tokens", None) or 0),
+            int(getattr(u, "cache_creation_input_tokens", None) or 0),
+        )
         if msg.stop_reason == "refusal":
             raise LLMRefusal(f"model declined (usage {usage.as_dict()})")
         text = "".join(b.text for b in msg.content if b.type == "text")

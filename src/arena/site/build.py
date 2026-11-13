@@ -47,7 +47,14 @@ from arena.site.content import (
     SKIP_HELP,
 )
 from arena.site.game import live_deck, practice_deck
-from arena.site.llm_obs import PRICE_SOURCE, load_spans, totals, traces_by_question, usage_rows
+from arena.site.llm_obs import (
+    CACHE_READ_MULT,
+    PRICE_SOURCE,
+    load_spans,
+    totals,
+    traces_by_question,
+    usage_rows,
+)
 from arena.site.matrices import MIN_N, head_to_head, heatmap
 from arena.site.methods_content import LIMITATIONS, PRINCIPLES
 from arena.site.ops_status import llm_usage, missed_days, parse_failures, source_freshness
@@ -302,6 +309,7 @@ def build_site(
                 "rows": urows,
                 "total": totals(urows),
                 "price_source": PRICE_SOURCE,
+                "cache_read_mult": CACHE_READ_MULT,
                 "parse": parse_failures(rec),
             },
         ),

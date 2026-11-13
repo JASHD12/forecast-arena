@@ -246,3 +246,79 @@ def test_effort_setting_validated() -> None:
     assert Settings.from_env({"ARENA_LLM_EFFORT": ""}).llm_effort is None
     with pytest.raises(ValueError):
         Settings.from_env({"ARENA_LLM_EFFORT": "turbo"})
+
+
+def test_anthropic_cache_and_structured_output_requests() -> None:
+    """T190: request bodies follow the documented shapes; usage reads the cache fields."""
+    from arena.llm.parse import ANSWER_SCHEMA
+
+    def h(r):
+        return httpx2.Response(
+            200,
+            json={
+                "id": "m",
+                "type": "message",
+                "role": "assistant",
+                "model": "claude-test",
+                "content": [
+                    {
+                        "type": "text",
+                        "text": '{"probability": 0.4, "rationale": "x", "key_factors": []}',
+                    }
+                ],
+                "stop_reason": "end_turn",
+                "stop_sequence": None,
+                "usage": {
+                    "input_tokens": 20,
+                    "output_tokens": 30,
+                    "cache_read_input_tokens": 600,
+                    "cache_creation_input_tokens": 0,
+                },
+            },
+        )
+
+    seen: list[dict] = []
+
+    def rec(request):
+        seen.append(json.loads(request.content))
+        return h(request)
+
+    sdk = anthropic.Anthropic(
+        api_key="k", max_retries=0, http_client=httpx2.Client(transport=httpx2.MockTransport(rec))
+    )
+    llm = AnthropicLLM(
+        "claude-test", "unused", client=sdk, effort="low", cache=True, structured=True
+    )
+    r = llm.complete("S", [UserText("q")], max_tokens=1024)
+    body = seen[0]
+    assert body["cache_control"] == {"type": "ephemeral"}
+    assert body["output_config"] == {
+        "effort": "low",
+        "format": {"type": "json_schema", "schema": ANSWER_SCHEMA},
+    }
+    assert r.usage == Usage(1, 20, 30, 600, 0) and r.usage.total_tokens == 650
+    assert r.usage.as_dict()["cache_read_tokens"] == 600
+    llm.complete("S", [UserText("q")], max_tokens=1024, tools=[TOOL])
+    assert "format" not in seen[1]["output_config"]  # never constrain a tool-calling turn
+    assert llm.sampling()["output_format"] == "json_schema"
+    assert llm.sampling()["prompt_cache"] == "auto"
+    plain = AnthropicLLM("claude-test", "unused", client=sdk)
+    plain.complete("S", [UserText("q")], max_tokens=10)
+    assert "cache_control" not in seen[2] and "output_config" not in seen[2]
+    assert Usage(1, 2, 3).as_dict() == {"requests": 1, "input_tokens": 2, "output_tokens": 3}
+
+
+def test_structured_contract_is_visible_in_the_version() -> None:
+    from arena.forecasters.llm import LLMPlain
+
+    class C:
+        model, provider = "m", "anthropic"
+
+        def __init__(self, fmt: str) -> None:
+            self.fmt = fmt
+
+        def sampling(self):
+            return {"output_format": self.fmt}
+
+    assert LLMPlain(C("json_schema")).version().endswith("|so")  # type: ignore[arg-type]
+    assert not LLMPlain(C("text")).version().endswith("|so")  # type: ignore[arg-type]

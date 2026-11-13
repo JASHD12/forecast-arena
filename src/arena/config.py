@@ -58,6 +58,11 @@ class Settings(BaseModel):
     llm_max_requests_per_day: int = Field(100, ge=0)
     llm_max_tokens_per_day: int = Field(400_000, ge=0)
     llm_max_output_tokens: int = Field(400, ge=1)
+    #: T190: automatic prompt caching (Anthropic); changes cost, never the answer.
+    llm_cache: bool = False
+    #: T190: schema-constrained answers (Anthropic structured outputs) on calls without
+    #: tools; a new output contract, visible in forecaster versions. Off until evaluated.
+    llm_structured: bool = False
     agent_max_tool_calls: int = Field(4, ge=0)
     #: T120: offer the agent the similar-past-questions tool (prompt v2); needs fastembed
     #: (requirements/rag.txt). Off by default; the workflows switch it on.

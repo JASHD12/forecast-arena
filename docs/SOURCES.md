@@ -63,6 +63,8 @@ checked against and the date. Code must not rely on anything that is not in this
 | MLflow 3.18: the plain file store is in maintenance mode and raises unless `MLFLOW_ALLOW_FILE_STORE=true`; a SQLite file (`sqlite:///...`) works with `mlflow-skinny` + SQLAlchemy + Alembic | the installed package's own error message and a test run | 2026-11-12 | |
 | Evidently 0.7.23: `Report([DataDriftPreset()]).run(current, reference)`, `.save_html()`, `.dict()["metrics"]`; needs pandas < 3; telemetry via `iterative-telemetry` is used by its UI/collector and is disabled by `DO_NOT_TRACK` | the installed package source and a test run | 2026-11-12 | weekly drift report |
 | `astral-sh/setup-uv` latest is v10.3.3 but moving major tags stop at `v7` | https://github.com/astral-sh/setup-uv (tags) | 2026-11-12 | not used: CI installs with pip from the lock file |
+| Structured outputs: `output_config.format = {"type": "json_schema", "schema": ...}` on `messages.create`; the first text block is valid JSON for the schema; `output_config` also carries `effort` | Claude API skill docs (python/claude-api/tool-use.md, Structured Outputs) | 2026-11-13 | T190; applied only to calls without tools |
+| Automatic prompt caching: top-level `cache_control={"type": "ephemeral"}`; usage fields `cache_read_input_tokens`, `cache_creation_input_tokens`; minimum cacheable prefix 512 tokens on Claude Haiku 5.5; cache reads 0.1x and 5-minute writes 1.25x the input price on models other than Opus 5.5/Sonnet 5.5/Fable/Mythos | Claude API skill docs (shared/prompt-caching.md) | 2026-11-13 | T190; multipliers in `site/llm_obs.py` |
 
 ## Availability rules for historical data
 

@@ -18,6 +18,10 @@ on:
         description: "Also evaluate llm_local (builds llama.cpp; slower)"
         type: boolean
         default: false
+      structured:
+        description: "T190: schema-constrained answers (structured outputs) for the Claude forecasters"
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -34,6 +38,8 @@ jobs:
       ARENA_LLM_MAX_OUTPUT_TOKENS: ${{ vars.ARENA_LLM_MAX_OUTPUT_TOKENS || '1024' }}  # T124 eval: 400 cut off thinking answers
       ARENA_LLM_BASE_URL: ${{ vars.ARENA_LLM_BASE_URL }}
       ARENA_LLM_API_KEY: ${{ secrets.ARENA_LLM_API_KEY }}
+      ARENA_LLM_CACHE: "1"  # T190: prompt caching changes cost, never the answer
+      ARENA_LLM_STRUCTURED: ${{ inputs.structured && '1' || '0' }}
     steps:
       - uses: actions/checkout@v7
         with:

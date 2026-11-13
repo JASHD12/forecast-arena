@@ -15,7 +15,13 @@ def client_from_settings(settings: Settings) -> LLMClient | None:
     if settings.llm_provider == "anthropic":
         from arena.llm.anthropic_adapter import AnthropicLLM
 
-        return AnthropicLLM(settings.llm_model, key, effort=settings.llm_effort)
+        return AnthropicLLM(
+            settings.llm_model,
+            key,
+            effort=settings.llm_effort,
+            cache=settings.llm_cache,
+            structured=settings.llm_structured,
+        )
     if settings.llm_provider == "openai_compatible":
         from arena.llm.openai_compatible import OpenAICompatibleLLM
 

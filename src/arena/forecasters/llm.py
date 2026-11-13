@@ -84,7 +84,11 @@ class LLMForecaster:
         """Model id and prompt version (SPEC 8.5)."""
         model = self.client.model if self.client is not None else "none"
         fp = prompts.fingerprint(self.prompt_files, self.prompt_version)
-        return f"{model}|prompt-{self.prompt_version}-{fp}|out-{self.max_output_tokens}"
+        # T190: a schema-constrained answer is a different output contract, so it is visible
+        so = ""
+        if self.client is not None and self.client.sampling().get("output_format") == "json_schema":
+            so = "|so"
+        return f"{model}|prompt-{self.prompt_version}-{fp}|out-{self.max_output_tokens}{so}"
 
     def user_prompt(self, q: Question, ctx: dict[str, Any], asof: datetime) -> str:
         """The first user message."""

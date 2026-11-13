@@ -46,26 +46,41 @@ class Usage:
     requests: int = 0
     input_tokens: int = 0
     output_tokens: int = 0
+    #: T190: prompt-cache reads and writes, reported separately by providers that cache.
+    cache_read_tokens: int = 0
+    cache_write_tokens: int = 0
 
     @property
     def total_tokens(self) -> int:
-        """Input plus output tokens (what the daily cap counts)."""
-        return self.input_tokens + self.output_tokens
+        """Every token processed (what the daily cap counts). Cached tokens are counted
+        in full, so caching can only make the cap more conservative, never less."""
+        return (
+            self.input_tokens
+            + self.output_tokens
+            + self.cache_read_tokens
+            + self.cache_write_tokens
+        )
 
     def __add__(self, other: Usage) -> Usage:
         return Usage(
             self.requests + other.requests,
             self.input_tokens + other.input_tokens,
             self.output_tokens + other.output_tokens,
+            self.cache_read_tokens + other.cache_read_tokens,
+            self.cache_write_tokens + other.cache_write_tokens,
         )
 
     def as_dict(self) -> dict[str, int]:
-        """For run manifests."""
-        return {
+        """For run manifests (cache fields only when a cache was used)."""
+        out = {
             "requests": self.requests,
             "input_tokens": self.input_tokens,
             "output_tokens": self.output_tokens,
         }
+        if self.cache_read_tokens or self.cache_write_tokens:
+            out["cache_read_tokens"] = self.cache_read_tokens
+            out["cache_write_tokens"] = self.cache_write_tokens
+        return out
 
 
 @dataclass(frozen=True)

@@ -956,3 +956,15 @@ Ideas outside the specification. The agent lists them here and does not build th
   that harmless.
 - Alternatives: an external scheduler calling `workflow_dispatch` (needs an account,
   human item); moving the lock (rejected: SPEC and the noon auction).
+
+## 2026-11-13 Prompt caching on, structured outputs evaluated first (T190)
+
+- Prompt caching (`ARENA_LLM_CACHE`, on in the morning and eval workflows) changes cost,
+  never the answer, so forecaster versions do not change. Cached tokens count in full
+  towards the daily cap (the cap stays conservative); the cost estimate prices cache reads
+  at 0.1x and writes at 1.25x the input price (docs/SOURCES.md).
+- Structured outputs (`ARENA_LLM_STRUCTURED`) constrain `llm_plain` and `llm_context`
+  answers to the answer JSON Schema. That is a new output contract, so versions gain
+  `|so`. It stays off live until the eval harness has compared both contracts on the same
+  golden set (I8: improvements go through evaluation and versioning). Tool-calling turns
+  are never constrained.

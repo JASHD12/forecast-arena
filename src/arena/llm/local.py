@@ -28,6 +28,7 @@ from arena.llm.client import (
     Usage,
     UserText,
 )
+from arena.llm.parse import ANSWER_SCHEMA
 
 REPO = "Qwen/Qwen2.5-1.5B-Instruct-GGUF"
 FILENAME = "qwen2.5-1.5b-instruct-q4_k_m.gguf"
@@ -37,16 +38,6 @@ SEED = 0
 N_CTX = 4096
 
 #: The SPEC 9.2 answer contract as a JSON schema (llama.cpp turns it into a grammar).
-ANSWER_SCHEMA: dict[str, Any] = {
-    "type": "object",
-    "properties": {
-        "probability": {"type": "number", "minimum": 0, "maximum": 1},
-        "rationale": {"type": "string", "maxLength": 600},
-        "key_factors": {"type": "array", "items": {"type": "string"}, "maxItems": 5},
-    },
-    "required": ["probability", "rationale", "key_factors"],
-    "additionalProperties": False,
-}
 
 #: (messages, max_tokens, stop) -> llama.cpp chat completion dict; injectable for tests.
 Backend = Callable[[list[dict[str, str]], int, Callable[[], bool]], dict[str, Any]]

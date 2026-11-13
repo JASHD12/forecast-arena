@@ -20,6 +20,9 @@ from arena.ledger import Ledger, layout
 #: to 100K tokens (ours are far smaller). Source and date are shown with every figure.
 PRICES: dict[str, tuple[float, float]] = {"claude-haiku-5-5": (0.10, 0.50)}
 PRICE_SOURCE = "Anthropic list prices for Claude Haiku 5.5 as of 2026-11-03 (docs/SOURCES.md)"
+#: T190: prompt-cache reads and 5-minute cache writes, as multiples of the input price
+#: (Claude Haiku 5.5; docs/SOURCES.md).
+CACHE_READ_MULT, CACHE_WRITE_MULT = 0.1, 1.25
 FREE_PROVIDERS = frozenset({"llama_cpp"})
 
 
@@ -79,6 +82,8 @@ class UsageRow:
     p50_ms: float | None
     p95_ms: float | None
     cost_usd: float | None
+    cache_read_tokens: int = 0
+    cache_write_tokens: int = 0
 
 
 def usage_rows(spans: list[dict[str, Any]]) -> list[UsageRow]:
@@ -91,8 +96,13 @@ def usage_rows(spans: list[dict[str, Any]]) -> list[UsageRow]:
     for (day, fid, provider, model), ss in groups.items():
         inp = sum(int(s.get("input_tokens", 0)) for s in ss)
         outp = sum(int(s.get("output_tokens", 0)) for s in ss)
+        cr = sum(int(s.get("cache_read_tokens", 0)) for s in ss)
+        cw = sum(int(s.get("cache_write_tokens", 0)) for s in ss)
         price = price_for(provider, model)
-        cost = None if price is None else (inp * price[0] + outp * price[1]) / 1e6
+        cost = None
+        if price is not None:
+            billed_in = inp + CACHE_READ_MULT * cr + CACHE_WRITE_MULT * cw
+            cost = (billed_in * price[0] + outp * price[1]) / 1e6
         ms = [float(s["duration_ms"]) for s in ss if s.get("error") is None]
         rows.append(
             UsageRow(
@@ -107,6 +117,8 @@ def usage_rows(spans: list[dict[str, Any]]) -> list[UsageRow]:
                 _pct(ms, 0.5),
                 _pct(ms, 0.95),
                 cost,
+                cache_read_tokens=cr,
+                cache_write_tokens=cw,
             )
         )
     return sorted(rows, key=lambda r: (str(r.day), r.forecaster_id), reverse=True)
@@ -119,6 +131,8 @@ def totals(rows: list[UsageRow]) -> dict[str, Any]:
         "calls": sum(r.calls for r in rows),
         "input_tokens": sum(r.input_tokens for r in rows),
         "output_tokens": sum(r.output_tokens for r in rows),
+        "cache_read_tokens": sum(r.cache_read_tokens for r in rows),
+        "cache_write_tokens": sum(r.cache_write_tokens for r in rows),
         "cost_usd": sum(known) if known else None,
         "unpriced": sum(1 for r in rows if r.cost_usd is None),
     }

@@ -29,7 +29,7 @@ from arena.llm.tracing import Tracer, TracingLLM, scope
 from arena.models import Forecast
 from arena.scoring.core import brier, brier_skill, log_score
 from arena.scoring.stats import expected_calibration_error, paired_brier_difference
-from arena.site.llm_obs import price_for
+from arena.site.llm_obs import CACHE_READ_MULT, CACHE_WRITE_MULT, price_for
 
 KIND = "evaluation"
 VARIANTS: dict[str, type[LLMForecaster]] = {
@@ -138,7 +138,10 @@ def metrics(
         b0 = brier([x for _, x in ref], [r["outcome"] for r, _ in ref]) if ref else None
         inp = sum(s.input_tokens for s in spans)
         outp = sum(s.output_tokens for s in spans)
+        cr = sum(s.cache_read_tokens for s in spans)
+        cw = sum(s.cache_write_tokens for s in spans)
         price = price_for(spans[0].provider, spans[0].model) if spans else None
+        billed_in = inp + CACHE_READ_MULT * cr + CACHE_WRITE_MULT * cw
         out[name] = {
             "n": len(mine),
             "answered": len(ok),
@@ -165,7 +168,9 @@ def metrics(
             ),
             "input_tokens": inp,
             "output_tokens": outp,
-            "cost_usd": None if price is None else (inp * price[0] + outp * price[1]) / 1e6,
+            "cache_read_tokens": cr,
+            "cache_write_tokens": cw,
+            "cost_usd": None if price is None else (billed_in * price[0] + outp * price[1]) / 1e6,
             "model": spans[0].model if spans else None,
         }
     return out

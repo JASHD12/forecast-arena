@@ -4,7 +4,8 @@
 {{ page_head("Operations", "LLM observability", "Every call an AI forecaster made: how many, how many tokens, how long it took, how often an answer had to be repaired or was skipped, and what it cost by list price.") }}
 <div class="kpis">
 <div class="kpi"><span class="kpi-n">{{ "{:,}".format(total.calls) }}</span><span class="kpi-l">model calls</span></div>
-<div class="kpi"><span class="kpi-n">{{ "{:,}".format(total.input_tokens + total.output_tokens) }}</span><span class="kpi-l">tokens</span></div>
+<div class="kpi"><span class="kpi-n">{{ "{:,}".format(total.input_tokens + total.output_tokens + total.cache_read_tokens + total.cache_write_tokens) }}</span><span class="kpi-l">tokens</span></div>
+{% if total.cache_read_tokens %}<div class="kpi"><span class="kpi-n">{{ "{:,}".format(total.cache_read_tokens) }}</span><span class="kpi-l">tokens read from the prompt cache (billed at {{ "%.0f"|format(cache_read_mult * 100) }}% of the input price)</span></div>{% endif %}
 <div class="kpi"><span class="kpi-n">{{ "$%.4f"|format(total.cost_usd) if total.cost_usd is not none else "–" }}</span><span class="kpi-l">estimated cost</span></div>
 </div>
 <p class="note">Estimated cost = recorded tokens × list price ({{ price_source }}). Output tokens include thinking tokens. The open model (<code>llm_local</code>) runs on the runner's CPU and costs nothing per call. This is an estimate, not an invoice.{% if total.unpriced %} {{ total.unpriced }} row(s) use a model with no price on file and are left out of the total.{% endif %}</p>

@@ -159,6 +159,7 @@ POWER_PAIRS = (
     ("agent", "base_rate"),
     ("persistence", "base_rate"),
     ("agent_graph", "agent"),
+    ("llm_local", "llm_context"),
 )
 EFFECTS = (0.01, 0.02)
 

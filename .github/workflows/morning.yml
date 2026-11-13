@@ -50,6 +50,7 @@ jobs:
       ARENA_LLM_MAX_TOKENS_PER_DAY: ${{ vars.ARENA_LLM_MAX_TOKENS_PER_DAY || '150000' }}  # owner: keep cost under ~$1/month on Haiku 5.5
       ARENA_LLM_BASE_URL: ${{ vars.ARENA_LLM_BASE_URL }}
       ARENA_LLM_API_KEY: ${{ secrets.ARENA_LLM_API_KEY }}
+      ARENA_LLM_LOCAL: ${{ vars.ARENA_LLM_LOCAL || '1' }}  # T122: open model on the runner CPU, no API cost
       ARENA_AGENT_GRAPH: ${{ vars.ARENA_AGENT_GRAPH || '1' }}  # T121: LangGraph agent, 1 question per topic per day
       ARENA_AGENT_RAG: ${{ vars.ARENA_AGENT_RAG || '1' }}  # T120: similar-past-questions tool (local embeddings, no API cost)
       OMP_NUM_THREADS: "2"
@@ -61,10 +62,22 @@ jobs:
       - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
+          cache: pip  # keeps the llama-cpp-python wheel built from source (T122)
+          cache-dependency-path: requirements-*.txt
       - name: Install pinned dependencies
         run: |
           make setup
           .venv/bin/pip install -r requirements-rag.txt -r requirements-graph.txt
+      - name: Install the local LLM runtime (llm_local; a failure only skips llm_local)
+        continue-on-error: true
+        env:
+          CMAKE_ARGS: "-DGGML_NATIVE=OFF"  # portable build, so the cached wheel fits any runner
+        run: .venv/bin/pip install -r requirements-local.txt
+      - name: Restore cached model weights (Qwen2.5-1.5B-Instruct GGUF, pinned revision)
+        uses: actions/cache@v6
+        with:
+          path: models_cache
+          key: models-qwen2.5-1.5b-instruct-q4km-91cad51
       - name: Restore cached source data
         uses: actions/cache@v6
         with:

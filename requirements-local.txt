@@ -1,0 +1,9 @@
+# Extra pins for the local open-weights LLM (T122, llm_local), installed by the morning
+# workflow only (llama-cpp-python builds from source; CI tests use a fake backend).
+# Compiled with all other requirement files as constraints.
+diskcache==5.6.3
+jinja2==3.1.6
+llama-cpp-python==0.3.36
+markupsafe==3.0.4
+numpy==2.5.4
+typing-extensions==4.16.0

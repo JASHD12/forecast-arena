@@ -62,6 +62,10 @@ class Settings(BaseModel):
     agent_rag: bool = False
     #: T121: run the LangGraph agent `agent_graph` (needs requirements-graph.txt).
     agent_graph: bool = False
+    #: T122: run `llm_local`, an open model on the local CPU (needs requirements-local.txt).
+    llm_local: bool = False
+    #: Where large model weights are cached (kept apart from the per-run data cache).
+    models_dir: Path = Path("models_cache")
 
     panel_csv_url: str | None = None
     coingecko_api_key: SecretStr | None = None

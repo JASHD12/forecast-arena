@@ -576,6 +576,24 @@ Made by: agent
 - On in the morning workflow (`ARENA_AGENT_GRAPH`, default 1); a missing langgraph fails
   the run (I6). Before the official start (T110 gate).
 
+## 2026-11-13 · Local open-weights LLM `llm_local` (T122)
+
+- Qwen2.5-1.5B-Instruct (Q4_K_M GGUF, Apache-2.0, not gated) through llama.cpp on the
+  runner CPU; same prompts and contract as `llm_context` (subclass), same daily sample.
+  Greedy decoding, fixed seed, output constrained by llama.cpp's JSON-schema grammar (the
+  parser still validates). Deadline 120 s per call, 900 s per run; a timeout is an
+  `error` skip. Token usage is approximate (tokenizer count of the message texts, and
+  one output token per streamed chunk) and never counts against the API caps.
+- Alternatives: Llama 3.2 1B (gated licence acceptance: an owner action, S2); Qwen3
+  small models (thinking mode adds tokens); Ollama (a background server, S9).
+- Operations: installed in the morning workflow only (CI uses a fake backend), with the
+  pip wheel cache and a fixed-key cache for the weights in `models_cache/` (kept out of
+  the per-run `data_cache` cache). If the build or the load fails, `llm_local` records
+  `model_missing` skips that name the reason and the other forecasters run normally;
+  the batch is never put at risk for an optional forecaster.
+- Colour: the validated palette has 8 slots, all taken; `llm_local` shares slot 6 with
+  the not yet active ensemble until T134 adds a validated ninth colour.
+
 ## Proposals for the human
 
 Ideas outside the specification. The agent lists them here and does not build them.

@@ -186,3 +186,21 @@ class LLMContext(LLMForecaster):
             .replace("{asof}", asof.strftime("%Y-%m-%d %H:%M UTC"))
             .replace("{context}", render_context(ctx))
         )
+
+
+class LLMLocal(LLMContext):
+    """`llm_local` (SPEC 8.8): exactly `llm_context`'s prompts and contract, answered by an
+    open-weights model running locally on the CPU (`arena.llm.local`), at no API cost."""
+
+    forecaster_id = "llm_local"
+
+    def __init__(self, client: LLMClient | None, per_domain: int = 3, *,
+                 missing: str = "no local model configured") -> None:  # fmt: skip
+        super().__init__(client, per_domain)
+        self.missing = missing
+
+    def forecast(self, q: Question, ctx: dict[str, Any], asof: datetime) -> Forecast | Skip:
+        """As `llm_context`; without a model, the skip says why it is missing."""
+        if self.client is None:
+            return self._skip(q, "model_missing", self.missing, asof)
+        return super().forecast(q, ctx, asof)

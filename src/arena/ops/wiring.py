@@ -152,6 +152,20 @@ def build_domains(
     return out
 
 
+def _local_forecaster(settings: Settings, n: int) -> Forecaster:
+    """`llm_local` on the CPU: no API cost, so it runs in dry runs too and is never wrapped
+    by the API budget guard. If the library or the model cannot be loaded, the forecaster
+    has no client and records `model_missing` skips (I6), and the other forecasters run."""
+    from arena.forecasters.llm import LLMLocal
+    from arena.llm import local
+
+    try:
+        backend = local.llama_backend(local.model_path(settings.models_dir / "gguf"))
+    except Exception as exc:  # ImportError, download or load failure
+        return LLMLocal(None, n, missing=f"local model unavailable: {type(exc).__name__}: {exc}")
+    return LLMLocal(local.LlamaCppLLM(backend), n)
+
+
 def build_forecasters(
     ledger: Ledger,
     domains: Sequence[Domain],
@@ -194,6 +208,8 @@ def build_forecasters(
         wiki=None if llm is not None else partial(wikipedia_summary, http),
     )
     out += [LLMPlain(client, n), LLMContext(client, n), agent]
+    if settings.llm_local:
+        out.append(_local_forecaster(settings, n))
     if settings.agent_graph:
         # No silent fallback: if langgraph is missing this raises and the run fails.
         from arena.agent.graph import GraphAgentForecaster

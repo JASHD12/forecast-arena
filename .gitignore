@@ -9,6 +9,7 @@ __pycache__/
 
 # Local data and build output
 data_cache/
+models_cache/
 _ledger/
 backtests/
 /site/

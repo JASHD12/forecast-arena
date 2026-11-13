@@ -442,10 +442,15 @@ CI jobs; core `make check` stays offline and fast.
   - Do: `agent_graph` (plan, retrieve, tools, critique, answer) via langchain-anthropic,
     behind the existing budget guard; 1 question per domain per day.
   - Done when: FakeLLM-scripted graph tests pass; caps hold in a test.
-- [ ] T122 · Open-source local LLM forecaster (deps: T063)
+- [x] T122a · Open-source local LLM forecaster: code (deps: T063)
   - Do: `llm_local`: small quantized model via llama-cpp-python on the runner CPU, same
     contract as `llm_context`, time limit, skips on timeout. No API cost.
-  - Done when: tests with a fake backend pass; a dry-run dispatch records forecasts.
+  - Done when: tests with a fake backend pass; a real local run gives a valid forecast.
+- [!] T122b · llm_local live check (deps: T122a) WAIT(until=2026-11-14)
+  - Do: check the first morning run with llm_local (split from T122: today's lock had
+    passed when T122a was ready, so no dispatch could record forecasts).
+  - Done when: the morning run of 2026-11-14 (or a dry-run dispatch before its lock)
+    records llm_local forecasts or skips with a stated reason.
 - [ ] T123 · LLM tracing and observability page (deps: T067)
   - Do: spans per LLM call (prompt version, model, tokens, latency, tools, repair) in
     `agent_traces/`; trace panel on question pages; LLM page with usage and est. cost.

@@ -80,6 +80,7 @@ SERIES_SLOTS = {
     "ensemble": 6,
     "human_panel": 7,
     "agent_graph": 8,
+    "llm_local": 6,  # shares the ensemble slot until T134 adds a validated ninth colour
 }
 RACE_W, RACE_H = 680, 300
 RACE_PAD = (16, 150, 30, 44)  # top, right, bottom, left

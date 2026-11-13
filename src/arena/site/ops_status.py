@@ -13,7 +13,7 @@ from arena.ops.official import first_day
 from arena.scoring.core import Record
 
 #: Forecasters that call an LLM and can therefore fail to parse.
-LLM_FORECASTERS = ("llm_plain", "llm_context", "agent", "agent_graph")
+LLM_FORECASTERS = ("llm_plain", "llm_context", "llm_local", "agent", "agent_graph")
 
 
 def missed_days(ledger: Ledger, today: date) -> list[date]:

@@ -1,0 +1,3 @@
+{"forecaster_id": "agent", "outcome": "error", "question_id": "power-evening_gt-DE_LU-2026-11-14-v1", "tool_calls": [], "usage": {"input_tokens": 3273, "output_tokens": 400, "requests": 1}}
+{"forecaster_id": "agent", "outcome": "error", "question_id": "power-min_lt-DE_LU-2026-11-14-v1", "tool_calls": [], "usage": {"input_tokens": 3229, "output_tokens": 400, "requests": 1}}
+{"forecaster_id": "agent", "outcome": "error", "question_id": "power-up_vs_today-DE_LU-2026-11-14-v1", "tool_calls": [], "usage": {"input_tokens": 3263, "output_tokens": 400, "requests": 1}}

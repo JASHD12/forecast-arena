@@ -137,7 +137,7 @@ Keep the first line of each task in exactly this shape; the status script parses
   - Do: implement principle 2.9: clean-day streak tracking, one-time write of
     `meta/official_start.json`, rehearsal banner on the site, exclusion from headline scores.
   - Done when: tests cover a streak broken by an incident and the one-time write.
-- [ ] T036 · Explainers 01 and 02 (deps: T032)
+- [x] T036 · Explainers 01 and 02 (deps: T032)
   - Do: `docs/explainers/01-ledger-and-forecast-before-truth.md` and
     `02-power-market-questions.md` in the format of AGENTS.md section 8.
   - Done when: both files exist, each with ten interview questions and answers.

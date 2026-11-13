@@ -42,6 +42,7 @@ move older "Done log" lines to `docs/progress-archive.md`.
 
 ## Done log
 
+- 2026-11-13 T036: explainers 01 (ledger, forecast before truth) and 02 (power questions), ten Q&A each
 - 2026-11-13 T035+T110: clean-day streak from run manifests, recorded health reports and day seals; official start written once (write_raw refuses a second write); not-before gate (default 2099-12-31 until roadmap changes are live); streak on Status
 - 2026-11-13 T033: health checks + incident issue live-tested: failing dry run 43396287940 opened issue #1, healthy dry run 43397819217 closed it
 - 2026-11-13 T118: Hypothesis property tests (round-trip, scoring bounds, any changed byte detected, late forecasts rejected) found a real bug: verify crashed on non-UTF-8 bytes -> now a LedgerError; pytest-cov in CI summary (87% coverage)

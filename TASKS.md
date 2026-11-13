@@ -117,7 +117,7 @@ Keep the first line of each task in exactly this shape; the status script parses
   - Do: `promote.yml` fast-forwards `stable` after CI succeeds on `main`; scheduled jobs
     check out `stable`.
   - Done when: after a green CI run, `stable` and `main` point to the same commit.
-- [!] T032 · Rehearsal go-live (live) (deps: T031) WAIT(until=2026-11-13)
+- [x] T032 · Rehearsal go-live (live) (deps: T031)
   - Do: trigger a real morning run; confirm the ledger branch holds today's questions,
     forecasts and batch seal committed before lock; confirm the site is reachable at the
     Pages URL; write "Daily operations" and "If something breaks" in `docs/RUNBOOK.md`;

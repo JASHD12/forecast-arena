@@ -107,3 +107,23 @@ def test_budget_and_missing_model() -> None:
     )
     out = agent(llm).forecast(q, {"a": [1]}, ASOF)
     assert isinstance(out, Skip) and out.reason_code == "budget_exhausted"
+
+
+def test_repair_never_sends_two_assistant_turns_in_a_row() -> None:
+    """Regression (live 2026-11-13): the repair request repeated the model's last reply, so
+    the API received consecutive assistant messages, merged them and rejected the
+    request for modified thinking blocks. Every request must alternate roles."""
+    from itertools import pairwise
+
+    from arena.llm.client import AssistantTurn
+
+    q = question()
+    fake = FakeLLM(["not json", GOOD])  # unparseable first answer -> one repair request
+    out = agent(fake).forecast(q, {}, ASOF)
+    assert isinstance(out, Forecast) and out.probability == 0.37
+    assert len(fake.calls) == 2
+    for _system, turns, _tools in fake.calls:
+        kinds = [isinstance(t, AssistantTurn) for t in turns]
+        assert not any(a and b for a, b in pairwise(kinds))
+    repair_turns = fake.calls[1][1]
+    assert sum(isinstance(t, AssistantTurn) for t in repair_turns) == 1

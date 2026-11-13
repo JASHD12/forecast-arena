@@ -13,7 +13,7 @@ This is a research project. Nothing here is advice of any kind.
 
 **Status (2026-11-12):** the live pipeline is running on GitHub Actions. The site and the
 public ledger branch went live on 2026-11-12; the first batch of questions and forecasts
-is scheduled for the morning run of 2026-11-13. The first days are a *rehearsal*: they are
+was written on 2026-11-13 (rehearsal start date: 2026-11-13). The first days are a *rehearsal*: they are
 shown, but excluded from headline scores. The official record starts automatically after
 five consecutive clean days (SPEC 2.9). Electricity prices are live first; weather,
 Wikipedia attention and exchange rates follow once each has passed its next-day checks.

@@ -43,6 +43,8 @@ move older "Done log" lines to `docs/progress-archive.md`.
 
 ## Done log
 
+- 2026-11-13 T032: first real batch (6 power questions, 18 forecasts incl. Claude Haiku 5.5) on the ledger at 08:27 UTC, before the 09:30 lock; verify --git PASS; rehearsal start 2026-11-13. Both morning schedules were skipped by GitHub; dispatched by hand from `stable` (run 43393206918)
+- 2026-11-13 fix: agent repair step re-sent the model's reply (two assistant turns in a row -> API 400 on thinking blocks); regression test; workflows default ARENA_LLM_EFFORT=low so thinking does not use the 400-token answer budget
 - 2026-11-13 T111: weekly job trains several candidate families per domain, promotes the best only if not worse than the champion; candidates table on Experiments
 - 2026-11-13 Phase 0: roadmap tasks T110-T171 in TASKS.md, H15-H19, decisions, SPEC 8.8/11 amendments; scheduled resume every 5 h (trig_016b95iyHSuR6B44xPaAgDPF)
 - 2026-11-13 owner approved docs/ROADMAP.md (portfolio roadmap v2); next session starts with its Phase 0 (add tasks T110+ to TASKS.md), then Phase 1

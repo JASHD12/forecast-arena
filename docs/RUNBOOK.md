@@ -49,6 +49,7 @@ new correcting records.
 | Symptom | Likely cause | What to do |
 |---|---|---|
 | Jobs fail within seconds, no steps run | Account billing lock or an Actions budget of $0 (seen on 2026-11-12) | github.com/settings/billing: fix the payment issue; raise the Actions budget above $0. Re-run. |
+| No morning run by 08:00 UTC (GitHub skipped both schedules, seen on 2026-11-13) | GitHub drops scheduled runs under load | Start it by hand before 09:30 UTC: Actions > morning > Run workflow from `stable` (tested code; its Pages deploy step fails by design) or from `main` if `main` == `stable`. The site updates at the next resolve run. |
 | A morning run says "late run" | The scheduled run started after 09:30 UTC | Nothing to repair: the day has no forecasts and that is recorded. Check whether GitHub's schedule is delayed; the 05:30 and 07:00 runs exist for this. |
 | Morning run fails in question generation for one domain | A source was down or returned malformed data | The other domains still run. Check the source with `make smoke-sources`. The run manifest on the ledger lists the warning. |
 | Push to `ledger` rejected | Another job pushed first | The job pulls with rebase and retries up to five times; if it still fails, re-run the workflow (it is idempotent). |

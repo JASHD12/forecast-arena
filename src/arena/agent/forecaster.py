@@ -126,7 +126,10 @@ class AgentForecaster:
                 answer = parse_answer(answer_text)
             except ParseError as first:
                 repair = prompts.load("repair", self.prompt_version).replace("{error}", str(first))
-                turns = [*turns, AssistantTurn(resp), UserText(repair)]
+                # `_loop` already appended the model's reply to `turns`; adding it again
+                # would send two assistant messages in a row, which the API merges and
+                # then rejects for modified thinking blocks (seen live on 2026-11-13).
+                turns = [*turns, UserText(repair)]
                 resp = self.client.complete(
                     system, turns, max_tokens=self.max_output_tokens, tools=TOOL_SPECS
                 )

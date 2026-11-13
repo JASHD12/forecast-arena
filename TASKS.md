@@ -455,7 +455,7 @@ CI jobs; core `make check` stays offline and fast.
   - Do: spans per LLM call (prompt version, model, tokens, latency, tools, repair) in
     `agent_traces/`; trace panel on question pages; LLM page with usage and est. cost.
   - Done when: tests cover span writing and the page with FakeLLM data.
-- [ ] T124 · LLM evaluation harness (deps: T123)
+- [x] T124 · LLM evaluation harness (deps: T123)
   - Do: `arena eval run` on a frozen golden set; prompt A/B; Brier, calibration, JSON
     validity, repair rate, cost; FakeLLM gate in CI; real runs by manual dispatch only.
   - Done when: CI gate passes; results page labelled evaluation (I4).

@@ -1,0 +1,75 @@
+name: llm-eval
+
+# Manual LLM evaluation on the frozen golden set (T124). Real model calls, under the
+# eval's own hard caps (default 60,000 tokens, two requests per question and variant).
+# Writes no ledger and deploys nothing: the result is a workflow artifact, which the
+# agent commits to evals/results/ on main (labelled "evaluation", never live, I4).
+
+on:
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: "Golden questions to sample (stratified, seeded)"
+        default: "24"
+      max_tokens:
+        description: "Hard token cap for this run"
+        default: "60000"
+      local:
+        description: "Also evaluate llm_local (builds llama.cpp; slower)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  eval:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      ARENA_CONTACT: ${{ vars.ARENA_CONTACT }}
+      ARENA_LLM_PROVIDER: ${{ vars.ARENA_LLM_PROVIDER }}
+      ARENA_LLM_MODEL: ${{ vars.ARENA_LLM_MODEL }}
+      ARENA_LLM_EFFORT: ${{ vars.ARENA_LLM_EFFORT || 'low' }}  # thinking must not eat the 400-token answer budget
+      ARENA_LLM_MAX_OUTPUT_TOKENS: ${{ vars.ARENA_LLM_MAX_OUTPUT_TOKENS || '400' }}
+      ARENA_LLM_BASE_URL: ${{ vars.ARENA_LLM_BASE_URL }}
+      ARENA_LLM_API_KEY: ${{ secrets.ARENA_LLM_API_KEY }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements-*.txt
+      - name: Install pinned dependencies
+        run: make setup
+      - name: Install the local LLM runtime
+        if: inputs.local
+        env:
+          CMAKE_ARGS: "-DGGML_NATIVE=OFF"
+        run: .venv/bin/pip install -r requirements-local.txt
+      - name: Restore cached model weights
+        if: inputs.local
+        uses: actions/cache@v6
+        with:
+          path: models_cache
+          key: models-qwen2.5-1.5b-instruct-q4km-91cad51
+      - name: Run the evaluation
+        env:
+          LIMIT: ${{ inputs.limit }}
+          MAX_TOKENS: ${{ inputs.max_tokens }}
+          LOCAL: ${{ inputs.local }}
+        run: |
+          set -o pipefail
+          variants="--variant llm_plain --variant llm_context"
+          if [ "$LOCAL" = "true" ]; then variants="$variants --variant llm_local"; fi
+          .venv/bin/arena eval run --golden evals/golden/power-2026-10.jsonl \
+            --limit "$LIMIT" --max-tokens "$MAX_TOKENS" $variants | tee eval.log
+          { echo "## LLM evaluation (not the live record)"; echo '```'; cat eval.log; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: llm-eval-result
+          path: evals/results/*.json
+          retention-days: 30

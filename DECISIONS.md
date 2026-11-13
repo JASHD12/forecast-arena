@@ -609,6 +609,25 @@ Made by: agent
 - Cost on the site is an estimate from recorded tokens and a dated list price
   (`site/llm_obs.py`); unknown models show "no price" rather than a guess.
 
+## 2026-11-13 · LLM evaluation harness (T124)
+
+- Golden set `evals/golden/power-2026-10.jsonl` (186 power questions, batch days
+  2026-10-01 to 2026-10-31): generated and resolved by the production domain code from
+  SMARD history, each with the as-of context of that morning and the benchmark base rate
+  from replayed history before it. Frozen: its SHA-256 is in every result. Honest limit,
+  stated on the page: the answers were known when an eval runs, so training-data
+  contamination cannot be ruled out (daily auction prices are an unlikely thing to
+  memorise, but the live record is the real test).
+- Variants: `llm_plain` vs `llm_context` (same model; prompt and information differ),
+  optionally `llm_local`. The agent is not evaluated offline (its news and Wikipedia
+  tools would read today's web, which would leak).
+- CI gate: a FakeLLM run on the committed set inside `make check` (every answer parsed
+  and scored, metrics computed). Real runs only by manual dispatch of `llm-eval.yml`,
+  with the eval's own hard caps (default 60,000 tokens; about one US cent on Haiku 5.5),
+  separate from the live daily cap. The workflow writes no ledger; its artifact is
+  committed to `evals/results/` by the agent and shown on `evals.html` under an
+  EVALUATION banner, never in a leaderboard (I4).
+
 ## Proposals for the human
 
 Ideas outside the specification. The agent lists them here and does not build them.

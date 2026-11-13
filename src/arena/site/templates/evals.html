@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% from "macros.html" import page_head %}
+{% block content %}
+{{ page_head("Evaluation", "LLM evals", "The AI forecasters re-tested on a frozen set of past questions, with prompt variants side by side. This is evaluation, kept apart from the live record.") }}
+<div class="banner" role="note"><strong>EVALUATION</strong>: not the live record and never counted in any leaderboard. The questions are past days whose answers were already known when the test ran, so a model could in principle have seen similar data in training; the live record exists to rule that out.</div>
+{% for r in runs %}
+<section class="card" aria-labelledby="ev-{{ loop.index }}">
+<h2 id="ev-{{ loop.index }}">Run {{ r.run_id }}</h2>
+<p class="note">{{ r.created_at[:16]|replace("T", " ") }} UTC · golden set <code>{{ r.golden }}</code> (sha256 <code>{{ r.golden_sha256[:12] }}</code>) · {{ r.n_items }} questions · caps: {{ "{:,}".format(r.caps.max_tokens) }} tokens, {{ r.caps.max_requests }} requests</p>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Metrics of run {{ r.run_id }}"><table>
+<thead><tr><th scope="col">Variant</th><th scope="col" class="num">Answered</th><th scope="col" class="num">Brier</th><th scope="col" class="num">Base rate (same questions)</th><th scope="col" class="num">Skill</th><th scope="col" class="num">Log score</th><th scope="col" class="num">ECE</th><th scope="col" class="num">Valid JSON first try</th><th scope="col" class="num">Repairs</th><th scope="col" class="num">Tokens</th><th scope="col" class="num">Est. cost</th></tr></thead>
+<tbody>{% for name, m in r.metrics.items() %}<tr><th scope="row">{{ fname(name) }}<br><span class="muted"><code>{{ r.versions[name] }}</code></span></th>
+<td class="num">{{ m.answered }}/{{ m.n }}</td><td class="num">{{ "%.4f"|format(m.brier) if m.brier is not none else "–" }}</td><td class="num">{{ "%.4f"|format(m.base_rate_brier_same_items) if m.base_rate_brier_same_items is not none else "–" }}</td><td class="num">{{ "%+.3f"|format(m.skill_vs_base_rate) if m.skill_vs_base_rate is not none else "–" }}</td><td class="num">{{ "%.4f"|format(m.log_score) if m.log_score is not none else "–" }}</td><td class="num">{{ "%.3f"|format(m.ece) if m.ece is not none else "–" }}</td><td class="num">{{ "%.0f%%"|format(100 * m.json_valid_first_try) if m.json_valid_first_try is not none else "–" }}</td><td class="num">{{ "%.0f%%"|format(100 * m.repair_rate) if m.repair_rate is not none else "–" }}</td><td class="num">{{ "{:,}".format(m.input_tokens + m.output_tokens) }}</td><td class="num">{{ "$%.4f"|format(m.cost_usd) if m.cost_usd is not none else "–" }}</td></tr>{% endfor %}</tbody></table></div>
+{% if r.paired %}<ul class="plain">{% for p in r.paired %}<li>{{ fname(p.a) }} minus {{ fname(p.b) }}: Brier difference {{ "%+.4f"|format(p.diff) }}, 95% interval [{{ "%+.4f"|format(p.lo) }}, {{ "%+.4f"|format(p.hi) }}] over {{ p.n }} questions on {{ p.days }} days ({% if p.lo > 0 or p.hi < 0 %}interval excludes zero{% else %}interval includes zero: no difference shown{% endif %}).</li>{% endfor %}</ul>{% endif %}
+</section>
+{% else %}<p class="empty">No evaluation run yet. Runs are started by hand (workflow <code>llm-eval</code>) and capped at a few cents of tokens.</p>{% endfor %}
+<p class="note">Harness: <code>src/arena/evals/</code>. Golden set: power questions of October 2026, generated and resolved by the production code, each with the data the forecasters would have had that morning. Variants share the model and differ in prompt and information; every call is traced like a live one.</p>
+{% endblock %}

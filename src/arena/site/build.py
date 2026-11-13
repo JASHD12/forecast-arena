@@ -315,6 +315,20 @@ def _runs(ledger: Ledger, limit: int = 20) -> list[RunManifest]:
     return sorted(out, key=lambda r: r.started_at, reverse=True)[:limit]
 
 
+def eval_runs(evals_dir: Path | None) -> list[dict[str, Any]]:
+    """Committed evaluation results (T124), newest first; fake CI-gate runs are skipped."""
+    if evals_dir is None or not evals_dir.is_dir():
+        return []
+    runs = []
+    for p in sorted(evals_dir.glob("*.json")):
+        if p.name.startswith("fake-"):
+            continue
+        r = json.loads(p.read_text(encoding="utf-8"))
+        if r.get("kind") == "evaluation":
+            runs.append(r)
+    return sorted(runs, key=lambda r: str(r.get("created_at")), reverse=True)
+
+
 def official_start(ledger: Ledger) -> str | None:
     """The official start date if `meta/official_start.json` exists."""
     if not ledger.exists(layout.OFFICIAL_START_PATH):
@@ -373,6 +387,7 @@ def build_site(
     content_dir: Path | None = None,
     site_url: str = DEFAULT_SITE_URL,
     llm_token_cap: int | None = None,
+    evals_dir: Path | None = None,
 ) -> SiteResult:
     """Render every page into `out_dir` (built aside, then moved into place)."""
     rec = load(ledger)
@@ -527,6 +542,7 @@ def build_site(
                 "parse": parse_failures(rec),
             },
         ),
+        "evals.html": ("LLM evals", {"runs": eval_runs(evals_dir)}),
         "about.html": (
             "About",
             {"about": read_content("about.md"), "legal": read_content("legal.md")},

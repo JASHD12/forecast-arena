@@ -636,6 +636,17 @@ def build_site(
         "evals.html": ("LLM evals", {"runs": eval_runs(evals_dir)}),
         "backtests.html": ("Backtests", {"cards": load_cards(models_dir)}),
         "api.html": ("JSON API", {"endpoints": ENDPOINTS}),
+        "de.html": (
+            "Auf Deutsch",
+            {
+                "page_lang": "de",
+                "k": {
+                    "questions": len(rec.questions),
+                    "forecasts": len(rec.forecasts),
+                    "forecasters": len({f.forecaster_id for f in rec.forecasts}),
+                },
+            },
+        ),
         "recruiters.html": (
             "For recruiters",
             {

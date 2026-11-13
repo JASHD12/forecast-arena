@@ -793,6 +793,13 @@ Made by: agent
 - API taken from the installed package (`airflow.sdk.DAG`, the standard provider's
   `BashOperator`, `airflow.models.dagbag.DagBag`), as recorded in SOURCES.
 
+## 2026-11-13 · German summary (T141)
+
+- `de.html` with `<html lang="de">` (the shared English header and footer carry
+  `lang="en"`), linked as "Auf Deutsch" (hreflang) from every footer, plus a German README
+  section. Live counts come from the ledger; the page states that a native speaker has
+  not proofread it yet (H17), and repeats the "research project, not advice" notice.
+
 ## Proposals for the human
 
 Ideas outside the specification. The agent lists them here and does not build them.

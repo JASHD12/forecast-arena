@@ -163,6 +163,18 @@ For Claude Desktop, add the same command and arguments as a server entry in its
 `claude_desktop_config.json`. Then ask, for example, "Which forecaster has the best Brier
 score on electricity questions?"
 
+## Auf Deutsch
+
+Forecast Arena ist ein öffentlicher Forschungs-Benchmark. Jeden Morgen entstehen aus
+öffentlichen Daten Ja/Nein-Fragen über den nächsten Tag (zunächst deutsche
+Day-Ahead-Strompreise). Basisrate, ein Gradient-Boosting-Modell, Sprachmodelle und zwei
+KI-Agenten geben ihre Wahrscheinlichkeit ab, **bevor** die Antwort feststeht; alles wird in
+ein öffentliches, nur erweiterbares und per Hash verkettetes Protokoll geschrieben und am
+nächsten Tag mit dem Brier-Score bewertet. Forschungsfrage: Wann schlägt ein KI-Agent ein
+klassisches Modell, und wann nicht? Eine Kurzfassung steht auf der Seite
+[Auf Deutsch](https://jashd12.github.io/forecast-arena/de.html). Forschungsprojekt, keine
+Beratung. (Die deutsche Fassung wartet noch auf eine muttersprachliche Durchsicht.)
+
 ## Data and attribution
 
 | Data | Source | Licence / terms |

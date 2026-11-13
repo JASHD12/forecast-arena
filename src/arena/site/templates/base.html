@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="{{ page_lang|default('en') }}">
 <head>
 <meta charset="utf-8">
 {% if base_href %}<base href="{{ base_href }}">{% endif %}
@@ -23,7 +23,7 @@
 <link rel="alternate" type="application/atom+xml" title="Forecast Arena: daily questions" href="{{ root }}feed.xml">
 </head>
 <body>
-<header class="site-header"><div class="wrap">
+<header class="site-header"{% if page_lang|default('en') != 'en' %} lang="en"{% endif %}><div class="wrap">
 <a class="skip" href="#main">Skip to content</a>
 <a class="brand" href="{{ root }}index.html"><svg viewBox="0 0 32 32" aria-hidden="true" focusable="false"><circle cx="16" cy="16" r="14" fill="none" stroke="#9ea4ff" stroke-width="3"/><circle cx="16" cy="16" r="8" fill="none" stroke="#f08bcf" stroke-width="3"/><circle cx="16" cy="16" r="3" fill="#ffffff"/></svg>Forecast Arena</a>
 <nav aria-label="Main"><ul>
@@ -36,13 +36,14 @@ The official record starts automatically after five clean days in a row; until t
 <main id="main"><div class="wrap">
 {% block content %}{% endblock %}
 </div></main>
-<footer><div class="wrap">
+<footer{% if page_lang|default('en') != 'en' %} lang="en"{% endif %}><div class="wrap">
 <div class="footer-grid">
 <div>
 <p><strong>Research project, not advice.</strong> Forecast Arena is a research benchmark. Nothing on this site is financial, investment, energy-purchasing or any other kind of advice. Probabilities are experimental outputs and may be wrong.</p>
 <p><strong>AI disclosure.</strong> Forecasters labelled "AI" are generated automatically by a large language model; their numbers and rationales are machine-generated and published without human editing.</p>
 </div>
 <nav aria-label="Footer"><ul class="footer-links">
+<li><a href="{{ root }}de.html" lang="de" hreflang="de">Auf Deutsch</a></li>
 <li><a href="{{ root }}guide.html">Guide &amp; FAQ</a></li>
 <li><a href="{{ root }}imprint.html">Imprint</a></li>
 <li><a href="{{ root }}privacy.html">Privacy</a></li>

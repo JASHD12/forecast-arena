@@ -494,7 +494,7 @@ CI jobs; core `make check` stays offline and fast.
   - Do: 60-second summary, measured results, requirement-to-proof table, print layout;
     personal lines from `site_content/recruiters.md` (FILL IN guard).
   - Done when: every technology named links to code CI runs.
-- [ ] T141 · German summary page and README section (deps: T140)
+- [x] T141 · German summary page and README section (deps: T140)
   - Done when: `de.html` (lang="de") and the README section exist; H17 asks for proofreading.
 - [ ] T142 · README overhaul (deps: T140)
   - Done when: badges, screenshots, generated results, skills list, Docker quickstart.

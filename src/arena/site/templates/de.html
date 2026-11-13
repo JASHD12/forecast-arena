@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% from "macros.html" import page_head %}
+{% block content %}
+{{ page_head("Auf Deutsch", "Forecast Arena auf einen Blick", "Ein öffentlicher Forschungs-Benchmark: Können KI-Agenten den morgigen Tag besser vorhersagen als ein klassisches Modell des maschinellen Lernens?") }}
+<p class="note">Diese Zusammenfassung wurde vom Projekt erstellt; eine Durchsicht durch eine Muttersprachlerin oder einen Muttersprachler steht noch aus. Die ausführlichen Seiten sind auf Englisch.</p>
+<div class="kpis">
+<div class="kpi"><span class="kpi-n">{{ k.questions }}</span><span class="kpi-l">Fragen gestellt</span></div>
+<div class="kpi"><span class="kpi-n">{{ k.forecasts }}</span><span class="kpi-l">Prognosen vor der Antwort veröffentlicht</span></div>
+<div class="kpi"><span class="kpi-n">{{ k.forecasters }}</span><span class="kpi-l">Prognosemodelle im Vergleich</span></div>
+</div>
+<section class="card" aria-labelledby="de-was"><h2 id="de-was">Worum es geht</h2>
+<p>Jeden Morgen erzeugt das System Ja/Nein-Fragen über den nächsten Tag aus öffentlichen Daten, zunächst zu den deutschen Day-Ahead-Strompreisen (Bundesnetzagentur, SMARD). Beispiel: „Liegt der durchschnittliche Strompreis morgen über 80 €/MWh?“ Mehrere Prognosemodelle geben jeweils eine Wahrscheinlichkeit ab, <strong>bevor</strong> die Antwort feststeht. Am nächsten Tag kommen die echten Daten, jede Prognose wird bewertet, und diese Website zeigt die Ergebnisse.</p>
+</section>
+<section class="card" aria-labelledby="de-wer"><h2 id="de-wer">Wer prognostiziert</h2>
+<ul>
+<li><strong>Basisrate</strong>: wie oft die Antwort früher „Ja“ war – der Maßstab, den alle schlagen müssen.</li>
+<li><strong>Persistenz</strong>: „morgen wie heute“.</li>
+<li><strong>ML-Modell</strong>: Gradient Boosting, trainiert auf vergangenen Daten, mit kalibrierten Wahrscheinlichkeiten.</li>
+<li><strong>Sprachmodelle (LLM)</strong>: Claude mit nur der Frage oder zusätzlich mit den aktuellen Daten.</li>
+<li><strong>KI-Agenten</strong>: ein LLM, das vor der Antwort Werkzeuge nutzt (Daten, Nachrichten, ähnliche frühere Fragen), einmal selbst geschrieben und einmal mit LangGraph.</li>
+<li><strong>Offenes Modell</strong>: ein kleines Open-Weight-Modell, das kostenlos auf der CPU läuft.</li>
+</ul>
+</section>
+<section class="card" aria-labelledby="de-vertrauen"><h2 id="de-vertrauen">Warum man den Zahlen trauen kann</h2>
+<ul>
+<li>Alle Fragen und Prognosen werden um 09:30 UTC gesperrt und in ein nur erweiterbares, öffentliches Protokoll auf einem Git-Branch geschrieben. Jeder Tag wird mit SHA-256-Hashes verkettet; jede nachträgliche Änderung wäre sichtbar.</li>
+<li>Prognosemodelle sehen nur Daten, die zum Zeitpunkt der Prognose bereits veröffentlicht waren (kein „Blick in die Zukunft“).</li>
+<li>Bewertet wird mit dem Brier-Score: (Wahrscheinlichkeit − Ergebnis)², kleiner ist besser; 0,25 erreicht, wer immer 50 % sagt. Ein Unterschied gilt erst als belegt, wenn sein 95-%-Intervall die Null ausschließt; vorher steht dort „zu früh für ein Urteil“.</li>
+<li>Fällt ein Modell aus, wird ein Auslassen mit Grund gespeichert – niemals eine erfundene Zahl.</li>
+</ul>
+</section>
+<section class="card" aria-labelledby="de-technik"><h2 id="de-technik">Technik</h2>
+<p>Python, scikit-learn, LightGBM, PyTorch, DuckDB, dbt, FastAPI, die Anthropic-API, LangGraph, RAG mit lokalen Embeddings, LLM-Evaluation und Tracing, ein MCP-Server, Docker, Kubernetes (in CI geprüft), Airflow (in CI geprüft) und GitHub Actions. Alles läuft kostenlos auf GitHub Actions und GitHub Pages; die KI-Nutzung kostet etwa einen US-Dollar im Monat. Details mit Links zum Code: <a href="recruiters.html" lang="en">For recruiters</a>.</p>
+</section>
+<p class="note"><strong>Forschungsprojekt, keine Beratung.</strong> Nichts auf dieser Website ist eine Finanz-, Anlage-, Energieeinkaufs- oder sonstige Beratung. Die Wahrscheinlichkeiten sind experimentelle Ergebnisse und können falsch sein.</p>
+{% endblock %}

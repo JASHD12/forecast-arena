@@ -662,7 +662,8 @@ def eval_run(
     for name, m in res["metrics"].items():
         click.echo(f"{name}: answered {m['answered']}/{m['n']}, brier {m['brier']}, "
                    f"json-valid {m['json_valid_first_try']}, tokens "
-                   f"{m['input_tokens'] + m['output_tokens']}, cost {m['cost_usd']}")  # fmt: skip
+                   f"{m['input_tokens'] + m['output_tokens']}, cost {m['cost_usd']}, "
+                   f"skips {m['skips']}, stop reasons {m['stop_reasons']}")  # fmt: skip
     click.echo(f"written: {path}")
 
 

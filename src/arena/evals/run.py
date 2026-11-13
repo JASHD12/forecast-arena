@@ -152,6 +152,9 @@ def metrics(
             "repair_rate": len(repaired) / len(mine) if mine else None,
             "skips": dict(Counter(r["skip"] for r in mine if r["skip"])),
             "calls": len(spans),
+            "stop_reasons": dict(
+                Counter(s.stop_reason or ("error" if s.error else "") for s in spans)
+            ),
             "input_tokens": inp,
             "output_tokens": outp,
             "cost_usd": None if price is None else (inp * price[0] + outp * price[1]) / 1e6,

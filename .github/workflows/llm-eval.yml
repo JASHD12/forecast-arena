@@ -68,6 +68,11 @@ jobs:
           .venv/bin/arena eval run --golden evals/golden/power-2026-10.jsonl \
             --limit "$LIMIT" --max-tokens "$MAX_TOKENS" $variants | tee eval.log
           { echo "## LLM evaluation (not the live record)"; echo '```'; cat eval.log; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+      - name: Print the result (the log is how the agent reads it back)
+        run: |
+          echo "::group::result json"
+          cat evals/results/*.json
+          echo "::endgroup::"
       - uses: actions/upload-artifact@v7
         with:
           name: llm-eval-result

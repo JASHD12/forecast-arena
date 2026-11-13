@@ -42,6 +42,7 @@ from arena.site.ops_status import llm_usage, missed_days, parse_failures, source
 from arena.site.profiles import profile
 from arena.site.qchart import chart_data, series_svg
 from arena.site.titles import FORECASTER_NAMES, domain_name, forecaster_name, plain_title
+from arena.site.topics import topic
 from arena.sources.brightsky import ATTRIBUTION as WX_ATTRIBUTION
 from arena.sources.brightsky import LICENCE as WX_LICENCE
 from arena.sources.ecb import ATTRIBUTION as ECB_ATTRIBUTION
@@ -577,6 +578,7 @@ def build_site(
         ),
         "evals.html": ("LLM evals", {"runs": eval_runs(evals_dir)}),
         "forecasters/index.html": ("Forecasters", {"profiles": profiles}),
+        "topics/index.html": ("Topics", {"topics": [topic(d, rec) for d in domains]}),
         "play.html": (
             "Can you beat the AI?",
             {
@@ -599,6 +601,7 @@ def build_site(
     (tmp / "static").mkdir(parents=True)
     (tmp / "questions").mkdir()
     (tmp / "forecasters").mkdir()
+    (tmp / "topics").mkdir()
     (tmp / "data").mkdir(exist_ok=True)
     (tmp / "data" / "game.json").write_text(game_payload + "\n", encoding="utf-8")
     pages["data.html"] = (
@@ -677,6 +680,16 @@ def build_site(
             **{**common, "root": "../"}, p=p,
         )  # fmt: skip
         (tmp / "forecasters" / f"{p['fid']}.html").write_text(html_text, encoding="utf-8")
+    ttpl = env.get_template("topic.html")
+    scope = "official record" if off else "rehearsal days"
+    for dom in domains:
+        boards_d = [b for b in (headline if off else rehearsal_boards) if b.domain == dom]
+        html_text = ttpl.render(
+            title=domain_name(dom), page="topics/index.html", **{**common, "root": "../"},
+            t=topic(dom, rec), boards=boards_d, scope=scope,
+            race=race_data([s for s in (off if off else rehearsal) if s.domain == dom]),
+        )  # fmt: skip
+        (tmp / "topics" / f"{dom}.html").write_text(html_text, encoding="utf-8")
     static = Path(__file__).parent / "static"
     for f in static.iterdir():
         shutil.copy(f, tmp / "static" / f.name)

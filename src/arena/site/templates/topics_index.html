@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% from "macros.html" import page_head %}
+{% block content %}
+{{ page_head("What we forecast", "Topics", "Each topic has its own official data source, its own kinds of question and its own leaderboard.") }}
+<ul class="topics">{% for t in topics %}<li><a href="{{ t.domain }}.html"><strong>{{ dname(t.domain) }}</strong></a><br><span class="note">{{ t.about }}</span><br><span class="muted">{{ t.n_questions }} questions · {{ t.n_resolved }} answered · {{ t.kinds|length }} kinds</span></li>{% endfor %}</ul>
+{% endblock %}

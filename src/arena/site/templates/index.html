@@ -87,7 +87,7 @@
 {% set live = topics|map(attribute="domain")|list %}
 {% for d, blurb in (("power", "German day-ahead electricity prices: averages, peaks, negative prices, evening prices."), ("weather", "Four German cities: heat, rain, frost, wind gusts and city-vs-city duels."), ("attention", "Which Wikipedia articles people will read tomorrow, from public pageviews."), ("markets", "The next ECB euro reference rates for the dollar and the yen."), ("crypto", "Daily moves of Bitcoin, Ethereum, Solana, XRP and BNB.")) %}
 {% set t = (topics|selectattr("domain", "equalto", d)|list|first) if d in live else none %}
-<li class="topic topic-{{ d }}"><span class="topic-ico">{{ icon(d) }}</span><div><h3>{{ dname(d) }} {% if t %}<span class="label">live</span>{% else %}<span class="label muted-label">coming</span>{% endif %}</h3><p>{{ blurb }}</p>{% if t %}<p class="topic-n"><a href="questions/topic-{{ d }}.html">{{ t.questions }} questions · {{ t.resolved }} answered →</a></p>{% endif %}</div></li>
+<li class="topic topic-{{ d }}"><span class="topic-ico">{{ icon(d) }}</span><div><h3>{{ dname(d) }} {% if t %}<span class="label">live</span>{% else %}<span class="label muted-label">coming</span>{% endif %}</h3><p>{{ blurb }}</p>{% if t %}<p class="topic-n"><a href="topics/{{ d }}.html">{{ t.questions }} questions · {{ t.resolved }} answered →</a></p>{% endif %}</div></li>
 {% endfor %}</ul>
 
 <div class="section-head"><h2>Why you can trust the numbers</h2></div>

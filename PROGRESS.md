@@ -42,6 +42,7 @@ move older "Done log" lines to `docs/progress-archive.md`.
 
 ## Done log
 
+- 2026-11-13 T133: topic pages (source and verified terms, kinds of question with rules, per-topic boards and race, latest questions), linked from Home; fixed unencoded question links and macro context
 - 2026-11-13 T132: forecaster profile pages (what it sees, model cards, score over time vs base rate, calibration, best/worst calls, skips, LLM usage, version history) linked from the leaderboard
 - 2026-11-13 T131: question page chart from the morning snapshot (per-domain series, threshold, observed value, data table) and previous/next links
 - 2026-11-13 T130: play.html "Can you beat the AI?" (live + practice decks, in-memory score), self-hosted app.js, CSP on every page, Playwright round test in make a11y, home teaser, nav link

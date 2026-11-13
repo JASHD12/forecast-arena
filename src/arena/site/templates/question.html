@@ -58,7 +58,7 @@
 <tr><th scope="row">Id</th><td><code>{{ q.question_id }}</code></td></tr>
 </tbody></table></div>
 
-<nav class="qnav" aria-label="Neighbouring questions">{% if prev_q %}<a href="{{ prev_q.question_id }}.html" rel="prev">← {{ prev_q.batch_date }}: {{ prev_q.template|replace("_", " ") }}</a>{% endif %}{% if next_q %}<a href="{{ next_q.question_id }}.html" rel="next">{{ next_q.batch_date }}: {{ next_q.template|replace("_", " ") }} →</a>{% endif %}</nav>
+<nav class="qnav" aria-label="Neighbouring questions">{% if prev_q %}<a href="{{ qhref(prev_q.question_id, '') }}" rel="prev">← {{ prev_q.batch_date }}: {{ prev_q.template|replace("_", " ") }}</a>{% endif %}{% if next_q %}<a href="{{ qhref(next_q.question_id, '') }}" rel="next">{{ next_q.batch_date }}: {{ next_q.template|replace("_", " ") }} →</a>{% endif %}</nav>
 
 <details class="faq"><summary>All forecasts with versions and timestamps</summary>
 <div class="table-scroll" tabindex="0" role="region" aria-label="All forecasts"><table>

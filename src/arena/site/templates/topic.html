@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% from "macros.html" import page_head, board_table with context %}
+{% block content %}
+{{ page_head("Topic", dname(t.domain), t.about) }}
+<div class="kpis">
+<div class="kpi"><span class="kpi-n">{{ t.n_questions }}</span><span class="kpi-l">questions</span></div>
+<div class="kpi"><span class="kpi-n">{{ t.n_resolved }}</span><span class="kpi-l">answered</span></div>
+<div class="kpi"><span class="kpi-n">{{ t.kinds|length }}</span><span class="kpi-l">kinds of question</span></div>
+</div>
+<section class="card" aria-labelledby="tp-src"><h2 id="tp-src">Where the answers come from</h2>
+<p><strong>{{ t.source }}</strong>{% if t.url %} (<a href="{{ t.url }}">source</a>){% endif %}. Terms: {{ t.terms }}.</p>
+<p class="note">Every answer is computed by code from the published data and stored with its evidence; see any question page.</p></section>
+
+<h2>The kinds of question</h2>
+{% if t.kinds %}<ul class="plain topic-kinds">{% for k in t.kinds %}<li><strong>{{ k.title }}</strong> <span class="muted">({{ k.n }} so far, template <code>{{ k.template }}</code>)</span>
+<details class="faq"><summary>Exact rule</summary><p>{{ k.rule }}</p></details></li>{% endfor %}</ul>
+{% else %}<p class="empty">No questions on this topic yet. It is switched on when its data source is live.</p>{% endif %}
+
+<h2>Who forecasts this topic best</h2>
+{% for b in boards %}{{ board_table(b, ("Questions every compared forecaster answered" if b.kind == "common" else "All questions") ~ " (" ~ scope ~ ")") }}{% else %}<p class="empty">No scored questions yet.</p>{% endfor %}
+
+<h2>The race</h2>
+{% if race.days %}<figure class="race-card">
+<ul class="legend" aria-label="Legend">{% for fid in race.fids %}<li><span class="dot-key {{ series_class(fid) }}" aria-hidden="true"></span>{{ fname(fid) }}</li>{% endfor %}</ul>
+{{ race_svg(race.series, all_names, race.days) }}
+<figcaption class="note">Running average Brier score on the {{ race.n }} {{ dname(t.domain) }} questions every plotted forecaster answered ({{ scope }}).</figcaption>
+<details class="faq"><summary>Data table</summary>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Race data"><table>
+<thead><tr><th scope="col">Day</th>{% for fid in race.fids %}<th scope="col" class="num">{{ fname(fid) }}</th>{% endfor %}</tr></thead>
+<tbody>{% for d in race.days %}{% set i = loop.index0 %}<tr><th scope="row">{{ d }}</th>{% for fid in race.fids %}<td class="num">{{ "%.3f"|format(race.series[fid][i][1]) }}</td>{% endfor %}</tr>{% endfor %}</tbody></table></div></details>
+</figure>{% else %}<p class="empty">The race starts after the first day of answers.</p>{% endif %}
+
+<h2>Latest questions</h2>
+{% if t.recent %}<ul class="plain">{% for q in t.recent %}<li><a href="{{ root }}{{ qhref(q.question_id) }}">{{ plain_title(q) }}</a> <span class="muted">({{ q.batch_date }})</span></li>{% endfor %}</ul>
+<p><a href="{{ root }}questions/topic-{{ t.domain }}.html">All {{ dname(t.domain) }} questions →</a></p>{% else %}<p class="empty">None yet.</p>{% endif %}
+{% endblock %}

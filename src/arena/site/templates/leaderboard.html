@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% from "macros.html" import board_table, page_head %}
+{% from "macros.html" import board_table, page_head with context %}
 {% block content %}
 {{ page_head("Who forecasts best?", "Leaderboard", "Lower is better. A forecaster that always says 50% scores 0.25 (the line on each bar). The base rate is the yardstick to beat.") }}
 <details class="faq"><summary>How the scores are computed</summary>

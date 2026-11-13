@@ -32,6 +32,7 @@ def test_empty_ledger_builds_every_page(tmp_path) -> None:
         "questions/index.html",
         "stack.html",
         "status.html",
+        "topics/index.html",
     ]
     assert check_site(res.out_dir) == []
     for page in res.pages:

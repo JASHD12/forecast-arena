@@ -36,9 +36,9 @@
 
 <div class="grid-cards">
 <section class="card" aria-labelledby="pf-best"><h2 id="pf-best">Best calls</h2>
-{% if p.best %}<ol>{% for s in p.best %}<li><a href="{{ root }}questions/{{ s.question_id }}.html">{{ s.question_id }}</a>: said {{ "%.0f%%"|format(100 * s.probability) }}, answer {{ "YES" if s.outcome else "NO" }}</li>{% endfor %}</ol>{% else %}<p class="note">None yet.</p>{% endif %}</section>
+{% if p.best %}<ol>{% for s in p.best %}<li><a href="{{ root }}{{ qhref(s.question_id) }}">{{ s.question_id }}</a>: said {{ "%.0f%%"|format(100 * s.probability) }}, answer {{ "YES" if s.outcome else "NO" }}</li>{% endfor %}</ol>{% else %}<p class="note">None yet.</p>{% endif %}</section>
 <section class="card" aria-labelledby="pf-worst"><h2 id="pf-worst">Worst calls</h2>
-{% if p.worst %}<ol>{% for s in p.worst %}<li><a href="{{ root }}questions/{{ s.question_id }}.html">{{ s.question_id }}</a>: said {{ "%.0f%%"|format(100 * s.probability) }}, answer {{ "YES" if s.outcome else "NO" }}</li>{% endfor %}</ol>{% else %}<p class="note">None yet.</p>{% endif %}</section>
+{% if p.worst %}<ol>{% for s in p.worst %}<li><a href="{{ root }}{{ qhref(s.question_id) }}">{{ s.question_id }}</a>: said {{ "%.0f%%"|format(100 * s.probability) }}, answer {{ "YES" if s.outcome else "NO" }}</li>{% endfor %}</ol>{% else %}<p class="note">None yet.</p>{% endif %}</section>
 </div>
 
 <h2>Version history</h2>

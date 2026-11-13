@@ -15,6 +15,7 @@ from __future__ import annotations
 import random
 from pathlib import Path
 from typing import Any
+from urllib.parse import quote
 
 from arena.scoring.core import Record, excluded
 from arena.site.titles import domain_name, plain_title
@@ -36,7 +37,7 @@ def live_deck(rec: Record) -> list[dict[str, Any]]:
         out.append({
             "id": qid, "title": plain_title(q), "topic": domain_name(q.domain),
             "rule": q.resolution_rule, "outcome": rec.resolutions[qid].outcome,
-            "forecasts": fs, "url": f"questions/{qid}.html",
+            "forecasts": fs, "url": "questions/" + quote(qid, safe="") + ".html",
         })  # fmt: skip
     return out
 

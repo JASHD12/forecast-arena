@@ -547,7 +547,7 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
   - Do: `make smoke-site` (Playwright: key pages load, no console errors, site built
     under 26 h ago); run it as a step after deploy in `resolve.yml`.
   - Done when: the step is green on a real resolve run.
-- [ ] T183 · Clean repository root (deps: T171)
+- [x] T183 · Clean repository root (deps: T171)
   - Do: requirements files to `requirements/`; TASKS, PROGRESS, HUMAN_TODO, DECISIONS,
     KICKOFF_PROMPTS, START_HERE to `docs/project/` (update AGENTS.md, CLAUDE.md text
     references, `scripts/status.py`, Makefile, workflows, Dockerfile, tests).

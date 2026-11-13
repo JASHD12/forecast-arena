@@ -87,7 +87,7 @@ readers the notebook really uses.
 - 2026-11-13 T186: home hero: "joining soon" gone; labelled BACKTEST card (one year of electricity, parsed from docs/models/power.md) beside live standings; recruiter page: honest authorship line, "five things worth 30 seconds" (figures from eval files); README screenshots regenerated
 - 2026-11-13 T185: one-row header (7 primary links + "More" disclosure reaching Backtests, Experiments, LLM evals/observability, Data, API); rehearsal band -> pill, full sentence on Leaderboard/Findings/Methods; phone header 2 short rows; a11y 0 serious
 - 2026-11-13 T184: README first screen: pitch, tour links, one image, five generated highlights (cards + evals), stack line; detail tables collapsed
-- 2026-11-13 T183: repo root cleaned: requirements/ and docs/project/ (references, AGENTS.md, CLAUDE.md, scripts, Makefile, workflows, Dockerfile updated)
+- 2026-11-13 T183: repo root cleaned: requirements/ and docs/project/ (references, AGENTS.md, CLAUDE.md, scripts, Makefile, workflows, Dockerfile updated); dry runs of morning, evening, players, resolve and weekly all green
 - 2026-11-13 T171: honesty audit of stack, recruiters, de and README (table in docs/project/PROGRESS.md); removed the Polars/Spark wording from stack.html; no open item
 - 2026-11-13 T170: docs/interview/ (pitch EN/DE, system design, 40 Q&A, 6 STAR stories, CV/LinkedIn text); every figure checked against the generated docs/interview/numbers.md (cards, evals, live ledger via arena report cv)
 - 2026-11-13 T161: players intake (form CSV -> players/B.jsonl at 09:00/09:15 UTC, random-code pseudonyms, consent, latest row before the run, never replaced); tests cover late, duplicate and invalid rows; live once H15 is done

@@ -21,7 +21,13 @@ from jinja2 import Environment, PackageLoader, select_autoescape
 from markupsafe import Markup
 
 from arena.agent.tools import GDELT_ATTRIBUTION
-from arena.analytics.sql import COLUMN_DOCS, column_types, export_parquet, run_queries
+from arena.analytics.sql import (
+    COLUMN_DOCS,
+    column_types,
+    export_parquet,
+    run_dbt_marts,
+    run_queries,
+)
 from arena.analytics.sql import connect as sql_connect
 from arena.clock import Clock
 from arena.config import DEFAULT_REPO_URL, DEFAULT_SITE_URL
@@ -102,6 +108,7 @@ STACK_LIBRARIES = (
     ("shap", "SHAP explanations of LightGBM models"),
     ("statsmodels", "ETS and SARIMAX benchmarks in the power backtest"),
     ("llama-cpp-python", "runs the open-weights model of llm_local on the CPU (morning job)"),
+    ("dbt-duckdb", "dbt models and tests (staging, marts) over the open data, built in CI"),
     ("fastapi", "the read-only REST API (`arena api`), served from the Docker image in CI"),
     ("uvicorn", "the ASGI server that runs the REST API"),
     ("streamlit", "the interactive dashboard (apps/dashboard), smoke-tested with AppTest in CI"),
@@ -447,6 +454,7 @@ def build_site(
     golden_path: Path | None = None,
     models_dir: Path | None = None,
     dashboard_url: str | None = None,
+    marts_dir: Path | None = None,
 ) -> SiteResult:
     """Render every page into `out_dir` (built aside, then moved into place)."""
     rec = load(ledger)
@@ -660,6 +668,7 @@ def build_site(
             "results": run_queries(con),
             "dictionary": COLUMN_DOCS,
             "types": column_types(),
+            "marts": run_dbt_marts(con, marts_dir),
         },
     )
     for name, (title, ctx) in pages.items():

@@ -8,6 +8,7 @@ leaderboard (SPEC 10), which is computed by `arena.scoring`.
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -203,4 +204,32 @@ def column_types() -> dict[str, dict[str, str]]:
         for part in cols.split(","):
             name, typ = part.strip().split(" ", 1)
             out.setdefault(table, {})[name] = typ
+    return out
+
+
+_REF = re.compile(r"\{\{\s*ref\('([a-z_]+)'\)\s*\}\}")
+
+
+def run_dbt_marts(
+    con: duckdb.DuckDBPyConnection, marts_dir: Path | None, limit: int = 50
+) -> list[dict[str, Any]]:
+    """Execute the dbt mart models (T152) on the site's tables, so the Data page shows the
+    same definitions that `dbt build` runs and tests in CI. `ref('stg_x')` is the table
+    `x` (the staging models are plain selects); other refs are earlier models, created as
+    views first (fct_* before mart_*)."""
+    if marts_dir is None or not marts_dir.is_dir():
+        return []
+    files = sorted(marts_dir.glob("*.sql"), key=lambda p: (not p.stem.startswith("fct_"), p.stem))
+    out = []
+    for f in files:
+        body = f.read_text(encoding="utf-8")
+        sql = _REF.sub(lambda m: m.group(1).removeprefix("stg_"), body)
+        sql = "\n".join(ln for ln in sql.splitlines() if not ln.lstrip().startswith("--"))
+        con.execute(f"CREATE OR REPLACE VIEW {f.stem} AS {sql}")
+        if f.stem.startswith("mart_"):
+            cur = con.execute(f"SELECT * FROM {f.stem} ORDER BY ALL LIMIT {limit}")
+            cols = [d[0] for d in cur.description or []]
+            doc = next((ln[2:].strip() for ln in body.splitlines() if ln.startswith("--")), "")
+            out.append({"name": f.stem, "doc": doc, "columns": cols, "rows": cur.fetchall(),
+                        "source": f"analytics/dbt/models/marts/{f.name}"})  # fmt: skip
     return out

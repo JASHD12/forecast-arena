@@ -1,0 +1,19 @@
+version: 2
+models:
+  - name: fct_scored_forecasts
+    description: Every resolved forecast with its clipped Brier term.
+    columns:
+      - name: brier
+        tests: [not_null]
+      - name: outcome
+        tests:
+          - accepted_values:
+              arguments:
+                values: [0, 1]
+  - name: mart_daily_scores
+    description: Mean Brier score per forecaster and batch day.
+  - name: mart_forecaster_topic
+    description: Mean Brier score per forecaster and topic.
+    columns:
+      - name: n
+        tests: [not_null]

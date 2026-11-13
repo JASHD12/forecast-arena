@@ -1,0 +1,11 @@
+version: 2
+sources:
+  - name: open_data
+    description: The four public Parquet files the site publishes (data/ folder).
+    meta:
+      external_location: "{{ env_var('ARENA_DATA_DIR', 'data') }}/{name}.parquet"
+    tables:
+      - name: questions
+      - name: forecasts
+      - name: resolutions
+      - name: skips

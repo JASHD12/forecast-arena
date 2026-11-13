@@ -6,7 +6,7 @@ export PYTHONPATH := src
 # One OpenMP thread: deterministic model fits and no oversubscription in parallel jobs.
 export OMP_NUM_THREADS ?= 1
 
-.PHONY: setup setup-offline lint test e2e check status smoke-sources schemas site-e2e a11y notebook
+.PHONY: setup setup-offline lint test e2e check status smoke-sources schemas site-e2e a11y notebook dbt
 
 setup:  ## Create .venv and install pinned dependencies
 	@if uv --version >/dev/null 2>&1; then \
@@ -55,3 +55,7 @@ a11y: site-e2e  ## axe-core accessibility lint (needs Node and tools/a11y depend
 
 notebook: site-e2e  ## Execute notebooks/explore.ipynb on the e2e Parquet export (needs requirements-nb.txt)
 	$(PY) scripts/run_notebook.py notebooks/explore.ipynb _site_e2e/data
+
+dbt: site-e2e  ## dbt build over the e2e export (dbt in its own venv: .venv-dbt, requirements-dbt.txt)
+	test -x .venv-dbt/bin/dbt || (python3 -m venv .venv-dbt && .venv-dbt/bin/pip install -r requirements-dbt.txt)
+	cd analytics/dbt && ARENA_DATA_DIR=$(CURDIR)/_site_e2e/data ../../.venv-dbt/bin/dbt build --profiles-dir .

@@ -1,0 +1,41 @@
+version: 2
+models:
+  - name: stg_questions
+    description: One row per question.
+    columns:
+      - name: question_id
+        tests: [unique, not_null]
+      - name: domain
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [power, weather, attention, markets, crypto, toy]
+  - name: stg_forecasts
+    description: One row per published forecast.
+    columns:
+      - name: question_id
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_questions')
+                field: question_id
+      - name: probability
+        tests: [not_null]
+  - name: stg_resolutions
+    columns:
+      - name: question_id
+        tests: [unique, not_null]
+      - name: outcome
+        tests:
+          - accepted_values:
+              arguments:
+                values: [0, 1]
+  - name: stg_skips
+    columns:
+      - name: reason_code
+        tests:
+          - accepted_values:
+              arguments:
+                values: [not_sampled, budget_exhausted, parse_failure, model_missing, error]

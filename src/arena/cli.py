@@ -279,6 +279,7 @@ def site_build(obj: Ctx, out_dir: Path, check_links: bool) -> None:
         golden_path=Path("evals/golden/power-2026-10.jsonl"),
         models_dir=Path("docs/models"),
         dashboard_url=obj.settings.dashboard_url,
+        marts_dir=Path("analytics/dbt/models/marts"),
     )
     click.echo(f"site built: {len(res.pages)} pages in {res.out_dir}")
     if check_links:

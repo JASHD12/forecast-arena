@@ -34,3 +34,4 @@ _tmp_*/
 # Node tools
 node_modules/
 _site_e2e/
+.venv-dbt/

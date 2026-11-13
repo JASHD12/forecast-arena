@@ -758,6 +758,22 @@ Made by: agent
 - Stated everywhere as "validated in CI, not hosted": production scheduling stays on
   GitHub Actions (free); a hosted cluster would cost money (S1, owner rule).
 
+## 2026-11-13 · dbt models over the open data (T152)
+
+- `analytics/dbt/`: dbt-duckdb project. Sources are the four public Parquet files
+  (`meta.external_location`), staging views, `fct_scored_forecasts` (clipped Brier per
+  resolved forecast) and two marts (daily scores; forecaster x topic). Tests: unique and
+  not-null ids, accepted values (domains, outcomes, skip reasons), a foreign key from
+  forecasts to questions. `dbt build` runs in CI on the e2e export (21 of 21 pass).
+- dbt runs in its own virtual environment (`requirements-dbt.txt`): dbt-common needs
+  python-dateutil<3 while the main pins use 4.x. DuckDB is pinned to the same 1.5.6, so
+  both read the same files. This file is left out of the combined pip-audit, because the
+  combined resolution would conflict by design.
+- The Data page "reads the marts" by executing the same mart SQL files in DuckDB at site
+  build (`ref('stg_x')` resolves to the table `x`), so the published numbers come from
+  the dbt definitions without making dbt a dependency of the daily jobs. A unit test
+  checks that the marts agree with the scoring code (clipping included).
+
 ## Proposals for the human
 
 Ideas outside the specification. The agent lists them here and does not build them.

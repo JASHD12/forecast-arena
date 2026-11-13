@@ -1,0 +1,7 @@
+forecast_arena:
+  target: local
+  outputs:
+    local:
+      type: duckdb
+      path: target/arena.duckdb
+      threads: 2

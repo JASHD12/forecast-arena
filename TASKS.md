@@ -505,7 +505,7 @@ CI jobs; core `make check` stays offline and fast.
   - Done when: TestClient tests pass; the Docker image serves the API in CI.
 - [x] T151 · Kubernetes manifests validated on kind in CI (deps: T150)
   - Done when: a CI job applies `deploy/k8s/` to kind and smoke-tests the API.
-- [ ] T152 · dbt models over the open data (deps: T045i)
+- [x] T152 · dbt models over the open data (deps: T045i)
   - Done when: `dbt build` (dbt-duckdb) with tests passes in CI; Data page reads marts.
 - [ ] T153 · Airflow DAG mirror of the schedule (deps: T030)
   - Done when: a CI job imports the DAG with DagBag without errors.

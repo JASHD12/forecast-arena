@@ -1,0 +1,13 @@
+# dbt project over the Forecast Arena open data (T152). Run from this folder:
+#   ARENA_DATA_DIR=/path/to/parquet dbt build --profiles-dir .
+name: forecast_arena
+version: "1.0.0"
+config-version: 2
+profile: forecast_arena
+model-paths: ["models"]
+models:
+  forecast_arena:
+    staging:
+      +materialized: view
+    marts:
+      +materialized: table

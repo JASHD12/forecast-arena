@@ -20,6 +20,13 @@
 <tbody>{% for c, meaning in cols.items() %}<tr><th scope="row"><code>{{ c }}</code></th><td><code>{{ types[table][c] }}</code></td><td>{{ meaning }}</td></tr>{% endfor %}</tbody></table></div>{% endfor %}
 <p class="note">A notebook that explores these files with pandas and DuckDB is in the repository: <a href="{{ repo_url }}/blob/main/notebooks/explore.ipynb"><code>notebooks/explore.ipynb</code></a> (it runs in CI on every push).</p>
 
+{% if marts %}<h2>dbt marts</h2>
+<p class="note">Tables defined as <a href="{{ repo_url }}/tree/main/analytics/dbt">dbt models</a> over these files. In CI, <code>dbt build</code> creates them and runs their tests (unique and non-null ids, allowed values, foreign keys); here the same model SQL runs on this build's data.</p>
+{% for m in marts %}<h3><code>{{ m.name }}</code></h3><p class="note">{{ m.doc }} Source: <a href="{{ repo_url }}/blob/main/{{ m.source }}"><code>{{ m.source }}</code></a>.</p>
+{% if m.rows %}<div class="table-scroll" tabindex="0" role="region" aria-label="{{ m.name }}"><table>
+<thead><tr>{% for c in m.columns %}<th scope="col">{{ c }}</th>{% endfor %}</tr></thead>
+<tbody>{% for row in m.rows %}<tr>{% for v in row %}<td>{{ "%.4f"|format(v) if v is float else v }}</td>{% endfor %}</tr>{% endfor %}</tbody></table></div>{% else %}<p class="empty">No rows yet.</p>{% endif %}{% endfor %}{% endif %}
+
 {% for r in results %}
 <section class="sqlblock" id="{{ r.q.slug }}">
 <h2>{{ r.q.title }}</h2>

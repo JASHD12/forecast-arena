@@ -88,6 +88,29 @@ jobs:
           test "$(curl -s -o /dev/null -w '%{http_code}' 'http://127.0.0.1:8000/sql?q=DROP%20TABLE%20skips')" = 400
           docker logs arena-api | tail -5
 
+  dbt:
+    # T152: dbt build (models + tests) over the open-data export of the offline e2e run.
+    # dbt lives in its own virtual environment (its python-dateutil<3 pin conflicts with
+    # the main pins); duckdb is pinned to the same version as the main lock file.
+    needs: check
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Install pinned dependencies and the e2e export
+        run: |
+          make setup
+          make site-e2e
+      - name: dbt build (models and tests)
+        run: |
+          python -m venv .venv-dbt
+          .venv-dbt/bin/pip install -r requirements-dbt.txt
+          cd analytics/dbt
+          ARENA_DATA_DIR="$GITHUB_WORKSPACE/_site_e2e/data" ../../.venv-dbt/bin/dbt build --profiles-dir .
+
   kubernetes:
     # T151: apply deploy/k8s/ to a throwaway kind cluster and smoke-test it. Nothing is
     # hosted; this only proves the manifests and the image work on Kubernetes.

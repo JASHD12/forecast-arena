@@ -2,6 +2,8 @@
 
 [![CI](https://github.com/JASHD12/forecast-arena/actions/workflows/ci.yml/badge.svg)](https://github.com/JASHD12/forecast-arena/actions/workflows/ci.yml)
 [![Live site](https://img.shields.io/badge/live-site-3b3fc4)](https://jashd12.github.io/forecast-arena/)
+[![Coverage](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FJASHD12%2Fforecast-arena%2Fmain%2Fdocs%2Fbadges%2Fcoverage.json)](.github/workflows/ci.yml)
+[![Tests](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FJASHD12%2Fforecast-arena%2Fmain%2Fdocs%2Fbadges%2Ftests.json)](tests)
 [![Licence: MIT](https://img.shields.io/badge/licence-MIT-informational)](LICENSE)
 
 **Can an LLM agent beat a classical ML model at forecasting tomorrow?** Forecast Arena is a

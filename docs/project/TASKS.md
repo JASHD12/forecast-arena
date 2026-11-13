@@ -575,7 +575,7 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
   - Do: `docs/CODE_TOUR.md`; split `site/build.py` into page modules and `cli.py` into a
     `cli/` package; remove `# fmt: skip` and let ruff format the code (separate commit).
   - Done when: tests pass and the offline site build is byte-identical before and after.
-- [ ] T188 · Coverage floor and badges (deps: T187)
+- [x] T188 · Coverage floor and badges (deps: T187)
   - Done when: CI fails under the current coverage; README shows coverage and test count.
 - [ ] T192 · Schedule delay on the Status page (deps: T180)
   - Do: record the scheduled time and the start time of each real run (manifest) and show

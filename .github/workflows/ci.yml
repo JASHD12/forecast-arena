@@ -31,7 +31,9 @@ jobs:
       - name: make check (with test coverage)
         run: |
           set -o pipefail
-          make check PYTEST_ARGS="--cov=arena --cov-report=term" | tee check.log
+          # T188: coverage floor; README badges must not overstate what CI measures
+          make check PYTEST_ARGS="--cov=arena --cov-report=term --cov-report=xml --junitxml=junit.xml --cov-fail-under=87" | tee check.log
+          .venv/bin/python scripts/badges.py --check coverage.xml junit.xml
       - name: Coverage summary
         if: always()
         run: |

@@ -5,12 +5,13 @@ CLI commands and schedule so the pipeline could move to Airflow unchanged; they 
 validated in CI by parsing them with Airflow's DagBag, and are not deployed anywhere.
 
 Mapping (UTC):
+- arena_evening   18:00 daily: publish tomorrow's questions -> verify -> site -> health (T160).
 - arena_morning   05:30 daily: morning job -> verify -> site -> health -> official start.
                   The 09:30 lock is enforced inside `arena daily morning` (a late run
                   writes nothing), and the DAG run times out at the lock as a second guard.
 - arena_resolve   03:30, 12:30, 16:30, 20:30: resolve -> verify -> site -> health.
 - arena_weekly    Sunday 02:00: weekly retraining -> health -> official start.
-All three share one pool slot ("arena_ledger") so only one job writes the ledger at a time,
+All four share one pool slot ("arena_ledger") so only one job writes the ledger at a time,
 like the shared concurrency group in GitHub Actions.
 """
 
@@ -30,6 +31,22 @@ START = datetime(2026, 11, 13, tzinfo=UTC)
 def _task(dag: DAG, task_id: str, cmd: str) -> BashOperator:
     return BashOperator(task_id=task_id, bash_command=f"{ARENA} {cmd}", dag=dag)
 
+
+with DAG(
+    "arena_evening",
+    schedule="0 18 * * *",
+    start_date=START,
+    catchup=False,
+    max_active_runs=1,
+    default_args=DEFAULTS,
+    tags=["forecast-arena"],
+    doc_md="Publish tomorrow's questions tonight; the forecasts follow in the morning.",
+) as evening:
+    e_run = _task(evening, "evening", "daily evening --push")
+    e_verify = _task(evening, "verify", "ledger verify --git")
+    e_site = _task(evening, "build_site", "site build --out site")
+    e_health = _task(evening, "health_check", "health check --job evening --record")
+    e_run >> e_verify >> e_site >> e_health
 
 with DAG(
     "arena_morning",

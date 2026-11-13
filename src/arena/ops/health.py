@@ -4,6 +4,7 @@ Checks (each pass/fail with a one-line detail):
 
 - `batch_sealed`: after the lock (or after a morning run), today's questions exist and the
   batch seal was written before the lock.
+- `next_batch_published` (evening job only): tomorrow's questions exist (T160).
 - `nothing_overdue`: no question is still unresolved and unvoided more than
   `OVERDUE_AFTER` past its `resolve_after` (longer than every domain's grace period).
 - `sources_fresh`: every domain that asked questions in the last week asked some within
@@ -111,6 +112,12 @@ def run_checks(
                 f"{len(todays)} questions sealed at {seal.sealed_at:%H:%M} UTC",
             )
         )
+
+    if job == "evening":  # T160: tomorrow's questions are published tonight
+        nxt = today + timedelta(days=1)
+        n = sum(q.batch_date == nxt for q in rec.questions.values())
+        detail = f"{n} questions for {nxt}" if n else f"no questions for {nxt}"
+        rep.checks.append(Check("next_batch_published", n > 0, detail))
 
     overdue = sorted(
         q.question_id

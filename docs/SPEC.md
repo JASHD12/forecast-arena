@@ -96,7 +96,8 @@ because scheduled workflows can start late):
 
 | Time | Job | What happens |
 |---|---|---|
-| 05:30, 07:00 | morning | Generate questions for the batch, snapshot as-of inputs, run all forecasters, append, seal, push, rebuild site. |
+| 18:00, 19:30 (day before) | evening | Publish the next batch's questions (template version 2, T160), push, rebuild site. No forecasts. |
+| 05:30, 07:00 | morning | Generate questions for any domain the evening job did not cover (template version 1), snapshot as-of inputs, run all forecasters, append, seal, push, rebuild site. |
 | 09:30 | (lock) | Batch lock time for every question created that morning. |
 | 12:30, 16:30, 20:30, 03:30 | resolve | Resolve whatever has become resolvable, seal finished days, rescore, rebuild and deploy the site, run health checks. |
 | Sunday 02:00 | weekly | Retrain models, drift report, promote models by rule. |
@@ -429,6 +430,12 @@ Information sets (this table is shown on the Methods page):
   tool over past resolved questions) and `llm_local` (an open-source model run locally on
   the CI runner, no API cost). Both follow the same output contract, sampling and skip
   rules as the other LLM forecasters.
+- Timing (T160): questions are published by an evening job on the day before the batch,
+  so people in every time zone can answer before the unchanged 09:30 UTC lock. The machine
+  forecasters still answer in the morning job. Questions published the evening before are
+  template version 2 (their thresholds use data as of that evening); the morning job only
+  generates a domain the evening job missed, as version 1, so a batch never mixes two
+  versions of one domain.
 - Players: members of the public submit forecasts through a published form CSV; each
   player is ranked under a random id on the same questions and scoring rules.
 

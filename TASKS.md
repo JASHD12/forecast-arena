@@ -509,7 +509,7 @@ CI jobs; core `make check` stays offline and fast.
   - Done when: `dbt build` (dbt-duckdb) with tests passes in CI; Data page reads marts.
 - [x] T153 · Airflow DAG mirror of the schedule (deps: T030)
   - Done when: a CI job imports the DAG with DagBag without errors.
-- [ ] T160 · Questions published the evening before (deps: T032)
+- [x] T160 · Questions published the evening before (deps: T032)
   - Do: generation at about 18:00 UTC on B-1; machine forecasts still in the morning;
     changed templates get template_version 2; before the official start.
   - Done when: e2e test covers the new timing; lock unchanged.

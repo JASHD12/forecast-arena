@@ -8,6 +8,7 @@ from airflow.models.dagbag import DagBag
 
 HERE = Path(__file__).resolve().parent
 EXPECTED = {
+    "arena_evening": (["evening", "verify", "build_site", "health_check"], "0 18 * * *"),
     "arena_morning": (
         ["morning", "verify", "build_site", "health_check", "official_start"],
         "30 5 * * *",

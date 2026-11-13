@@ -61,7 +61,7 @@
 {{ bars(row, forecasters) }}
 </li>
 {% endfor %}</ul>
-{% else %}<p class="empty">No questions yet. The first batch is written by the morning run (05:30 UTC) and locks at 09:30 UTC.</p>{% endif %}
+{% else %}<p class="empty">No questions yet. Questions are published the evening before (18:00 UTC), answered by the morning run (05:30 UTC) and locked at 09:30 UTC.</p>{% endif %}
 
 <section class="card play-teaser" aria-labelledby="play-title">
 <h2 id="play-title">Can you beat the AI?</h2>
@@ -99,7 +99,8 @@
 </ul>
 
 <ol class="how" aria-label="How it works">
-<li><strong>05:30 UTC</strong> Questions about tomorrow are created from live public data.</li>
+<li><strong>18:00 UTC, the evening before</strong> Questions are published from live public data.</li>
+<li><strong>05:30 UTC</strong> Every forecaster answers.</li>
 <li><strong>09:30 UTC</strong> Every forecast is locked into the public ledger.</li>
 <li><strong>Next day</strong> Official data arrives, questions resolve, scores update. <a href="guide.html">Read the guide</a></li>
 </ol>

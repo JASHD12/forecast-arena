@@ -1,7 +1,8 @@
 """Offline end-to-end run: five simulated days through the real job code (SPEC 13).
 
 Data: recorded SMARD fixtures. Time: a fixed clock moved through the daily schedule of
-SPEC 4 (two morning runs, four resolve runs). Ends with ledger verification.
+SPEC 4 (two morning runs, four resolve runs). Ends with ledger verification. A second
+schedule adds the evening job (T160): questions published at 18:00 UTC the day before.
 """
 
 import json
@@ -15,7 +16,7 @@ from arena.ledger import Ledger, layout
 from arena.ledger.verify import verify
 from arena.llm.client import FakeLLM
 from arena.models import Forecast, Question, Resolution, Skip
-from arena.ops.jobs import morning, resolve
+from arena.ops.jobs import evening, morning, resolve
 from arena.ops.wiring import build_forecasters
 
 FIRST = date(2026, 10, 21)
@@ -30,9 +31,10 @@ def answer(system, turns, tools):
 DAYS = 5
 MORNINGS = (time(5, 30), time(7, 0))
 RESOLVES = (time(3, 30), time(12, 30), time(16, 30), time(20, 30))
+EVENINGS = (time(18, 0), time(19, 30))
 
 
-def run_schedule(root) -> Ledger:
+def run_schedule(root, with_evening: bool = False) -> Ledger:
     led = Ledger(root)
     clock = FixedClock(datetime.combine(FIRST, time(0), tzinfo=UTC))
     domains = [fixture_domain()]
@@ -49,10 +51,14 @@ def run_schedule(root) -> Ledger:
         events = [(t, "resolve") for t in RESOLVES]
         if i < DAYS:
             events += [(t, "morning") for t in MORNINGS]
+        if with_evening and i < DAYS - 1:
+            events += [(t, "evening") for t in EVENINGS]
         for t, job in sorted(events):
             clock.set(datetime.combine(day, t, tzinfo=UTC))
             if job == "morning":
                 morning(led, day, clock, domains, forecasters, on_record=attach)
+            elif job == "evening":
+                evening(led, day + timedelta(days=1), clock, domains)
             else:
                 resolve(led, clock, domains)
     return led
@@ -121,9 +127,52 @@ def test_five_days_offline(tmp_path) -> None:
     assert [f.domain for f in source_freshness(rec, now)] == ["power"]
 
 
+def test_evening_publication(tmp_path) -> None:
+    """T160: questions appear the evening before; forecasts still in the morning; same lock."""
+    led = run_schedule(tmp_path / "ledger", with_evening=True)
+    qs = [r for _, r in led.iter_family("questions") if isinstance(r, Question)]
+    fs = [r for _, r in led.iter_family("forecasts") if isinstance(r, Forecast)]
+    assert len({q.batch_date for q in qs}) == DAYS
+    for q in qs:
+        assert q.lock_time == datetime.combine(q.batch_date, time(9, 30), tzinfo=UTC)
+        if q.batch_date == FIRST:  # no evening run before the first day: morning, version 1
+            assert q.template_version == 1 and q.created_at.date() == FIRST
+        else:
+            assert q.template_version == 2 and q.question_id.endswith("-v2")
+            assert q.created_at == datetime.combine(
+                q.batch_date - timedelta(days=1), time(18, 0), tzinfo=UTC
+            )
+    by_id = {q.question_id: q for q in qs}
+    for f in fs:
+        q = by_id[f.question_id]
+        assert q.created_at <= f.created_at < q.lock_time  # forecasts after publication
+        assert f.created_at.date() == q.batch_date and f.created_at.time() < time(9, 30)
+    assert len([f for f in fs if f.forecaster_id == "base_rate"]) == len(qs)
+    morning_v2 = [q for q in qs if q.template_version == 2]
+    assert morning_v2 and len(morning_v2) == len(qs) - sum(q.batch_date == FIRST for q in qs)
+    rep = verify(led)
+    assert rep.ok, rep.summary()
+    from arena.scoring.core import counts, load
+
+    assert counts(load(led)).open == 0
+    next_batch = FIRST + timedelta(days=DAYS + 1)  # tomorrow's questions, published tonight
+    clock = FixedClock(datetime.combine(next_batch - timedelta(days=1), time(21), tzinfo=UTC))
+    assert evening(led, next_batch, clock, [fixture_domain()]).written["questions"] > 0
+    from arena.site.build import build_site
+    from arena.site.linkcheck import check_site
+
+    site = build_site(led, tmp_path / "site", clock)
+    assert check_site(site.out_dir) == []
+    methods = (site.out_dir / "methods.html").read_text()
+    assert "Question template versions" in methods and "evening before the batch day" in methods
+    new = next(q for q in load(led).questions.values() if q.batch_date == next_batch)
+    page = (site.out_dir / "questions" / f"{new.question_id}.html").read_text()
+    assert "Forecasts lock at" in page and "No forecasts yet" in page
+
+
 def test_rerunning_the_schedule_changes_nothing(tmp_path) -> None:
-    a = run_schedule(tmp_path / "a")
-    b = run_schedule(tmp_path / "b")
+    a = run_schedule(tmp_path / "a", with_evening=True)
+    b = run_schedule(tmp_path / "b", with_evening=True)
     files = [f for f in a.list_files() if not f.startswith("runs/")]
     assert files == [f for f in b.list_files() if not f.startswith("runs/")]
     for f in files:

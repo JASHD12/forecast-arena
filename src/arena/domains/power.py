@@ -23,14 +23,14 @@ from functools import lru_cache
 from itertools import pairwise
 from typing import Any
 
-from arena.domains.base import AsOfStore, is_degenerate, trailing_frequency
+from arena.domains.base import AsOfStore, is_degenerate, template_version_for, trailing_frequency
 from arena.domains.power_history import PRICE_KEY, daily_from_store, daily_series
 from arena.models import Evidence, Question, Resolution, Void, question_id_for
 from arena.sources.smard import ATTRIBUTION, BERLIN, Point, berlin_day_hours
 
 DOMAIN = "power"
 ENTITY = "DE_LU"
-TEMPLATE_VERSION = 1
+#: Template versions: 1 = published on the batch morning, 2 = the evening before (T160).
 LOCK = time(9, 30)
 RESOLVE_AFTER = time(12, 30)
 GRACE = timedelta(hours=30)
@@ -258,11 +258,12 @@ class PowerDomain:
     def _question(self, batch_date: date, target: date, created: datetime, lock: datetime,
                   template: str, text: str, rule: str, thr: float | None, comparator: str,
                   params: dict[str, Any], freq: float | None) -> Question:  # fmt: skip
+        version = template_version_for(batch_date, created)
         return Question(
-            question_id=question_id_for(DOMAIN, template, ENTITY, target, TEMPLATE_VERSION),
+            question_id=question_id_for(DOMAIN, template, ENTITY, target, version),
             domain=DOMAIN,
             template=template,
-            template_version=TEMPLATE_VERSION,
+            template_version=version,
             entity=ENTITY,
             text=text,
             batch_date=batch_date,

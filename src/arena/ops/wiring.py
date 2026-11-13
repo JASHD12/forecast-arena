@@ -70,9 +70,9 @@ MARKETS_DAYS = 660
 #: Daily crypto prices fetched per coin (the Demo API keeps 365 days).
 CRYPTO_DAYS = 365
 
-#: Observation days loaded for weather: morning runs replay ~200 batches (each needing a
-#: 90-day window); resolve runs only need the last days within the grace period.
-WEATHER_DAYS = {"morning": 300, "resolve": 10}
+#: Observation days loaded for weather: morning and evening runs replay ~200 batches (each
+#: needing a 90-day window); resolve runs only need the last days within the grace period.
+WEATHER_DAYS = {"evening": 300, "morning": 300, "resolve": 10}
 
 
 def weather_domain_live(

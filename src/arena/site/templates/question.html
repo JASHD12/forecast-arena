@@ -12,7 +12,7 @@
 <span>Observed value: <strong>{{ resolution.observed_value }}</strong>{% if q.unit %} {{ q.unit }}{% endif %}. Resolved {{ resolution.resolved_at.strftime("%Y-%m-%d %H:%M UTC") }}.</span>
 </div>
 {% elif void %}<div class="verdict verdict-void" role="status"><span class="verdict-big">Void</span><span>{{ void.reason_code }}: {{ void.detail }}</span></div>
-{% else %}<div class="verdict verdict-open" role="status"><span class="verdict-big">Open</span><span>Forecasts locked at {{ q.lock_time.strftime("%Y-%m-%d %H:%M UTC") }}. The answer is expected after {{ q.resolve_after.strftime("%Y-%m-%d %H:%M UTC") }}.</span></div>{% endif %}
+{% else %}<div class="verdict verdict-open" role="status"><span class="verdict-big">Open</span><span>Published {{ q.created_at.strftime("%Y-%m-%d %H:%M UTC") }}. {% if before_lock %}Forecasts lock at {{ q.lock_time.strftime("%Y-%m-%d %H:%M UTC") }}{% else %}Forecasts locked at {{ q.lock_time.strftime("%Y-%m-%d %H:%M UTC") }}{% endif %}. The answer is expected after {{ q.resolve_after.strftime("%Y-%m-%d %H:%M UTC") }}.</span></div>{% endif %}
 
 <h2>{% if resolution %}Who was closest?{% else %}What the forecasters said{% endif %}</h2>
 {% if scores %}
@@ -20,6 +20,7 @@
 {% for row in scores %}{% set f = row.f %}<li class="{{ 'ai' if is_ai(f.forecaster_id) else ('base' if f.forecaster_id in ('base_rate', 'persistence') else '') }}"><span class="who">{% if resolution and loop.first %}<span class="medal" aria-label="closest">★</span> {% endif %}{{ fname(f.forecaster_id) }}{% if is_ai(f.forecaster_id) %} <span class="label">AI</span>{% endif %}</span><span class="track" aria-hidden="true"><span class="fill" style="width: {{ '%.1f'|format(f.probability * 100) }}%"></span></span><span class="val">{{ '%.0f'|format(f.probability * 100) }}%</span>{% if row.brier is not none %}<span class="score" title="Brier score for this question (lower is better)">{{ '%.3f'|format(row.brier) }}</span>{% endif %}</li>
 {% endfor %}</ul>
 {% if resolution %}<p class="note">Percentages are each forecaster's probability of YES. The number on the right is its Brier score for this question: 0 is perfect, 0.25 is a coin flip, lower is better. One question proves little; see the <a href="{{ root }}leaderboard.html">leaderboard</a>.</p>{% endif %}
+{% elif before_lock %}<p class="empty">No forecasts yet: the machine forecasters answer on the morning of {{ q.batch_date }}, before the lock.</p>
 {% else %}<p class="empty">No forecasts were recorded for this question.</p>{% endif %}
 {% if skips %}<p class="note">Skipped: {% for s in skips %}{{ fname(s.forecaster_id) }} (<code>{{ s.reason_code }}</code>){% if not loop.last %}, {% endif %}{% endfor %}. A skip is recorded instead of a guess.</p>{% endif %}
 

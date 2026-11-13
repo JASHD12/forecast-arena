@@ -24,12 +24,18 @@ from decimal import ROUND_HALF_UP, Decimal
 from itertools import pairwise
 from typing import Any
 
-from arena.domains.base import AsOfStore, Observation, is_degenerate, trailing_frequency
+from arena.domains.base import (
+    AsOfStore,
+    Observation,
+    is_degenerate,
+    template_version_for,
+    trailing_frequency,
+)
 from arena.models import Evidence, Question, Resolution, Void, question_id_for
 from arena.sources.coingecko import ATTRIBUTION, available_at
 
 DOMAIN = "crypto"
-TEMPLATE_VERSION = 1
+#: Template versions: 1 = published on the batch morning, 2 = the evening before (T160).
 #: CoinGecko id -> display name. Fixed list; changing it needs a decision record.
 COINS: dict[str, str] = {
     "bitcoin": "Bitcoin",
@@ -164,11 +170,12 @@ class CryptoDomain:
             " CoinGecko may revise a price for up to 2 days; later changes are recorded as "
             "revisions. Void if P0 or P1 is still missing 72 hours after resolve_after."
         )
+        version = template_version_for(batch_date, created)
         return Question(
-            question_id=question_id_for(DOMAIN, template, coin, target, TEMPLATE_VERSION),
+            question_id=question_id_for(DOMAIN, template, coin, target, version),
             domain=DOMAIN,
             template=template,
-            template_version=TEMPLATE_VERSION,
+            template_version=version,
             entity=coin,
             text=text,
             batch_date=batch_date,

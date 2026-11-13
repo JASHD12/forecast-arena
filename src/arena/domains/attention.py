@@ -24,7 +24,7 @@ from datetime import UTC, date, datetime, time, timedelta
 from importlib import resources
 from typing import Any, Protocol
 
-from arena.domains.base import is_degenerate, trailing_frequency
+from arena.domains.base import is_degenerate, template_version_for, trailing_frequency
 from arena.models import Evidence, Question, Resolution, Void, question_id_for
 from arena.sources.wikimedia import (
     ATTRIBUTION,
@@ -35,7 +35,7 @@ from arena.sources.wikimedia import (
 
 DOMAIN = "attention"
 TEMPLATE = "views_ge"
-TEMPLATE_VERSION = 1
+#: Template versions: 1 = published on the batch morning, 2 = the evening before (T160).
 PROJECTS = ("de.wikipedia", "en.wikipedia")
 LOCK = time(9, 30)
 RESOLVE_AFTER = time(12, 0)
@@ -231,13 +231,14 @@ class AttentionDomain:
             "article is deleted or moved or the day is missing 96 hours after "
             "resolve_after."
         )
+        version = template_version_for(batch_date, created)
         return Question(
             question_id=question_id_for(
-                DOMAIN, TEMPLATE, entity_for(project, c.title), target, TEMPLATE_VERSION
+                DOMAIN, TEMPLATE, entity_for(project, c.title), target, version
             ),
             domain=DOMAIN,
             template=TEMPLATE,
-            template_version=TEMPLATE_VERSION,
+            template_version=version,
             entity=entity_for(project, c.title),
             text=text,
             batch_date=batch_date,

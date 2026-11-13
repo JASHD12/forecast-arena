@@ -890,3 +890,23 @@ Ideas outside the specification. The agent lists them here and does not build th
   say so.
 - Alternatives: `arena report cv` output pasted by hand (drifts); live leaderboard in the
   README (empty until the official start; the site already shows it).
+
+## 2026-11-13 Evening publication of questions (T160)
+
+- Context: the players' leaderboard (Phase 6) needs questions public well before the
+  09:30 UTC lock; at 05:30 UTC most of the Americas are asleep.
+- Decision: a new `evening` job (18:00 and 19:30 UTC on B-1, workflow `evening.yml`)
+  publishes batch B's questions; the morning job only fills domains the evening missed and
+  runs every forecaster as before. The lock, question texts and resolution rules are
+  unchanged. Because thresholds are computed from data as of the evening (for example the
+  Wikipedia reference day is a day older), evening questions are `template_version` 2;
+  the version is derived from `created_at < batch day`, not from a flag, so it cannot be
+  wrong. Methods shows a template-version table (SPEC 2.9 changelog). The evening job is
+  refused before 16:00 UTC (the day-ahead auction for B is published around noon UTC) and
+  on any day other than B-1. Its run manifest and health report count towards the
+  clean-day rule: a failed evening run makes that day not clean (the stricter reading).
+  The official record has not started (`ARENA_OFFICIAL_START_NOT_BEFORE` is 2099-12-31),
+  so no official question changes version.
+- Alternatives: run forecasters in the evening too (rejected: less data, and it changes
+  every forecaster's information set); move the lock (rejected: the task says lock
+  unchanged, and the lock must stay before the noon auction).

@@ -10,7 +10,7 @@ DAG = (ROOT / "orchestration" / "airflow" / "arena_dag.py").read_text()
 
 def test_every_dag_command_is_run_by_the_matching_workflow() -> None:
     blocks = re.split(r'with DAG\(\n\s+"arena_', DAG)[1:]
-    assert len(blocks) == 3
+    assert len(blocks) == 4
     for block in blocks:
         job = block.split('"', 1)[0]
         wf = (ROOT / ".github" / "workflows" / f"{job}.yml").read_text()
@@ -20,8 +20,8 @@ def test_every_dag_command_is_run_by_the_matching_workflow() -> None:
 
 
 def test_schedules_match_the_workflows() -> None:
-    for job, cron in (("morning", "30 5 * * *"), ("resolve", "30 3,12,16,20 * * *"),
-                      ("weekly", "0 2 * * 0")):  # fmt: skip
+    for job, cron in (("evening", "0 18 * * *"), ("morning", "30 5 * * *"),
+                      ("resolve", "30 3,12,16,20 * * *"), ("weekly", "0 2 * * 0")):  # fmt: skip
         assert f'"arena_{job}",\n    schedule="{cron}"' in DAG
     resolve = (ROOT / ".github" / "workflows" / "resolve.yml").read_text()
     assert all(f'"30 {h} * * *"' in resolve for h in (3, 12, 16, 20))

@@ -21,7 +21,13 @@ from decimal import ROUND_HALF_UP, Decimal
 from itertools import pairwise
 from typing import Any
 
-from arena.domains.base import AsOfStore, Observation, is_degenerate, trailing_frequency
+from arena.domains.base import (
+    AsOfStore,
+    Observation,
+    is_degenerate,
+    template_version_for,
+    trailing_frequency,
+)
 from arena.models import Evidence, Question, Resolution, Void, question_id_for
 from arena.sources.ecb import (
     ATTRIBUTION,
@@ -31,7 +37,7 @@ from arena.sources.ecb import (
 )
 
 DOMAIN = "markets"
-TEMPLATE_VERSION = 1
+#: Template versions: 1 = published on the batch morning, 2 = the evening before (T160).
 PAIRS = ("USD", "JPY")
 LOCK = time(9, 30)
 RESOLVE_AFTER = time(16, 0)
@@ -148,11 +154,12 @@ class MarketsDomain:
             " F0 must be the fixing of the batch date itself. Void if F0 or F1 is still "
             "missing 96 hours after resolve_after."
         )
+        version = template_version_for(batch_date, created)
         return Question(
-            question_id=question_id_for(DOMAIN, template, pair, target, TEMPLATE_VERSION),
+            question_id=question_id_for(DOMAIN, template, pair, target, version),
             domain=DOMAIN,
             template=template,
-            template_version=TEMPLATE_VERSION,
+            template_version=version,
             entity=pair,
             text=text,
             batch_date=batch_date,

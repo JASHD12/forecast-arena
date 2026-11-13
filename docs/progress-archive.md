@@ -92,3 +92,4 @@ Older "Done log" lines moved from PROGRESS.md (newest first).
 - 2026-11-12 T042: Wikimedia top/per-article client, title encoding, Wikidata person check (fail closed), smoke
 - 2026-11-12 T041: weather templates, resolver (void on >2 missing hours), MOSMIX as-of snapshot, goldens
 - 2026-11-12 T040: weather via Bright Sky (DWD obs + MOSMIX), 4 stations, fixtures, smoke
+- 2026-11-13 T035+T110: clean-day streak from run manifests, recorded health reports and day seals; official start written once (write_raw refuses a second write); not-before gate (default 2099-12-31 until roadmap changes are live); streak on Status

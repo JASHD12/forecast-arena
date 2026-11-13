@@ -69,7 +69,8 @@ def health() -> None:
 
 
 @health.command("check")
-@click.option("--job", required=True, type=click.Choice(["morning", "resolve", "weekly"]))
+@click.option("--job", required=True,
+              type=click.Choice(["evening", "morning", "resolve", "weekly"]))  # fmt: skip
 @click.option("--report", "report_path", type=click.Path(path_type=Path), default=None,
               help="Also write the report as JSON here.")  # fmt: skip
 @click.option("--force-fail", is_flag=True, help="Add a failing check (dry-run tests only).")
@@ -318,6 +319,27 @@ def _push(obj: Ctx, remote: str | None, job: str, day: date) -> None:
 
     sha = commit_and_push(obj.ledger.root, job, day)
     click.echo(f"ledger pushed: {sha}" if sha else "ledger: nothing to push")
+
+
+@daily.command("evening")
+@click.option("--push", is_flag=True, help="Sync with and push to the ledger branch.")
+@click.pass_obj
+def daily_evening(obj: Ctx, push: bool) -> None:
+    """Publish tomorrow's questions tonight (T160): the batch is the day after --date.
+
+    No forecasts are written; the morning job answers them before the usual lock.
+    """
+    from arena.ops.jobs import evening
+    from arena.ops.wiring import build_domains
+
+    batch = obj.day + timedelta(days=1)
+    remote = _sync(obj, push)
+    domains = build_domains(obj.settings, obj.clock.now(), job="evening", ledger=obj.ledger)
+    result = evening(obj.ledger, batch, obj.clock, domains, dry_run=obj.dry_run)
+    click.echo(result.line())
+    for w in result.warnings:
+        click.echo(f"warning: {w}")
+    _push(obj, remote, "evening", batch)
 
 
 @daily.command("morning")

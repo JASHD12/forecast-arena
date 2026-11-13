@@ -1,4 +1,5 @@
-"""The scheduled jobs: `morning` (questions, forecasts, seal) and `resolve` (outcomes, seals).
+"""The scheduled jobs: `evening` (next day's questions), `morning` (questions not yet
+published, forecasts, seal) and `resolve` (outcomes, seals).
 
 Both are idempotent: running a job twice for the same date and time writes nothing the
 second time. The morning job enforces the lock time (integrity rule I1): a run at or after
@@ -29,6 +30,8 @@ from arena.llm import tracing
 from arena.models import Forecast, Question, Resolution, Skip, Void
 
 LOCK = time(9, 30)
+#: The evening job publishes the next batch's questions from this UTC time on (T160).
+EVENING_EARLIEST = time(16, 0)
 #: How long after a first resolution the resolve job keeps checking for source revisions.
 REVISION_WINDOW = timedelta(days=7)
 MAX_DETAIL = 300
@@ -118,23 +121,7 @@ def morning(
             return res
 
         qpath = layout.questions_path(batch)
-        existing = [q for q in led.read(qpath) if isinstance(q, Question)]
-        have_domains = {q.domain for q in existing}
-        new_qs: list[Question] = []
-        for dom in domains:
-            if dom.name in have_domains:
-                continue
-            try:
-                qs = dom.generate_questions(batch, clock.now())
-            except Exception as exc:
-                rec.warn(f"{dom.name}: question generation failed: {_short(exc)}")
-                continue
-            bad = [q for q in qs if q.lock_time != deadline or q.batch_date != batch]
-            if bad:
-                rec.warn(f"{dom.name}: generated questions with the wrong batch or lock")
-                continue
-            new_qs.extend(qs)
-            rec.count(f"questions_{dom.name}", len(qs))
+        existing, new_qs = _generate(led, batch, clock, domains, rec, deadline)
         if clock.now() >= deadline:
             res.late = True
             rec.warn("lock passed during question generation; nothing written")
@@ -194,6 +181,71 @@ def morning(
         if all_qs and clock.now() < deadline:
             seal_batch(led, batch, clock)
             res.written["batch_seal"] = 1
+        res.warnings = list(rec.warnings)
+    return res
+
+
+def _generate(
+    led: Ledger, batch: date, clock: Clock, domains: Sequence[Domain], rec: RunRecorder,
+    deadline: datetime,
+) -> tuple[list[Question], list[Question]]:  # fmt: skip
+    """The batch's questions already in the ledger, and new ones for domains without any.
+
+    A domain that already published questions for the batch (for example the evening
+    before) is never asked again, so a batch never mixes two template versions of a domain.
+    """
+    existing = [q for q in led.read(layout.questions_path(batch)) if isinstance(q, Question)]
+    have_domains = {q.domain for q in existing}
+    new_qs: list[Question] = []
+    for dom in domains:
+        if dom.name in have_domains:
+            continue
+        try:
+            qs = dom.generate_questions(batch, clock.now())
+        except Exception as exc:
+            rec.warn(f"{dom.name}: question generation failed: {_short(exc)}")
+            continue
+        bad = [q for q in qs if q.lock_time != deadline or q.batch_date != batch]
+        if bad:
+            rec.warn(f"{dom.name}: generated questions with the wrong batch or lock")
+            continue
+        new_qs.extend(qs)
+        rec.count(f"questions_{dom.name}", len(qs))
+    return existing, new_qs
+
+
+def evening(
+    ledger: Ledger,
+    batch: date,
+    clock: Clock,
+    domains: Sequence[Domain],
+    *,
+    dry_run: bool = False,
+    lock: time = LOCK,
+) -> JobResult:
+    """Publish the questions of `batch` on the evening before it (T160); no forecasts.
+
+    The machine forecasters still answer in the morning job, before the same 09:30 UTC
+    lock; publishing early only gives people time to answer too. The job runs on the UTC
+    day before `batch`, not before EVENING_EARLIEST (the day-ahead auction for the batch
+    day is published around noon), and never after the batch is sealed.
+    """
+    res = JobResult("evening", batch)
+    with _maybe_dry(ledger, dry_run) as led, run_manifest(led, "evening", batch, clock,
+                                                         dry_run=dry_run) as rec:  # fmt: skip
+        now = clock.now()
+        if led.exists(layout.batch_seal_path(batch)):
+            rec.warn(f"batch {batch} already sealed; nothing to do")
+        elif now.date() != batch - timedelta(days=1):
+            rec.warn(f"batch {batch} is not tomorrow's UTC date (today is {now.date()}); refused")
+        elif now.time() < EVENING_EARLIEST:
+            rec.warn(f"too early: questions for {batch} are published from "
+                     f"{EVENING_EARLIEST:%H:%M} UTC")  # fmt: skip
+        else:
+            deadline = batch_lock(batch, lock)
+            _, new_qs = _generate(led, batch, clock, domains, rec, deadline)
+            if new_qs:
+                res.written["questions"] = led.append(layout.questions_path(batch), new_qs)
         res.warnings = list(rec.warnings)
     return res
 

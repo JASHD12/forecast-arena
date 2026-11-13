@@ -124,3 +124,19 @@ class DomainRegistry:
     def enabled(self, names: Sequence[str]) -> list[Domain]:
         """The domains named in settings, in that order."""
         return [self.get(n) for n in names]
+
+
+#: Template version of a question published on the morning of its batch day (SPEC 4).
+MORNING_TEMPLATE_VERSION = 1
+#: Template version of a question published the evening before its batch day (T160).
+EVENING_TEMPLATE_VERSION = 2
+
+
+def template_version_for(batch_date: date, created: datetime) -> int:
+    """Which template version a question has, given when it was published.
+
+    Publishing the evening before changes what data the threshold is computed from (for
+    example the Wikipedia reference day is one day older), so it is a new template version
+    (SPEC 2.9). The question text and the lock are the same in both versions.
+    """
+    return EVENING_TEMPLATE_VERSION if created.date() < batch_date else MORNING_TEMPLATE_VERSION

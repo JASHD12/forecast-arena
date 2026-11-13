@@ -29,7 +29,13 @@ from datetime import UTC, date, datetime, time, timedelta
 from decimal import ROUND_HALF_UP, Decimal
 from typing import Any
 
-from arena.domains.base import AsOfStore, Observation, is_degenerate, trailing_frequency
+from arena.domains.base import (
+    AsOfStore,
+    Observation,
+    is_degenerate,
+    template_version_for,
+    trailing_frequency,
+)
 from arena.domains.power import quantile
 from arena.models import Evidence, Question, Resolution, Void, question_id_for
 from arena.sources.brightsky import (
@@ -44,7 +50,7 @@ from arena.sources.brightsky import (
 )
 
 DOMAIN = "weather"
-TEMPLATE_VERSION = 1
+#: Template versions: 1 = published on the batch morning, 2 = the evening before (T160).
 LOCK = time(9, 30)
 RESOLVE_AFTER = time(6, 0)
 GRACE = timedelta(hours=72)
@@ -385,11 +391,12 @@ class WeatherDomain:
                 template: str, sa: Station, sb: Station, text: str, rule: str,
                 freq: float | None) -> Question:  # fmt: skip
         entity = duel_entity(sa.city, sb.city)
+        version = template_version_for(batch_date, created)
         return Question(
-            question_id=question_id_for(DOMAIN, template, entity, target, TEMPLATE_VERSION),
+            question_id=question_id_for(DOMAIN, template, entity, target, version),
             domain=DOMAIN,
             template=template,
-            template_version=TEMPLATE_VERSION,
+            template_version=version,
             entity=entity,
             text=text,
             batch_date=batch_date,
@@ -423,11 +430,12 @@ class WeatherDomain:
             " Void if more than 2 hourly observations of D are missing for the variable "
             "72 hours after resolve_after."
         )
+        version = template_version_for(batch_date, created)
         return Question(
-            question_id=question_id_for(DOMAIN, template, st.city, target, TEMPLATE_VERSION),
+            question_id=question_id_for(DOMAIN, template, st.city, target, version),
             domain=DOMAIN,
             template=template,
-            template_version=TEMPLATE_VERSION,
+            template_version=version,
             entity=st.city,
             text=text,
             batch_date=batch_date,

@@ -140,27 +140,31 @@ flowchart LR
     S4[ECB reference rates]
   end
   subgraph "GitHub Actions (code from the stable branch)"
-    M[Morning job: questions + forecasts]
+    E[Evening job: next day's questions]
+    M[Morning job: forecasts + seal]
     R[Resolve job: outcomes + seals + site]
     T[Weekly job: retrain + reports]
   end
   L[(ledger branch: append-only JSONL + hash chain)]
   P[GitHub Pages: static site]
+  Sources --> E --> L
   Sources --> M --> L
   Sources --> R --> L
   L --> R --> P
   L --> T --> L
 ```
 
-1. **Morning (05:30 and 07:00 UTC).** About 25 yes/no questions about tomorrow are
+1. **Evening (18:00 and 19:30 UTC, the day before).** About 25 yes/no questions are
    generated from live public data: German day-ahead electricity prices, the weather at
    four DWD stations, attention to Wikipedia articles, and the next ECB exchange-rate
-   fixing. Every forecaster publishes a probability. The batch is written to the ledger
+   fixing. They are public from then on, so people can answer too.
+2. **Morning (05:30 and 07:00 UTC).** Every forecaster publishes a probability (and any
+   topic the evening missed gets its questions now). The batch is written to the ledger
    and sealed **before the 09:30 UTC lock**.
-2. **Resolve (four times a day).** When the answers are published, questions are
+3. **Resolve (four times a day).** When the answers are published, questions are
    resolved with evidence, finished days are sealed into a hash chain, and the site is
    rebuilt.
-3. **Scoring.** Brier and log scores, skill against the base rate, calibration, and
+4. **Scoring.** Brier and log scores, skill against the base rate, calibration, and
    day-block bootstrap intervals. Below 30 official days everything says "too early to
    tell"; a difference is only called supported when its interval excludes zero.
 
@@ -248,10 +252,10 @@ score on electricity questions?"
 
 ## Auf Deutsch
 
-Forecast Arena ist ein öffentlicher Forschungs-Benchmark. Jeden Morgen entstehen aus
-öffentlichen Daten Ja/Nein-Fragen über den nächsten Tag (zunächst deutsche
-Day-Ahead-Strompreise). Basisrate, ein Gradient-Boosting-Modell, Sprachmodelle und zwei
-KI-Agenten geben ihre Wahrscheinlichkeit ab, **bevor** die Antwort feststeht; alles wird in
+Forecast Arena ist ein öffentlicher Forschungs-Benchmark. Jeden Abend entstehen aus
+öffentlichen Daten Ja/Nein-Fragen über die nächsten Tage (zunächst deutsche
+Day-Ahead-Strompreise). Am Morgen darauf geben Basisrate, ein Gradient-Boosting-Modell,
+Sprachmodelle und zwei KI-Agenten ihre Wahrscheinlichkeit ab, **bevor** die Antwort feststeht; alles wird in
 ein öffentliches, nur erweiterbares und per Hash verkettetes Protokoll geschrieben und am
 nächsten Tag mit dem Brier-Score bewertet. Forschungsfrage: Wann schlägt ein KI-Agent ein
 klassisches Modell, und wann nicht? Eine Kurzfassung steht auf der Seite

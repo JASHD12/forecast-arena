@@ -3,13 +3,15 @@ from datetime import UTC, date, datetime, timedelta
 from power_fixtures import fixture_domain
 
 from arena.clock import FixedClock
+from arena.domains.base import template_version_for
 from arena.forecasters.base import LedgerHistory
 from arena.forecasters.baselines import BaseRate, Persistence
 from arena.forecasters.replay import CombinedHistory, ReplayHistory
 from arena.ledger import Ledger, layout
 from arena.ledger.verify import verify
-from arena.models import Forecast, Skip
-from arena.ops.jobs import morning, resolve
+from arena.models import Forecast, Question, Skip
+from arena.ops.health import run_checks
+from arena.ops.jobs import evening, morning, resolve
 
 B = date(2026, 11, 2)
 
@@ -120,3 +122,60 @@ def test_batch_must_be_today(tmp_path) -> None:
     led, clock, doms, fcs = setup(tmp_path, datetime(2026, 11, 1, 6, 0, tzinfo=UTC))
     r = morning(led, B, clock, doms, fcs)
     assert r.written == {} and "refused" in r.warnings[0]
+
+
+# ----- T160: evening publication -------------------------------------------------------
+
+
+def _questions(led: Ledger) -> list[Question]:
+    return [q for q in led.read(layout.questions_path(B)) if isinstance(q, Question)]
+
+
+def test_template_version_follows_publication_time() -> None:
+    assert template_version_for(B, datetime(2026, 11, 1, 18, tzinfo=UTC)) == 2
+    assert template_version_for(B, datetime(2026, 11, 2, 5, 30, tzinfo=UTC)) == 1
+
+
+def test_evening_publishes_questions_only_and_morning_forecasts_them(tmp_path) -> None:
+    led, clock, doms, fcs = setup(tmp_path, datetime(2026, 11, 1, 18, tzinfo=UTC))
+    r = evening(led, B, clock, doms)
+    qs = _questions(led)
+    assert r.written["questions"] == len(qs) > 0 and not r.warnings
+    assert {q.template_version for q in qs} == {2}
+    assert {q.lock_time for q in qs} == {datetime(2026, 11, 2, 9, 30, tzinfo=UTC)}
+    assert not led.exists(layout.forecasts_path(B)) and not led.exists(layout.batch_seal_path(B))
+    before = snapshot(led)
+    assert evening(led, B, clock, doms).written == {}  # idempotent
+    assert snapshot(led) == before
+    rep = run_checks(led, "evening", clock.now())
+    assert next(c for c in rep.checks if c.name == "next_batch_published").ok
+    clock.set(datetime(2026, 11, 2, 5, 30, tzinfo=UTC))
+    m = morning(led, B, clock, doms, fcs)
+    assert "questions" not in m.written and m.written["forecasts"] > 0
+    assert _questions(led) == qs  # the morning adds no second version
+    assert led.exists(layout.batch_seal_path(B))
+    assert verify(led).ok
+
+
+def test_evening_refuses_wrong_day_too_early_and_sealed(tmp_path) -> None:
+    led, clock, doms, fcs = setup(tmp_path, datetime(2026, 11, 1, 12, tzinfo=UTC))
+    assert "too early" in evening(led, B, clock, doms).warnings[0]
+    clock.set(datetime(2026, 10, 31, 18, tzinfo=UTC))
+    assert "not tomorrow" in evening(led, B, clock, doms).warnings[0]
+    clock.set(datetime(2026, 11, 2, 18, tzinfo=UTC))
+    assert "not tomorrow" in evening(led, B, clock, doms).warnings[0]
+    assert not led.exists(layout.questions_path(B))
+    rep = run_checks(led, "evening", datetime(2026, 11, 1, 18, tzinfo=UTC))
+    assert not next(c for c in rep.checks if c.name == "next_batch_published").ok
+    clock.set(datetime(2026, 11, 2, 5, 30, tzinfo=UTC))
+    morning(led, B, clock, doms, fcs)
+    assert {q.template_version for q in _questions(led)} == {1}  # morning fallback
+    clock.set(datetime(2026, 11, 1, 18, tzinfo=UTC))  # sealed: nothing more, ever
+    assert "already sealed" in evening(led, B, clock, doms).warnings[0]
+
+
+def test_evening_dry_run_writes_nothing(tmp_path) -> None:
+    led, clock, doms, _ = setup(tmp_path, datetime(2026, 11, 1, 18, tzinfo=UTC))
+    r = evening(led, B, clock, doms, dry_run=True)
+    assert r.written["questions"] > 0
+    assert not led.exists(layout.questions_path(B))

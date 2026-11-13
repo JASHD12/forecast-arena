@@ -417,6 +417,24 @@ def version_changelog(rec: Any) -> list[dict[str, Any]]:
     return sorted(rows, key=lambda r: (r["since"], r["forecaster"], r["version"]))
 
 
+TEMPLATE_VERSION_NOTES = {
+    1: "published on the morning of the batch day",
+    2: "published the evening before the batch day (T160); same text and lock",
+}
+
+
+def template_changelog(rec: Any) -> list[dict[str, Any]]:
+    """First and last batch date of each (domain, template, template_version) (SPEC 2.9)."""
+    span: dict[tuple[str, str, int], list[date]] = {}
+    for q in rec.questions.values():
+        k = (q.domain, q.template, q.template_version)
+        lo_hi = span.setdefault(k, [q.batch_date, q.batch_date])
+        lo_hi[0], lo_hi[1] = min(lo_hi[0], q.batch_date), max(lo_hi[1], q.batch_date)
+    rows = [{"domain": k[0], "template": k[1], "version": k[2], "since": v[0], "until": v[1],
+             "note": TEMPLATE_VERSION_NOTES.get(k[2], "")} for k, v in span.items()]  # fmt: skip
+    return sorted(rows, key=lambda r: (r["since"], r["domain"], r["template"], r["version"]))
+
+
 def calibration_panels(scored: Sequence[Scored]) -> list[dict[str, Any]]:
     """Per forecaster: bins, ECE, Murphy decomposition and the SVG diagram."""
     by: dict[str, list[Scored]] = {}
@@ -600,6 +618,7 @@ def build_site(
             {
                 "information_sets": INFORMATION_SETS,
                 "changelog": version_changelog(rec),
+                "template_changelog": template_changelog(rec),
                 "principles": PRINCIPLES,
                 "limitations": LIMITATIONS,
             },
@@ -756,6 +775,7 @@ def build_site(
             skips=sk,
             resolution=rec.resolutions.get(q.question_id),
             void=rec.voids.get(q.question_id),
+            before_lock=clock.now() < q.lock_time,
             traces=qtraces.get(q.question_id, []),
             chart=_question_chart(ledger, snaps, q, res_q),
             prev_q=neighbours[q.question_id][0],

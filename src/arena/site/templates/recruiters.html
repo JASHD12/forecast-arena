@@ -9,7 +9,7 @@
 <div class="kpi"><span class="kpi-n">{{ k.days }}</span><span class="kpi-l">days of data</span></div>
 </div>
 <section class="card" aria-labelledby="r-what"><h2 id="r-what">What it is</h2>
-<p>Every morning the system creates yes/no questions about tomorrow from public data (electricity prices first). Baselines, a gradient-boosting model, LLM forecasters and two LLM agents each publish a probability <strong>before</strong> the answer exists, into an append-only, hash-chained public record. The next day the answers arrive and every forecast is scored with proper scoring rules. It runs entirely on GitHub Actions and Pages for about one US dollar a month of AI usage.</p>
+<p>Every day the system publishes yes/no questions about the near future from public data (electricity prices first), the evening before they lock. Baselines, a gradient-boosting model, LLM forecasters and two LLM agents each publish a probability <strong>before</strong> the answer exists, into an append-only, hash-chained public record. The next day the answers arrive and every forecast is scored with proper scoring rules. It runs entirely on GitHub Actions and Pages for about one US dollar a month of AI usage.</p>
 <p><strong>Measured so far:</strong> see the <a href="backtests.html">backtests</a> (a year of replayed past days, clearly labelled as not live), the <a href="evals.html">LLM evaluation</a> (it found and fixed a real bug) and the <a href="leaderboard.html">live leaderboard</a>, which says "too early to tell" until the statistics can decide.</p>
 </section>
 {% if personal %}<section class="card" aria-labelledby="r-me"><h2 id="r-me">About me</h2><div class="prose">{{ personal }}</div></section>{% endif %}

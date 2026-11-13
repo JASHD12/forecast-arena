@@ -414,7 +414,7 @@ CI jobs; core `make check` stays offline and fast.
     Optuna study (seeded, time-series CV with gap); SHAP TreeExplainer summary next to
     permutation importance; backtest report and model card.
   - Done when: unit tests on tiny data pass in the ml CI job; a backtest card is committed.
-- [ ] T113 · PyTorch quantile network challenger (deps: T111)
+- [x] T113 · PyTorch quantile network challenger (deps: T111)
   - Do: small MLP with pinball loss for power (CPU wheel, seeded); weekly candidate;
     backtest card published whatever the result.
   - Done when: deterministic unit test passes in the ml CI job; card committed.
@@ -422,7 +422,7 @@ CI jobs; core `make check` stays offline and fast.
   - Do: statsmodels ETS/SARIMAX and a tiny pretrained time-series model (zero-shot, CPU,
     weights cached) as power benchmarks in the backtest table.
   - Done when: both appear in a committed backtest report with intervals.
-- [ ] T115 · Conformal prediction intervals (deps: T045m)
+- [x] T115 · Conformal prediction intervals (deps: T045m)
   - Do: conformalized quantile regression (rolling split-conformal) for power quantiles;
     coverage before/after in the weekly summary and on Experiments.
   - Done when: a test shows empirical coverage reaches the target on synthetic data.

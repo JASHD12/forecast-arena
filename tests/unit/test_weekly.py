@@ -159,3 +159,29 @@ def test_worse_challenger_family_never_replaces_the_champion(tmp_path, dom) -> N
     assert d.best_family == "constant" and d.promoted is None
     assert "worse than current" in d.reason
     assert registry.load_current(led, ["power"])["power"].version == champion
+
+
+def test_conformal_margin_restores_coverage_on_synthetic_data() -> None:
+    import numpy as np
+
+    from arena.ops.explain import cqr_margin
+
+    rng = np.random.default_rng(0)
+    y_cal, y_new = rng.normal(size=2000), rng.normal(size=20000)
+    lo, hi = -0.5, 0.5  # a far too narrow "80%" band (true coverage about 38%)
+    m = cqr_margin(np.full(2000, lo), np.full(2000, hi), y_cal, 0.80)
+    raw = np.mean((lo <= y_new) & (y_new <= hi))
+    adj = np.mean((lo - m <= y_new) & (y_new <= hi + m))
+    assert raw < 0.5 and 0.79 <= adj <= 0.83
+    wide = cqr_margin(np.full(2000, -5.0), np.full(2000, 5.0), y_cal, 0.80)
+    assert wide < 0  # a too wide band is narrowed
+
+
+def test_conformal_in_weekly_summary(tmp_path, dom) -> None:
+    led = Ledger(tmp_path / "l")
+    res = weekly(led, FixedClock(NOW), {"power": dom}, {"power": trainer(dom)})
+    assert {d["stat"] for d in res.conformal} == {"mean", "max", "min", "spread", "evening"}
+    for d in res.conformal:
+        assert 0 <= d["raw80"] <= 1 and 0 <= d["conformal80"] <= 1
+    (summary,) = summaries(led)
+    assert summary["conformal"]["power"] == res.conformal

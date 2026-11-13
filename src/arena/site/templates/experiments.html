@@ -36,6 +36,12 @@
 <div class="table-scroll" tabindex="0" role="region" aria-label="Quantile diagnostics"><table>
 <thead><tr><th scope="col">Statistic</th><th scope="col" class="num">Days</th><th scope="col" class="num">Pinball loss</th><th scope="col" class="num">80% band coverage</th><th scope="col" class="num">90% band coverage</th></tr></thead>
 <tbody>{% for d in qd %}<tr><th scope="row">{{ d.stat }}</th><td class="num">{{ d.n }}</td><td class="num">{{ "%.2f"|format(d.pinball) }}</td><td class="num">{{ "%.2f"|format(d.coverage80) }}</td><td class="num">{{ "%.2f"|format(d.coverage90) }}</td></tr>{% endfor %}</tbody></table></div>{% endif %}
+{% set cf = (r.conformal or {}).get("power") if r.conformal is defined else none %}
+{% if cf %}<h3>Conformal prediction intervals ({{ r.day }})</h3>
+<p class="note">Conformalized quantile regression: the margin that makes the 80% and 90% bands hold their coverage on the previous 28 days is added to both ends, then coverage is measured on the evaluation window. Target: 0.80 and 0.90. The promoted model has been refitted on recent days, so coverage on this window can look better than on truly unseen days.</p>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Conformal coverage"><table>
+<thead><tr><th scope="col">Statistic</th><th scope="col" class="num">80% raw</th><th scope="col" class="num">80% conformal</th><th scope="col" class="num">margin (EUR/MWh)</th><th scope="col" class="num">90% raw</th><th scope="col" class="num">90% conformal</th><th scope="col" class="num">margin (EUR/MWh)</th></tr></thead>
+<tbody>{% for d in cf %}<tr><th scope="row">{{ d.stat }}</th><td class="num">{{ "%.2f"|format(d.raw80) }}</td><td class="num">{{ "%.2f"|format(d.conformal80) }}</td><td class="num">{{ "%+.1f"|format(d.margin80) }}</td><td class="num">{{ "%.2f"|format(d.raw90) }}</td><td class="num">{{ "%.2f"|format(d.conformal90) }}</td><td class="num">{{ "%+.1f"|format(d.margin90) }}</td></tr>{% endfor %}</tbody></table></div>{% endif %}
 {% if r.drift %}<h3>Drift ({{ r.day }})</h3>
 <p class="note">Computed with Evidently: share of drifted columns and per-column drift test p-values (current window vs. training reference). Small p-values mean the distribution changed.</p>
 <div class="table-scroll" tabindex="0" role="region" aria-label="Drift {{ r.day }}"><table>

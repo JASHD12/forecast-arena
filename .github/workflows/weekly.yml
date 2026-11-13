@@ -87,6 +87,7 @@ jobs:
         if: always() && !(github.event_name == 'workflow_dispatch' && inputs.dry_run)
         continue-on-error: true
         run: |
+          set -o pipefail  # keep the check's exit code through tee
           .venv/bin/arena health check --job weekly --report health.json ${{ (github.event_name == 'workflow_dispatch' && inputs.fail_health) && '--force-fail' || '' }} | tee -a "$GITHUB_STEP_SUMMARY"
       - name: Open, update or close the incident issue
         if: always() && !(github.event_name == 'workflow_dispatch' && inputs.dry_run)

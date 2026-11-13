@@ -123,3 +123,49 @@ def power_shap(domain: PowerDomain, model: Any, first: date, last: date) -> list
             for i, v in enumerate(mean_abs)]  # fmt: skip
     rows.sort(key=lambda d: float(d["mean_abs_shap"]), reverse=True)
     return rows[:TOP]
+
+
+def cqr_margin(lo: np.ndarray, hi: np.ndarray, y: np.ndarray, coverage: float) -> float:
+    """Conformalized quantile regression (Romano, Patterson & Candes 2019): the margin
+    q_hat to add to both ends of a [lo, hi] band so that, under exchangeability, a new
+    point falls inside with probability at least `coverage`. Conformity score
+    E = max(lo - y, y - hi); q_hat = the ceil((n + 1) * coverage) / n empirical quantile."""
+    scores = np.maximum(np.asarray(lo) - y, np.asarray(y) - hi)
+    n = len(scores)
+    if n == 0:
+        raise ValueError("no calibration points")
+    level = min(1.0, np.ceil((n + 1) * coverage) / n)
+    return float(np.quantile(scores, level, method="higher"))
+
+
+def power_conformal(
+    domain: PowerDomain, model: Any, cal: tuple[date, date], ev: tuple[date, date]
+) -> list[dict[str, Any]]:
+    """Per daily statistic: coverage of the model's central 80% and 90% bands on the
+    evaluation window, raw and after a CQR margin fitted on the calibration window (the
+    days just before it, so no evaluation day informs its own correction)."""
+    from arena.forecasters.ml_power import QUANTILES, STATS
+
+    if not hasattr(model, "quantiles"):
+        return []
+    daily = domain.all_days()
+    xc, yc, _ = training_rows(daily, *cal)
+    xe, ye, _ = training_rows(daily, *ev)
+    if len(xc) < MIN_ROWS or len(xe) < MIN_ROWS:
+        return []
+    bands = {80: (QUANTILES.index(0.1), QUANTILES.index(0.9)),
+             90: (QUANTILES.index(0.05), QUANTILES.index(0.95))}  # fmt: skip
+    out = []
+    for stat in STATS:
+        qc = np.array([sorted(model.quantiles(stat, list(r))) for r in xc])
+        qe = np.array([sorted(model.quantiles(stat, list(r))) for r in xe])
+        row: dict[str, Any] = {"stat": stat, "n_cal": len(xc), "n_eval": len(xe)}
+        for pct, (i_lo, i_hi) in bands.items():
+            m = cqr_margin(qc[:, i_lo], qc[:, i_hi], yc[stat], pct / 100)
+            raw = np.mean((qe[:, i_lo] <= ye[stat]) & (ye[stat] <= qe[:, i_hi]))
+            adj = np.mean((qe[:, i_lo] - m <= ye[stat]) & (ye[stat] <= qe[:, i_hi] + m))
+            row[f"raw{pct}"] = round(float(raw), 3)
+            row[f"conformal{pct}"] = round(float(adj), 3)
+            row[f"margin{pct}"] = round(m, 2)
+        out.append(row)
+    return out

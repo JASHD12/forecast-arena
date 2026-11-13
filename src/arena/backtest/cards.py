@@ -101,3 +101,25 @@ mean) is a proxy for the Brier score of the yes/no questions.
 def power_lgbm_card(report_md: str, run_id: str) -> str:
     """Challenger card with the generated head-to-head backtest report appended."""
     return POWER_LGBM_CARD + f"\n## Backtest (run `{run_id}`)\n\n" + report_md.split("\n", 2)[2]
+
+
+POWER_MLP_CARD = """# Model card: power PyTorch challenger (power-mlpq-r1)
+
+**What it is.** The power champion's probabilistic model with a neural learner: one
+multi-layer perceptron (two hidden layers of 64 ReLU units) predicts all 13 quantile levels
+of a daily price statistic at once, trained with the summed pinball loss (full-batch Adam,
+learning rate 1e-3, weight decay 1e-4, 400 epochs, CPU, fixed seed, deterministic
+algorithms). Inputs and target are standardised; predicted quantiles are sorted so they
+never cross. Calibration and question logic are the champion's.
+
+**Role.** A challenger in the weekly champion/challenger job; promoted only if it scores at
+least as well as the champion on the same recent questions.
+
+**Known limits.** A few hundred training rows per statistic are a small sample for a
+neural network; gradient-boosted trees are the usual strong baseline on such tabular data.
+"""
+
+
+def power_mlp_card(report_md: str, run_id: str) -> str:
+    """Challenger card with the generated head-to-head backtest report appended."""
+    return POWER_MLP_CARD + f"\n## Backtest (run `{run_id}`)\n\n" + report_md.split("\n", 2)[2]

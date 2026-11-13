@@ -33,7 +33,12 @@ from arena.ledger import Ledger
 from arena.ledger.manifest import run_manifest
 from arena.models import Resolution
 from arena.ops.drift import power_drift
-from arena.ops.explain import power_importance, power_quantile_diagnostics, power_shap
+from arena.ops.explain import (
+    power_conformal,
+    power_importance,
+    power_quantile_diagnostics,
+    power_shap,
+)
 from arena.ops.jobs import _maybe_dry
 from arena.scoring.core import brier
 
@@ -81,6 +86,7 @@ class WeeklyResult:
     drift: list[dict[str, Any]] = field(default_factory=list)
     importance: list[dict[str, Any]] = field(default_factory=list)
     shap: list[dict[str, Any]] = field(default_factory=list)
+    conformal: list[dict[str, Any]] = field(default_factory=list)
     quantiles: list[dict[str, Any]] = field(default_factory=list)
 
     def lines(self) -> list[str]:
@@ -243,6 +249,8 @@ def weekly(
                     res.importance = power_importance(pdom, model, first, last)
                     res.quantiles = power_quantile_diagnostics(pdom, model, first, last)
                     res.shap = power_shap(pdom, model, first, last)
+                    cal = (first - timedelta(days=WINDOW_DAYS), first - timedelta(days=1))
+                    res.conformal = power_conformal(pdom, model, cal, (first, last))
             except Exception as exc:  # explainability never blocks the weekly job
                 rec.warn(f"weekly/importance: {type(exc).__name__}: {exc}"[:300])
         summary = {
@@ -252,6 +260,7 @@ def weekly(
             "drift": res.drift,
             "importance": {"power": res.importance},
             "shap": {"power": res.shap},
+            "conformal": {"power": res.conformal},
             "quantile_diagnostics": {"power": res.quantiles},
         }
         rel = f"models/weekly/{today.isoformat()}-summary.json"

@@ -43,6 +43,15 @@ MORNING = time(5, 30)
 FAR = datetime.max.replace(tzinfo=UTC)
 
 Trainer = Callable[[date], Any]  # cut-off date -> fitted model with .version/.probability
+#: Per domain either one trainer or several named candidate families (champion/challenger).
+TrainerSpec = Trainer | Mapping[str, Trainer]
+
+
+def candidate_families(spec: TrainerSpec) -> dict[str, Trainer]:
+    """Named candidate trainers; a single trainer is the family "default"."""
+    if isinstance(spec, Mapping):
+        return dict(sorted(spec.items()))
+    return {"default": spec}
 
 
 @dataclass
@@ -59,6 +68,8 @@ class Decision:
     brier_current: float | None = None
     promoted: str | None = None
     reason: str = ""
+    best_family: str | None = None
+    candidates: list[dict[str, Any]] = field(default_factory=list)
 
 
 @dataclass
@@ -81,6 +92,11 @@ class WeeklyResult:
                 f"{d.domain}: window {d.window_first}..{d.window_last}, n={d.n}, "
                 f"candidate {bc} vs current {bu}: {d.reason}"
             )
+            for c in d.candidates:
+                b = "-" if c["brier"] is None else f"{c['brier']:.4f}"
+                out.append(
+                    f"  {d.domain}/{c['family']}: {b}" + (f" ({c['error']})" if c["error"] else "")
+                )
         return out
 
 
@@ -121,7 +137,7 @@ def weekly(
     ledger: Ledger,
     clock: Clock,
     domains: Mapping[str, Domain],
-    trainers: Mapping[str, Trainer],
+    trainers: Mapping[str, TrainerSpec],
     *,
     cards: Mapping[str, Callable[[Decision], str]] | None = None,
     dry_run: bool = False,
@@ -136,34 +152,51 @@ def weekly(
         _maybe_dry(ledger, dry_run) as led,
         run_manifest(led, "weekly", today, clock, dry_run=dry_run) as rec,
     ):
-        for name, trainer in sorted(trainers.items()):
+        for name, spec in sorted(trainers.items()):
+            families = candidate_families(spec)
             d = Decision(name, first, last)
             res.decisions.append(d)
             dom = domains.get(name)
             if dom is None:
                 d.reason = "domain not loaded"
                 continue
-            try:
-                candidate = trainer(first - timedelta(days=1))
-            except Exception as exc:
-                d.reason = f"training failed: {type(exc).__name__}: {exc}"[:300]
-                rec.warn(f"weekly/{name}: {d.reason}")
+            fitted: dict[str, Any] = {}
+            for fam, trainer in families.items():
+                try:
+                    fitted[fam] = trainer(first - timedelta(days=1))
+                except Exception as exc:
+                    msg = f"training failed: {type(exc).__name__}: {exc}"[:300]
+                    d.candidates.append({"family": fam, "version": None, "brier": None,
+                                         "n": 0, "error": msg})  # fmt: skip
+                    rec.warn(f"weekly/{name}/{fam}: {msg}")
+            if not fitted:
+                d.reason = "training failed for every candidate"
                 continue
-            d.candidate_version = candidate.version
             current = registry.load_current(led, [name]).get(name)
             d.current_version = current.version if current is not None else None
-            models = {"candidate": candidate} | ({"current": current} if current else {})
+            models = {f"cand:{f}": m for f, m in fitted.items()}
+            if current is not None:
+                models["current"] = current
             scores = evaluate(dom, models, first, last)
             if not scores:
+                d.candidates += [{"family": f, "version": m.version, "brier": None, "n": 0,
+                                  "error": None} for f, m in fitted.items()]  # fmt: skip
                 d.reason = "no resolved questions in the window; nothing promoted"
                 continue
-            d.n = scores["candidate"][1]
-            d.brier_candidate = scores["candidate"][0]
+            for f, m in fitted.items():
+                b, n = scores[f"cand:{f}"]
+                d.candidates.append({"family": f, "version": m.version, "brier": round(b, 6),
+                                     "n": n, "error": None})  # fmt: skip
+            best = min(fitted, key=lambda f: (scores[f"cand:{f}"][0], f))
+            d.best_family = best
+            d.candidate_version = fitted[best].version
+            d.n = scores[f"cand:{best}"][1]
+            d.brier_candidate = scores[f"cand:{best}"][0]
             d.brier_current = scores["current"][0] if "current" in scores else None
             if d.brier_current is not None and d.brier_candidate > d.brier_current:
-                d.reason = "candidate worse than current; kept current"
+                d.reason = f"best candidate ({best}) worse than current; kept current"
                 continue
-            final = trainer(today - timedelta(days=LAG_DAYS))
+            final = families[best](today - timedelta(days=LAG_DAYS))
             card = cards[name](d) if cards and name in cards else None
             if final.version not in registry.versions(led, name):
                 registry.save_model(
@@ -187,10 +220,10 @@ def weekly(
                 name,
                 final.version,
                 at=clock.now(),
-                reason=f"{why} on {d.n} questions, {first}..{last}",
+                reason=f"{why} ({best}) on {d.n} questions, {first}..{last}",
             )
             d.promoted = final.version
-            d.reason = f"promoted {final.version} ({why})"
+            d.reason = f"promoted {final.version} ({why}; family {best})"
             rec.count(f"promoted_{name}")
         if "power" in domains and "power" in trainers and drift:
             try:

@@ -127,3 +127,35 @@ def test_pinball_and_quantile_diagnostics(tmp_path, dom) -> None:
     assert summary["quantile_diagnostics"]["power"] == res.quantiles
     first, last = window(NOW.date())
     assert power_quantile_diagnostics(dom, Constant(), first, last) == []
+
+
+def test_multi_candidate_promotes_best_family_and_lists_all(tmp_path, dom) -> None:
+    def boom(cutoff):
+        raise RuntimeError("no data")
+
+    led = Ledger(tmp_path / "l")
+    fams = {"hgb": trainer(dom), "constant": lambda c: Constant(), "broken": boom}
+    res = weekly(led, FixedClock(NOW), {"power": dom}, {"power": fams}, drift=False)
+    (d,) = res.decisions
+    assert d.best_family == "hgb" and d.promoted and d.promoted.startswith("power-")
+    by = {c["family"]: c for c in d.candidates}
+    assert set(by) == {"hgb", "constant", "broken"}
+    assert by["broken"]["error"].startswith("training failed: RuntimeError")
+    assert by["hgb"]["brier"] < by["constant"]["brier"]
+    assert by["hgb"]["n"] == by["constant"]["n"] == d.n  # same questions for every model
+    (summary,) = summaries(led)
+    assert {c["family"] for c in summary["decisions"][0]["candidates"]} == set(by)
+    assert any("power/constant" in line for line in res.lines())
+
+
+def test_worse_challenger_family_never_replaces_the_champion(tmp_path, dom) -> None:
+    led = Ledger(tmp_path / "l")
+    weekly(led, FixedClock(NOW), {"power": dom}, {"power": trainer(dom)}, drift=False)
+    champion = registry.load_current(led, ["power"])["power"].version
+    later = FixedClock(datetime(2026, 11, 17, 2, tzinfo=UTC))
+    res = weekly(led, later, {"power": dom}, {"power": {"constant": lambda c: Constant()}},
+                 drift=False)  # fmt: skip
+    (d,) = res.decisions
+    assert d.best_family == "constant" and d.promoted is None
+    assert "worse than current" in d.reason
+    assert registry.load_current(led, ["power"])["power"].version == champion

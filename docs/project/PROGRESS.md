@@ -82,6 +82,7 @@ readers the notebook really uses.
 
 ## Done log
 
+- 2026-11-13 T187: docs/CODE_TOUR.md; all 218 `# fmt: skip` removed (ruff format); site/build.py split into content.py + shaping.py (877 -> 474 lines); cli.py -> cli/ package (record, jobs, reports, llm_cmds; 28 commands kept); e2e site byte-identical except data.html, where SQL tie-breakers fixed a real nondeterminism
 - 2026-11-13 T186: home hero: "joining soon" gone; labelled BACKTEST card (one year of electricity, parsed from docs/models/power.md) beside live standings; recruiter page: honest authorship line, "five things worth 30 seconds" (figures from eval files); README screenshots regenerated
 - 2026-11-13 T185: one-row header (7 primary links + "More" disclosure reaching Backtests, Experiments, LLM evals/observability, Data, API); rehearsal band -> pill, full sentence on Leaderboard/Findings/Methods; phone header 2 short rows; a11y 0 serious
 - 2026-11-13 T184: README first screen: pitch, tour links, one image, five generated highlights (cards + evals), stack line; detail tables collapsed

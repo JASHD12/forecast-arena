@@ -54,7 +54,7 @@ FROM forecasts f
 JOIN resolutions r USING (question_id)
 JOIN questions q USING (question_id)
 GROUP BY ALL
-ORDER BY q.domain, brier""",
+ORDER BY q.domain, brier, f.forecaster_id""",
     ),
     Query(
         "yes-rate-by-template",
@@ -79,7 +79,7 @@ ORDER BY q.domain, q.template""",
        round(avg(probability), 3) AS mean_probability
 FROM forecasts
 GROUP BY ALL
-ORDER BY mean_distance_from_50 DESC""",
+ORDER BY mean_distance_from_50 DESC, forecaster_id""",
     ),
     Query(
         "skips",
@@ -88,7 +88,7 @@ ORDER BY mean_distance_from_50 DESC""",
         """SELECT forecaster_id, reason_code, count(*) AS skips
 FROM skips
 GROUP BY ALL
-ORDER BY skips DESC, forecaster_id""",
+ORDER BY skips DESC, forecaster_id, reason_code""",
     ),
 )
 

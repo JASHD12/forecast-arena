@@ -5,13 +5,8 @@ Every number on the site is computed here from the ledger by code (integrity rul
 
 from __future__ import annotations
 
-import gzip
-import html
 import json
-import re
 import shutil
-import urllib.parse
-from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
@@ -20,7 +15,6 @@ from typing import Any
 from jinja2 import Environment, PackageLoader, select_autoescape
 from markupsafe import Markup
 
-from arena.agent.tools import GDELT_ATTRIBUTION
 from arena.analytics.sql import (
     COLUMN_DOCS,
     column_types,
@@ -31,162 +25,57 @@ from arena.analytics.sql import (
 from arena.analytics.sql import connect as sql_connect
 from arena.clock import Clock
 from arena.config import DEFAULT_REPO_URL, DEFAULT_SITE_URL
-from arena.ledger import Ledger, layout
+from arena.ledger import Ledger
 from arena.ledger.verify import verify
-from arena.models import Question, RunManifest
+from arena.models import Question
 from arena.ops.official import STREAK, update_official_start
 from arena.ops.weekly import summaries as weekly_summaries
 from arena.scoring.boards import MIN_DAYS, all_boards, official
-from arena.scoring.core import Scored, clip, counts, load
+from arena.scoring.core import counts, load
 from arena.scoring.findings import findings, power_table
-from arena.scoring.stats import calibration_bins, expected_calibration_error, murphy
 from arena.site.api import ENDPOINTS, build_api
 from arena.site.cards_page import headline_backtest, load_cards
-from arena.site.charts import forest_svg, race_svg, reliability_svg, series_class
+from arena.site.charts import forest_svg, race_svg, series_class
+from arena.site.content import (
+    AI_FORECASTERS,
+    ATTRIBUTIONS,
+    FEED_BATCHES,
+    INFORMATION_SETS,
+    NAV,
+    NAV_MORE,
+    PLACEHOLDER,
+    SKIP_HELP,
+)
 from arena.site.game import live_deck, practice_deck
 from arena.site.llm_obs import PRICE_SOURCE, load_spans, totals, traces_by_question, usage_rows
 from arena.site.matrices import MIN_N, head_to_head, heatmap
 from arena.site.methods_content import LIMITATIONS, PRINCIPLES
 from arena.site.ops_status import llm_usage, missed_days, parse_failures, source_freshness
 from arena.site.profiles import profile
-from arena.site.qchart import chart_data, series_svg
 from arena.site.recruiters import PROOFS
+from arena.site.shaping import (
+    _question_chart,
+    _rows,
+    _runs,
+    calibration_panels,
+    domain_stats,
+    drift_badge,
+    eval_runs,
+    featured_row,
+    json_validity_change,
+    library_versions,
+    live_versions,
+    model_timeline,
+    official_start,
+    question_href,
+    question_scores,
+    race_data,
+    simple_markdown,
+    template_changelog,
+    version_changelog,
+)
 from arena.site.titles import FORECASTER_NAMES, domain_name, forecaster_name, plain_title
 from arena.site.topics import topic
-from arena.sources.brightsky import ATTRIBUTION as WX_ATTRIBUTION
-from arena.sources.brightsky import LICENCE as WX_LICENCE
-from arena.sources.ecb import ATTRIBUTION as ECB_ATTRIBUTION
-from arena.sources.smard import ATTRIBUTION as SMARD_ATTRIBUTION
-from arena.sources.smard import LICENCE as SMARD_LICENCE
-from arena.sources.wikimedia import ATTRIBUTION as WIKI_ATTRIBUTION
-
-#: T185: the primary links a first-time visitor needs; everything else is under "More".
-NAV: tuple[tuple[str, str], ...] = (
-    ("index.html", "Home"),
-    ("questions/index.html", "Questions"),
-    ("leaderboard.html", "Leaderboard"),
-    ("play.html", "Play"),
-    ("guide.html", "How it works"),
-    ("stack.html", "Tech stack"),
-    ("recruiters.html", "For recruiters"),
-)
-NAV_MORE: tuple[tuple[str, str], ...] = (
-    ("findings.html", "Findings"),
-    ("calibration.html", "Calibration"),
-    ("backtests.html", "Backtests"),
-    ("experiments.html", "Experiments"),
-    ("evals.html", "LLM evals"),
-    ("llm.html", "LLM observability"),
-    ("data.html", "Open data and SQL"),
-    ("api.html", "JSON API"),
-    ("methods.html", "Methods"),
-    ("status.html", "Status"),
-    ("about.html", "About"),
-)
-#: CC BY 4.0 asks to indicate changes: daily statistics, thresholds and returns are
-#: computed by this project from the published values.
-ATTRIBUTIONS = (
-    f"electricity prices: {SMARD_ATTRIBUTION} ({SMARD_LICENCE}; daily statistics computed "
-    "by this project)",
-    f"weather: {WX_ATTRIBUTION} ({WX_LICENCE}; daily values computed by this project)",
-    f"attention: {WIKI_ATTRIBUTION}",
-    f"exchange rates: {ECB_ATTRIBUTION}",
-    f"news headlines for the agent: {GDELT_ATTRIBUTION}",
-)
-FEED_BATCHES = 7
-#: Marker of an unfinished owner-written draft (docs/legal/*.md); such files stay unpublished.
-PLACEHOLDER = "[FILL IN"
-SKIP_HELP = {
-    "not_sampled": "the AI forecasters answer a fixed daily sample per topic, to cap cost",
-    "budget_exhausted": "the daily AI token or request cap was reached",
-    "parse_failure": "the AI answer did not match the required JSON format, even after a repair",
-    "model_missing": "no AI model or key configured",
-    "error": "the forecaster raised an error (for example missing input data)",
-}
-#: Libraries shown on the tech-stack page, with the version installed where the site is
-#: built (read at build time, never typed in by hand).
-STACK_LIBRARIES = (
-    ("scikit-learn", "gradient-boosted quantile regression and classification, calibration"),
-    ("numpy", "numerics"),
-    ("scipy", "Student-t distributions for volatility models"),
-    ("anthropic", "official Claude SDK for the LLM and agent forecasters"),
-    ("pydantic", "typed, validated ledger records and settings"),
-    ("jinja2", "static site generation"),
-    ("click", "command-line interface for every job"),
-    ("joblib", "model artefacts in the registry"),
-    ("lightgbm", "challenger gradient-boosting models (quantile regression, classification)"),
-    ("optuna", "hyperparameter search for the LightGBM challenger (time-series folds)"),
-    ("shap", "SHAP explanations of LightGBM models"),
-    ("statsmodels", "ETS and SARIMAX benchmarks in the power backtest"),
-    ("llama-cpp-python", "runs the open-weights model of llm_local on the CPU (morning job)"),
-    ("dbt-duckdb", "dbt models and tests (staging, marts) over the open data, built in CI"),
-    ("fastapi", "the read-only REST API (`arena api`), served from the Docker image in CI"),
-    ("uvicorn", "the ASGI server that runs the REST API"),
-    ("streamlit", "the interactive dashboard (apps/dashboard), smoke-tested with AppTest in CI"),
-    ("nbclient", "executes the analysis notebook (pandas + DuckDB on the open data) in CI"),
-    ("mcp", "official MCP SDK: the read-only `arena mcp` server over the ledger"),
-    ("langgraph", "the agent_graph forecaster's state machine (plan, retrieve, tools, critique)"),
-    ("fastembed", "local ONNX text embeddings for the agent's similar-questions tool (RAG)"),
-    ("chronos-forecasting", "Chronos-Bolt tiny (pretrained time-series model), backtest only"),
-    ("mlflow-skinny", "experiment tracking of the weekly retraining (SQLite backend)"),
-    ("evidently", "data-drift reports on model inputs"),
-)
-
-
-def library_versions() -> list[dict[str, str]]:
-    """Name, installed version (or "not installed here") and role of each library."""
-    from importlib.metadata import PackageNotFoundError, version
-
-    out = []
-    for name, role in STACK_LIBRARIES:
-        try:
-            v = version(name)
-        except PackageNotFoundError:
-            v = "installed by another job, not by this site build"
-        out.append({"name": name, "version": v, "role": role})
-    return out
-
-
-def live_versions(rec: Any) -> list[dict[str, str]]:
-    """The most recent version string each forecaster published, from the ledger."""
-    latest: dict[str, tuple[Any, str]] = {}
-    for f in rec.forecasts:
-        cur = latest.get(f.forecaster_id)
-        if cur is None or f.created_at > cur[0]:
-            latest[f.forecaster_id] = (f.created_at, f.forecaster_version)
-    rows = []
-    for fid in sorted(latest):
-        v = latest[fid][1]
-        rows.append({"id": fid, "version": v, "model": v.split("|", 1)[0] if "|" in v else v})
-    return rows
-
-
-INFORMATION_SETS = (
-    ("base_rate", "Trailing outcomes of the same template and entity", "all questions"),
-    ("persistence", "Yesterday's outcome of the same template and entity", "all questions"),
-    ("ml", "The full as-of context", "all questions (planned)"),
-    (
-        "llm_plain",
-        "Question text, resolution rule, current date; no data, no tools",
-        "daily sample (planned)",
-    ),
-    (
-        "llm_context",
-        "The above plus a compact rendering of the as-of context",
-        "daily sample (planned)",
-    ),
-    ("agent", "As llm_context, plus read-only tools", "daily sample (planned)"),
-    (
-        "llm_local",
-        "As llm_context, answered by an open model (Qwen2.5-1.5B) on the runner's CPU",
-        "daily sample (planned)",
-    ),
-    (
-        "agent_graph",
-        "As agent, run as a LangGraph graph: plan, retrieved evidence, tools, self-check",
-        "1 question per topic per day (planned)",
-    ),
-)
 
 
 @dataclass(frozen=True)
@@ -216,298 +105,6 @@ def _env() -> Environment:
         all_names=FORECASTER_NAMES,
     )
     return env
-
-
-AI_FORECASTERS = frozenset({"llm_plain", "llm_context", "agent", "agent_graph", "llm_local"})
-
-
-def race_data(scored: Sequence[Scored]) -> dict[str, Any]:
-    """Cumulative mean (clipped) Brier score per forecaster after each batch day, on the
-    questions every plotted forecaster answered (a fair, like-for-like race). Display only;
-    the leaderboards with intervals come from `arena.scoring`."""
-    by_q: dict[str, dict[str, Scored]] = {}
-    for s in scored:
-        by_q.setdefault(s.question_id, {})[s.forecaster_id] = s
-    fids = sorted({s.forecaster_id for s in scored})
-    common = [q for q, m in by_q.items() if all(f in m for f in fids)]
-    if len(fids) < 2 or not common:
-        return {"days": [], "series": {}, "n": 0, "fids": fids}
-    days = sorted({by_q[q][fids[0]].batch_date for q in common})
-    series: dict[str, list[tuple[str, float]]] = {f: [] for f in fids}
-    for f in fids:
-        tot, cnt = 0.0, 0
-        for d in days:
-            for q in common:
-                s = by_q[q][f]
-                if s.batch_date == d:
-                    tot += (clip(s.probability) - s.outcome) ** 2
-                    cnt += 1
-            series[f].append((d.isoformat(), tot / cnt))
-    return {"days": [d.isoformat() for d in days], "series": series, "n": len(common), "fids": fids}
-
-
-def featured_row(rows: Sequence[dict[str, Any]]) -> dict[str, Any] | None:
-    """The latest question on which the forecasters disagree most (display only)."""
-    best, spread = None, -1.0
-    for r in rows:
-        ps = list(r["pn"].values())
-        if len(ps) >= 2 and max(ps) - min(ps) > spread:
-            best, spread = r, max(ps) - min(ps)
-    return None if best is None else {**best, "spread": spread}
-
-
-def domain_stats(rec: Any) -> list[dict[str, Any]]:
-    """Questions and resolved questions per domain."""
-    out: dict[str, dict[str, Any]] = {}
-    for q in rec.questions.values():
-        d = out.setdefault(q.domain, {"domain": q.domain, "questions": 0, "resolved": 0})
-        d["questions"] += 1
-        if q.question_id in rec.resolutions:
-            d["resolved"] += 1
-    return [out[k] for k in sorted(out)]
-
-
-def question_scores(forecasts: Sequence[Any], outcome: int | None) -> list[dict[str, Any]]:
-    """Per forecast of one question: probability and, once resolved, its (clipped) Brier
-    score; closest first. Display only; leaderboards come from `arena.scoring`."""
-    rows = []
-    for f in forecasts:
-        b = None if outcome is None else (clip(f.probability) - outcome) ** 2
-        rows.append({"f": f, "brier": b})
-    if outcome is not None:
-        rows.sort(key=lambda r: (r["brier"], r["f"].forecaster_id))
-    return rows
-
-
-def simple_markdown(text: str) -> Markup:
-    """Tiny, safe renderer for human-written pages: paragraphs, `#` headings, links.
-
-    Everything is HTML-escaped first; only [text](https://...) links are turned into anchors.
-    """
-    blocks = [b.strip() for b in re.split(r"\n\s*\n", text) if b.strip()]
-    out = []
-    for b in blocks:
-        esc = html.escape(b)
-        esc = re.sub(r"\[([^\]]+)\]\((https?://[^)\s]+)\)", r'<a href="\2">\1</a>', esc)
-        m = re.match(r"^(#{1,3})\s+(.*)$", esc)
-        if m:
-            level = len(m.group(1)) + 1
-            out.append(f"<h{level}>{m.group(2)}</h{level}>")
-        else:
-            out.append("<p>" + esc.replace("\n", "<br>") + "</p>")
-    return Markup("\n".join(out))
-
-
-def _fmt_p(p: float) -> str:
-    return f"{p:.2f}"
-
-
-def _rows(questions: Sequence[Question], rec: Any) -> tuple[list[dict[str, Any]], list[str]]:
-    by_q: dict[str, dict[str, str]] = {}
-    pn: dict[str, dict[str, float]] = {}
-    fids: set[str] = set()
-    for f in rec.forecasts:
-        by_q.setdefault(f.question_id, {})[f.forecaster_id] = _fmt_p(f.probability)
-        pn.setdefault(f.question_id, {})[f.forecaster_id] = f.probability
-        fids.add(f.forecaster_id)
-    rows = []
-    for q in questions:
-        r = rec.resolutions.get(q.question_id)
-        v = rec.voids.get(q.question_id)
-        state = f"void ({v.reason_code})" if v is not None and r is None else "open"
-        rows.append(
-            {
-                "qid": q.question_id,
-                "text": q.text,
-                "title": plain_title(q),
-                "domain": q.domain,
-                "pn": pn.get(q.question_id, {}),
-                "lock": q.lock_time.strftime("%Y-%m-%d %H:%M UTC"),
-                "p": by_q.get(q.question_id, {}),
-                "outcome": None if r is None else r.outcome,
-                "observed": None if r is None else r.observed_value,
-                "state": state,
-            }
-        )
-    order = [
-        "base_rate",
-        "persistence",
-        "ml",
-        "llm_plain",
-        "llm_context",
-        "llm_local",
-        "agent",
-        "agent_graph",
-    ]
-    ordered = [f for f in order if f in fids] + sorted(fids - set(order))
-    return rows, ordered
-
-
-def _runs(ledger: Ledger, limit: int = 20) -> list[RunManifest]:
-    out = []
-    for rel in ledger.list_files("runs"):
-        rec = ledger.read_json(rel)
-        if isinstance(rec, RunManifest):
-            out.append(rec)
-    return sorted(out, key=lambda r: r.started_at, reverse=True)[:limit]
-
-
-def _question_chart(
-    ledger: Ledger, snaps: dict[tuple[str, date], dict[str, Any]], q: Question, res: Any
-) -> dict[str, Any] | None:
-    """Chart (SVG and table rows) from the morning snapshot of the question's batch."""
-    key = (q.domain, q.batch_date)
-    if key not in snaps:
-        rel = f"{layout.snapshot_dir(q.domain, q.batch_date)}/morning_context.json.gz"
-        snaps[key] = (
-            json.loads(gzip.decompress(ledger.read_bytes(rel))) if ledger.exists(rel) else {}
-        )
-    ctx = snaps[key].get(q.question_id)
-    if not isinstance(ctx, dict):
-        return None
-    cd = chart_data(q, ctx, None if res is None else res.observed_value)
-    if cd is None or not any(pts for _, pts in cd.series):
-        return None
-    return {"svg": series_svg(cd), "data": cd}
-
-
-def model_timeline(runs: Sequence[dict[str, Any]]) -> list[dict[str, Any]]:
-    """Every weekly decision per domain, newest first (promotions and keeps)."""
-    out = []
-    for r in runs:
-        if r.get("dry_run"):
-            continue
-        for d in r.get("decisions", []):
-            out.append(
-                {
-                    "day": r["day"],
-                    "domain": d["domain"],
-                    "promoted": d.get("promoted"),
-                    "family": d.get("best_family"),
-                    "reason": d.get("reason", ""),
-                }
-            )
-    return out
-
-
-def drift_badge(metrics: Sequence[dict[str, Any]]) -> dict[str, Any] | None:
-    """Share of drifted inputs from Evidently's drifted-columns metric, as a badge."""
-    for m in metrics:
-        if "DriftedColumnsCount" in str(m.get("metric")):
-            hit = re.search(r"share=([0-9.]+)", str(m.get("value")))
-            if hit:
-                share = float(hit.group(1))
-                return {"alert": share >= 0.5, "text": f"{share:.0%} of model inputs drifted"}
-    return None
-
-
-def eval_runs(evals_dir: Path | None) -> list[dict[str, Any]]:
-    """Committed evaluation results (T124), newest first; fake CI-gate runs are skipped."""
-    if evals_dir is None or not evals_dir.is_dir():
-        return []
-    runs = []
-    for p in sorted(evals_dir.glob("*.json")):
-        if p.name.startswith("fake-"):
-            continue
-        r = json.loads(p.read_text(encoding="utf-8"))
-        if r.get("kind") == "evaluation":
-            runs.append(r)
-    return sorted(runs, key=lambda r: str(r.get("created_at")), reverse=True)
-
-
-def json_validity_change(
-    runs: Sequence[dict[str, Any]], fid: str = "llm_plain"
-) -> dict[str, str] | None:
-    """First-try valid JSON of `fid` in the oldest and newest eval run, as percentages (T186).
-
-    Computed from the committed eval results, so the recruiter page never types it (I5).
-    """
-    vals = []
-    for r in sorted(runs, key=lambda r: str(r.get("created_at"))):
-        v = r.get("metrics", {}).get(fid, {}).get("json_valid_first_try")
-        if v is not None:
-            vals.append(v)
-    if len(vals) < 2:
-        return None
-    return {"before": f"{100 * vals[0]:.0f}%", "after": f"{100 * vals[-1]:.0f}%"}
-
-
-def official_start(ledger: Ledger) -> str | None:
-    """The official start date if `meta/official_start.json` exists."""
-    if not ledger.exists(layout.OFFICIAL_START_PATH):
-        return None
-    data = json.loads(ledger.read_bytes(layout.OFFICIAL_START_PATH))
-    value = data.get("official_start")
-    return str(value) if value else None
-
-
-def version_changelog(rec: Any) -> list[dict[str, Any]]:
-    """First batch date on which each (forecaster, version) appeared."""
-    first: dict[tuple[str, str], date] = {}
-    for f in rec.forecasts:
-        q = rec.questions.get(f.question_id)
-        if q is None:
-            continue
-        k = (f.forecaster_id, f.forecaster_version)
-        if k not in first or q.batch_date < first[k]:
-            first[k] = q.batch_date
-    rows = [{"forecaster": k[0], "version": k[1], "since": d} for k, d in first.items()]
-    return sorted(rows, key=lambda r: (r["since"], r["forecaster"], r["version"]))
-
-
-TEMPLATE_VERSION_NOTES = {
-    1: "published on the morning of the batch day",
-    2: "published the evening before the batch day (T160); same text and lock",
-}
-
-
-def template_changelog(rec: Any) -> list[dict[str, Any]]:
-    """First and last batch date of each (domain, template, template_version) (SPEC 2.9)."""
-    span: dict[tuple[str, str, int], list[date]] = {}
-    for q in rec.questions.values():
-        k = (q.domain, q.template, q.template_version)
-        lo_hi = span.setdefault(k, [q.batch_date, q.batch_date])
-        lo_hi[0], lo_hi[1] = min(lo_hi[0], q.batch_date), max(lo_hi[1], q.batch_date)
-    rows = [
-        {
-            "domain": k[0],
-            "template": k[1],
-            "version": k[2],
-            "since": v[0],
-            "until": v[1],
-            "note": TEMPLATE_VERSION_NOTES.get(k[2], ""),
-        }
-        for k, v in span.items()
-    ]
-    return sorted(rows, key=lambda r: (r["since"], r["domain"], r["template"], r["version"]))
-
-
-def calibration_panels(scored: Sequence[Scored]) -> list[dict[str, Any]]:
-    """Per forecaster: bins, ECE, Murphy decomposition and the SVG diagram."""
-    by: dict[str, list[Scored]] = {}
-    for s in scored:
-        by.setdefault(s.forecaster_id, []).append(s)
-    out = []
-    for fid in sorted(by):
-        ss = by[fid]
-        p, y = [s.probability for s in ss], [s.outcome for s in ss]
-        bins = calibration_bins(p, y)
-        out.append(
-            {
-                "forecaster": fid,
-                "n": len(ss),
-                "bins": bins,
-                "svg": reliability_svg(fid, bins),
-                "ece": expected_calibration_error(p, y),
-                "murphy": murphy(p, y),
-            }
-        )
-    return out
-
-
-def question_href(question_id: str, prefix: str = "questions/") -> str:
-    """Link to a question page (ids may contain '%', which is encoded)."""
-    return prefix + urllib.parse.quote(question_id, safe="") + ".html"
 
 
 def build_site(

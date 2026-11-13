@@ -596,7 +596,7 @@ third-party requests; every page stays usable without JavaScript.
 ```
 AGENTS.md  CLAUDE.md  docs/project/TASKS.md  docs/project/PROGRESS.md  docs/project/HUMAN_TODO.md  docs/project/DECISIONS.md  README.md
 docs/        SPEC.md  SOURCES.md  RUNBOOK.md  METHODS.md  explainers/  schemas/
-src/arena/   config.py  clock.py  models.py  cli.py
+src/arena/   config.py  clock.py  models.py  cli/ (commands by purpose)
              ledger/  sources/  domains/  forecasters/  llm/  scoring/  site/  ops/
 tests/       unit/  fixtures/  e2e/
 scripts/     status.py

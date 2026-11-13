@@ -571,7 +571,7 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
     recruiter page with an honest authorship line and "five things worth 30 seconds".
   - Done when: tests check the backtest card values against `docs/models/power.md` and
     that "built end to end by one person" is gone; screenshots reviewed.
-- [ ] T187 · Code tour and entry-file refactor (deps: T183)
+- [x] T187 · Code tour and entry-file refactor (deps: T183)
   - Do: `docs/CODE_TOUR.md`; split `site/build.py` into page modules and `cli.py` into a
     `cli/` package; remove `# fmt: skip` and let ruff format the code (separate commit).
   - Done when: tests pass and the offline site build is byte-identical before and after.

@@ -47,3 +47,41 @@ def test_recruiter_page_is_honest_and_computed(tmp_path) -> None:
     ch = json_validity_change(runs)
     assert ch is not None and f"from {ch['before']} to {ch['after']}" in page
     assert json_validity_change(runs[:1]) is None
+
+
+def test_experiments_shows_labelled_challenger_backtests_until_a_weekly_run(tmp_path) -> None:
+    from arena.site.cards_page import challenger_backtests
+
+    rows = challenger_backtests(MODELS)
+    assert {r["challenger"] for r in rows} >= {"ml_lgbm", "ml_mlp", "ts_chronos"}
+    lgbm = next(r for r in rows if r["challenger"] == "ml_lgbm")
+    assert lgbm["supported"] and lgbm["better"]
+    assert (
+        f"| ml_lgbm - ml | {lgbm['diff']} | {lgbm['interval']} |"
+        in (MODELS / "power-lgbm.md").read_text()
+    )
+    page = (_site(tmp_path) / "experiments.html").read_text()
+    assert "Challengers against the champion" in page and "not the live record" in page
+    assert lgbm["diff"] in page and "better than the champion" in page
+    assert challenger_backtests(None) == []
+
+
+def test_agent_card_only_from_real_successful_traces() -> None:
+    from datetime import date
+    from types import SimpleNamespace
+
+    from arena.site.shaping import agent_trace_of_day
+
+    q = SimpleNamespace(batch_date=date(2026, 11, 1))
+    rec = SimpleNamespace(questions={"q1": q}, forecasts=[], resolutions={})
+    ok = {
+        "forecaster_id": "agent",
+        "outcome": "forecast",
+        "tool_calls": [{"tool": "get_series"}, {"tool": "get_base_rate"}],
+    }
+    bad = {"forecaster_id": "agent", "outcome": "error", "tool_calls": []}
+    card = agent_trace_of_day({"q1": [ok]}, rec, date(2026, 11, 2))
+    assert card and card["tools"] == ["get_series", "get_base_rate"] and card["probability"] is None
+    assert agent_trace_of_day({"q1": [bad]}, rec, date(2026, 11, 2)) is None
+    assert agent_trace_of_day({"q1": [ok]}, rec, date(2026, 10, 31)) is None  # not after batch
+    assert agent_trace_of_day({}, rec, None) is None

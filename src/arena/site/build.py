@@ -34,7 +34,7 @@ from arena.scoring.boards import MIN_DAYS, all_boards, official
 from arena.scoring.core import counts, load
 from arena.scoring.findings import findings, power_table
 from arena.site.api import ENDPOINTS, build_api
-from arena.site.cards_page import headline_backtest, load_cards
+from arena.site.cards_page import challenger_backtests, headline_backtest, load_cards
 from arena.site.charts import forest_svg, race_svg, series_class
 from arena.site.content import (
     AI_FORECASTERS,
@@ -57,6 +57,7 @@ from arena.site.shaping import (
     _question_chart,
     _rows,
     _runs,
+    agent_trace_of_day,
     calibration_panels,
     domain_stats,
     drift_badge,
@@ -197,6 +198,7 @@ def build_site(
                 "forecast_count": len(rec.forecasts),
                 "ml_live": any(f.forecaster_id == "ml" for f in rec.forecasts),
                 "backtest": headline_backtest(models_dir),
+                "agent_card": agent_trace_of_day(traces_by_question(ledger), rec, latest_b),
                 "days_live": len(batches),
                 "counts": counts(rec),
                 "verify_ok": rep.ok,
@@ -271,7 +273,12 @@ def build_site(
         ),
         "experiments.html": (
             "Experiments",
-            {"runs": runs_w, "timeline": model_timeline(runs_w), "drift_badge": drift_badge},
+            {
+                "runs": runs_w,
+                "timeline": model_timeline(runs_w),
+                "drift_badge": drift_badge,
+                "challengers": challenger_backtests(models_dir),
+            },
         ),
         "status.html": (
             "Status",

@@ -114,3 +114,53 @@ def headline_backtest(models_dir: Path | None, stem: str = "power") -> dict[str,
         "end": span.group(2),
         "days": int(span.group(3)),
     }
+
+
+#: Plain names of the backtest-only challengers (they never publish live forecasts).
+CHALLENGER_NAMES = {
+    "ml_lgbm": "LightGBM, tuned with Optuna",
+    "ml_mlp": "PyTorch quantile network",
+    "ts_ets": "ETS (statsmodels)",
+    "ts_sarimax": "SARIMAX (statsmodels)",
+    "ts_chronos": "Chronos-Bolt (pretrained)",
+}
+
+#: The power cards whose comparison tables hold challenger-versus-champion rows.
+CHALLENGER_CARDS = ("power-lgbm", "power-mlp", "power-ts")
+
+
+def challenger_backtests(models_dir: Path | None) -> list[dict[str, Any]]:
+    """Every "<challenger> - ml" row of the committed power cards (T189).
+
+    Shown on Experiments, labelled as backtests, until the weekly job has run on the live
+    record. Values are copied from the cards, never recomputed (I5).
+    """
+    out: list[dict[str, Any]] = []
+    if models_dir is None:
+        return out
+    row = re.compile(r"^\| (\w+) - ml \| ([-+0-9.]+) \| (\[[^\]]+\]) \| (yes|no)[^|]*\|", re.M)
+    for stem in CHALLENGER_CARDS:
+        path = models_dir / f"{stem}.md"
+        if not path.is_file():
+            continue
+        text = path.read_text(encoding="utf-8")
+        brier = {
+            m.group(1): m.group(2)
+            for m in re.finditer(r"^\| (\w+) \| \d+ \| ([0-9.]+) \| \[", text, re.M)
+        }
+        for m in row.finditer(text):
+            fid, diff = m.group(1), m.group(2)
+            out.append(
+                {
+                    "card": stem,
+                    "challenger": fid,
+                    "name": CHALLENGER_NAMES.get(fid, fid),
+                    "brier": brier.get(fid),
+                    "champion": brier.get("ml"),
+                    "diff": diff,
+                    "interval": m.group(3),
+                    "supported": m.group(4) == "yes",
+                    "better": diff.startswith("-"),
+                }
+            )
+    return out

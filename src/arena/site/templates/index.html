@@ -46,7 +46,7 @@
 <div class="kpi"><span class="kpi-n">{{ counts.questions }}</span><span class="kpi-l">questions asked</span></div>
 <div class="kpi"><span class="kpi-n">{{ forecast_count }}</span><span class="kpi-l">forecasts locked in</span></div>
 <div class="kpi"><span class="kpi-n">{{ counts.resolved }}</span><span class="kpi-l">answers scored</span></div>
-<div class="kpi"><span class="kpi-n">{{ topics|length }}</span><span class="kpi-l">topics live</span></div>
+{% if topics|length > 1 or not backtest %}<div class="kpi"><span class="kpi-n">{{ topics|length }}</span><span class="kpi-l">{{ "topic" if topics|length == 1 else "topics" }} live</span></div>{% else %}<div class="kpi"><span class="kpi-n">{{ backtest.days }}</span><span class="kpi-l">days replayed in the <a href="backtests.html">backtests</a></span></div>{% endif %}
 </div>
 
 <p class="built">Built with <span class="tag">Anthropic Claude: LLM + tool-using agent</span> <span class="tag">scikit-learn gradient boosting</span> <span class="tag">Platt calibration</span> <span class="tag">proper scoring rules</span> <span class="tag">day-block bootstrap</span> <span class="tag">MLflow</span> <span class="tag">Evidently</span> <span class="tag">permutation importance</span> <span class="tag">Diebold-Mariano</span> <span class="tag">mypy</span> <span class="tag">DuckDB SQL + Parquet</span> <span class="tag">GitHub Actions CI/CD</span> <a href="stack.html">Full tech stack →</a></p>
@@ -73,6 +73,13 @@
 {% endfor %}</ul>
 {% else %}<p class="empty">No questions yet. Questions are published the evening before (18:00 UTC), answered by the morning run (05:30 UTC) and locked at 09:30 UTC.</p>{% endif %}
 
+{% if agent_card %}{% set a = agent_card %}<section class="card agent-card" aria-labelledby="agent-title">
+<h2 id="agent-title">How the AI agent worked on {{ a.question.batch_date }}</h2>
+<p><a href="{{ a.href }}">{{ plain_title(a.question) }}</a></p>
+<ol class="agent-steps">{% for tool in a.tools %}<li><code>{{ tool }}</code></li>{% endfor %}<li>answered <strong>{% if a.probability is not none %}{{ "%.0f"|format(a.probability * 100) }}% YES{% else %}(no forecast recorded){% endif %}</strong>{% if a.outcome is not none %}; the answer was <strong>{{ "YES" if a.outcome == 1 else "NO" }}</strong>{% endif %}</li></ol>
+<p class="note">{{ fname(a.forecaster_id) }}: every tool call is read-only and limited by the harness (calls, time, tokens). <a href="{{ a.href }}">The full trace is on the question page.</a></p>
+</section>
+{% endif %}
 <section class="card play-teaser" aria-labelledby="play-title">
 <h2 id="play-title">Can you beat the AI?</h2>
 <p>Give your own probability for real questions, see the answer, and compare your score with the AI, the ML model and the base rate. Nothing is stored.</p>

@@ -581,7 +581,7 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
   - Do: record the scheduled time and the start time of each real run (manifest) and show
     the median delay per job on the Status page.
   - Done when: a unit test covers the delay computation; the Status page shows it.
-- [ ] T189 · Empty states and home details (deps: T186)
+- [x] T189 · Empty states and home details (deps: T186)
   - Do: Experiments and LLM pages show labelled backtest or evaluation results until live
     data exists; stronger home stat; "agent trace of the day" card; share preview check.
   - Done when: no page shows a bare "nothing yet"; a11y passes.

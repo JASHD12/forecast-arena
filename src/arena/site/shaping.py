@@ -340,3 +340,46 @@ def calibration_panels(scored: Sequence[Scored]) -> list[dict[str, Any]]:
 def question_href(question_id: str, prefix: str = "questions/") -> str:
     """Link to a question page (ids may contain '%', which is encoded)."""
     return prefix + urllib.parse.quote(question_id, safe="") + ".html"
+
+
+#: Agent forecasters whose tool use is worth showing on the home page.
+AGENT_IDS = ("agent", "agent_graph")
+
+
+def agent_trace_of_day(
+    traces: dict[str, list[dict[str, Any]]], rec: Any, batch: date | None
+) -> dict[str, Any] | None:
+    """The home page's "how the agent worked" card (T189): from the newest batch (up to
+    `batch`) that has a successful agent trace, the one with the most tool calls, with the
+    published probability. None if there is none; nothing is invented to fill it (I5)."""
+    if batch is None:
+        return None
+    best: tuple[date, int, str, dict[str, Any]] | None = None
+    for qid, lines in sorted(traces.items()):
+        q = rec.questions.get(qid)
+        if q is None or q.batch_date > batch:
+            continue
+        for t in lines:
+            if t.get("forecaster_id") in AGENT_IDS and t.get("outcome") == "forecast":
+                key = (q.batch_date, len(t.get("tool_calls") or []))
+                if best is None or key > best[:2]:
+                    best = (*key, qid, t)
+    if best is None:
+        return None
+    _, _, qid, t = best
+    fc = next(
+        (
+            f
+            for f in rec.forecasts
+            if f.question_id == qid and f.forecaster_id == t["forecaster_id"]
+        ),
+        None,
+    )
+    return {
+        "question": rec.questions[qid],
+        "href": question_href(qid),
+        "forecaster_id": t["forecaster_id"],
+        "tools": [c.get("tool") for c in t.get("tool_calls") or []],
+        "probability": None if fc is None else fc.probability,
+        "outcome": None if qid not in rec.resolutions else rec.resolutions[qid].outcome,
+    }

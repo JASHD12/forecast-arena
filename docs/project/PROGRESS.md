@@ -82,6 +82,7 @@ readers the notebook really uses.
 
 ## Done log
 
+- 2026-11-13 T184: README first screen: pitch, tour links, one image, five generated highlights (cards + evals), stack line; detail tables collapsed
 - 2026-11-13 T183: repo root cleaned: requirements/ and docs/project/ (references, AGENTS.md, CLAUDE.md, scripts, Makefile, workflows, Dockerfile updated)
 - 2026-11-13 T171: honesty audit of stack, recruiters, de and README (table in docs/project/PROGRESS.md); removed the Polars/Spark wording from stack.html; no open item
 - 2026-11-13 T170: docs/interview/ (pitch EN/DE, system design, 40 Q&A, 6 STAR stories, CV/LinkedIn text); every figure checked against the generated docs/interview/numbers.md (cards, evals, live ledger via arena report cv)

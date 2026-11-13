@@ -4,33 +4,38 @@
 [![Live site](https://img.shields.io/badge/live-site-3b3fc4)](https://jashd12.github.io/forecast-arena/)
 [![Licence: MIT](https://img.shields.io/badge/licence-MIT-informational)](LICENSE)
 
-A live, public benchmark in which different kinds of forecasters (simple baselines, a
-classical ML model, LLMs with and without data, an LLM agent with tools) predict
-tomorrow's real-world outcomes and are scored against what actually happens.
+**Can an LLM agent beat a classical ML model at forecasting tomorrow?** Forecast Arena is a
+live, public benchmark that answers this honestly. Every day it turns public data (German
+electricity prices first) into yes/no questions; baselines, a gradient-boosted model and
+several LLM forecasters (Claude, a tool-using agent, a LangGraph agent, a local
+open-weights model) each publish a probability **before the answer exists**, into an
+append-only, hash-chained ledger. When the official data arrives, every forecast is scored.
 
-**Research question:** when does an LLM agent beat a classical ML model at forecasting,
-and when does it not? An honest "it does not" is a valid result.
+**[Live site](https://jashd12.github.io/forecast-arena/)** ·
+**[60-second tour](https://jashd12.github.io/forecast-arena/recruiters.html)** ·
+**[Status](https://jashd12.github.io/forecast-arena/status.html)** ·
+[Architecture](#how-it-works) · [Reproduce it](#reproduce-it)
 
-This is a research project. Nothing here is advice of any kind.
+[![The home page](docs/img/home.png)](https://jashd12.github.io/forecast-arena/)
 
-**Live site: <https://jashd12.github.io/forecast-arena/>**
+*Screenshot of the offline demo build (fixture data). Research project, not advice.*
 
-**Status (2026-11-12):** the live pipeline is running on GitHub Actions. The site and the
-public ledger branch went live on 2026-11-12; the first batch of questions and forecasts
-was written on 2026-11-13 (rehearsal start date: 2026-11-13). The first days are a *rehearsal*: they are
-shown, but excluded from headline scores. The official record starts automatically after
-five consecutive clean days (SPEC 2.9). Electricity prices are live first; weather,
-Wikipedia attention and exchange rates follow once each has passed its next-day checks.
+## What this shows
 
-## At a glance
+<!-- highlights:start -->
+- **A classical model that clearly beats the base rate** (backtest, 365 days of German electricity): Brier 0.1930 vs 0.2466, paired difference -0.0536 [-0.0655, -0.0414]. Calibrated gradient-boosted quantile regression.
+- **Honest champion/challenger:** an Optuna-tuned LightGBM challenger improved Brier by -0.0045 [-0.0069, -0.0021] (supported); a PyTorch network (-0.0003 [-0.0087, +0.0081], interval includes zero) and three time-series models (Chronos-Bolt 0.2142, SARIMAX 0.2279, ETS 0.2441) did not beat the champion, and say so.
+- **LLM engineering with evals:** a frozen golden set caught a silent output-cap truncation; first-try valid JSON went from 17% to 100%. Tool-using agent, LangGraph agent, RAG over past questions, tracing, hard daily cost caps.
+- **Forecasts locked before the truth:** an append-only, hash-chained ledger on a git branch; `arena ledger verify --git` lets anyone check that no forecast was written after its question locked. Failures are recorded as skips, never filled in.
+- **Runs itself:** scheduled GitHub Actions jobs, CI-gated promotion to a stable branch, health checks with incident issues, Docker, Kubernetes (kind), dbt and Airflow validated in CI. Live record: "too early to tell" until the statistics can decide.
+<!-- highlights:end -->
 
-| Home | Play | Leaderboard |
-|---|---|---|
-| ![Home page](docs/img/home.png) | ![Can you beat the AI?](docs/img/play.png) | ![Leaderboard heatmap](docs/img/leaderboard.png) |
+<!-- stack:start -->
+**Stack:** Python, typing, testing · SQL, DuckDB, Parquet · dbt · scikit-learn, calibration · LightGBM, Optuna, SHAP · PyTorch · Time-series models · MLOps: MLflow, Evidently, champion/challenger · Statistics · LLM APIs, prompts, structured output · Agents and tool use · RAG, embeddings · LangGraph · Open-weight models (llama.cpp) · LLM evals and tracing · MCP · REST and JSON APIs · Docker, Kubernetes, Airflow · CI/CD on GitHub Actions · Data integrity · Dashboards and frontend
+<!-- stack:end -->
 
-*Screenshots of the offline demo build (fixture data, not the live record).*
-
-## Results so far
+<details>
+<summary><strong>All backtest results</strong> (model cards)</summary>
 
 <!-- results:start -->
 All numbers below are **backtests**: past days replayed through the production code, not the live record. Lower Brier is better; always saying 50% scores 0.25. Generated from the model cards in `docs/models/`.
@@ -64,7 +69,10 @@ All numbers below are **backtests**: past days replayed through the production c
 | ts_chronos | 2190 | 0.2142 | [0.2040, 0.2243] | 0.6227 |
 <!-- results:end -->
 
-## Skills shown, and where the code is
+</details>
+
+<details>
+<summary><strong>Skills and where the code is</strong></summary>
 
 <!-- skills:start -->
 | Skill | In this project | Code |
@@ -91,6 +99,17 @@ All numbers below are **backtests**: past days replayed through the production c
 | Data integrity | Append-only ledger with a daily hash chain; anyone can verify it | `src/arena/ledger` |
 | Dashboards and frontend | Streamlit dashboard; static site with an accessible game, checked in Chromium | `apps/dashboard`<br>`src/arena/site`<br>`tools/a11y` |
 <!-- skills:end -->
+
+</details>
+
+<details>
+<summary><strong>More screenshots</strong></summary>
+
+| Play | Leaderboard |
+|---|---|
+| ![Can you beat the AI?](docs/img/play.png) | ![Leaderboard heatmap](docs/img/leaderboard.png) |
+
+</details>
 
 ## Using it
 
@@ -154,14 +173,18 @@ flowchart LR
   L --> T --> L
 ```
 
-1. **Evening (18:00 and 19:30 UTC, the day before).** About 25 yes/no questions are
-   generated from live public data: German day-ahead electricity prices, the weather at
-   four DWD stations, attention to Wikipedia articles, and the next ECB exchange-rate
-   fixing. They are public from then on, so people can answer too.
-2. **Morning (05:30 and 07:00 UTC).** Every forecaster publishes a probability (and any
+Times are the intended ones; GitHub can start scheduled jobs late, so each job is scheduled
+many times and a gate lets the first run with work do it (`src/arena/ops/schedule.py`).
+
+1. **Evening (18:00 UTC, the day before).** Yes/no questions are generated from live
+   public data: German day-ahead electricity prices (live now); the weather at four DWD
+   stations, attention to Wikipedia articles and ECB exchange rates are built and
+   backtested and switch on next. Questions are public from then on, so people can
+   answer too.
+2. **Morning (05:30 UTC).** Every forecaster publishes a probability (and any
    topic the evening missed gets its questions now). The batch is written to the ledger
    and sealed **before the 09:30 UTC lock**.
-3. **Resolve (four times a day).** When the answers are published, questions are
+3. **Resolve (every 3 hours).** When the answers are published, questions are
    resolved with evidence, finished days are sealed into a hash chain, and the site is
    rebuilt.
 4. **Scoring.** Brier and log scores, skill against the base rate, calibration, and

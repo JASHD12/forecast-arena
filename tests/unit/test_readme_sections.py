@@ -20,5 +20,11 @@ def test_readme_screenshots_exist_and_are_labelled() -> None:
     for name in ("home", "play", "leaderboard"):
         assert f"docs/img/{name}.png" in text
         assert (ROOT / "docs" / "img" / f"{name}.png").stat().st_size > 1000
-    assert "fixture data, not the live record" in text
+    assert "offline demo build (fixture data)" in text
     assert "**backtests**" in text
+    # T184: the first screen carries the pitch, links, one image and generated highlights
+    top = text[: text.index("<details>")]
+    for must in ("Can an LLM agent beat a classical ML model", "60-second tour",
+                 "docs/img/home.png", "<!-- highlights:start -->", "**Stack:**"):  # fmt: skip
+        assert must in top, must
+    assert "Status (20" not in text  # no hand-written, dated status paragraph

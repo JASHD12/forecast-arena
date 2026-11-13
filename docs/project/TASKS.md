@@ -553,7 +553,7 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
     references, `scripts/status.py`, Makefile, workflows, Dockerfile, tests).
   - Done when: root shows code and README first; `make check`, CI and a dry-run of each
     scheduled workflow pass.
-- [ ] T184 · README first screen (deps: T183)
+- [x] T184 · README first screen (deps: T183)
   - Do: pitch, live-site and 60-second-tour links, one image, five generated "what this
     shows" bullets, Mermaid architecture, generated tech row; detail tables in
     `<details>`; status paragraph replaced by a link.

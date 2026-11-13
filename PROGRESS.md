@@ -42,6 +42,7 @@ move older "Done log" lines to `docs/progress-archive.md`.
 
 ## Done log
 
+- 2026-11-13 T125: arena mcp, read-only MCP server (official SDK 2.3.0): list_questions, get_question, leaderboard, run_sql (single SELECT, DuckDB external access off); stdio test; README setup
 - 2026-11-13 T124 follow-up: first real evals showed 400-token cap truncating thinking answers; cap now from settings (workflow default 1024) and in every LLM version string
 - 2026-11-13 T124: eval harness (frozen golden set of 186 past power questions, llm_plain vs llm_context A/B, Brier/log/ECE/skill/JSON validity/repairs/cost), FakeLLM CI gate, manual llm-eval.yml, evals.html (EVALUATION banner)
 - 2026-11-13 T123: TracingLLM spans per model call in agent_traces/; trace panel on question pages; llm.html (calls, tokens, latency p50/p95, repairs, skips, estimated cost from a dated price table)

@@ -93,6 +93,7 @@ STACK_LIBRARIES = (
     ("shap", "SHAP explanations of LightGBM models"),
     ("statsmodels", "ETS and SARIMAX benchmarks in the power backtest"),
     ("llama-cpp-python", "runs the open-weights model of llm_local on the CPU (morning job)"),
+    ("mcp", "official MCP SDK: the read-only `arena mcp` server over the ledger"),
     ("langgraph", "the agent_graph forecaster's state machine (plan, retrieve, tools, critique)"),
     ("fastembed", "local ONNX text embeddings for the agent's similar-questions tool (RAG)"),
     ("chronos-forecasting", "Chronos-Bolt tiny (pretrained time-series model), backtest only"),

@@ -141,6 +141,28 @@ Other entry points:
 LLM forecasters only call a real provider inside GitHub Actions, with hard daily caps;
 locally and in tests they use a scripted fake.
 
+### Ask the benchmark from Claude (MCP)
+
+`arena mcp` serves a local copy of the ledger to any MCP host over stdio, read-only, with
+four tools: `list_questions`, `get_question`, `leaderboard` and `run_sql` (one SELECT
+over the DuckDB tables of the Open data page; file and network access are switched off).
+
+```bash
+git clone --branch ledger --single-branch https://github.com/JASHD12/forecast-arena.git _ledger
+```
+
+```bash
+.venv/bin/pip install -r requirements-mcp.txt
+```
+
+```bash
+claude mcp add forecast-arena -- "$PWD/.venv/bin/arena" --ledger-dir "$PWD/_ledger" mcp
+```
+
+For Claude Desktop, add the same command and arguments as a server entry in its
+`claude_desktop_config.json`. Then ask, for example, "Which forecaster has the best Brier
+score on electricity questions?"
+
 ## Data and attribution
 
 | Data | Source | Licence / terms |

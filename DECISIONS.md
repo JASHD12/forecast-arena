@@ -642,6 +642,18 @@ Made by: agent
 - This is a format and cost fix from an evaluation, not a change made because of how a
   live question resolved (I8). It happens before the official start.
 
+## 2026-11-13 · MCP server `arena mcp` (T125)
+
+- Official `mcp` SDK 2.3.0 (`MCPServer`), stdio only (no network listener, no hosting).
+  Four read-only tools over a snapshot of the ledger loaded at start; tools carry the
+  read-only annotation. SQL: a single SELECT/WITH statement, at most 200 rows, DuckDB
+  external access off and the configuration locked after loading (tested: `read_csv` of
+  a local file fails, `SET` is refused).
+- The leaderboard tool scores every resolved question, rehearsal included, and says so;
+  the site's headline boards keep the official-record rule.
+- Installed by CI (`requirements-mcp.txt`); tested in-process and over a real stdio
+  subprocess with the SDK's own client.
+
 ## Proposals for the human
 
 Ideas outside the specification. The agent lists them here and does not build them.

@@ -668,5 +668,14 @@ def eval_run(
     click.echo(f"written: {path}")
 
 
+@main.command("mcp")
+@click.pass_obj
+def mcp_command(obj: Ctx) -> None:
+    """Serve the ledger read-only over MCP on stdio (needs requirements-mcp.txt)."""
+    from arena.mcp_server import build_server
+
+    build_server(obj.ledger).run("stdio")
+
+
 if __name__ == "__main__":
     main()

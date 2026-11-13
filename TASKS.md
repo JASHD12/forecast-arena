@@ -459,7 +459,7 @@ CI jobs; core `make check` stays offline and fast.
   - Do: `arena eval run` on a frozen golden set; prompt A/B; Brier, calibration, JSON
     validity, repair rate, cost; FakeLLM gate in CI; real runs by manual dispatch only.
   - Done when: CI gate passes; results page labelled evaluation (I4).
-- [ ] T125 · MCP server over the benchmark (deps: T045i)
+- [x] T125 · MCP server over the benchmark (deps: T045i)
   - Do: `arena mcp` (stdio, official SDK): list_questions, get_question, leaderboard,
     read-only SQL.
   - Done when: an SDK client test calls every tool; README documents it.

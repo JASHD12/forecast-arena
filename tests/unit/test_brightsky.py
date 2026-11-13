@@ -50,10 +50,15 @@ def test_fallback_values_count_as_missing() -> None:
     payload = {
         "sources": [{"id": 1, "observation_type": "historical"}],
         "weather": [
-            {"timestamp": "2026-11-10T01:00:00+01:00", "source_id": 1, "temperature": 5.0,
-             "precipitation": 0.1, "fallback_source_ids": {"temperature": 9}},
+            {
+                "timestamp": "2026-11-10T01:00:00+01:00",
+                "source_id": 1,
+                "temperature": 5.0,
+                "precipitation": 0.1,
+                "fallback_source_ids": {"temperature": 9},
+            },
         ],
-    }  # fmt: skip
+    }
     recs = parse_weather(payload)
     t = day_values(recs, date(2026, 11, 10), "temperature", OBSERVATION_TYPES)
     p = day_values(recs, date(2026, 11, 10), "precipitation", OBSERVATION_TYPES)
@@ -62,11 +67,19 @@ def test_fallback_values_count_as_missing() -> None:
 
 @pytest.mark.parametrize(
     "payload",
-    [[], {"weather": []}, {"weather": [{"x": 1}], "sources": []},
-     {"weather": [{"timestamp": "2026-11-10T01:00:00", "source_id": 1}], "sources": []},
-     {"weather": [{"timestamp": "2026-11-10T01:00:00+01:00", "source_id": 1,
-                   "temperature": "warm"}], "sources": []}],
-)  # fmt: skip
+    [
+        [],
+        {"weather": []},
+        {"weather": [{"x": 1}], "sources": []},
+        {"weather": [{"timestamp": "2026-11-10T01:00:00", "source_id": 1}], "sources": []},
+        {
+            "weather": [
+                {"timestamp": "2026-11-10T01:00:00+01:00", "source_id": 1, "temperature": "warm"}
+            ],
+            "sources": [],
+        },
+    ],
+)
 def test_malformed_rejected(payload) -> None:
     with pytest.raises(BrightSkyError):
         parse_weather(payload)

@@ -39,11 +39,14 @@ def git(
     ident = identity or GitIdentity()
     cmd = [
         "git",
-        "-c", f"user.name={ident.name}",
-        "-c", f"user.email={ident.email}",
-        "-c", "commit.gpgsign=false",
+        "-c",
+        f"user.name={ident.name}",
+        "-c",
+        f"user.email={ident.email}",
+        "-c",
+        "commit.gpgsign=false",
         *args,
-    ]  # fmt: skip
+    ]
     full_env = {**os.environ, **env} if env else None
     res = subprocess.run(cmd, cwd=cwd, capture_output=True, text=True, check=False, env=full_env)
     if res.returncode != 0:
@@ -75,8 +78,10 @@ def ensure_checkout(remote: str, dest: Path, branch: str = LEDGER_BRANCH) -> str
         raise GitError(f"{dest} exists, is not empty and is not a git checkout")
     dest.parent.mkdir(parents=True, exist_ok=True)
     if remote_has_branch(remote, branch, dest.parent):
-        git(["clone", "--quiet", "--branch", branch, "--single-branch", remote, str(dest)],
-            cwd=dest.parent)  # fmt: skip
+        git(
+            ["clone", "--quiet", "--branch", branch, "--single-branch", remote, str(dest)],
+            cwd=dest.parent,
+        )
         return "cloned"
     dest.mkdir(exist_ok=True)
     git(["init", "--quiet", "-b", branch], cwd=dest)
@@ -101,8 +106,11 @@ def commit_and_push(
     git(["add", "-A"], cwd=dest, identity=identity)
     staged = subprocess.run(["git", "diff", "--cached", "--quiet"], cwd=dest, check=False)
     if staged.returncode != 0:
-        git(["commit", "--quiet", "-m", f"ledger: {job} {day.isoformat()}"], cwd=dest,
-            identity=identity)  # fmt: skip
+        git(
+            ["commit", "--quiet", "-m", f"ledger: {job} {day.isoformat()}"],
+            cwd=dest,
+            identity=identity,
+        )
     elif not _has_unpushed(dest, branch):
         return None
     last = ""
@@ -117,8 +125,7 @@ def commit_and_push(
         try:
             git(["pull", "--rebase", "--quiet", "origin", branch], cwd=dest, identity=identity)
         except GitError as exc:
-            subprocess.run(["git", "rebase", "--abort"], cwd=dest, capture_output=True,
-                           check=False)  # fmt: skip
+            subprocess.run(["git", "rebase", "--abort"], cwd=dest, capture_output=True, check=False)
             raise GitError(f"rebase onto origin/{branch} failed; not forcing: {exc}") from exc
     raise GitError(f"push rejected {max_attempts} times; giving up without forcing: {last}")
 

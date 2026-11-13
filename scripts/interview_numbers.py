@@ -21,12 +21,14 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 OUT = ROOT / "docs" / "interview" / "numbers.md"
-CARDS = (("power", "Electricity, champion vs baselines"),
-         ("power-lgbm", "Electricity, LightGBM challenger"),
-         ("power-mlp", "Electricity, PyTorch network challenger"),
-         ("power-ts", "Electricity, time-series benchmarks"),
-         ("attention", "Wikipedia attention"),
-         ("markets", "Exchange rates"))  # fmt: skip
+CARDS = (
+    ("power", "Electricity, champion vs baselines"),
+    ("power-lgbm", "Electricity, LightGBM challenger"),
+    ("power-mlp", "Electricity, PyTorch network challenger"),
+    ("power-ts", "Electricity, time-series benchmarks"),
+    ("attention", "Wikipedia attention"),
+    ("markets", "Exchange rates"),
+)
 
 HEAD = """# Numbers for the interview kit (generated)
 
@@ -60,8 +62,9 @@ def backtests() -> str:
         md = (ROOT / "docs" / "models" / f"{stem}.md").read_text(encoding="utf-8")
         span = re.search(r"Batches (\S+) to (\S+) \((\d+) batch days\)", md)
         when = f" - {span.group(1)} to {span.group(2)}, {span.group(3)} batch days" if span else ""
-        parts.append(f"### {title}{when}\n\nSource: `docs/models/{stem}.md`\n\n"
-                     + "\n\n".join(_tables(md)))  # fmt: skip
+        parts.append(
+            f"### {title}{when}\n\nSource: `docs/models/{stem}.md`\n\n" + "\n\n".join(_tables(md))
+        )
     return "\n\n".join(parts)
 
 
@@ -73,9 +76,11 @@ def evals() -> str:
     parts = ["## LLM evaluations (golden set of past questions; not the live record)"]
     for f in sorted((ROOT / "evals" / "results").glob("eval-*.json")):
         d = json.loads(f.read_text(encoding="utf-8"))
-        rows = ["| Forecaster | Model | n | Answered | Brier | Base rate, same items | "
-                "Valid JSON first try | Repair rate | Cost (USD) | Output tokens |",
-                "|---|---|---|---|---|---|---|---|---|---|"]  # fmt: skip
+        rows = [
+            "| Forecaster | Model | n | Answered | Brier | Base rate, same items | "
+            "Valid JSON first try | Repair rate | Cost (USD) | Output tokens |",
+            "|---|---|---|---|---|---|---|---|---|---|",
+        ]
         for fid, m in sorted(d["metrics"].items()):
             rows.append(
                 f"| {fid} | {m['model']} | {m['n']} | {m['answered']} | {m['brier']:.4f} | "
@@ -102,12 +107,18 @@ def live(ledger: Path) -> str:
         cmd = [str(ROOT / ".venv" / "bin" / "arena"), "--ledger-dir", str(ledger), *args]
         return subprocess.run(cmd, capture_output=True, text=True, check=True).stdout.strip()
 
-    sha = subprocess.run(["git", "-C", str(ledger), "log", "-1", "--format=%h %cI"],
-                         capture_output=True, text=True, check=True).stdout.strip()  # fmt: skip
+    sha = subprocess.run(
+        ["git", "-C", str(ledger), "log", "-1", "--format=%h %cI"],
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout.strip()
     verify = arena("ledger", "verify").splitlines()[0]
-    return (f"## Live record (ledger commit {sha})\n\nSource: `arena report cv` and "
-            f"`arena ledger verify` on the ledger branch.\n\n```\n{arena('report', 'cv')}\n"
-            f"{verify}\n```")  # fmt: skip
+    return (
+        f"## Live record (ledger commit {sha})\n\nSource: `arena report cv` and "
+        f"`arena ledger verify` on the ledger branch.\n\n```\n{arena('report', 'cv')}\n"
+        f"{verify}\n```"
+    )
 
 
 def block(name: str, body: str) -> str:
@@ -120,10 +131,20 @@ def _old(text: str, name: str) -> str | None:
 
 
 def render(old: str, ledger: Path | None) -> str:
-    live_body = live(ledger) if ledger else (_old(old, "live") or
-                                             "## Live record\n\nNot generated yet.")  # fmt: skip
-    return "\n\n".join([HEAD.rstrip(), block("backtests", backtests()), block("evals", evals()),
-                        block("live", live_body)]) + "\n"  # fmt: skip
+    live_body = (
+        live(ledger) if ledger else (_old(old, "live") or "## Live record\n\nNot generated yet.")
+    )
+    return (
+        "\n\n".join(
+            [
+                HEAD.rstrip(),
+                block("backtests", backtests()),
+                block("evals", evals()),
+                block("live", live_body),
+            ]
+        )
+        + "\n"
+    )
 
 
 def main(argv: list[str]) -> int:

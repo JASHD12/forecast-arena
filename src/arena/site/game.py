@@ -34,11 +34,17 @@ def live_deck(rec: Record) -> list[dict[str, Any]]:
         q = rec.questions[qid]
         if excluded(rec, qid) or qid not in rec.resolutions:
             continue
-        out.append({
-            "id": qid, "title": plain_title(q), "topic": domain_name(q.domain),
-            "rule": q.resolution_rule, "outcome": rec.resolutions[qid].outcome,
-            "forecasts": fs, "url": "questions/" + quote(qid, safe="") + ".html",
-        })  # fmt: skip
+        out.append(
+            {
+                "id": qid,
+                "title": plain_title(q),
+                "topic": domain_name(q.domain),
+                "rule": q.resolution_rule,
+                "outcome": rec.resolutions[qid].outcome,
+                "forecasts": fs,
+                "url": "questions/" + quote(qid, safe="") + ".html",
+            }
+        )
     return out
 
 
@@ -56,11 +62,18 @@ def practice_deck(golden: Path | None, n: int = PRACTICE_ITEMS) -> list[dict[str
         stat = str(q.params.get("stat", ""))
         thr = q.params.get("reference_mean") if q.template == "up_vs_today" else q.threshold
         series = [{"day": r["day"], "value": r.get(stat)} for r in it.context.get("daily", [])]
-        out.append({
-            "id": q.question_id, "title": plain_title(q), "topic": domain_name(q.domain),
-            "rule": q.resolution_rule, "outcome": it.outcome,
-            "forecasts": {} if it.base_rate is None else {"base_rate": round(it.base_rate, 4)},
-            "series": series[-SERIES_DAYS:], "threshold": thr, "unit": q.unit,
-        })  # fmt: skip
+        out.append(
+            {
+                "id": q.question_id,
+                "title": plain_title(q),
+                "topic": domain_name(q.domain),
+                "rule": q.resolution_rule,
+                "outcome": it.outcome,
+                "forecasts": {} if it.base_rate is None else {"base_rate": round(it.base_rate, 4)},
+                "series": series[-SERIES_DAYS:],
+                "threshold": thr,
+                "unit": q.unit,
+            }
+        )
     random.Random(0).shuffle(out)
     return out

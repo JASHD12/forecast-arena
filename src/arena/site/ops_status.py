@@ -80,8 +80,9 @@ def parse_failures(rec: Record) -> list[ParseRow]:
     """Per LLM forecaster: forecasts, parse failures and other skips (not `not_sampled`)."""
     fc = Counter(f.forecaster_id for f in rec.forecasts)
     pf = Counter(s.forecaster_id for s in rec.skips if s.reason_code == "parse_failure")
-    other = Counter(s.forecaster_id for s in rec.skips
-                    if s.reason_code not in ("parse_failure", "not_sampled"))  # fmt: skip
+    other = Counter(
+        s.forecaster_id for s in rec.skips if s.reason_code not in ("parse_failure", "not_sampled")
+    )
     ids = [f for f in LLM_FORECASTERS if fc[f] or pf[f] or other[f]]
     return [ParseRow(f, fc[f], pf[f], other[f]) for f in ids]
 
@@ -106,11 +107,17 @@ def source_freshness(rec: Record, now: datetime) -> list[Freshness]:
     out = []
     for dom in sorted({q.domain for q in rec.questions.values()}):
         qs = [q for q in rec.questions.values() if q.domain == dom]
-        res = [rec.resolutions[q.question_id].resolved_at for q in qs
-               if q.question_id in rec.resolutions]  # fmt: skip
-        overdue = sum(1 for q in qs if q.question_id not in rec.resolutions
-                      and q.question_id not in rec.voids
-                      and now - q.resolve_after > timedelta(days=1))  # fmt: skip
-        out.append(Freshness(dom, max(q.batch_date for q in qs), max(res, default=None),
-                             overdue))  # fmt: skip
+        res = [
+            rec.resolutions[q.question_id].resolved_at
+            for q in qs
+            if q.question_id in rec.resolutions
+        ]
+        overdue = sum(
+            1
+            for q in qs
+            if q.question_id not in rec.resolutions
+            and q.question_id not in rec.voids
+            and now - q.resolve_after > timedelta(days=1)
+        )
+        out.append(Freshness(dom, max(q.batch_date for q in qs), max(res, default=None), overdue))
     return out

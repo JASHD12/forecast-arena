@@ -40,11 +40,11 @@ def test_per_article_series_and_missing_article() -> None:
     )
     assert len(series) == 103 and series[date(2026, 11, 1)] == 775 and len(sha) == 64
     assert "Rudolf_H%C3%B6%C3%9F" in url
-    _, _, slash = client.per_article("en.wikipedia", "AC/DC", date(2026, 11, 1),
-                                     date(2026, 11, 11))  # fmt: skip
+    _, _, slash = client.per_article("en.wikipedia", "AC/DC", date(2026, 11, 1), date(2026, 11, 11))
     assert len(slash) == 11
-    _, _, gone = client.per_article("de.wikipedia", "Gibt_es_nicht_xyz_123",
-                                    date(2026, 11, 1), date(2026, 11, 11))  # fmt: skip
+    _, _, gone = client.per_article(
+        "de.wikipedia", "Gibt_es_nicht_xyz_123", date(2026, 11, 1), date(2026, 11, 11)
+    )
     assert gone == {}
 
 

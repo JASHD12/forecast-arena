@@ -40,13 +40,13 @@ def check_weather(http: HttpClient) -> str:
     parts = []
     for city, (station, _) in sorted(WEATHER_STATIONS.items()):
         y, t = today - timedelta(days=1), today + timedelta(days=1)
-        obs = day_values(client.weather(station, y, y).records, y, "temperature",
-                         OBSERVATION_TYPES)  # fmt: skip
+        obs = day_values(client.weather(station, y, y).records, y, "temperature", OBSERVATION_TYPES)
         fc = day_values(client.weather(station, t, t).records, t, "temperature", FORECAST_TYPES)
         if not obs.present or not fc.present:
             raise RuntimeError(f"{city}: no observations or no forecast")
-        parts.append(f"{city} obs max {max(obs.present)} ({obs.missing} missing), "
-                     f"fc max {max(fc.present)}")  # fmt: skip
+        parts.append(
+            f"{city} obs max {max(obs.present)} ({obs.missing} missing), fc max {max(fc.present)}"
+        )
     return "; ".join(parts)
 
 

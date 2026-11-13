@@ -119,8 +119,12 @@ class LlamaCppLLM:
 
     def sampling(self) -> dict[str, Any]:
         """Recorded on every forecast."""
-        return {"temperature": 0.0, "seed": SEED, "grammar": "answer-json-schema",
-                "call_limit_s": self.call_limit}  # fmt: skip
+        return {
+            "temperature": 0.0,
+            "seed": SEED,
+            "grammar": "answer-json-schema",
+            "call_limit_s": self.call_limit,
+        }
 
     def complete(
         self, system: str, turns: Sequence[Turn], *, max_tokens: int, tools: Sequence[ToolSpec] = ()

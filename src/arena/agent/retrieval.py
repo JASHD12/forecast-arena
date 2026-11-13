@@ -97,8 +97,9 @@ class PastQuestions:
     def __init__(self, items: Sequence[PastQuestion], embedder: Embedder) -> None:
         self.items = list(items)
         self.embedder = embedder
-        self._vecs = (_unit(embedder.embed([p.text for p in self.items]))
-                      if self.items else np.zeros((0, 1)))  # fmt: skip
+        self._vecs = (
+            _unit(embedder.embed([p.text for p in self.items])) if self.items else np.zeros((0, 1))
+        )
 
     @classmethod
     def from_ledger(cls, ledger: Ledger, embedder: Embedder) -> PastQuestions:
@@ -110,21 +111,38 @@ class PastQuestions:
             if q is None or excluded(rec, qid):
                 continue
             items.append(
-                PastQuestion(qid, q.domain, q.template, q.text, q.target_date,
-                             res.resolved_at, res.outcome, res.observed_value)
-            )  # fmt: skip
+                PastQuestion(
+                    qid,
+                    q.domain,
+                    q.template,
+                    q.text,
+                    q.target_date,
+                    res.resolved_at,
+                    res.outcome,
+                    res.observed_value,
+                )
+            )
         items.sort(key=lambda p: (p.resolved_at, p.question_id))
         return cls(items, embedder)
 
     def search(
-        self, text: str, asof: datetime, *, k: int = 5, exclude: str | None = None,
+        self,
+        text: str,
+        asof: datetime,
+        *,
+        k: int = 5,
+        exclude: str | None = None,
         domain: str | None = None,
-    ) -> list[tuple[PastQuestion, float]]:  # fmt: skip
+    ) -> list[tuple[PastQuestion, float]]:
         """Top-k eligible past questions by cosine similarity (ties by id)."""
         k = max(1, min(MAX_K, k))
-        ok = [i for i, p in enumerate(self.items)
-              if p.resolved_at < asof and p.question_id != exclude
-              and (domain is None or p.domain == domain)]  # fmt: skip
+        ok = [
+            i
+            for i, p in enumerate(self.items)
+            if p.resolved_at < asof
+            and p.question_id != exclude
+            and (domain is None or p.domain == domain)
+        ]
         if not ok:
             return []
         qv = _unit(self.embedder.embed([text]))[0]

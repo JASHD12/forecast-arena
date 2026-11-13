@@ -87,8 +87,11 @@ class MarketsDomain:
 
     def fixings(self, ccy: str, asof: datetime) -> dict[date, float]:
         """Fixings known at `asof`, by day."""
-        return {o.observed_at.date(): o.value for o in self.store.series(key(ccy), asof)
-                if o.value is not None}  # fmt: skip
+        return {
+            o.observed_at.date(): o.value
+            for o in self.store.series(key(ccy), asof)
+            if o.value is not None
+        }
 
     def generate_questions(self, batch_date: date, asof: datetime) -> list[Question]:
         """`absmove_gt` and `up` per pair; none unless B is a publication day."""
@@ -114,19 +117,36 @@ class MarketsDomain:
                 if is_degenerate(freq) or thr <= 0:
                     self.on_skip(f"markets/absmove_gt/{ccy}: degenerate ({freq})")
                 else:
-                    text = (f"Will the absolute log change of the ECB euro reference rate "
-                            f"EUR/{ccy} from the fixing of {batch_date.isoformat()} to the next "
-                            f"fixing ({target.isoformat()}) exceed {thr:.4f}, that is "
-                            f"|ln(F1/F0)| > {thr:.4f}?")  # fmt: skip
+                    text = (
+                        f"Will the absolute log change of the ECB euro reference rate "
+                        f"EUR/{ccy} from the fixing of {batch_date.isoformat()} to the next "
+                        f"fixing ({target.isoformat()}) exceed {thr:.4f}, that is "
+                        f"|ln(F1/F0)| > {thr:.4f}?"
+                    )
                     rule = (
                         "F0 = ECB reference rate (units of the currency per euro, as "
                         "published, four decimals) on the batch date; F1 = the next "
                         "published fixing. YES if |ln(F1/F0)|, rounded to 6 decimals, is "
                         "strictly greater than the threshold."
                     )
-                    out.append(self._q("absmove_gt", pair, ccy, batch_date, target, created,
-                                       lock, text, rule, thr, "log return", "gt",
-                                       {"window_fixings": ABS_WINDOW}, freq))  # fmt: skip
+                    out.append(
+                        self._q(
+                            "absmove_gt",
+                            pair,
+                            ccy,
+                            batch_date,
+                            target,
+                            created,
+                            lock,
+                            text,
+                            rule,
+                            thr,
+                            "log return",
+                            "gt",
+                            {"window_fixings": ABS_WINDOW},
+                            freq,
+                        )
+                    )
             else:
                 self.on_skip(f"markets/absmove_gt/{ccy}: only {len(recent)} returns")
             ups = [int(r > 0) for r in rets[-UP_WINDOW:]]
@@ -134,22 +154,52 @@ class MarketsDomain:
             if len(ups) < UP_WINDOW or is_degenerate(freq):
                 self.on_skip(f"markets/up/{ccy}: insufficient or degenerate history")
                 continue
-            text = (f"Will the ECB euro reference rate EUR/{ccy} published on {target.isoformat()} "
-                    f"be higher than the one published on {batch_date.isoformat()}?")  # fmt: skip
+            text = (
+                f"Will the ECB euro reference rate EUR/{ccy} published on {target.isoformat()} "
+                f"be higher than the one published on {batch_date.isoformat()}?"
+            )
             rule = (
                 "F0 = ECB reference rate on the batch date, F1 = the next published fixing "
                 "(four decimals, units of the currency per euro); YES if F1 > F0 "
                 "(an equal rate is NO)."
             )
-            out.append(self._q("up", pair, ccy, batch_date, target, created, lock, text, rule,
-                               None, "rate", "gt", {"degeneracy_window_fixings": UP_WINDOW},
-                               freq))  # fmt: skip
+            out.append(
+                self._q(
+                    "up",
+                    pair,
+                    ccy,
+                    batch_date,
+                    target,
+                    created,
+                    lock,
+                    text,
+                    rule,
+                    None,
+                    "rate",
+                    "gt",
+                    {"degeneracy_window_fixings": UP_WINDOW},
+                    freq,
+                )
+            )
         return out
 
-    def _q(self, template: str, pair: str, ccy: str, batch_date: date, target: date,
-           created: datetime, lock: datetime, text: str, rule: str, thr: float | None,
-           unit: str, comparator: str, params: dict[str, Any], freq: float | None
-           ) -> Question:  # fmt: skip
+    def _q(
+        self,
+        template: str,
+        pair: str,
+        ccy: str,
+        batch_date: date,
+        target: date,
+        created: datetime,
+        lock: datetime,
+        text: str,
+        rule: str,
+        thr: float | None,
+        unit: str,
+        comparator: str,
+        params: dict[str, Any],
+        freq: float | None,
+    ) -> Question:
         common = (
             " F0 must be the fixing of the batch date itself. Void if F0 or F1 is still "
             "missing 96 hours after resolve_after."
@@ -172,11 +222,15 @@ class MarketsDomain:
             threshold=thr,
             unit=unit,
             comparator=comparator,  # type: ignore[arg-type]
-            params={"currency": ccy, "f0_day": batch_date.isoformat(),
-                    "f1_day": target.isoformat(), **params},
+            params={
+                "currency": ccy,
+                "f0_day": batch_date.isoformat(),
+                "f1_day": target.isoformat(),
+                **params,
+            },
             base_rate_hint=None if freq is None else round(freq, 4),
             tags=["markets", "control"],
-        )  # fmt: skip
+        )
 
     def context(self, question: Question, asof: datetime) -> dict[str, Any]:
         """The last 60 known fixings of the pair."""
@@ -202,9 +256,12 @@ class MarketsDomain:
         f1 = fx.get(question.target_date)
         if f0 is None or f1 is None:
             if now >= question.resolve_after + GRACE:
-                return Void(question_id=question.question_id, reason_code="source_missing",
-                            detail="F0 or F1 not published by the end of grace",
-                            voided_at=now)  # fmt: skip
+                return Void(
+                    question_id=question.question_id,
+                    reason_code="source_missing",
+                    detail="F0 or F1 not published by the end of grace",
+                    voided_at=now,
+                )
             return None
         r = logret(f0, f1)
         if question.template == "absmove_gt":
@@ -218,9 +275,12 @@ class MarketsDomain:
             outcome=outcome,  # type: ignore[arg-type]
             observed_value=value,
             resolved_at=now,
-            evidence=Evidence(source_url=url, snapshot_sha256=sha,
-                              values_used={"f0": f0, "f1": f1, "log_return": r}),
-        )  # fmt: skip
+            evidence=Evidence(
+                source_url=url,
+                snapshot_sha256=sha,
+                values_used={"f0": f0, "f1": f1, "log_return": r},
+            ),
+        )
 
     def revised(self, question: Question, first: Resolution) -> bool:
         """True if the published F0 or F1 changed after the first resolution."""
@@ -232,9 +292,12 @@ class MarketsDomain:
         return (f0, f1) != (used.get("f0"), used.get("f1"))
 
 
-def markets_domain_from_rates(rates: dict[str, dict[date, float]], url: str, sha: str,
-                              on_skip: Callable[[str], None] | None = None
-                              ) -> MarketsDomain:  # fmt: skip
+def markets_domain_from_rates(
+    rates: dict[str, dict[date, float]],
+    url: str,
+    sha: str,
+    on_skip: Callable[[str], None] | None = None,
+) -> MarketsDomain:
     """Build a domain from a fetched ECB response."""
     store = AsOfStore()
     add_rates(store, rates)

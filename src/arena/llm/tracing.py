@@ -62,8 +62,11 @@ class Tracer:
 
     def for_pair(self, forecaster_id: str, question_id: str) -> list[dict[str, Any]]:
         """Spans of one forecaster on one question, in call order."""
-        return [s.as_dict() for s in self.spans
-                if s.forecaster_id == forecaster_id and s.question_id == question_id]  # fmt: skip
+        return [
+            s.as_dict()
+            for s in self.spans
+            if s.forecaster_id == forecaster_id and s.question_id == question_id
+        ]
 
     def pairs(self) -> list[tuple[str, str]]:
         """(forecaster, question) pairs that made at least one call, sorted."""
@@ -112,16 +115,24 @@ class TracingLLM:
         fid, qid, pv = _SCOPE.get()
         seq = sum(1 for s in self.tracer.spans if s.forecaster_id == fid and s.question_id == qid)
         start = self.clock.now()
-        base: dict[str, Any] = {"name": "llm.complete", "forecaster_id": fid, "question_id": qid,
-                "prompt_version": pv, "seq": seq, "start": start.isoformat(),
-                "provider": self.inner.provider, "model": self.inner.model,
-                "repair": _is_repair(turns)}  # fmt: skip
+        base: dict[str, Any] = {
+            "name": "llm.complete",
+            "forecaster_id": fid,
+            "question_id": qid,
+            "prompt_version": pv,
+            "seq": seq,
+            "start": start.isoformat(),
+            "provider": self.inner.provider,
+            "model": self.inner.model,
+            "repair": _is_repair(turns),
+        }
         try:
             resp = self.inner.complete(system, turns, max_tokens=max_tokens, tools=tools)
         except Exception as exc:
             ms = round((self.clock.now() - start).total_seconds() * 1000, 1)
-            self.tracer.spans.append(Span(**base, duration_ms=ms,
-                                          error=f"{type(exc).__name__}: {exc}"[:200]))  # fmt: skip
+            self.tracer.spans.append(
+                Span(**base, duration_ms=ms, error=f"{type(exc).__name__}: {exc}"[:200])
+            )
             raise
         ms = round((self.clock.now() - start).total_seconds() * 1000, 1)
         self.tracer.spans.append(

@@ -22,8 +22,12 @@ def test_every_dag_command_is_run_by_the_matching_workflow() -> None:
 def test_schedules_match_the_intended_times() -> None:
     """The DAGs keep the intended times (Airflow starts on time). GitHub starts scheduled
     runs late, so the workflows run more often behind a gate (T180) instead."""
-    for job, cron in (("evening", "0 18 * * *"), ("morning", "30 5 * * *"),
-                      ("resolve", "30 3,12,16,20 * * *"), ("weekly", "0 2 * * 0")):  # fmt: skip
+    for job, cron in (
+        ("evening", "0 18 * * *"),
+        ("morning", "30 5 * * *"),
+        ("resolve", "30 3,12,16,20 * * *"),
+        ("weekly", "0 2 * * 0"),
+    ):
         assert f'"arena_{job}",\n    schedule="{cron}"' in DAG
     wf = ROOT / ".github" / "workflows"
     assert '"15 0-8 * * *"' in (wf / "morning.yml").read_text()  # covers 05:30 and earlier

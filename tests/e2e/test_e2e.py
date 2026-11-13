@@ -104,8 +104,11 @@ def test_five_days_offline(tmp_path) -> None:
     assert check_site(site.out_dir) == []
     home = (site.out_dir / "index.html").read_text()
     assert "base_rate" in home and "not advice" in home and "SMARD.de" in home
-    traces = [json.loads(x) for rel in led.list_files("agent_traces")
-              for x in led.read_bytes(rel).decode().splitlines()]  # fmt: skip
+    traces = [
+        json.loads(x)
+        for rel in led.list_files("agent_traces")
+        for x in led.read_bytes(rel).decode().splitlines()
+    ]
     spans = [s for t in traces for s in t.get("spans", [])]
     assert {t["forecaster_id"] for t in traces} == {"llm_plain", "llm_context", "agent"}
     assert spans and all(s["model"] and s["question_id"] and s["duration_ms"] >= 0 for s in spans)

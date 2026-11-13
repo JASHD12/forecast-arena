@@ -78,8 +78,12 @@ class ToyDomain:
         rows = [o for o in self.store.series("toy", now) if o.observed_at == day]
         if not rows or rows[-1].value is None:
             if now >= question.resolve_after + self.grace:
-                return Void(question_id=question.question_id, reason_code="source_missing",
-                            detail="no toy value", voided_at=now)  # fmt: skip
+                return Void(
+                    question_id=question.question_id,
+                    reason_code="source_missing",
+                    detail="no toy value",
+                    voided_at=now,
+                )
             return None
         value = rows[-1].value
         assert question.threshold is not None

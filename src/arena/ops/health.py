@@ -71,8 +71,14 @@ class HealthReport:
     def to_json(self) -> str:
         """Serialised report (for the workflow step and the incident text)."""
         return json.dumps(
-            {"job": self.job, "at": self.at.isoformat(), "ok": self.ok,
-             "checks": [asdict(c) for c in self.checks]}, indent=1)  # fmt: skip
+            {
+                "job": self.job,
+                "at": self.at.isoformat(),
+                "ok": self.ok,
+                "checks": [asdict(c) for c in self.checks],
+            },
+            indent=1,
+        )
 
     def markdown(self) -> str:
         """A short Markdown table of the checks."""
@@ -127,9 +133,12 @@ def run_checks(
         and q.question_id not in rec.voids
     )
     rep.checks.append(
-        Check("nothing_overdue", not overdue,
-              "none" if not overdue else f"{len(overdue)} overdue, e.g. {', '.join(overdue[:3])}")
-    )  # fmt: skip
+        Check(
+            "nothing_overdue",
+            not overdue,
+            "none" if not overdue else f"{len(overdue)} overdue, e.g. {', '.join(overdue[:3])}",
+        )
+    )
 
     week_ago = today - timedelta(days=7)
     latest: dict[str, datetime] = {}
@@ -142,20 +151,26 @@ def run_checks(
         if now - t > FRESH_OVERRIDES.get(d, FRESH_WITHIN)
     ]
     rep.checks.append(
-        Check("sources_fresh", not stale,
-              "stale: " + ", ".join(stale) if stale else f"{len(latest)} domain(s) fresh")
-    )  # fmt: skip
+        Check(
+            "sources_fresh",
+            not stale,
+            "stale: " + ", ".join(stale) if stale else f"{len(latest)} domain(s) fresh",
+        )
+    )
 
     todays_ids = {q.question_id for q in todays}
     answers = sum(
-        1 for f in rec.forecasts
+        1
+        for f in rec.forecasts
         if f.forecaster_id in LLM_FORECASTERS and f.question_id in todays_ids
-    )  # fmt: skip
+    )
     failures = sum(
-        1 for s in rec.skips
-        if s.forecaster_id in LLM_FORECASTERS and s.question_id in todays_ids
+        1
+        for s in rec.skips
+        if s.forecaster_id in LLM_FORECASTERS
+        and s.question_id in todays_ids
         and s.reason_code == "parse_failure"
-    )  # fmt: skip
+    )
     total = answers + failures
     rate = failures / total if total else 0.0
     ok = total < MIN_LLM_ANSWERS or rate < MAX_PARSE_FAILURE_RATE
@@ -210,10 +225,32 @@ def sync_incident(
     if open_ids:
         run(["issue", "comment", open_ids[0], *scope, "--body", body])
         return f"commented on {open_ids[0]}"
-    run(["label", "create", INCIDENT_LABEL, *scope, "--color", "B60205",
-         "--description", "A Forecast Arena job or health check failed", "--force"])  # fmt: skip
-    run(["issue", "create", *scope, "--title", INCIDENT_TITLE, "--label", INCIDENT_LABEL,
-         "--body", body])  # fmt: skip
+    run(
+        [
+            "label",
+            "create",
+            INCIDENT_LABEL,
+            *scope,
+            "--color",
+            "B60205",
+            "--description",
+            "A Forecast Arena job or health check failed",
+            "--force",
+        ]
+    )
+    run(
+        [
+            "issue",
+            "create",
+            *scope,
+            "--title",
+            INCIDENT_TITLE,
+            "--label",
+            INCIDENT_LABEL,
+            "--body",
+            body,
+        ]
+    )
     return "opened"
 
 
@@ -227,6 +264,9 @@ def incident_body(report: dict[str, Any] | None, job_status: str, run_url: str) 
         for c in report.get("checks", []):
             res = "pass" if c["ok"] else "FAIL"
             lines.append(f"| {res} | `{c['name']}` | {c['detail']} |")
-    lines += ["", "See docs/RUNBOOK.md, \"If something breaks\". An open incident breaks the "
-              "clean-day streak (SPEC 2.9)."]  # fmt: skip
+    lines += [
+        "",
+        'See docs/RUNBOOK.md, "If something breaks". An open incident breaks the '
+        "clean-day streak (SPEC 2.9).",
+    ]
     return "\n".join(lines)

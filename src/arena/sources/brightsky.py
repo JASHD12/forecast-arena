@@ -74,8 +74,11 @@ def parse_weather(payload: object) -> tuple[WxRecord, ...]:
     weather, sources = payload.get("weather"), payload.get("sources")
     if not isinstance(weather, list) or not isinstance(sources, list):
         raise BrightSkyError("response without 'weather' and 'sources' lists")
-    kinds = {s["id"]: s["observation_type"] for s in sources
-             if isinstance(s, dict) and "id" in s and "observation_type" in s}  # fmt: skip
+    kinds = {
+        s["id"]: s["observation_type"]
+        for s in sources
+        if isinstance(s, dict) and "id" in s and "observation_type" in s
+    }
     out = []
     for r in weather:
         if not isinstance(r, dict) or "timestamp" not in r or "source_id" not in r:
@@ -84,10 +87,16 @@ def parse_weather(payload: object) -> tuple[WxRecord, ...]:
         if ts.tzinfo is None:
             raise BrightSkyError("timestamp without UTC offset")
         fb = r.get("fallback_source_ids") or {}
-        out.append(WxRecord(ts.astimezone(UTC), kinds.get(r["source_id"], "unknown"),
-                            _num(r.get("temperature")), _num(r.get("precipitation")),
-                            frozenset(fb) if isinstance(fb, dict) else frozenset(),
-                            _num(r.get("wind_gust_speed"))))  # fmt: skip
+        out.append(
+            WxRecord(
+                ts.astimezone(UTC),
+                kinds.get(r["source_id"], "unknown"),
+                _num(r.get("temperature")),
+                _num(r.get("precipitation")),
+                frozenset(fb) if isinstance(fb, dict) else frozenset(),
+                _num(r.get("wind_gust_speed")),
+            )
+        )
     return tuple(sorted(out, key=lambda x: x.ts))
 
 

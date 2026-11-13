@@ -46,8 +46,14 @@ def test_full_path_plan_retrieve_research_tools_critique() -> None:
     out = graph(fake).forecast(q, {"daily": [1, 2]}, ASOF)
     assert isinstance(out, Forecast) and out.forecaster_id == "agent_graph"
     assert out.probability == 0.45  # the critique's answer counts, not the draft
-    assert out.meta["graph_path"] == ["plan", "retrieve", "research", "tools", "research",
-                                      "critique"]  # fmt: skip
+    assert out.meta["graph_path"] == [
+        "plan",
+        "retrieve",
+        "research",
+        "tools",
+        "research",
+        "critique",
+    ]
     assert out.meta["usage"]["requests"] == 4
     assert out.meta["tool_calls"] == 2  # the automatic base rate + one model call
     assert "graph-prompt-v1" in out.forecaster_version and "langgraph-" in out.forecaster_version
@@ -76,8 +82,14 @@ def test_tool_limit_forces_an_answer() -> None:
     fake = FakeLLM([PLAN, burst, DRAFT, FINAL])
     out = graph(fake, max_tool_calls=2).forecast(question(), {}, ASOF)
     assert isinstance(out, Forecast)
-    assert out.meta["graph_path"] == ["plan", "retrieve", "research", "tools", "research",
-                                      "critique"]  # fmt: skip
+    assert out.meta["graph_path"] == [
+        "plan",
+        "retrieve",
+        "research",
+        "tools",
+        "research",
+        "critique",
+    ]
     asked = fake.calls[2][1][-1]
     assert isinstance(asked, UserText) and "limit" in asked.text  # agent_final prompt
 
@@ -103,8 +115,9 @@ def test_two_bad_answers_are_a_parse_failure_skip() -> None:
 
 
 def test_caps_hold_inside_the_graph() -> None:
-    caps = Caps(max_requests_per_day=2, max_tokens_per_day=10**6, max_output_tokens=400,
-                max_tool_calls=4)  # fmt: skip
+    caps = Caps(
+        max_requests_per_day=2, max_tokens_per_day=10**6, max_output_tokens=400, max_tool_calls=4
+    )
     guard = BudgetGuard(caps, Usage())
     fake = FakeLLM([PLAN, DRAFT, FINAL])
     out = graph(GuardedLLM(fake, guard)).forecast(question(), {}, ASOF)
@@ -138,8 +151,9 @@ def test_wiring_adds_agent_graph_only_when_switched_on(tmp_path) -> None:
     from arena.ops.wiring import build_forecasters
 
     led = Ledger(tmp_path)
-    on, _ = build_forecasters(led, [], Settings.from_env({"ARENA_AGENT_GRAPH": "1"}), B,
-                              llm=FakeLLM([FINAL]))  # fmt: skip
+    on, _ = build_forecasters(
+        led, [], Settings.from_env({"ARENA_AGENT_GRAPH": "1"}), B, llm=FakeLLM([FINAL])
+    )
     off, _ = build_forecasters(led, [], Settings.from_env({}), B, llm=FakeLLM([FINAL]))
     assert [f.forecaster_id for f in on][-1] == "agent_graph"
     assert "agent_graph" not in [f.forecaster_id for f in off]

@@ -153,8 +153,9 @@ def test_worse_challenger_family_never_replaces_the_champion(tmp_path, dom) -> N
     weekly(led, FixedClock(NOW), {"power": dom}, {"power": trainer(dom)}, drift=False)
     champion = registry.load_current(led, ["power"])["power"].version
     later = FixedClock(datetime(2026, 11, 17, 2, tzinfo=UTC))
-    res = weekly(led, later, {"power": dom}, {"power": {"constant": lambda c: Constant()}},
-                 drift=False)  # fmt: skip
+    res = weekly(
+        led, later, {"power": dom}, {"power": {"constant": lambda c: Constant()}}, drift=False
+    )
     (d,) = res.decisions
     assert d.best_family == "constant" and d.promoted is None
     assert "worse than current" in d.reason
@@ -195,17 +196,21 @@ def test_experiments_page_renders_every_view_from_real_summaries(tmp_path, dom) 
     from arena.site.build import build_site
 
     led = Ledger(tmp_path / "l")
-    fams = {"hgb": trainer(dom),
-            "lgbm": lambda c: train_lgbm(dom, c, n_trials=2, folds=1)}  # fmt: skip
+    fams = {"hgb": trainer(dom), "lgbm": lambda c: train_lgbm(dom, c, n_trials=2, folds=1)}
     weekly(led, FixedClock(NOW), {"power": dom}, {"power": fams}, drift=True)
     (s,) = summaries(led)
     cands = {c["family"]: c for c in s["decisions"][0]["candidates"]}
     assert set(cands) == {"hgb", "lgbm"} and cands["lgbm"]["params"]  # Optuna's best trial
     res = build_site(led, tmp_path / "site", FixedClock(NOW))
     page = (res.out_dir / "experiments.html").read_text()
-    for part in ("Model timeline", "Champion vs challengers", "Tuned settings",
-                 "What drives the electricity model", "Conformal prediction intervals",
-                 "Probabilistic accuracy"):  # fmt: skip
+    for part in (
+        "Model timeline",
+        "Champion vs challengers",
+        "Tuned settings",
+        "What drives the electricity model",
+        "Conformal prediction intervals",
+        "Probabilistic accuracy",
+    ):
         assert part in page, part
     if s.get("drift"):
         assert "Drift (" in page

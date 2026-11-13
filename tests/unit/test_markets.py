@@ -68,8 +68,9 @@ def test_resolution() -> None:
     assert up.evidence.values_used["f0"] == RATES["USD"][date(2026, 11, 6)]
     assert up.outcome == int(RATES["USD"][date(2026, 11, 9)] > RATES["USD"][date(2026, 11, 6)])
     mv = d.resolve(qs["absmove_gtEUR_JPY"], qs["absmove_gtEUR_JPY"].resolve_after)
-    assert isinstance(mv, Resolution) and mv.outcome == int(mv.observed_value > qs[
-        "absmove_gtEUR_JPY"].threshold)  # fmt: skip
+    assert isinstance(mv, Resolution) and mv.outcome == int(
+        mv.observed_value > qs["absmove_gtEUR_JPY"].threshold
+    )
     assert d.resolve(qs["upEUR_USD"], qs["upEUR_USD"].resolve_after - timedelta(seconds=1)) is None
 
 

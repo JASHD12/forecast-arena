@@ -19,9 +19,11 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from arena.site.recruiters import PROOFS  # noqa: E402
 
-CARDS = (("power", "Electricity: champion vs baselines"),
-         ("power-lgbm", "Electricity: LightGBM challenger"),
-         ("power-ts", "Electricity: time-series benchmarks"))  # fmt: skip
+CARDS = (
+    ("power", "Electricity: champion vs baselines"),
+    ("power-lgbm", "Electricity: LightGBM challenger"),
+    ("power-ts", "Electricity: time-series benchmarks"),
+)
 
 
 def _first_table(md: str) -> str:
@@ -37,9 +39,11 @@ def _first_table(md: str) -> str:
 
 
 def results() -> str:
-    parts = ["All numbers below are **backtests**: past days replayed through the production "
-             "code, not the live record. Lower Brier is better; always saying 50% scores "
-             "0.25. Generated from the model cards in `docs/models/`."]  # fmt: skip
+    parts = [
+        "All numbers below are **backtests**: past days replayed through the production "
+        "code, not the live record. Lower Brier is better; always saying 50% scores "
+        "0.25. Generated from the model cards in `docs/models/`."
+    ]
     for stem, title in CARDS:
         md = (ROOT / "docs" / "models" / f"{stem}.md").read_text(encoding="utf-8")
         span = re.search(r"Batches (\S+) to (\S+) \((\d+) batch days\)", md)
@@ -113,8 +117,12 @@ def skills() -> str:
 
 
 def render(readme: str) -> str:
-    blocks = (("highlights", highlights()), ("stack", stack()), ("results", results()),
-              ("skills", skills()))  # fmt: skip
+    blocks = (
+        ("highlights", highlights()),
+        ("stack", stack()),
+        ("results", results()),
+        ("skills", skills()),
+    )
     for name, body in blocks:
         start, end = f"<!-- {name}:start -->", f"<!-- {name}:end -->"
         pat = re.compile(re.escape(start) + r".*?" + re.escape(end), re.S)

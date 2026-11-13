@@ -86,21 +86,36 @@ def _question(rec: Record, qid: str, url: str) -> QuestionOut:
     res, void = rec.resolutions.get(qid), rec.voids.get(qid)
     fs = sorted((f for f in rec.forecasts if f.question_id == qid), key=lambda f: f.forecaster_id)
     return QuestionOut(
-        question_id=qid, domain=q.domain, title=plain_title(q), text=q.text,
-        batch_date=q.batch_date, target_date=q.target_date, lock_time=q.lock_time,
+        question_id=qid,
+        domain=q.domain,
+        title=plain_title(q),
+        text=q.text,
+        batch_date=q.batch_date,
+        target_date=q.target_date,
+        lock_time=q.lock_time,
         status="void" if void else "resolved" if res else "open",
         outcome=None if res is None or void else res.outcome,
-        forecasts=[ForecastOut(forecaster_id=f.forecaster_id,
-                               forecaster_version=f.forecaster_version,
-                               probability=f.probability, created_at=f.created_at) for f in fs],
+        forecasts=[
+            ForecastOut(
+                forecaster_id=f.forecaster_id,
+                forecaster_version=f.forecaster_version,
+                probability=f.probability,
+                created_at=f.created_at,
+            )
+            for f in fs
+        ],
         url=url,
-    )  # fmt: skip
+    )
 
 
 def build_api(
-    out_dir: Path, rec: Record, board: Board | None, scope: Literal["official", "rehearsal"],
-    now: datetime, href: Any,
-) -> list[str]:  # fmt: skip
+    out_dir: Path,
+    rec: Record,
+    board: Board | None,
+    scope: Literal["official", "rehearsal"],
+    now: datetime,
+    href: Any,
+) -> list[str]:
     """Write the three files and their schemas under `out_dir/api/v1`; returns their paths."""
     base = out_dir / "api" / API_VERSION
     (base / "schema").mkdir(parents=True, exist_ok=True)
@@ -113,14 +128,27 @@ def build_api(
     rows = []
     if board is not None:
         for r in board.rows:
-            rows.append(LeaderboardRow(
-                forecaster_id=r.forecaster_id, n=r.n, brier=r.brier.estimate,
-                brier_low=r.brier.low, brier_high=r.brier.high, log_score=r.log,
-                brier_minus_base_rate=None if r.vs_reference is None else r.vs_reference.estimate,
-            ))  # fmt: skip
-    lb = LeaderboardFile(generated_at=now, scope=scope, label=board.label if board else None,
-                         questions=board.questions if board else 0,
-                         days=board.days if board else 0, rows=rows)  # fmt: skip
+            rows.append(
+                LeaderboardRow(
+                    forecaster_id=r.forecaster_id,
+                    n=r.n,
+                    brier=r.brier.estimate,
+                    brier_low=r.brier.low,
+                    brier_high=r.brier.high,
+                    log_score=r.log,
+                    brier_minus_base_rate=None
+                    if r.vs_reference is None
+                    else r.vs_reference.estimate,
+                )
+            )
+    lb = LeaderboardFile(
+        generated_at=now,
+        scope=scope,
+        label=board.label if board else None,
+        questions=board.questions if board else 0,
+        days=board.days if board else 0,
+        rows=rows,
+    )
     files = {"questions": allq, "latest": latest, "leaderboard": lb}
     out = []
     for name, model in files.items():
@@ -128,7 +156,8 @@ def build_api(
         schema = type(model).model_json_schema()
         schema["$id"] = f"api/{API_VERSION}/schema/{name}.schema.json"
         (base / "schema" / f"{name}.schema.json").write_text(
-            json.dumps(schema, indent=1, sort_keys=True) + "\n", encoding="utf-8")  # fmt: skip
+            json.dumps(schema, indent=1, sort_keys=True) + "\n", encoding="utf-8"
+        )
         out += [f"api/{API_VERSION}/{name}.json", f"api/{API_VERSION}/schema/{name}.schema.json"]
     return out
 

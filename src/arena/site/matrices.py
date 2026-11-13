@@ -71,8 +71,11 @@ def head_to_head(scored: Sequence[Scored], fids: Sequence[str]) -> dict[str, Any
             )
             excludes = iv.low > 0 or iv.high < 0
             cells.setdefault(a, {})[b] = {
-                "n": len(common), "diff": iv.estimate, "lo": iv.low, "hi": iv.high,
+                "n": len(common),
+                "diff": iv.estimate,
+                "lo": iv.low,
+                "hi": iv.high,
                 "excludes_zero": excludes,
                 "tone": (("hm-b2" if iv.estimate < 0 else "hm-r2") if excludes else "hm-n"),
-            }  # fmt: skip
+            }
     return {"fids": list(fids), "cells": cells}

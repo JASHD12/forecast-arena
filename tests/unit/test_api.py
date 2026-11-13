@@ -18,12 +18,22 @@ def _site(tmp_path):
     led = Ledger(tmp_path / "led")
     q1, q2 = question(), question(template="max_gt")
     led.append(layout.questions_path(B), [q1, q2])
-    led.append(layout.forecasts_path(B), [forecast(q1, "base_rate", 0.5),
-                                          forecast(q1, "llm_context", 0.8),
-                                          forecast(q2, "base_rate", 0.5)])  # fmt: skip
+    led.append(
+        layout.forecasts_path(B),
+        [
+            forecast(q1, "base_rate", 0.5),
+            forecast(q1, "llm_context", 0.8),
+            forecast(q2, "base_rate", 0.5),
+        ],
+    )
     ev = Evidence(source_url="https://x", snapshot_sha256="a" * 64, values_used={})
-    res = Resolution(question_id=q1.question_id, outcome=1, observed_value=91.0,
-                     resolved_at=q1.resolve_after, evidence=ev)  # fmt: skip
+    res = Resolution(
+        question_id=q1.question_id,
+        outcome=1,
+        observed_value=91.0,
+        resolved_at=q1.resolve_after,
+        evidence=ev,
+    )
     led.append(layout.resolutions_path(B), [res])
     return q1, q2, build_site(led, tmp_path / "site", FixedClock(NOW))
 

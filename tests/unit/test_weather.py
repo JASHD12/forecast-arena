@@ -153,8 +153,15 @@ def test_v1_context_shape_unchanged_and_new_context_has_extras() -> None:
     qs = gen(date(2026, 11, 12))
     t = next(q for q in qs if q.template == "tmax_gt")
     ctx = dom.context(t, late)
-    assert list(ctx) == ["domain", "asof", "attribution", "station", "observed_daily",
-                         "forecast_daily", "forecast_hourly"]  # fmt: skip
+    assert list(ctx) == [
+        "domain",
+        "asof",
+        "attribution",
+        "station",
+        "observed_daily",
+        "forecast_daily",
+        "forecast_hourly",
+    ]
     assert set(ctx["observed_daily"][0]) == {"day", "tmax", "precip"}
     assert set(ctx["forecast_daily"]) == {"tmax", "precip"}
     g = next(q for q in qs if q.template == "gust_gt")

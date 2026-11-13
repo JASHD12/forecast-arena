@@ -67,8 +67,9 @@ def day_statuses(ledger: Ledger, first: date, last: date) -> list[DayStatus]:
     d = first
     while d <= last:
         st = DayStatus(d)
-        manifests = [m for rel in runs.get(d, []) if isinstance(m := ledger.read_json(rel),
-                                                                   RunManifest)]  # fmt: skip
+        manifests = [
+            m for rel in runs.get(d, []) if isinstance(m := ledger.read_json(rel), RunManifest)
+        ]
         real = [m for m in manifests if not m.dry_run]
         if not any(m.job == "morning" and m.status == "ok" for m in real):
             st.reasons.append("no successful morning run")

@@ -52,6 +52,7 @@ def test_site_links_the_dashboard_only_when_configured(tmp_path) -> None:
     clk = FixedClock(datetime(2026, 11, 13, tzinfo=UTC))
     off = build_site(Ledger(tmp_path / "a"), tmp_path / "s1", clk)
     assert "interactive dashboard" not in (off.out_dir / "data.html").read_text()
-    on = build_site(Ledger(tmp_path / "b"), tmp_path / "s2", clk,
-                    dashboard_url="https://example.streamlit.app")  # fmt: skip
+    on = build_site(
+        Ledger(tmp_path / "b"), tmp_path / "s2", clk, dashboard_url="https://example.streamlit.app"
+    )
     assert 'href="https://example.streamlit.app"' in (on.out_dir / "data.html").read_text()

@@ -147,9 +147,15 @@ def to_forecasts(
         fid = f"{qid}::{player}"
         if fid in have:
             continue
-        out.append(Forecast(
-            forecast_id=fid, question_id=qid, forecaster_id=player, forecaster_version=VERSION,
-            probability=s.probability, created_at=created_at,
-            meta={"submitted_at": s.submitted_at.isoformat()},
-        ))  # fmt: skip
+        out.append(
+            Forecast(
+                forecast_id=fid,
+                question_id=qid,
+                forecaster_id=player,
+                forecaster_version=VERSION,
+                probability=s.probability,
+                created_at=created_at,
+                meta={"submitted_at": s.submitted_at.isoformat()},
+            )
+        )
     return out

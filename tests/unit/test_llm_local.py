@@ -33,9 +33,10 @@ def backend(texts, clock=None, step=0.0):
         if clock is not None:
             clock.t += step
         stop()
-        return {"choices": [{"message": {"content": texts[len(seen) - 1]},
-                             "finish_reason": "stop"}],
-                "usage": {"prompt_tokens": 500, "completion_tokens": 40}}  # fmt: skip
+        return {
+            "choices": [{"message": {"content": texts[len(seen) - 1]}, "finish_reason": "stop"}],
+            "usage": {"prompt_tokens": 500, "completion_tokens": 40},
+        }
 
     run.seen = seen  # type: ignore[attr-defined]
     return run
@@ -68,8 +69,9 @@ def test_repair_then_parse_failure_skip() -> None:
 
 def test_time_limit_and_run_budget_become_error_skips() -> None:
     clock = Clock()
-    client = LlamaCppLLM(backend([GOOD, GOOD, GOOD], clock, step=30), call_limit=20,
-                         run_budget=50, monotonic=clock)  # fmt: skip
+    client = LlamaCppLLM(
+        backend([GOOD, GOOD, GOOD], clock, step=30), call_limit=20, run_budget=50, monotonic=clock
+    )
     f = LLMLocal(client)
     slow = f.forecast(question(), {}, ASOF)
     assert isinstance(slow, Skip) and slow.reason_code == "error" and "time limit" in slow.detail

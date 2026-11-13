@@ -24,9 +24,16 @@ def test_marts_match_the_scoring_code(tmp_path) -> None:
         fs = [forecast(q, "base_rate", 0.5) for q in qs]
         fs += [forecast(q, "ml", 0.995 if k else 0.2) for k, q in enumerate(qs)]
         led.append(layout.forecasts_path(d), fs)
-        rs = [Resolution(question_id=q.question_id, outcome=k, observed_value=1.0,
-                         resolved_at=q.resolve_after, evidence=ev)
-              for k, q in enumerate(qs)]  # fmt: skip
+        rs = [
+            Resolution(
+                question_id=q.question_id,
+                outcome=k,
+                observed_value=1.0,
+                resolved_at=q.resolve_after,
+                evidence=ev,
+            )
+            for k, q in enumerate(qs)
+        ]
         led.append(layout.resolutions_path(d), rs)
     rec = load(led)
     marts = {m["name"]: m for m in run_dbt_marts(connect(rec), MARTS)}

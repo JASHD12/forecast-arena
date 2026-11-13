@@ -38,9 +38,13 @@ def power_importance(
         return []
     est = models["mean"][len(models["mean"]) // 2]
     r = permutation_importance(
-        est, x, ys["mean"], scoring="neg_mean_absolute_error", n_repeats=REPEATS,
+        est,
+        x,
+        ys["mean"],
+        scoring="neg_mean_absolute_error",
+        n_repeats=REPEATS,
         random_state=0,
-    )  # fmt: skip
+    )
     rows: list[dict[str, Any]] = [
         {
             "feature": FEATURE_NAMES[i],
@@ -119,8 +123,10 @@ def power_shap(domain: PowerDomain, model: Any, first: date, last: date) -> list
     est = models["mean"][len(models["mean"]) // 2]
     values = np.asarray(shap.TreeExplainer(est).shap_values(x))
     mean_abs = np.abs(values).mean(axis=0)
-    rows: list[dict[str, Any]] = [{"feature": FEATURE_NAMES[i], "mean_abs_shap": round(float(v), 4)}
-            for i, v in enumerate(mean_abs)]  # fmt: skip
+    rows: list[dict[str, Any]] = [
+        {"feature": FEATURE_NAMES[i], "mean_abs_shap": round(float(v), 4)}
+        for i, v in enumerate(mean_abs)
+    ]
     rows.sort(key=lambda d: float(d["mean_abs_shap"]), reverse=True)
     return rows[:TOP]
 
@@ -153,8 +159,10 @@ def power_conformal(
     xe, ye, _ = training_rows(daily, *ev)
     if len(xc) < MIN_ROWS or len(xe) < MIN_ROWS:
         return []
-    bands = {80: (QUANTILES.index(0.1), QUANTILES.index(0.9)),
-             90: (QUANTILES.index(0.05), QUANTILES.index(0.95))}  # fmt: skip
+    bands = {
+        80: (QUANTILES.index(0.1), QUANTILES.index(0.9)),
+        90: (QUANTILES.index(0.05), QUANTILES.index(0.95)),
+    }
     out = []
     for stat in STATS:
         qc = np.array([sorted(model.quantiles(stat, list(r))) for r in xc])

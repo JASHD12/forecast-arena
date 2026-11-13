@@ -56,10 +56,18 @@ def dump(items: list[GoldenItem], path: Path) -> str:
     """Write the set as JSON Lines; returns its SHA-256."""
     lines = []
     for it in items:
-        lines.append(json.dumps({"asof": it.asof.isoformat(),
-                                 "question": json.loads(canonical_json(it.question)),
-                                 "context": it.context, "outcome": it.outcome,
-                                 "base_rate": it.base_rate}, sort_keys=True))  # fmt: skip
+        lines.append(
+            json.dumps(
+                {
+                    "asof": it.asof.isoformat(),
+                    "question": json.loads(canonical_json(it.question)),
+                    "context": it.context,
+                    "outcome": it.outcome,
+                    "base_rate": it.base_rate,
+                },
+                sort_keys=True,
+            )
+        )
     body = ("\n".join(lines) + "\n").encode()
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_bytes(body)
@@ -76,6 +84,13 @@ def load(path: Path) -> tuple[list[GoldenItem], str]:
         x = json.loads(line)
         q = parse_record(json.dumps(x["question"]))
         assert isinstance(q, Question)
-        items.append(GoldenItem(datetime.fromisoformat(x["asof"]), q, x["context"],
-                                int(x["outcome"]), x["base_rate"]))  # fmt: skip
+        items.append(
+            GoldenItem(
+                datetime.fromisoformat(x["asof"]),
+                q,
+                x["context"],
+                int(x["outcome"]),
+                x["base_rate"],
+            )
+        )
     return items, hashlib.sha256(body).hexdigest()

@@ -194,8 +194,13 @@ class LLMLocal(LLMContext):
 
     forecaster_id = "llm_local"
 
-    def __init__(self, client: LLMClient | None, per_domain: int = 3, *,
-                 missing: str = "no local model configured") -> None:  # fmt: skip
+    def __init__(
+        self,
+        client: LLMClient | None,
+        per_domain: int = 3,
+        *,
+        missing: str = "no local model configured",
+    ) -> None:
         super().__init__(client, per_domain)
         self.missing = missing
 

@@ -48,8 +48,13 @@ def test_metrics_repairs_and_parse_failures(tmp_path) -> None:
         calls["n"] += 1
         return "oops" if calls["n"] in (2, 5) else GOOD
 
-    res = run(items, {"llm_context": FakeLLM(flaky), "llm_plain": FakeLLM(lambda *a: "x")},
-              FixedClock(NOW), golden="g", golden_sha256=sha)  # fmt: skip
+    res = run(
+        items,
+        {"llm_context": FakeLLM(flaky), "llm_plain": FakeLLM(lambda *a: "x")},
+        FixedClock(NOW),
+        golden="g",
+        golden_sha256=sha,
+    )
     assert res["kind"] == KIND and res["golden_sha256"] == sha
     ctx, plain = res["metrics"]["llm_context"], res["metrics"]["llm_plain"]
     assert ctx["answered"] == 4 and ctx["repair_rate"] == 0.5 and ctx["json_valid_first_try"] == 0.5
@@ -61,8 +66,14 @@ def test_metrics_repairs_and_parse_failures(tmp_path) -> None:
 def test_caps_hold_during_an_eval() -> None:
     items, sha = load(GOLDEN)
     fake = FakeLLM(lambda *a: GOOD)
-    res = run(sample(items, 6), {"llm_context": fake}, FixedClock(NOW), golden="g",
-              golden_sha256=sha, caps=EvalCaps(max_requests=3))  # fmt: skip
+    res = run(
+        sample(items, 6),
+        {"llm_context": fake},
+        FixedClock(NOW),
+        golden="g",
+        golden_sha256=sha,
+        caps=EvalCaps(max_requests=3),
+    )
     m = res["metrics"]["llm_context"]
     assert len(fake.calls) == 3 and m["answered"] == 3 and m["skips"] == {"budget_exhausted": 3}
 
@@ -70,8 +81,10 @@ def test_caps_hold_during_an_eval() -> None:
 def test_ci_gate_fake_run_on_the_frozen_golden_set(tmp_path) -> None:
     from arena.cli import main
 
-    out = CliRunner().invoke(main, ["eval", "run", "--golden", str(GOLDEN), "--fake",
-                                    "--limit", "18", "--out", str(tmp_path)])  # fmt: skip
+    out = CliRunner().invoke(
+        main,
+        ["eval", "run", "--golden", str(GOLDEN), "--fake", "--limit", "18", "--out", str(tmp_path)],
+    )
     assert out.exit_code == 0, out.output
     (path,) = tmp_path.glob("fake-*.json")
     res = json.loads(path.read_text())
@@ -85,8 +98,7 @@ def test_live_eval_is_refused_outside_github_actions(monkeypatch, tmp_path) -> N
     from arena.cli import main
 
     monkeypatch.delenv("GITHUB_ACTIONS", raising=False)
-    out = CliRunner().invoke(main, ["eval", "run", "--golden", str(GOLDEN), "--out",
-                                    str(tmp_path)])  # fmt: skip
+    out = CliRunner().invoke(main, ["eval", "run", "--golden", str(GOLDEN), "--out", str(tmp_path)])
     assert out.exit_code == 2 and "refused" in out.output
 
 
@@ -95,15 +107,18 @@ def test_evals_page_shows_committed_runs_only(tmp_path) -> None:
     from arena.site.build import build_site
 
     items, sha = load(GOLDEN)
-    res = run(sample(items, 6), {"llm_context": FakeLLM(lambda *a: GOOD),
-                                 "llm_plain": FakeLLM(lambda *a: GOOD)},
-              FixedClock(NOW), golden=GOLDEN.name, golden_sha256=sha)  # fmt: skip
+    res = run(
+        sample(items, 6),
+        {"llm_context": FakeLLM(lambda *a: GOOD), "llm_plain": FakeLLM(lambda *a: GOOD)},
+        FixedClock(NOW),
+        golden=GOLDEN.name,
+        golden_sha256=sha,
+    )
     ev = tmp_path / "evals"
     ev.mkdir()
     (ev / "eval-real.json").write_text(json.dumps({**res, "run_id": "eval-real"}))
     (ev / "fake-eval-x.json").write_text(json.dumps({**res, "run_id": "fake-eval-x"}))
-    site = build_site(Ledger(tmp_path / "led"), tmp_path / "site", FixedClock(NOW),
-                      evals_dir=ev)  # fmt: skip
+    site = build_site(Ledger(tmp_path / "led"), tmp_path / "site", FixedClock(NOW), evals_dir=ev)
     page = (site.out_dir / "evals.html").read_text()
     assert "EVALUATION" in page and "eval-real" in page and "fake-eval-x" not in page
     assert "interval includes zero" in page  # identical answers: no difference shown

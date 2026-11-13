@@ -230,6 +230,13 @@ def run_dbt_marts(
             cur = con.execute(f"SELECT * FROM {f.stem} ORDER BY ALL LIMIT {limit}")
             cols = [d[0] for d in cur.description or []]
             doc = next((ln[2:].strip() for ln in body.splitlines() if ln.startswith("--")), "")
-            out.append({"name": f.stem, "doc": doc, "columns": cols, "rows": cur.fetchall(),
-                        "source": f"analytics/dbt/models/marts/{f.name}"})  # fmt: skip
+            out.append(
+                {
+                    "name": f.stem,
+                    "doc": doc,
+                    "columns": cols,
+                    "rows": cur.fetchall(),
+                    "source": f"analytics/dbt/models/marts/{f.name}",
+                }
+            )
     return out

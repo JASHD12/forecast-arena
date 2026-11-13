@@ -21,13 +21,21 @@ def _ledger(tmp_path) -> Ledger:
     led = Ledger(tmp_path)
     q1, q2 = question(), question(template="max_gt")
     led.append(layout.questions_path(B), [q1, q2])
-    led.append(layout.forecasts_path(B), [forecast(q1, "base_rate", 0.5),
-                                          forecast(q1, "llm_context", 0.8),
-                                          forecast(q2, "base_rate", 0.5)])  # fmt: skip
-    res = Resolution(question_id=q1.question_id, outcome=1, observed_value=91.2,
-                     resolved_at=q1.resolve_after,
-                     evidence=Evidence(source_url="https://x", snapshot_sha256="a" * 64,
-                                       values_used={}))  # fmt: skip
+    led.append(
+        layout.forecasts_path(B),
+        [
+            forecast(q1, "base_rate", 0.5),
+            forecast(q1, "llm_context", 0.8),
+            forecast(q2, "base_rate", 0.5),
+        ],
+    )
+    res = Resolution(
+        question_id=q1.question_id,
+        outcome=1,
+        observed_value=91.2,
+        resolved_at=q1.resolve_after,
+        evidence=Evidence(source_url="https://x", snapshot_sha256="a" * 64, values_used={}),
+    )
     led.append(layout.resolutions_path(B), [res])
     return led
 
@@ -57,7 +65,9 @@ def test_questions_question_and_leaderboard(tmp_path) -> None:
     q = question()
     one = call(server, "get_question", {"question_id": q.question_id}).structured_content
     assert one["observed_value"] == 91.2 and {f["forecaster"] for f in one["forecasts"]} == {
-        "base_rate", "llm_context"}  # fmt: skip
+        "base_rate",
+        "llm_context",
+    }
     board = call(server, "leaderboard").structured_content
     by = {r["forecaster"]: r for r in board["rows"]}
     assert by["llm_context"]["brier"] == pytest.approx(0.04) and "rehearsal" in board["note"]
@@ -69,8 +79,12 @@ def test_sql_is_read_only(tmp_path) -> None:
     b = Benchmark(_ledger(tmp_path))
     out = b.run_sql("SELECT forecaster_id, probability FROM forecasts ORDER BY 1, 2")
     assert out["columns"] == ["forecaster_id", "probability"] and len(out["rows"]) == 3
-    for q in ("DROP TABLE forecasts", "SELECT 1; DROP TABLE forecasts",
-              "INSERT INTO skips VALUES ('a', 'b', 'c')", "ATTACH 'x.db'"):  # fmt: skip
+    for q in (
+        "DROP TABLE forecasts",
+        "SELECT 1; DROP TABLE forecasts",
+        "INSERT INTO skips VALUES ('a', 'b', 'c')",
+        "ATTACH 'x.db'",
+    ):
         with pytest.raises(SqlRefused):
             check_sql(q)
     secret = tmp_path / "outside.csv"
@@ -87,9 +101,10 @@ def test_sql_is_read_only(tmp_path) -> None:
 def test_stdio_end_to_end(tmp_path) -> None:
     led = _ledger(tmp_path)
     params = StdioServerParameters(
-        command=sys.executable, args=["-m", "arena.cli", "--ledger-dir", str(led.root), "mcp"],
+        command=sys.executable,
+        args=["-m", "arena.cli", "--ledger-dir", str(led.root), "mcp"],
         env={**os.environ},
-    )  # fmt: skip
+    )
 
     async def go():
         async with Client(params) as c:

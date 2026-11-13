@@ -129,20 +129,38 @@ class CryptoDomain:
                     self.on_skip(f"crypto/bigmove/{coin}: degenerate ({freq})")
                 else:
                     pct = f"{thr * 100:.1f}"
-                    text = (f"Will the price of {name} in US dollars (CoinGecko) move by more "
-                            f"than {pct} % (up or down) over {_fmt_day(target)} (UTC), "
-                            f"from 00:00 UTC that day to 00:00 UTC the next day?")  # fmt: skip
+                    text = (
+                        f"Will the price of {name} in US dollars (CoinGecko) move by more "
+                        f"than {pct} % (up or down) over {_fmt_day(target)} (UTC), "
+                        f"from 00:00 UTC that day to 00:00 UTC the next day?"
+                    )
                     rule = (
                         "P0 = CoinGecko USD price stamped 00:00 UTC on D, P1 = the price "
                         "stamped 00:00 UTC on D+1 (daily market_chart); YES if "
                         "|ln(P1/P0)| rounded to 6 decimals is strictly greater than the "
                         "threshold (a log return)."
                     )
-                    out.append(self._q(coin, name, "bigmove", batch_date, target, created, lock,
-                                       text, rule, thr, "log return",
-                                       {"window_days": ABS_WINDOW,
-                                        "threshold_rule": "median |daily log return| of the "
-                                        "last 60 known days, rounded to 0.001"}, freq))  # fmt: skip
+                    out.append(
+                        self._q(
+                            coin,
+                            name,
+                            "bigmove",
+                            batch_date,
+                            target,
+                            created,
+                            lock,
+                            text,
+                            rule,
+                            thr,
+                            "log return",
+                            {
+                                "window_days": ABS_WINDOW,
+                                "threshold_rule": "median |daily log return| of the "
+                                "last 60 known days, rounded to 0.001",
+                            },
+                            freq,
+                        )
+                    )
             else:
                 self.on_skip(f"crypto/bigmove/{coin}: only {len(recent)} returns")
             ups = [int(r > 0) for r in rets[-UP_WINDOW:]]
@@ -150,22 +168,51 @@ class CryptoDomain:
             if len(ups) < UP_WINDOW or is_degenerate(freq):
                 self.on_skip(f"crypto/up/{coin}: insufficient or degenerate history")
                 continue
-            text = (f"Will the price of {name} in US dollars (CoinGecko) be higher at 00:00 UTC "
-                    f"on {_fmt_day(target + timedelta(days=1))} than at 00:00 UTC on "
-                    f"{_fmt_day(target)}?")  # fmt: skip
+            text = (
+                f"Will the price of {name} in US dollars (CoinGecko) be higher at 00:00 UTC "
+                f"on {_fmt_day(target + timedelta(days=1))} than at 00:00 UTC on "
+                f"{_fmt_day(target)}?"
+            )
             rule = (
                 "P0 = CoinGecko USD price stamped 00:00 UTC on D, P1 = the price stamped "
                 "00:00 UTC on D+1 (daily market_chart); YES if ln(P1/P0) rounded to 6 "
                 "decimals is strictly greater than 0 (unchanged is NO)."
             )
-            out.append(self._q(coin, name, "up", batch_date, target, created, lock, text, rule,
-                               None, "USD", {"degeneracy_window_days": UP_WINDOW},
-                               freq))  # fmt: skip
+            out.append(
+                self._q(
+                    coin,
+                    name,
+                    "up",
+                    batch_date,
+                    target,
+                    created,
+                    lock,
+                    text,
+                    rule,
+                    None,
+                    "USD",
+                    {"degeneracy_window_days": UP_WINDOW},
+                    freq,
+                )
+            )
         return out
 
-    def _q(self, coin: str, name: str, template: str, batch_date: date, target: date,
-           created: datetime, lock: datetime, text: str, rule: str, thr: float | None,
-           unit: str, params: dict[str, Any], freq: float | None) -> Question:  # fmt: skip
+    def _q(
+        self,
+        coin: str,
+        name: str,
+        template: str,
+        batch_date: date,
+        target: date,
+        created: datetime,
+        lock: datetime,
+        text: str,
+        rule: str,
+        thr: float | None,
+        unit: str,
+        params: dict[str, Any],
+        freq: float | None,
+    ) -> Question:
         common = (
             " CoinGecko may revise a price for up to 2 days; later changes are recorded as "
             "revisions. Void if P0 or P1 is still missing 72 hours after resolve_after."
@@ -226,9 +273,12 @@ class CryptoDomain:
         p0, p1 = self._p0p1(question)
         if p0 is None or p1 is None:
             if now >= question.resolve_after + GRACE:
-                return Void(question_id=question.question_id, reason_code="source_missing",
-                            detail="P0 or P1 not published by the end of grace",
-                            voided_at=now)  # fmt: skip
+                return Void(
+                    question_id=question.question_id,
+                    reason_code="source_missing",
+                    detail="P0 or P1 not published by the end of grace",
+                    voided_at=now,
+                )
             return None
         r = logret(p0, p1)
         if question.template == "bigmove":
@@ -243,9 +293,12 @@ class CryptoDomain:
             outcome=outcome,  # type: ignore[arg-type]
             observed_value=value,
             resolved_at=now,
-            evidence=Evidence(source_url=url, snapshot_sha256=sha,
-                              values_used={"p0": p0, "p1": p1, "log_return": r}),
-        )  # fmt: skip
+            evidence=Evidence(
+                source_url=url,
+                snapshot_sha256=sha,
+                values_used={"p0": p0, "p1": p1, "log_return": r},
+            ),
+        )
 
     def revised(self, question: Question, first: Resolution) -> bool:
         """True if P0 or P1 changed after the first resolution."""

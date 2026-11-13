@@ -205,13 +205,18 @@ def forest_svg(rows: Sequence[Any], names: dict[str, str]) -> Markup:
     ]
     t = xmin
     while t <= xmax + 1e-9:
-        p.append(f'<line class="grid" x1="{x(t):.1f}" x2="{x(t):.1f}" y1="{top - 8}" '
-                 f'y2="{h - bottom + 4}"/>')  # fmt: skip
-        p.append(f'<text class="tick" x="{x(t):.1f}" y="{h - 12}" text-anchor="middle">'
-                 f"{t:.2f}</text>")  # fmt: skip
+        p.append(
+            f'<line class="grid" x1="{x(t):.1f}" x2="{x(t):.1f}" y1="{top - 8}" '
+            f'y2="{h - bottom + 4}"/>'
+        )
+        p.append(
+            f'<text class="tick" x="{x(t):.1f}" y="{h - 12}" text-anchor="middle">{t:.2f}</text>'
+        )
         t = round(t + step, 10)
-    p.append(f'<line class="coinline" x1="{x(0.25):.1f}" x2="{x(0.25):.1f}" y1="{top - 14}" '
-             f'y2="{h - bottom + 4}"/>')  # fmt: skip
+    p.append(
+        f'<line class="coinline" x1="{x(0.25):.1f}" x2="{x(0.25):.1f}" y1="{top - 14}" '
+        f'y2="{h - bottom + 4}"/>'
+    )
     p.append(f'<text class="tick" x="{x(0.25) + 4:.1f}" y="{top - 16}">coin flip 0.25</text>')
     for i, r in enumerate(rows):
         cy = top + FOREST_ROW * i + FOREST_ROW / 2
@@ -222,8 +227,10 @@ def forest_svg(rows: Sequence[Any], names: dict[str, str]) -> Markup:
             f"{names.get(r.forecaster_id, r.forecaster_id)}: {b.estimate:.3f} "
             f"(95% interval {b.low:.3f} to {b.high:.3f}, n = {r.n})"
         )
-        p.append(f'<text class="rowlabel" x="{left - 12}" y="{cy + 4:.1f}" text-anchor="end">'
-                 f"{name}</text>")  # fmt: skip
+        p.append(
+            f'<text class="rowlabel" x="{left - 12}" y="{cy + 4:.1f}" text-anchor="end">'
+            f"{name}</text>"
+        )
         p.append(
             f'<g class="pt"><title>{tip}</title>'
             f'<rect class="hit" x="{left}" y="{cy - FOREST_ROW / 2:.1f}" width="{w}" '

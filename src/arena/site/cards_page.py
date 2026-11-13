@@ -80,8 +80,9 @@ def load_cards(models_dir: Path | None) -> list[dict[str, Any]]:
         first = text.splitlines()[0] if text else stem
         title = re.sub(r"^#\s*(Model card:\s*)?", "", first).replace("`", "")
         body = "\n".join(text.splitlines()[1:])
-        out.append({"id": f"card-{stem}", "stem": stem, "title": title,
-                    "html": render_card(body, title)})  # fmt: skip
+        out.append(
+            {"id": f"card-{stem}", "stem": stem, "title": title, "html": render_card(body, title)}
+        )
     return out
 
 
@@ -96,14 +97,20 @@ def headline_backtest(models_dir: Path | None, stem: str = "power") -> dict[str,
     if models_dir is None or not (models_dir / f"{stem}.md").is_file():
         return None
     text = (models_dir / f"{stem}.md").read_text(encoding="utf-8")
-    rows = {m.group(1): m.group(3) for m in
-            re.finditer(r"^\| (\w+) \| (\d+) \| ([0-9.]+) \| \[", text, re.M)}  # fmt: skip
+    rows = {
+        m.group(1): m.group(3)
+        for m in re.finditer(r"^\| (\w+) \| (\d+) \| ([0-9.]+) \| \[", text, re.M)
+    }
     diff = re.search(r"^\| ml - base_rate \| ([-+0-9.]+) \| (\[[^\]]+\]) \| (yes|no)", text, re.M)
     span = re.search(r"Batches (\S+) to (\S+) \((\d+) batch days\)", text)
     if not rows.get("ml") or not rows.get("base_rate") or diff is None or span is None:
         return None
     return {
         "rows": [(f, v, float(v)) for f, v in sorted(rows.items(), key=lambda kv: float(kv[1]))],
-        "diff": diff.group(1), "interval": diff.group(2), "supported": diff.group(3) == "yes",
-        "start": span.group(1), "end": span.group(2), "days": int(span.group(3)),
-    }  # fmt: skip
+        "diff": diff.group(1),
+        "interval": diff.group(2),
+        "supported": diff.group(3) == "yes",
+        "start": span.group(1),
+        "end": span.group(2),
+        "days": int(span.group(3)),
+    }

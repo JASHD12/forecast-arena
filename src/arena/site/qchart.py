@@ -70,15 +70,20 @@ def chart_data(q: Question, ctx: dict[str, Any], observed: float | None) -> Char
                 series.append((str(q.params.get(k, k)), _points(rows, "day", var)))
             return ChartData(f"Observed {var}", q.unit, series, None, None, td)
         pts = _points(ctx.get("observed_daily", []), "day", var)
-        return ChartData(f"Observed {var} at {ctx.get('station', q.entity)}", q.unit,
-                         [(var, pts)], ref, observed, td)  # fmt: skip
+        return ChartData(
+            f"Observed {var} at {ctx.get('station', q.entity)}",
+            q.unit,
+            [(var, pts)],
+            ref,
+            observed,
+            td,
+        )
     if q.domain == "attention":
         pts = _points(ctx.get("daily_views", []), "day", "views")
         return ChartData("Daily page views", "views", [("views", pts)], ref, observed, td)
     if q.domain == "markets":  # the question is about a change, so no level threshold
         pts = _points(ctx.get("fixings", []), "day", "rate")
-        return ChartData(f"ECB reference rate {q.entity}", "rate", [("rate", pts)], None,
-                         None, td)  # fmt: skip
+        return ChartData(f"ECB reference rate {q.entity}", "rate", [("rate", pts)], None, None, td)
     if q.domain == "crypto":
         pts = _points(ctx.get("daily_usd_00utc", []), "day", "price")
         return ChartData("Daily price at 00:00 UTC", "USD", [("price", pts)], None, None, td)
@@ -122,19 +127,23 @@ def series_svg(cd: ChartData) -> Markup:
         return top + h - (v - lo) / (hi - lo) * h
 
     e = html.escape
-    p = [f'<svg class="qchart" viewBox="0 0 {W} {H}" role="img" aria-labelledby="qc-t qc-d">',
-         f'<title id="qc-t">{e(cd.title)}</title>',
-         f'<desc id="qc-d">{e(cd.title)} in {e(cd.unit)} as known at forecast time'
-         f'{", with the threshold" if cd.reference else ""}'
-         f'{" and the observed value" if cd.observed is not None else ""}. '
-         'The values are also in the table below.</desc>']  # fmt: skip
+    p = [
+        f'<svg class="qchart" viewBox="0 0 {W} {H}" role="img" aria-labelledby="qc-t qc-d">',
+        f'<title id="qc-t">{e(cd.title)}</title>',
+        f'<desc id="qc-d">{e(cd.title)} in {e(cd.unit)} as known at forecast time'
+        f"{', with the threshold' if cd.reference else ''}"
+        f"{' and the observed value' if cd.observed is not None else ''}. "
+        "The values are also in the table below.</desc>",
+    ]
     for k in range(5):
         v = lo + (hi - lo) * k / 4
         p.append(
             f'<line class="grid" x1="{left}" x2="{left + w}" y1="{y(v):.1f}" y2="{y(v):.1f}"/>'
         )
-        p.append(f'<text class="tick" x="{left - 6}" y="{y(v) + 4:.1f}" text-anchor="end">'
-                 f"{e(_fmt(v))}</text>")  # fmt: skip
+        p.append(
+            f'<text class="tick" x="{left - 6}" y="{y(v) + 4:.1f}" text-anchor="end">'
+            f"{e(_fmt(v))}</text>"
+        )
     for d in (days[0], days[-1]):
         p.append(
             f'<text class="tick" x="{x(d):.1f}" y="{H - 8}" text-anchor="middle">{e(d[5:])}</text>'
@@ -145,8 +154,10 @@ def series_svg(cd: ChartData) -> Markup:
             f'<line class="ref-line" x1="{left}" x2="{left + w}" y1="{ry:.1f}" y2="{ry:.1f}"/>'
         )
         label = f"{e(cd.reference[1])} {e(_fmt(cd.reference[0]))}"
-        p.append(f'<text class="tick ref-label" x="{left + 6}" y="{ry - 5:.1f}" '
-                 f'text-anchor="start">{label}</text>')  # fmt: skip
+        p.append(
+            f'<text class="tick ref-label" x="{left + 6}" y="{ry - 5:.1f}" '
+            f'text-anchor="start">{label}</text>'
+        )
     for i, (name, pts) in enumerate(cd.series):
         if not pts:
             continue
@@ -155,12 +166,16 @@ def series_svg(cd: ChartData) -> Markup:
         )
         p.append(f'<path class="qline s-{i + 1}" d="{path}"><title>{e(name)}</title></path>')
         for d, v in pts:
-            p.append(f'<circle class="qdot s-{i + 1}" cx="{x(d):.1f}" cy="{y(v):.1f}" r="2.5">'
-                     f"<title>{e(d)}: {e(_fmt(v))}</title></circle>")  # fmt: skip
+            p.append(
+                f'<circle class="qdot s-{i + 1}" cx="{x(d):.1f}" cy="{y(v):.1f}" r="2.5">'
+                f"<title>{e(d)}: {e(_fmt(v))}</title></circle>"
+            )
     if cd.observed is not None:
         ox, oy = x(cd.target_day), y(cd.observed)
         label = f"observed on {e(cd.target_day)}: {e(_fmt(cd.observed))}"
-        p.append(f'<circle class="qobs" cx="{ox:.1f}" cy="{oy:.1f}" r="5">'
-                 f"<title>{label}</title></circle>")  # fmt: skip
+        p.append(
+            f'<circle class="qobs" cx="{ox:.1f}" cy="{oy:.1f}" r="5">'
+            f"<title>{label}</title></circle>"
+        )
     p.append("</svg>")
     return Markup("".join(p))

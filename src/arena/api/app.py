@@ -51,9 +51,12 @@ def create_app(ledger: Ledger) -> FastAPI:
         start = date.fromisoformat(
             json.loads(ledger.read_bytes(OFFICIAL_START_PATH))["official_start"]
         )
-    app = FastAPI(title="Forecast Arena API", version="1",
-                  description="Read-only access to the Forecast Arena record. A research "
-                  "project, not advice.")  # fmt: skip
+    app = FastAPI(
+        title="Forecast Arena API",
+        version="1",
+        description="Read-only access to the Forecast Arena record. A research "
+        "project, not advice.",
+    )
 
     @app.get("/health", response_model=Health)
     def health() -> Health:
@@ -65,8 +68,9 @@ def create_app(ledger: Ledger) -> FastAPI:
         status: Literal["open", "resolved", "void", "all"] = "all",
         limit: int = Query(50, ge=1, le=500),
     ) -> list[QuestionOut]:
-        qs = sorted(rec.questions.values(), key=lambda q: (q.batch_date, q.question_id),
-                    reverse=True)  # fmt: skip
+        qs = sorted(
+            rec.questions.values(), key=lambda q: (q.batch_date, q.question_id), reverse=True
+        )
         out = []
         for q in qs:
             if domain is not None and q.domain != domain:
@@ -89,17 +93,31 @@ def create_app(ledger: Ledger) -> FastAPI:
         scored = official(rec.scored, start) if start else rec.scored
         days = len({s.batch_date for s in scored}) if start else None
         bd = board(scored, "all", domain, days)
-        rows = [LeaderboardRow(forecaster_id=r.forecaster_id, n=r.n, brier=r.brier.estimate,
-                               brier_low=r.brier.low, brier_high=r.brier.high, log_score=r.log,
-                               brier_minus_base_rate=None if r.vs_reference is None
-                               else r.vs_reference.estimate) for r in bd.rows]  # fmt: skip
-        return LeaderboardFile(generated_at=SystemClock().now(),
-                               scope="official" if start else "rehearsal", label=bd.label,
-                               questions=bd.questions, days=bd.days, rows=rows)  # fmt: skip
+        rows = [
+            LeaderboardRow(
+                forecaster_id=r.forecaster_id,
+                n=r.n,
+                brier=r.brier.estimate,
+                brier_low=r.brier.low,
+                brier_high=r.brier.high,
+                log_score=r.log,
+                brier_minus_base_rate=None if r.vs_reference is None else r.vs_reference.estimate,
+            )
+            for r in bd.rows
+        ]
+        return LeaderboardFile(
+            generated_at=SystemClock().now(),
+            scope="official" if start else "rehearsal",
+            label=bd.label,
+            questions=bd.questions,
+            days=bd.days,
+            rows=rows,
+        )
 
     @app.get("/sql", response_model=SqlResult)
-    def sql(q: str = Query(..., description="One SELECT over questions, forecasts, "
-                                           "resolutions, skips")) -> SqlResult:  # fmt: skip
+    def sql(
+        q: str = Query(..., description="One SELECT over questions, forecasts, resolutions, skips"),
+    ) -> SqlResult:
         try:
             return SqlResult(**b.run_sql(q))
         except SqlRefused as exc:

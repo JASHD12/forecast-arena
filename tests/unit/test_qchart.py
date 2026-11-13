@@ -11,8 +11,13 @@ DAYS = [f"2026-11-{d:02d}" for d in range(5, 12)]
 
 def q_for(domain: str, template: str, **params):
     q = question(template=template)
-    return q.model_copy(update={"domain": domain, "params": {**q.params, **params},
-                                "target_date": date(2026, 11, 13)})  # fmt: skip
+    return q.model_copy(
+        update={
+            "domain": domain,
+            "params": {**q.params, **params},
+            "target_date": date(2026, 11, 13),
+        }
+    )
 
 
 def check(cd, n_series=1, ref=True, observed=True):
@@ -36,9 +41,11 @@ def test_weather_single_and_duel() -> None:
     rows = [{"day": d, "tmax": 10 + i, "precip": 0.0, "tmin": 2.0} for i, d in enumerate(DAYS)]
     cd = chart_data(q_for("weather", "tmax_gt"), {"observed_daily": rows, "station": "X"}, 14.2)
     check(cd)
-    duel = chart_data(q_for("weather", "warmer_than", city_a="Berlin", city_b="Munich"),
-                      {"city_a": {"observed_daily": rows}, "city_b": {"observed_daily": rows}},
-                      1.0)  # fmt: skip
+    duel = chart_data(
+        q_for("weather", "warmer_than", city_a="Berlin", city_b="Munich"),
+        {"city_a": {"observed_daily": rows}, "city_b": {"observed_daily": rows}},
+        1.0,
+    )
     check(duel, n_series=2, ref=False, observed=False)
     assert [n for n, _ in duel.series] == ["Berlin", "Munich"]
 
@@ -47,11 +54,15 @@ def test_attention_markets_crypto() -> None:
     views = [{"day": d, "views": 1000 * (i + 1)} for i, d in enumerate(DAYS)]
     check(chart_data(q_for("attention", "views_ge"), {"daily_views": views}, 9000.0))
     fx = [{"day": d, "rate": 1.08 + i / 1000} for i, d in enumerate(DAYS)]
-    check(chart_data(q_for("markets", "abs_move_gt"), {"fixings": fx}, 0.004), ref=False,
-          observed=False)  # fmt: skip
+    check(
+        chart_data(q_for("markets", "abs_move_gt"), {"fixings": fx}, 0.004),
+        ref=False,
+        observed=False,
+    )
     px = [{"day": d, "price": 60000.0 + i} for i, d in enumerate(DAYS)]
-    check(chart_data(q_for("crypto", "up"), {"daily_usd_00utc": px}, None), ref=False,
-          observed=False)  # fmt: skip
+    check(
+        chart_data(q_for("crypto", "up"), {"daily_usd_00utc": px}, None), ref=False, observed=False
+    )
 
 
 def test_missing_values_and_unknown_domains() -> None:

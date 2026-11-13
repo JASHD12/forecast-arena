@@ -100,8 +100,10 @@ def morning(
 ) -> JobResult:
     """Generate questions for `batch`, run every forecaster, snapshot inputs, seal."""
     res = JobResult("morning", batch)
-    with _maybe_dry(ledger, dry_run) as led, run_manifest(led, "morning", batch, clock,
-                                                         dry_run=dry_run) as rec:  # fmt: skip
+    with (
+        _maybe_dry(ledger, dry_run) as led,
+        run_manifest(led, "morning", batch, clock, dry_run=dry_run) as rec,
+    ):
         if on_record:
             on_record(rec)
         if led.exists(layout.batch_seal_path(batch)):
@@ -187,9 +189,13 @@ def morning(
 
 
 def _generate(
-    led: Ledger, batch: date, clock: Clock, domains: Sequence[Domain], rec: RunRecorder,
+    led: Ledger,
+    batch: date,
+    clock: Clock,
+    domains: Sequence[Domain],
+    rec: RunRecorder,
     deadline: datetime,
-) -> tuple[list[Question], list[Question]]:  # fmt: skip
+) -> tuple[list[Question], list[Question]]:
     """The batch's questions already in the ledger, and new ones for domains without any.
 
     A domain that already published questions for the batch (for example the evening
@@ -232,16 +238,19 @@ def evening(
     day is published around noon), and never after the batch is sealed.
     """
     res = JobResult("evening", batch)
-    with _maybe_dry(ledger, dry_run) as led, run_manifest(led, "evening", batch, clock,
-                                                         dry_run=dry_run) as rec:  # fmt: skip
+    with (
+        _maybe_dry(ledger, dry_run) as led,
+        run_manifest(led, "evening", batch, clock, dry_run=dry_run) as rec,
+    ):
         now = clock.now()
         if led.exists(layout.batch_seal_path(batch)):
             rec.warn(f"batch {batch} already sealed; nothing to do")
         elif now.date() != batch - timedelta(days=1):
             rec.warn(f"batch {batch} is not tomorrow's UTC date (today is {now.date()}); refused")
         elif now.time() < EVENING_EARLIEST:
-            rec.warn(f"too early: questions for {batch} are published from "
-                     f"{EVENING_EARLIEST:%H:%M} UTC")  # fmt: skip
+            rec.warn(
+                f"too early: questions for {batch} are published from {EVENING_EARLIEST:%H:%M} UTC"
+            )
         else:
             deadline = batch_lock(batch, lock)
             _, new_qs = _generate(led, batch, clock, domains, rec, deadline)
@@ -270,8 +279,10 @@ def players(
     from arena.forecasters.players import select, to_forecasts
 
     res = JobResult("players", batch)
-    with _maybe_dry(ledger, dry_run) as led, run_manifest(led, "players", batch, clock,
-                                                         dry_run=dry_run) as rec:  # fmt: skip
+    with (
+        _maybe_dry(ledger, dry_run) as led,
+        run_manifest(led, "players", batch, clock, dry_run=dry_run) as rec,
+    ):
         now = clock.now()
         deadline = batch_lock(batch, lock)
         qs = [q for q in led.read(layout.questions_path(batch)) if isinstance(q, Question)]
@@ -345,13 +356,22 @@ def _run_forecaster(
             version: str | None = f.version()
         except Exception:
             version = None
-        return Skip(question_id=q.question_id, forecaster_id=f.forecaster_id,
-                    forecaster_version=version, reason_code="error", detail=_short(exc),
-                    created_at=now)  # fmt: skip
+        return Skip(
+            question_id=q.question_id,
+            forecaster_id=f.forecaster_id,
+            forecaster_version=version,
+            reason_code="error",
+            detail=_short(exc),
+            created_at=now,
+        )
     if out.question_id != q.question_id or out.forecaster_id != f.forecaster_id:
-        return Skip(question_id=q.question_id, forecaster_id=f.forecaster_id,
-                    reason_code="error", detail="forecaster returned a record for another id",
-                    created_at=now)  # fmt: skip
+        return Skip(
+            question_id=q.question_id,
+            forecaster_id=f.forecaster_id,
+            reason_code="error",
+            detail="forecaster returned a record for another id",
+            created_at=now,
+        )
     return out
 
 
@@ -385,8 +405,10 @@ def resolve(
     now = clock.now()
     res = JobResult("resolve", now.date())
     by_domain = {d.name: d for d in domains}
-    with _maybe_dry(ledger, dry_run) as led, run_manifest(led, "resolve", now.date(), clock,
-                                                         dry_run=dry_run) as rec:  # fmt: skip
+    with (
+        _maybe_dry(ledger, dry_run) as led,
+        run_manifest(led, "resolve", now.date(), clock, dry_run=dry_run) as rec,
+    ):
         pending, first = open_questions(led)
         voided_ids = {r.record_id for _, r in led.iter_family("resolutions")}
         out: list[Resolution | Void] = []
@@ -402,8 +424,9 @@ def resolve(
             if r is not None:
                 out.append(r)
                 rec.count("resolutions" if isinstance(r, Resolution) else f"voids_{r.reason_code}")
-        questions = {q.question_id: q for _, q in led.iter_family("questions")
-                     if isinstance(q, Question)}  # fmt: skip
+        questions = {
+            q.question_id: q for _, q in led.iter_family("questions") if isinstance(q, Question)
+        }
         check = revised or _default_revised
         for qid, r in first.items():
             rq = questions.get(qid)
@@ -414,10 +437,15 @@ def resolve(
                 continue
             try:
                 if check(rdom, rq, r):
-                    out.append(Void(question_id=qid, reason_code="source_revised",
-                                    detail="source values changed after the first "
-                                           "resolution; the first resolution is kept",
-                                    voided_at=clock.now()))  # fmt: skip
+                    out.append(
+                        Void(
+                            question_id=qid,
+                            reason_code="source_revised",
+                            detail="source values changed after the first "
+                            "resolution; the first resolution is kept",
+                            voided_at=clock.now(),
+                        )
+                    )
                     rec.count("revisions")
             except Exception as exc:
                 rec.warn(f"{qid}: revision check failed: {_short(exc)}")

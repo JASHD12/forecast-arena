@@ -29,12 +29,18 @@ def _site(tmp_path, content=None):
         outcome=0,
         observed_value=70.0,
         resolved_at=datetime(2026, 11, 14, 12, tzinfo=UTC),
-        evidence=Evidence(source_url="https://www.smard.de/x", snapshot_sha256="a" * 64,
-                          values_used={}),
-    )  # fmt: skip
+        evidence=Evidence(
+            source_url="https://www.smard.de/x", snapshot_sha256="a" * 64, values_used={}
+        ),
+    )
     led.append(layout.resolutions_path(B), [res])
-    return q, build_site(led, tmp_path / "site", CLOCK, content or tmp_path / "none",
-                         site_url="https://example.org/arena")  # fmt: skip
+    return q, build_site(
+        led,
+        tmp_path / "site",
+        CLOCK,
+        content or tmp_path / "none",
+        site_url="https://example.org/arena",
+    )
 
 
 class _Refs(HTMLParser):
@@ -58,8 +64,15 @@ class _Refs(HTMLParser):
 
 def test_new_pages_exist_and_are_linked_from_every_page(tmp_path) -> None:
     _, res = _site(tmp_path)
-    for name in ("guide.html", "privacy.html", "imprint.html", "404.html", "feed.xml",
-                 "static/favicon.svg", "questions/topic-power.html"):  # fmt: skip
+    for name in (
+        "guide.html",
+        "privacy.html",
+        "imprint.html",
+        "404.html",
+        "feed.xml",
+        "static/favicon.svg",
+        "questions/topic-power.html",
+    ):
         assert (res.out_dir / name).is_file(), name
     for page in res.out_dir.rglob("*.html"):
         text = page.read_text()
@@ -86,8 +99,16 @@ def test_no_third_party_requests_scripts_only_self_hosted(tmp_path) -> None:
     css = (res.out_dir / "static" / "style.css").read_text()
     assert "@import" not in css and "url(http" not in css and "fonts.g" not in css
     js = (res.out_dir / "static" / "app.js").read_text()
-    for banned in ("fetch(", "XMLHttpRequest", "localStorage", "sessionStorage", "cookie",
-                   "indexedDB", "http://", "https://"):  # fmt: skip
+    for banned in (
+        "fetch(",
+        "XMLHttpRequest",
+        "localStorage",
+        "sessionStorage",
+        "cookie",
+        "indexedDB",
+        "http://",
+        "https://",
+    ):
         assert banned not in js, banned
 
 
@@ -173,8 +194,11 @@ def test_home_race_spotlight_and_honest_ml_status(tmp_path) -> None:
         SimpleNamespace(question_id=q, forecaster_id=f, batch_date=d, probability=p, outcome=1)
         for q in ("q1", "q2")
         for f, p in (("base_rate", 0.5), ("ml", 0.9))
-    ] + [SimpleNamespace(question_id="q3", forecaster_id="ml", batch_date=d, probability=0.1,
-                         outcome=1)]  # fmt: skip
+    ] + [
+        SimpleNamespace(
+            question_id="q3", forecaster_id="ml", batch_date=d, probability=0.1, outcome=1
+        )
+    ]
     r = race_data(sc)
     assert r["n"] == 2  # q3 is not in the common set
     assert r["series"]["base_rate"] == [("2026-11-01", 0.25)]
@@ -206,9 +230,10 @@ def test_leaderboard_forest_and_about_architecture(tmp_path) -> None:
     iv = SimpleNamespace(estimate=0.2, low=0.15, high=0.26)
     rows = [
         SimpleNamespace(forecaster_id="ml", n=40, brier=iv),
-        SimpleNamespace(forecaster_id="base_rate", n=40,
-                        brier=SimpleNamespace(estimate=0.24, low=0.2, high=0.3)),
-    ]  # fmt: skip
+        SimpleNamespace(
+            forecaster_id="base_rate", n=40, brier=SimpleNamespace(estimate=0.24, low=0.2, high=0.3)
+        ),
+    ]
     svg = forest_svg(rows, {"ml": "ML model", "base_rate": "Base rate"})
     assert svg.index("ML model") < svg.index("Base rate")  # best first
     assert "ML model: 0.200 (95% interval 0.150 to 0.260, n = 40)" in svg

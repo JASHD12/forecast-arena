@@ -55,8 +55,10 @@ TrainerSpec = Trainer | Mapping[str, Trainer]
 def _params(model: Any) -> dict[str, Any]:
     """Tuned hyperparameters of a fitted model (e.g. Optuna's best trial), JSON-safe."""
     raw = getattr(model, "params", None) or {}
-    return {str(k): (v if isinstance(v, int | float | str | bool) else str(v))
-            for k, v in sorted(raw.items())}  # fmt: skip
+    return {
+        str(k): (v if isinstance(v, int | float | str | bool) else str(v))
+        for k, v in sorted(raw.items())
+    }
 
 
 def candidate_families(spec: TrainerSpec) -> dict[str, Trainer]:
@@ -180,8 +182,9 @@ def weekly(
                     fitted[fam] = trainer(first - timedelta(days=1))
                 except Exception as exc:
                     msg = f"training failed: {type(exc).__name__}: {exc}"[:300]
-                    d.candidates.append({"family": fam, "version": None, "brier": None,
-                                         "n": 0, "error": msg})  # fmt: skip
+                    d.candidates.append(
+                        {"family": fam, "version": None, "brier": None, "n": 0, "error": msg}
+                    )
                     rec.warn(f"weekly/{name}/{fam}: {msg}")
             if not fitted:
                 d.reason = "training failed for every candidate"
@@ -193,15 +196,31 @@ def weekly(
                 models["current"] = current
             scores = evaluate(dom, models, first, last)
             if not scores:
-                d.candidates += [{"family": f, "version": m.version, "brier": None, "n": 0,
-                                  "error": None, "params": _params(m)}
-                                 for f, m in fitted.items()]  # fmt: skip
+                d.candidates += [
+                    {
+                        "family": f,
+                        "version": m.version,
+                        "brier": None,
+                        "n": 0,
+                        "error": None,
+                        "params": _params(m),
+                    }
+                    for f, m in fitted.items()
+                ]
                 d.reason = "no resolved questions in the window; nothing promoted"
                 continue
             for f, m in fitted.items():
                 b, n = scores[f"cand:{f}"]
-                d.candidates.append({"family": f, "version": m.version, "brier": round(b, 6),
-                                     "n": n, "error": None, "params": _params(m)})  # fmt: skip
+                d.candidates.append(
+                    {
+                        "family": f,
+                        "version": m.version,
+                        "brier": round(b, 6),
+                        "n": n,
+                        "error": None,
+                        "params": _params(m),
+                    }
+                )
             best = min(fitted, key=lambda f: (scores[f"cand:{f}"][0], f))
             d.best_family = best
             d.candidate_version = fitted[best].version

@@ -91,8 +91,9 @@ class PowerHistory:
                 store.add(obs)
         return store
 
-    def trailing_store(self, asof: datetime, days: int = 70, keys: Sequence[str] = (PRICE_KEY,)
-                       ) -> AsOfStore:  # fmt: skip
+    def trailing_store(
+        self, asof: datetime, days: int = 70, keys: Sequence[str] = (PRICE_KEY,)
+    ) -> AsOfStore:
         """The window a daily job needs: `days` Berlin days before `asof` up to D+1.
 
         Values not yet available at `asof` are still loaded (the gateway hides them), so
@@ -117,9 +118,11 @@ class BackfillSummary:
         """One printable summary line."""
         gaps = ", ".join(d.isoformat() for d in self.incomplete_days[:5])
         more = f" (+{len(self.incomplete_days) - 5} more)" if len(self.incomplete_days) > 5 else ""
-        return (f"{self.key}: {self.chunks} chunks, days {self.first_day}..{self.last_day}, "
-                f"{self.complete_days} complete, {len(self.incomplete_days)} incomplete"
-                f"{': ' + gaps + more if gaps else ''}")  # fmt: skip
+        return (
+            f"{self.key}: {self.chunks} chunks, days {self.first_day}..{self.last_day}, "
+            f"{self.complete_days} complete, {len(self.incomplete_days)} incomplete"
+            f"{': ' + gaps + more if gaps else ''}"
+        )
 
 
 def backfill(
@@ -150,5 +153,11 @@ def backfill(
     complete = daily_series(known)
     # The last day may legitimately be partial (still being published); not a gap.
     incomplete = [d for d in days[:-1] if d not in complete]
-    return BackfillSummary(key, len(stamps), days[0] if days else None,
-                           days[-1] if days else None, len(complete), incomplete)  # fmt: skip
+    return BackfillSummary(
+        key,
+        len(stamps),
+        days[0] if days else None,
+        days[-1] if days else None,
+        len(complete),
+        incomplete,
+    )

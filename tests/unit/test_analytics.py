@@ -14,10 +14,12 @@ def _rec(with_data: bool):
     q = question()
     fs = [forecast(q, "base_rate", 0.8), forecast(q, "ml", 0.3)]
     r = Resolution(
-        question_id=q.question_id, outcome=1, observed_value=90.0,
+        question_id=q.question_id,
+        outcome=1,
+        observed_value=90.0,
         resolved_at=datetime(2026, 11, 14, tzinfo=UTC),
         evidence=Evidence(source_url="x://", snapshot_sha256="a" * 64, values_used={}),
-    )  # fmt: skip
+    )
     return SimpleNamespace(
         questions={q.question_id: q}, forecasts=fs, resolutions={q.question_id: r}, skips=[]
     )

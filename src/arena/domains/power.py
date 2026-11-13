@@ -66,8 +66,9 @@ def quantile(values: Sequence[float], q: float) -> float:
 def evening_values(day: date, values: Sequence[float]) -> list[float]:
     """Prices of the hours starting 17, 18, 19 Berlin time on `day`."""
     hours = berlin_day_hours(day)
-    return [v for h, v in zip(hours, values, strict=True)
-            if h.astimezone(BERLIN).hour in EVENING_HOURS]  # fmt: skip
+    return [
+        v for h, v in zip(hours, values, strict=True) if h.astimezone(BERLIN).hour in EVENING_HOURS
+    ]
 
 
 def day_stats(day: date, values: Sequence[float]) -> dict[str, float]:
@@ -100,22 +101,49 @@ class Template:
 
 
 TEMPLATES: tuple[Template, ...] = (
-    Template("mean_gt", "mean", "gt", 28, "have a daily mean price above",
-             "Arithmetic mean of all hourly prices of D; YES if strictly greater than the "
-             "threshold."),
-    Template("max_gt", "max", "gt", 28, "have a highest hourly price above",
-             "Maximum of the hourly prices of D; YES if strictly greater than the threshold."),
-    Template("min_lt", "min", "lt", 60, "have a lowest hourly price below",
-             "Minimum of the hourly prices of D; YES if strictly less than the threshold."),
-    Template("spread_gt", "spread", "gt", 28,
-             "have a spread (highest minus lowest hourly price) above",
-             "Maximum minus minimum of the hourly prices of D; YES if strictly greater than "
-             "the threshold."),
-    Template("evening_gt", "evening", "gt", 28,
-             "have a mean evening price (17:00-20:00 Europe/Berlin) above",
-             "Mean of the three hourly prices starting 17:00, 18:00 and 19:00 Europe/Berlin "
-             "on D; YES if strictly greater than the threshold."),
-)  # fmt: skip
+    Template(
+        "mean_gt",
+        "mean",
+        "gt",
+        28,
+        "have a daily mean price above",
+        "Arithmetic mean of all hourly prices of D; YES if strictly greater than the threshold.",
+    ),
+    Template(
+        "max_gt",
+        "max",
+        "gt",
+        28,
+        "have a highest hourly price above",
+        "Maximum of the hourly prices of D; YES if strictly greater than the threshold.",
+    ),
+    Template(
+        "min_lt",
+        "min",
+        "lt",
+        60,
+        "have a lowest hourly price below",
+        "Minimum of the hourly prices of D; YES if strictly less than the threshold.",
+    ),
+    Template(
+        "spread_gt",
+        "spread",
+        "gt",
+        28,
+        "have a spread (highest minus lowest hourly price) above",
+        "Maximum minus minimum of the hourly prices of D; YES if strictly greater than "
+        "the threshold.",
+    ),
+    Template(
+        "evening_gt",
+        "evening",
+        "gt",
+        28,
+        "have a mean evening price (17:00-20:00 Europe/Berlin) above",
+        "Mean of the three hourly prices starting 17:00, 18:00 and 19:00 Europe/Berlin "
+        "on D; YES if strictly greater than the threshold.",
+    ),
+)
 UP_WINDOW = 60
 COMMON_RULE = (
     " Hourly day-ahead prices for Germany/Luxembourg in EUR/MWh as published by SMARD "
@@ -211,53 +239,106 @@ class PowerDomain:
                 self.on_skip(f"power/{t.name}: only {len(window)} days in window")
                 continue
             thr, how = threshold_for(t, window)
-            freq = trailing_frequency([int(compare(s[t.stat], t.comparator, thr))
-                                       for s in window])  # fmt: skip
+            freq = trailing_frequency([int(compare(s[t.stat], t.comparator, thr)) for s in window])
             if is_degenerate(freq):
                 self.on_skip(f"power/{t.name}: degenerate (trailing YES {freq:.2f})")
                 continue
             hours = len(berlin_day_hours(target))
-            text = (f"Will the German/Luxembourg day-ahead electricity price for "
-                    f"{_fmt_day(target)} (Europe/Berlin delivery day, {hours} hours) "
-                    f"{t.phrase} {_num(thr)} {UNIT}?")  # fmt: skip
-            out.append(self._question(batch_date, target, created, lock, t.name, text,
-                                      t.rule + COMMON_RULE, thr, t.comparator,
-                                      {"stat": t.stat, "window_days": t.window,
-                                       "window_end": last.isoformat(),
-                                       "threshold_rule": how}, freq))  # fmt: skip
+            text = (
+                f"Will the German/Luxembourg day-ahead electricity price for "
+                f"{_fmt_day(target)} (Europe/Berlin delivery day, {hours} hours) "
+                f"{t.phrase} {_num(thr)} {UNIT}?"
+            )
+            out.append(
+                self._question(
+                    batch_date,
+                    target,
+                    created,
+                    lock,
+                    t.name,
+                    text,
+                    t.rule + COMMON_RULE,
+                    thr,
+                    t.comparator,
+                    {
+                        "stat": t.stat,
+                        "window_days": t.window,
+                        "window_end": last.isoformat(),
+                        "threshold_rule": how,
+                    },
+                    freq,
+                )
+            )
         out.extend(self._up_vs_today(batch_date, target, created, lock, ordered, stats))
         return out
 
-    def _up_vs_today(self, batch_date: date, target: date, created: datetime, lock: datetime,
-                     ordered: list[date], stats: dict[date, dict[str, float]]
-                     ) -> list[Question]:  # fmt: skip
+    def _up_vs_today(
+        self,
+        batch_date: date,
+        target: date,
+        created: datetime,
+        lock: datetime,
+        ordered: list[date],
+        stats: dict[date, dict[str, float]],
+    ) -> list[Question]:
         if batch_date not in stats:
             self.on_skip(f"power/up_vs_today: mean for {batch_date} not available")
             return []
         ref = stats[batch_date]["mean"]
         window = ordered[-(UP_WINDOW + 1) :]
-        ups = [int(stats[b]["mean"] > stats[a]["mean"]) for a, b in pairwise(window)
-               if b - a == timedelta(days=1)]  # fmt: skip
+        ups = [
+            int(stats[b]["mean"] > stats[a]["mean"])
+            for a, b in pairwise(window)
+            if b - a == timedelta(days=1)
+        ]
         freq = trailing_frequency(ups)
         if is_degenerate(freq):
             self.on_skip(f"power/up_vs_today: degenerate (trailing YES {freq})")
             return []
-        text = (f"Will the daily mean German/Luxembourg day-ahead electricity price for "
-                f"{_fmt_day(target)} (Europe/Berlin delivery day) be higher than the daily "
-                f"mean for {_fmt_day(batch_date)}, which was {_num(ref)} {UNIT}?")  # fmt: skip
+        text = (
+            f"Will the daily mean German/Luxembourg day-ahead electricity price for "
+            f"{_fmt_day(target)} (Europe/Berlin delivery day) be higher than the daily "
+            f"mean for {_fmt_day(batch_date)}, which was {_num(ref)} {UNIT}?"
+        )
         rule = (
             "Arithmetic mean of all hourly prices of D compared with the published mean "
             "of B stored in params.reference_mean; YES if strictly greater."
         )
-        return [self._question(batch_date, target, created, lock, "up_vs_today", text,
-                               rule + COMMON_RULE, None, "gt",
-                               {"stat": "mean", "reference_day": batch_date.isoformat(),
-                                "reference_mean": ref, "degeneracy_window_days": UP_WINDOW},
-                               freq)]  # fmt: skip
+        return [
+            self._question(
+                batch_date,
+                target,
+                created,
+                lock,
+                "up_vs_today",
+                text,
+                rule + COMMON_RULE,
+                None,
+                "gt",
+                {
+                    "stat": "mean",
+                    "reference_day": batch_date.isoformat(),
+                    "reference_mean": ref,
+                    "degeneracy_window_days": UP_WINDOW,
+                },
+                freq,
+            )
+        ]
 
-    def _question(self, batch_date: date, target: date, created: datetime, lock: datetime,
-                  template: str, text: str, rule: str, thr: float | None, comparator: str,
-                  params: dict[str, Any], freq: float | None) -> Question:  # fmt: skip
+    def _question(
+        self,
+        batch_date: date,
+        target: date,
+        created: datetime,
+        lock: datetime,
+        template: str,
+        text: str,
+        rule: str,
+        thr: float | None,
+        comparator: str,
+        params: dict[str, Any],
+        freq: float | None,
+    ) -> Question:
         version = template_version_for(batch_date, created)
         return Question(
             question_id=question_id_for(DOMAIN, template, ENTITY, target, version),
@@ -327,9 +408,12 @@ class PowerDomain:
         values = self.observed(question.target_date)
         if values is None:
             if now >= question.resolve_after + GRACE:
-                return Void(question_id=question.question_id, reason_code="source_missing",
-                            detail=f"not all hours of {question.target_date} published "
-                                   f"by end of grace", voided_at=now)  # fmt: skip
+                return Void(
+                    question_id=question.question_id,
+                    reason_code="source_missing",
+                    detail=f"not all hours of {question.target_date} published by end of grace",
+                    voided_at=now,
+                )
             return None
         stats = day_stats(question.target_date, values)
         stat = str(question.params["stat"])
@@ -346,11 +430,18 @@ class PowerDomain:
             outcome=outcome,  # type: ignore[arg-type]
             observed_value=value,
             resolved_at=now,
-            evidence=Evidence(source_url=url, snapshot_sha256=sha,
-                              values_used={"day": question.target_date.isoformat(),
-                                           "hours": len(values), stat: value,
-                                           "threshold": thr, "hourly": values}),
-        )  # fmt: skip
+            evidence=Evidence(
+                source_url=url,
+                snapshot_sha256=sha,
+                values_used={
+                    "day": question.target_date.isoformat(),
+                    "hours": len(values),
+                    stat: value,
+                    "threshold": thr,
+                    "hourly": values,
+                },
+            ),
+        )
 
     def _evidence(self, day: date, values: list[float]) -> tuple[str, str]:
         if self.evidence is not None:

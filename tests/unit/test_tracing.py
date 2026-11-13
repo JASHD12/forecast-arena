@@ -54,18 +54,42 @@ def test_a_failing_call_is_traced_and_reraised() -> None:
 
 def test_observability_rows_prices_and_traces(tmp_path) -> None:
     led = Ledger(tmp_path)
-    span = {"forecaster_id": "agent", "question_id": "q1", "provider": "anthropic",
-            "model": "claude-haiku-5-5", "input_tokens": 1_000_000, "output_tokens": 200_000,
-            "duration_ms": 1500.0, "repair": False, "error": None, "seq": 0}  # fmt: skip
-    local = {**span, "forecaster_id": "llm_local", "provider": "llama_cpp", "model": "qwen",
-             "duration_ms": 20000.0}  # fmt: skip
+    span = {
+        "forecaster_id": "agent",
+        "question_id": "q1",
+        "provider": "anthropic",
+        "model": "claude-haiku-5-5",
+        "input_tokens": 1_000_000,
+        "output_tokens": 200_000,
+        "duration_ms": 1500.0,
+        "repair": False,
+        "error": None,
+        "seq": 0,
+    }
+    local = {
+        **span,
+        "forecaster_id": "llm_local",
+        "provider": "llama_cpp",
+        "model": "qwen",
+        "duration_ms": 20000.0,
+    }
     odd = {**span, "forecaster_id": "llm_plain", "model": "some-other-model", "error": "x"}
-    lines = [{"forecaster_id": "agent", "question_id": "q1", "outcome": "forecast",
-              "tool_calls": [], "spans": [span]},
-             {"forecaster_id": "llm_local", "question_id": "q1", "outcome": "forecast",
-              "spans": [local]},
-             {"forecaster_id": "llm_plain", "question_id": "q2", "outcome": "error",
-              "spans": [odd]}]  # fmt: skip
+    lines = [
+        {
+            "forecaster_id": "agent",
+            "question_id": "q1",
+            "outcome": "forecast",
+            "tool_calls": [],
+            "spans": [span],
+        },
+        {
+            "forecaster_id": "llm_local",
+            "question_id": "q1",
+            "outcome": "forecast",
+            "spans": [local],
+        },
+        {"forecaster_id": "llm_plain", "question_id": "q2", "outcome": "error", "spans": [odd]},
+    ]
     body = "".join(json.dumps(x) + "\n" for x in lines).encode()
     led.write_raw(layout.agent_traces_path(B), body)
     rows = {r.forecaster_id: r for r in usage_rows(load_spans(led))}

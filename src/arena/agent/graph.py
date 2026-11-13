@@ -61,9 +61,14 @@ class GraphAgentForecaster(AgentForecaster):
 
     forecaster_id = "agent_graph"
     prompt_files: tuple[str, ...] = (
-        "graph_system", "graph_plan", "graph_evidence", "graph_critique",
-        "agent_user", "agent_final", "repair",
-    )  # fmt: skip
+        "graph_system",
+        "graph_plan",
+        "graph_evidence",
+        "graph_critique",
+        "agent_user",
+        "agent_final",
+        "repair",
+    )
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         kwargs.setdefault("per_domain", 1)
@@ -77,8 +82,10 @@ class GraphAgentForecaster(AgentForecaster):
         fp = prompts.fingerprint(self.prompt_files, self.prompt_version)
         rag = f"|rag-{self.retriever.embedder.name}" if self.retriever is not None else ""
         lg = _pkg_version("langgraph")
-        return (f"{model}|graph-prompt-{self.prompt_version}-{fp}|tools-{self.max_tool_calls}"
-                f"{rag}|out-{self.max_output_tokens}|langgraph-{lg}")  # fmt: skip
+        return (
+            f"{model}|graph-prompt-{self.prompt_version}-{fp}|tools-{self.max_tool_calls}"
+            f"{rag}|out-{self.max_output_tokens}|langgraph-{lg}"
+        )
 
     def _call(self, system: str, s: State) -> State:
         assert self.client is not None
@@ -130,8 +137,11 @@ class GraphAgentForecaster(AgentForecaster):
             assert resp is not None
             results = tuple((c.id, *box.run(c)) for c in resp.tool_calls)
             done = box.calls_left <= 0 or box.time_left() <= 0
-            return {"turns": [*s["turns"], ToolResults(results)], "final": done,
-                    "path": step("tools", s)}  # fmt: skip
+            return {
+                "turns": [*s["turns"], ToolResults(results)],
+                "final": done,
+                "path": step("tools", s),
+            }
 
         def after_research(s: State) -> Literal["tools", "critique"]:
             resp = s["resp"]
@@ -177,11 +187,16 @@ class GraphAgentForecaster(AgentForecaster):
         if self.sample is not None and q.question_id not in self.sample:
             return self._skip(q, "not_sampled", "not in today's LLM sample", asof)
         box = ToolBox(
-            ctx, asof, probabilities=self._peer_probabilities(q, ctx, asof), news=self.news,
-            wiki=self.wiki, similar=self._similar(q, asof),
-            max_calls=self.max_tool_calls + AUTO_CALLS, time_limit=self.time_limit,
+            ctx,
+            asof,
+            probabilities=self._peer_probabilities(q, ctx, asof),
+            news=self.news,
+            wiki=self.wiki,
+            similar=self._similar(q, asof),
+            max_calls=self.max_tool_calls + AUTO_CALLS,
+            time_limit=self.time_limit,
             monotonic=self.monotonic,
-        )  # fmt: skip
+        )
         self._spent = Usage()
         state: State = {"turns": [], "usage": Usage(), "resp": None, "final": False, "path": []}
         try:
@@ -206,8 +221,9 @@ class GraphAgentForecaster(AgentForecaster):
         except LLMError as exc:
             return self._done_skip(q, box, state, "error", f"{type(exc).__name__}: {exc}", asof)
         except ParseError as exc:
-            return self._done_skip(q, box, state, "parse_failure",
-                                   f"two unparseable answers: {exc}", asof)  # fmt: skip
+            return self._done_skip(
+                q, box, state, "parse_failure", f"two unparseable answers: {exc}", asof
+            )
         self._graph_trace(q, box, state, "forecast")
         return Forecast(
             forecast_id=f"{q.question_id}::{self.forecaster_id}",

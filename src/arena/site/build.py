@@ -243,8 +243,7 @@ def race_data(scored: Sequence[Scored]) -> dict[str, Any]:
                     tot += (clip(s.probability) - s.outcome) ** 2
                     cnt += 1
             series[f].append((d.isoformat(), tot / cnt))
-    return {"days": [d.isoformat() for d in days], "series": series, "n": len(common),
-            "fids": fids}  # fmt: skip
+    return {"days": [d.isoformat() for d in days], "series": series, "n": len(common), "fids": fids}
 
 
 def featured_row(rows: Sequence[dict[str, Any]]) -> dict[str, Any] | None:
@@ -331,9 +330,15 @@ def _rows(questions: Sequence[Question], rec: Any) -> tuple[list[dict[str, Any]]
             }
         )
     order = [
-        "base_rate", "persistence", "ml", "llm_plain", "llm_context", "llm_local", "agent",
+        "base_rate",
+        "persistence",
+        "ml",
+        "llm_plain",
+        "llm_context",
+        "llm_local",
+        "agent",
         "agent_graph",
-    ]  # fmt: skip
+    ]
     ordered = [f for f in order if f in fids] + sorted(fids - set(order))
     return rows, ordered
 
@@ -354,8 +359,9 @@ def _question_chart(
     key = (q.domain, q.batch_date)
     if key not in snaps:
         rel = f"{layout.snapshot_dir(q.domain, q.batch_date)}/morning_context.json.gz"
-        snaps[key] = (json.loads(gzip.decompress(ledger.read_bytes(rel)))
-                      if ledger.exists(rel) else {})  # fmt: skip
+        snaps[key] = (
+            json.loads(gzip.decompress(ledger.read_bytes(rel))) if ledger.exists(rel) else {}
+        )
     ctx = snaps[key].get(q.question_id)
     if not isinstance(ctx, dict):
         return None
@@ -372,8 +378,15 @@ def model_timeline(runs: Sequence[dict[str, Any]]) -> list[dict[str, Any]]:
         if r.get("dry_run"):
             continue
         for d in r.get("decisions", []):
-            out.append({"day": r["day"], "domain": d["domain"], "promoted": d.get("promoted"),
-                        "family": d.get("best_family"), "reason": d.get("reason", "")})  # fmt: skip
+            out.append(
+                {
+                    "day": r["day"],
+                    "domain": d["domain"],
+                    "promoted": d.get("promoted"),
+                    "family": d.get("best_family"),
+                    "reason": d.get("reason", ""),
+                }
+            )
     return out
 
 
@@ -384,8 +397,7 @@ def drift_badge(metrics: Sequence[dict[str, Any]]) -> dict[str, Any] | None:
             hit = re.search(r"share=([0-9.]+)", str(m.get("value")))
             if hit:
                 share = float(hit.group(1))
-                return {"alert": share >= 0.5,
-                        "text": f"{share:.0%} of model inputs drifted"}  # fmt: skip
+                return {"alert": share >= 0.5, "text": f"{share:.0%} of model inputs drifted"}
     return None
 
 
@@ -456,8 +468,17 @@ def template_changelog(rec: Any) -> list[dict[str, Any]]:
         k = (q.domain, q.template, q.template_version)
         lo_hi = span.setdefault(k, [q.batch_date, q.batch_date])
         lo_hi[0], lo_hi[1] = min(lo_hi[0], q.batch_date), max(lo_hi[1], q.batch_date)
-    rows = [{"domain": k[0], "template": k[1], "version": k[2], "since": v[0], "until": v[1],
-             "note": TEMPLATE_VERSION_NOTES.get(k[2], "")} for k, v in span.items()]  # fmt: skip
+    rows = [
+        {
+            "domain": k[0],
+            "template": k[1],
+            "version": k[2],
+            "since": v[0],
+            "until": v[1],
+            "note": TEMPLATE_VERSION_NOTES.get(k[2], ""),
+        }
+        for k, v in span.items()
+    ]
     return sorted(rows, key=lambda r: (r["since"], r["domain"], r["template"], r["version"]))
 
 
@@ -779,11 +800,10 @@ def build_site(
     neighbours = {
         q.question_id: (
             ordered[i - 1] if i > 0 and ordered[i - 1].domain == q.domain else None,
-            ordered[i + 1] if i + 1 < len(ordered) and ordered[i + 1].domain == q.domain
-            else None,
+            ordered[i + 1] if i + 1 < len(ordered) and ordered[i + 1].domain == q.domain else None,
         )
         for i, q in enumerate(ordered)
-    }  # fmt: skip
+    }
     snaps: dict[tuple[str, date], dict[str, Any]] = {}
     for q in rec.questions.values():
         fs = sorted(
@@ -814,23 +834,38 @@ def build_site(
     ftpl = env.get_template("forecaster.html")
     for p in profiles:
         html_text = ftpl.render(
-            title=forecaster_name(p["fid"]), page="forecasters/index.html",
-            **{**common, "root": "../"}, p=p,
-        )  # fmt: skip
+            title=forecaster_name(p["fid"]),
+            page="forecasters/index.html",
+            **{**common, "root": "../"},
+            p=p,
+        )
         (tmp / "forecasters" / f"{p['fid']}.html").write_text(html_text, encoding="utf-8")
-    head_all = [b for b in (headline if off else rehearsal_boards)
-                if b.kind == "all" and b.domain == "overall"]  # fmt: skip
-    build_api(tmp, rec, head_all[0] if head_all else None, "official" if off else "rehearsal",
-              clock.now(), question_href)  # fmt: skip
+    head_all = [
+        b
+        for b in (headline if off else rehearsal_boards)
+        if b.kind == "all" and b.domain == "overall"
+    ]
+    build_api(
+        tmp,
+        rec,
+        head_all[0] if head_all else None,
+        "official" if off else "rehearsal",
+        clock.now(),
+        question_href,
+    )
     ttpl = env.get_template("topic.html")
     scope = "official record" if off else "rehearsal days"
     for dom in domains:
         boards_d = [b for b in (headline if off else rehearsal_boards) if b.domain == dom]
         html_text = ttpl.render(
-            title=domain_name(dom), page="topics/index.html", **{**common, "root": "../"},
-            t=topic(dom, rec), boards=boards_d, scope=scope,
+            title=domain_name(dom),
+            page="topics/index.html",
+            **{**common, "root": "../"},
+            t=topic(dom, rec),
+            boards=boards_d,
+            scope=scope,
             race=race_data([s for s in (off if off else rehearsal) if s.domain == dom]),
-        )  # fmt: skip
+        )
         (tmp / "topics" / f"{dom}.html").write_text(html_text, encoding="utf-8")
     static = Path(__file__).parent / "static"
     for f in static.iterdir():

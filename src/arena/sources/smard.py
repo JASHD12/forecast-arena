@@ -138,16 +138,18 @@ class SmardClient:
         cached = self._cache_path(filter_id, ts)
         if cached is not None and cached.exists():
             meta, body = cached.read_text(encoding="utf-8").split("\n", 1)
-            return Chunk(filter_id, ts, url, json.loads(meta)["sha256"],
-                         parse_chunk(json.loads(body)))  # fmt: skip
+            return Chunk(
+                filter_id, ts, url, json.loads(meta)["sha256"], parse_chunk(json.loads(body))
+            )
         resp = self.http.get(url)
         points = parse_chunk(resp.json())
         chunk = Chunk(filter_id, ts, url, resp.sha256, points)
         if cached is not None and points and all(p.value is not None for p in points):
             cached.parent.mkdir(parents=True, exist_ok=True)
             tmp = cached.with_suffix(".tmp")
-            tmp.write_text(json.dumps({"sha256": resp.sha256}) + "\n" + resp.body.decode(),
-                           encoding="utf-8")  # fmt: skip
+            tmp.write_text(
+                json.dumps({"sha256": resp.sha256}) + "\n" + resp.body.decode(), encoding="utf-8"
+            )
             tmp.replace(cached)
         return chunk
 

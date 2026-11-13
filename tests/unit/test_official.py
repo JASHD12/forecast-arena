@@ -31,8 +31,12 @@ def _day(led: Ledger, d: date, *, healthy: bool = True, failed_run: bool = False
 def _days(led: Ledger, n: int, bad: dict[int, str] | None = None) -> None:
     bad = bad or {}
     for i in range(n):
-        _day(led, D0 + timedelta(days=i), healthy=bad.get(i) != "incident",
-             failed_run=bad.get(i) == "failed")  # fmt: skip
+        _day(
+            led,
+            D0 + timedelta(days=i),
+            healthy=bad.get(i) != "incident",
+            failed_run=bad.get(i) == "failed",
+        )
 
 
 def at(i: int) -> datetime:

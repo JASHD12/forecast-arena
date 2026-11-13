@@ -64,9 +64,12 @@ def brier_terms(p: Sequence[float], y: Sequence[int]) -> list[float]:
 
 
 def paired_brier_difference(
-    days: Sequence[Hashable], p_a: Sequence[float], p_b: Sequence[float], y: Sequence[int],
+    days: Sequence[Hashable],
+    p_a: Sequence[float],
+    p_b: Sequence[float],
+    y: Sequence[int],
     **kw: int,
-) -> Interval:  # fmt: skip
+) -> Interval:
     """Brier(a) - Brier(b) on the same questions, with a day-block interval (negative: a
     is better)."""
     a, b = brier_terms(p_a, y), brier_terms(p_b, y)

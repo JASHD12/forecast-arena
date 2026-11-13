@@ -71,16 +71,19 @@ def run(
         out: list[Any] = [
             BaseRate(h),
             Persistence(h),
-            MLForecaster({}, refresher("ml", lambda c: train(domain, c, folds=folds,
-                                                             max_iter=max_iter))),
-        ]  # fmt: skip
+            MLForecaster(
+                {}, refresher("ml", lambda c: train(domain, c, folds=folds, max_iter=max_iter))
+            ),
+        ]
         if "lgbm" in challengers:
             from arena.forecasters.ml_power_lgbm import train_lgbm
 
             f = MLForecaster(
-                {}, refresher("lgbm", lambda c: train_lgbm(domain, c, n_trials=lgbm_trials,
-                                                           folds=folds))
-            )  # fmt: skip
+                {},
+                refresher(
+                    "lgbm", lambda c: train_lgbm(domain, c, n_trials=lgbm_trials, folds=folds)
+                ),
+            )
             f.forecaster_id = "ml_lgbm"
             out.append(f)
         if "mlp" in challengers:

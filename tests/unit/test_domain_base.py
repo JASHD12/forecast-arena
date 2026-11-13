@@ -12,8 +12,9 @@ T0 = datetime(2026, 10, 1, tzinfo=UTC)
 
 def obs(day: int, value: float | None, lag_h: float = 6) -> Observation:
     at = T0 + timedelta(days=day)
-    return Observation(available_at=at + timedelta(hours=lag_h), observed_at=at, key="toy",
-                       value=value)  # fmt: skip
+    return Observation(
+        available_at=at + timedelta(hours=lag_h), observed_at=at, key="toy", value=value
+    )
 
 
 @pytest.mark.parametrize("seed", range(20))

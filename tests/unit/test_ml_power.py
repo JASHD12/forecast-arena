@@ -41,8 +41,10 @@ def test_higher_threshold_means_lower_probability(trained) -> None:
     asof = datetime.combine(b, time(5, 30), tzinfo=UTC)
     q = next(q for q in dom.generate_questions(b, asof) if q.template == "mean_gt")
     ctx = dom.context(q, asof)
-    ps = [model.raw_probability(q.model_copy(update={"threshold": t}), ctx)
-          for t in (0, 50, 100, 200, 400)]  # fmt: skip
+    ps = [
+        model.raw_probability(q.model_copy(update={"threshold": t}), ctx)
+        for t in (0, 50, 100, 200, 400)
+    ]
     assert ps == sorted(ps, reverse=True)
 
 
@@ -53,7 +55,9 @@ def test_missing_model_is_a_skip_not_a_number() -> None:
 
 
 def test_features_use_only_context_rows() -> None:
-    rows = [{"day": f"2026-10-{d:02d}", "mean": d, "max": d, "min": d, "spread": 0,
-             "evening": d} for d in range(1, 29)]  # fmt: skip
+    rows = [
+        {"day": f"2026-10-{d:02d}", "mean": d, "max": d, "min": d, "spread": 0, "evening": d}
+        for d in range(1, 29)
+    ]
     x = features(rows, date(2026, 10, 29))
     assert len(x) == 12 + 5 * 5 and x[12] == 28.0

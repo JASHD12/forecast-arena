@@ -54,8 +54,15 @@ class BaseRate:
     def forecast(self, q: Question, ctx: dict[str, Any], asof: datetime) -> Forecast | Skip:
         """See `Forecaster.forecast`."""
         p, n = self.probability(q, asof)
-        return _forecast(self.forecaster_id, self.version(), q, p, asof, instances=n,
-                         rule="laplace" if n >= MIN_INSTANCES else "fewer_than_10")  # fmt: skip
+        return _forecast(
+            self.forecaster_id,
+            self.version(),
+            q,
+            p,
+            asof,
+            instances=n,
+            rule="laplace" if n >= MIN_INSTANCES else "fewer_than_10",
+        )
 
 
 class Persistence:
@@ -79,21 +86,45 @@ class Persistence:
         yesterday = by_day.get(q.target_date - timedelta(days=1))
         if yesterday is None:
             p, n = self.base.probability(q, asof)
-            return _forecast(self.forecaster_id, self.version(), q, p, asof,
-                             fallback="yesterday_unknown", instances=n)  # fmt: skip
+            return _forecast(
+                self.forecaster_id,
+                self.version(),
+                q,
+                p,
+                asof,
+                fallback="yesterday_unknown",
+                instances=n,
+            )
         pairs = _transitions(past[-self.window :])
         after = [today for prev, today in pairs if prev == yesterday]
         if len(after) < 10:
             p, n = self.base.probability(q, asof)
-            return _forecast(self.forecaster_id, self.version(), q, p, asof,
-                             fallback="fewer_than_10_transitions", instances=n)  # fmt: skip
+            return _forecast(
+                self.forecaster_id,
+                self.version(),
+                q,
+                p,
+                asof,
+                fallback="fewer_than_10_transitions",
+                instances=n,
+            )
         p = laplace(sum(after), len(after))
-        return _forecast(self.forecaster_id, self.version(), q, p, asof,
-                         yesterday=yesterday, transitions=len(after))  # fmt: skip
+        return _forecast(
+            self.forecaster_id,
+            self.version(),
+            q,
+            p,
+            asof,
+            yesterday=yesterday,
+            transitions=len(after),
+        )
 
 
 def _transitions(instances: list[Instance]) -> list[tuple[int, int]]:
     """(outcome on t-1, outcome on t) for consecutive target dates."""
     by_day = {i.target_date: i.outcome for i in instances}
-    return [(by_day[d - timedelta(days=1)], o) for d, o in by_day.items()
-            if d - timedelta(days=1) in by_day]  # fmt: skip
+    return [
+        (by_day[d - timedelta(days=1)], o)
+        for d, o in by_day.items()
+        if d - timedelta(days=1) in by_day
+    ]

@@ -172,8 +172,9 @@ class WeatherDomain:
         rows = self._map(key, asof)
         return [rows.get(ts) for ts in day_hours_ending(day)]
 
-    def daily(self, city: str, day: date, asof: datetime, kind: str = "obs"
-              ) -> dict[str, float] | None:  # fmt: skip
+    def daily(
+        self, city: str, day: date, asof: datetime, kind: str = "obs"
+    ) -> dict[str, float] | None:
         """{"tmax", "precip"} for a Berlin day from data known at `asof`; None if a
         variable has more than 2 missing hours."""
         keyf = obs_key if kind == "obs" else fc_key
@@ -238,8 +239,9 @@ class WeatherDomain:
         out += self._generate_duels(batch_date, target, created, lock)
         return out
 
-    def _generate_v1(self, batch_date: date, target: date, created: datetime, lock: datetime
-                     ) -> list[Question]:  # fmt: skip
+    def _generate_v1(
+        self, batch_date: date, target: date, created: datetime, lock: datetime
+    ) -> list[Question]:
         out: list[Question] = []
         for city in sorted(self.stations):
             st = self.stations[city]
@@ -254,20 +256,38 @@ class WeatherDomain:
                 if is_degenerate(freq):
                     self.on_skip(f"weather/tmax_gt/{city}: degenerate ({freq:.2f})")
                 else:
-                    text = (f"Will the maximum hourly air temperature measured at DWD station "
-                            f"{st.name} (id {st.station_id}) on {_fmt_day(target)} "
-                            f"(Europe/Berlin day) be above {thr:.1f} °C?")  # fmt: skip
+                    text = (
+                        f"Will the maximum hourly air temperature measured at DWD station "
+                        f"{st.name} (id {st.station_id}) on {_fmt_day(target)} "
+                        f"(Europe/Berlin day) be above {thr:.1f} °C?"
+                    )
                     rule = (
                         "Highest of the hour-ending hourly air temperature observations "
                         "(2 m, deg C, rounded to 0.1) of the Europe/Berlin day D from the "
                         "DWD observation sources of this station via Bright Sky; YES if "
                         "strictly greater than the threshold."
                     )
-                    out.append(self._q(batch_date, target, created, lock, "tmax_gt", st, text,
-                                       rule, thr, "°C", "gt", {"window_days": TMAX_WINDOW,
-                                       "window_end": max(hist).isoformat(),
-                                       "threshold_rule": "median of observed daily maxima, "
-                                       "rounded to 0.5"}, freq))  # fmt: skip
+                    out.append(
+                        self._q(
+                            batch_date,
+                            target,
+                            created,
+                            lock,
+                            "tmax_gt",
+                            st,
+                            text,
+                            rule,
+                            thr,
+                            "°C",
+                            "gt",
+                            {
+                                "window_days": TMAX_WINDOW,
+                                "window_end": max(hist).isoformat(),
+                                "threshold_rule": "median of observed daily maxima, rounded to 0.5",
+                            },
+                            freq,
+                        )
+                    )
             else:
                 self.on_skip(f"weather/tmax_gt/{city}: only {len(recent)} days in window")
             wet = [int(v["precip"] >= WET_MM) for v in hist.values()]
@@ -278,21 +298,38 @@ class WeatherDomain:
             if is_degenerate(freq):
                 self.on_skip(f"weather/wet_day/{city}: degenerate ({freq:.2f})")
                 continue
-            text = (f"Will at least {WET_MM:.1f} mm of precipitation be measured at DWD station "
-                    f"{st.name} (id {st.station_id}) on {_fmt_day(target)} "
-                    f"(Europe/Berlin day)?")  # fmt: skip
+            text = (
+                f"Will at least {WET_MM:.1f} mm of precipitation be measured at DWD station "
+                f"{st.name} (id {st.station_id}) on {_fmt_day(target)} "
+                f"(Europe/Berlin day)?"
+            )
             rule = (
                 "Sum of the hour-ending hourly precipitation totals (mm, rounded to 0.1) "
                 "of the Europe/Berlin day D from the DWD observation sources of this "
                 "station via Bright Sky; YES if greater than or equal to 1.0 mm."
             )
-            out.append(self._q(batch_date, target, created, lock, "wet_day", st, text, rule,
-                               WET_MM, "mm", "ge", {"degeneracy_window_days": WET_WINDOW},
-                               freq))  # fmt: skip
+            out.append(
+                self._q(
+                    batch_date,
+                    target,
+                    created,
+                    lock,
+                    "wet_day",
+                    st,
+                    text,
+                    rule,
+                    WET_MM,
+                    "mm",
+                    "ge",
+                    {"degeneracy_window_days": WET_WINDOW},
+                    freq,
+                )
+            )
         return out
 
-    def _generate_events(self, batch_date: date, target: date, created: datetime,
-                         lock: datetime) -> list[Question]:  # fmt: skip
+    def _generate_events(
+        self, batch_date: date, target: date, created: datetime, lock: datetime
+    ) -> list[Question]:
         """`frost_day` and `gust_gt` per station."""
         out: list[Question] = []
         for city in sorted(self.stations):
@@ -307,18 +344,34 @@ class WeatherDomain:
             elif is_degenerate(freq):
                 self.on_skip(f"weather/frost_day/{city}: degenerate ({freq:.2f})")
             else:
-                text = (f"Will the minimum hourly air temperature measured at DWD station "
-                        f"{st.name} (id {st.station_id}) on {_fmt_day(target)} "
-                        f"(Europe/Berlin day) be below 0.0 °C?")  # fmt: skip
+                text = (
+                    f"Will the minimum hourly air temperature measured at DWD station "
+                    f"{st.name} (id {st.station_id}) on {_fmt_day(target)} "
+                    f"(Europe/Berlin day) be below 0.0 °C?"
+                )
                 rule = (
                     "Lowest of the hour-ending hourly air temperature observations (2 m, "
                     "deg C, rounded to 0.1) of the Europe/Berlin day D from the DWD "
                     "observation sources of this station via Bright Sky; YES if strictly "
                     "less than 0.0 (a DWD frost day)."
                 )
-                out.append(self._q(batch_date, target, created, lock, "frost_day", st, text,
-                                   rule, 0.0, "°C", "lt",
-                                   {"degeneracy_window_days": FROST_WINDOW}, freq))  # fmt: skip
+                out.append(
+                    self._q(
+                        batch_date,
+                        target,
+                        created,
+                        lock,
+                        "frost_day",
+                        st,
+                        text,
+                        rule,
+                        0.0,
+                        "°C",
+                        "lt",
+                        {"degeneracy_window_days": FROST_WINDOW},
+                        freq,
+                    )
+                )
             gh = self.gust_history(city, created, GUST_WINDOW)
             if len(gh) < GUST_WINDOW - 2:
                 self.on_skip(f"weather/gust_gt/{city}: only {len(gh)} days with gust data")
@@ -328,24 +381,43 @@ class WeatherDomain:
             if is_degenerate(freq):
                 self.on_skip(f"weather/gust_gt/{city}: degenerate ({freq:.2f})")
                 continue
-            text = (f"Will the highest wind gust measured at DWD station {st.name} "
-                    f"(id {st.station_id}) on {_fmt_day(target)} (Europe/Berlin day) be "
-                    f"above {thr:.0f} km/h?")  # fmt: skip
+            text = (
+                f"Will the highest wind gust measured at DWD station {st.name} "
+                f"(id {st.station_id}) on {_fmt_day(target)} (Europe/Berlin day) be "
+                f"above {thr:.0f} km/h?"
+            )
             rule = (
                 "Highest of the hour-ending hourly maximum wind gust observations (10 m, "
                 "km/h, rounded to 0.1) of the Europe/Berlin day D from the DWD observation "
                 "sources of this station via Bright Sky; YES if strictly greater than the "
                 "threshold."
             )
-            out.append(self._q(batch_date, target, created, lock, "gust_gt", st, text, rule,
-                               thr, "km/h", "gt", {"window_days": GUST_WINDOW,
-                               "window_end": max(gh).isoformat(),
-                               "threshold_rule": "median of observed daily maximum gusts, "
-                               "rounded to 5"}, freq))  # fmt: skip
+            out.append(
+                self._q(
+                    batch_date,
+                    target,
+                    created,
+                    lock,
+                    "gust_gt",
+                    st,
+                    text,
+                    rule,
+                    thr,
+                    "km/h",
+                    "gt",
+                    {
+                        "window_days": GUST_WINDOW,
+                        "window_end": max(gh).isoformat(),
+                        "threshold_rule": "median of observed daily maximum gusts, rounded to 5",
+                    },
+                    freq,
+                )
+            )
         return out
 
-    def _generate_duels(self, batch_date: date, target: date, created: datetime,
-                        lock: datetime) -> list[Question]:  # fmt: skip
+    def _generate_duels(
+        self, batch_date: date, target: date, created: datetime, lock: datetime
+    ) -> list[Question]:
         """`warmer_than` and `wetter_than` for the fixed city duels."""
         out: list[Question] = []
         for a, b in DUELS:
@@ -367,9 +439,11 @@ class WeatherDomain:
                 if is_degenerate(freq):
                     self.on_skip(f"weather/{template}/{a}-{b}: degenerate ({freq:.2f})")
                     continue
-                text = (f"Will the {noun} measured at DWD station {sa.name} "
-                        f"(id {sa.station_id}) on {_fmt_day(target)} (Europe/Berlin day) be "
-                        f"higher than at DWD station {sb.name} (id {sb.station_id})?")  # fmt: skip
+                text = (
+                    f"Will the {noun} measured at DWD station {sa.name} "
+                    f"(id {sa.station_id}) on {_fmt_day(target)} (Europe/Berlin day) be "
+                    f"higher than at DWD station {sb.name} (id {sb.station_id})?"
+                )
                 what = (
                     "highest hour-ending hourly air temperature (2 m, deg C)"
                     if stat == "tmax"
@@ -383,13 +457,26 @@ class WeatherDomain:
                     "observations of D are missing at either station 72 hours after "
                     "resolve_after."
                 )
-                out.append(self._duel_q(batch_date, target, created, lock, template, sa, sb,
-                                        text, rule, freq))  # fmt: skip
+                out.append(
+                    self._duel_q(
+                        batch_date, target, created, lock, template, sa, sb, text, rule, freq
+                    )
+                )
         return out
 
-    def _duel_q(self, batch_date: date, target: date, created: datetime, lock: datetime,
-                template: str, sa: Station, sb: Station, text: str, rule: str,
-                freq: float | None) -> Question:  # fmt: skip
+    def _duel_q(
+        self,
+        batch_date: date,
+        target: date,
+        created: datetime,
+        lock: datetime,
+        template: str,
+        sa: Station,
+        sb: Station,
+        text: str,
+        rule: str,
+        freq: float | None,
+    ) -> Question:
         entity = duel_entity(sa.city, sb.city)
         version = template_version_for(batch_date, created)
         return Question(
@@ -423,9 +510,22 @@ class WeatherDomain:
             tags=["weather", "duel"],
         )
 
-    def _q(self, batch_date: date, target: date, created: datetime, lock: datetime,
-           template: str, st: Station, text: str, rule: str, thr: float, unit: str,
-           comparator: str, params: dict[str, Any], freq: float | None) -> Question:  # fmt: skip
+    def _q(
+        self,
+        batch_date: date,
+        target: date,
+        created: datetime,
+        lock: datetime,
+        template: str,
+        st: Station,
+        text: str,
+        rule: str,
+        thr: float,
+        unit: str,
+        comparator: str,
+        params: dict[str, Any],
+        freq: float | None,
+    ) -> Question:
         common = (
             " Void if more than 2 hourly observations of D are missing for the variable "
             "72 hours after resolve_after."
@@ -464,18 +564,26 @@ class WeatherDomain:
             a, b = str(question.params["city_a"]), str(question.params["city_b"])
             ca = self._city_context(a, question.target_date, asof, extra=True)
             cb = self._city_context(b, question.target_date, asof, extra=True)
-            return {"domain": DOMAIN, "asof": asof.isoformat(), "attribution": ATTRIBUTION,
-                    "city_a": ca, "city_b": cb}  # fmt: skip
+            return {
+                "domain": DOMAIN,
+                "asof": asof.isoformat(),
+                "attribution": ATTRIBUTION,
+                "city_a": ca,
+                "city_b": cb,
+            }
         extra = question.template not in ("tmax_gt", "wet_day")
         ctx = self._city_context(question.entity, question.target_date, asof, extra=extra)
         return {"domain": DOMAIN, "asof": asof.isoformat(), "attribution": ATTRIBUTION, **ctx}
 
-    def _city_context(self, city: str, target: date, asof: datetime, *, extra: bool
-                      ) -> dict[str, Any]:  # fmt: skip
+    def _city_context(
+        self, city: str, target: date, asof: datetime, *, extra: bool
+    ) -> dict[str, Any]:
         hist = self.history(city, asof, TMAX_WINDOW)
         fc = self.daily(city, target, asof, kind="fc")
-        hourly = {var: self._hourly(fc_key(city, var), asof, target)
-                  for var in ("temperature", "precipitation")}  # fmt: skip
+        hourly = {
+            var: self._hourly(fc_key(city, var), asof, target)
+            for var in ("temperature", "precipitation")
+        }
         out: dict[str, Any] = {
             "station": self.stations[city].name,
             "observed_daily": [
@@ -510,9 +618,12 @@ class WeatherDomain:
         missing = sum(v is None for v in hourly)
         if missing > MAX_MISSING:
             if now >= question.resolve_after + GRACE:
-                return Void(question_id=question.question_id, reason_code="source_missing",
-                            detail=f"{missing} hourly {var} observations of {day} missing "
-                                   f"at end of grace", voided_at=now)  # fmt: skip
+                return Void(
+                    question_id=question.question_id,
+                    reason_code="source_missing",
+                    detail=f"{missing} hourly {var} observations of {day} missing at end of grace",
+                    voided_at=now,
+                )
             return None
         present = [v for v in hourly if v is not None]
         assert question.threshold is not None
@@ -531,11 +642,19 @@ class WeatherDomain:
             outcome=outcome,  # type: ignore[arg-type]
             observed_value=value,
             resolved_at=now,
-            evidence=Evidence(source_url=url, snapshot_sha256=sha,
-                              values_used={"day": day.isoformat(), "variable": var,
-                                           "hours": len(hourly), "missing": missing,
-                                           "hourly": hourly, "value": value}),
-        )  # fmt: skip
+            evidence=Evidence(
+                source_url=url,
+                snapshot_sha256=sha,
+                values_used={
+                    "day": day.isoformat(),
+                    "variable": var,
+                    "hours": len(hourly),
+                    "missing": missing,
+                    "hourly": hourly,
+                    "value": value,
+                },
+            ),
+        )
 
     def _resolve_duel(self, question: Question, now: datetime) -> Resolution | Void | None:
         far = datetime.max.replace(tzinfo=UTC)
@@ -547,9 +666,13 @@ class WeatherDomain:
         ma, mb = sum(v is None for v in ha), sum(v is None for v in hb)
         if ma > MAX_MISSING or mb > MAX_MISSING:
             if now >= question.resolve_after + GRACE:
-                return Void(question_id=question.question_id, reason_code="source_missing",
-                            detail=f"{ma}/{mb} hourly {var} observations of {day} missing "
-                                   f"at end of grace ({a}/{b})", voided_at=now)  # fmt: skip
+                return Void(
+                    question_id=question.question_id,
+                    reason_code="source_missing",
+                    detail=f"{ma}/{mb} hourly {var} observations of {day} missing "
+                    f"at end of grace ({a}/{b})",
+                    voided_at=now,
+                )
             return None
         pa, pb = [v for v in ha if v is not None], [v for v in hb if v is not None]
         if var == "temperature":
@@ -564,12 +687,22 @@ class WeatherDomain:
             outcome=int(va > vb),  # type: ignore[arg-type]
             observed_value=r1(va - vb),
             resolved_at=now,
-            evidence=Evidence(source_url=ua, snapshot_sha256=sha,
-                              values_used={"day": day.isoformat(), "variable": var,
-                                           "value_a": va, "value_b": vb, "hourly_a": ha,
-                                           "hourly_b": hb, "missing_a": ma, "missing_b": mb,
-                                           "source_b": ub}),
-        )  # fmt: skip
+            evidence=Evidence(
+                source_url=ua,
+                snapshot_sha256=sha,
+                values_used={
+                    "day": day.isoformat(),
+                    "variable": var,
+                    "value_a": va,
+                    "value_b": vb,
+                    "hourly_a": ha,
+                    "hourly_b": hb,
+                    "missing_a": ma,
+                    "missing_b": mb,
+                    "source_b": ub,
+                },
+            ),
+        )
 
     def _evidence(self, city: str, day: date, hourly: list[float | None]) -> tuple[str, str]:
         if self.evidence is not None:

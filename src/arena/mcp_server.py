@@ -69,14 +69,20 @@ class Benchmark:
         self.con.execute("SET lock_configuration = true")
 
     def list_questions(
-        self, domain: str | None = None, status: Literal["open", "resolved", "all"] = "all",
+        self,
+        domain: str | None = None,
+        status: Literal["open", "resolved", "all"] = "all",
         limit: int = 50,
-    ) -> list[dict[str, Any]]:  # fmt: skip
+    ) -> list[dict[str, Any]]:
         """Newest questions first."""
-        qs = sorted(self.rec.questions.values(), key=lambda q: (q.batch_date, q.question_id),
-                    reverse=True)  # fmt: skip
-        rows = [_question_row(self.rec, q.question_id) for q in qs
-                if domain is None or q.domain == domain]  # fmt: skip
+        qs = sorted(
+            self.rec.questions.values(), key=lambda q: (q.batch_date, q.question_id), reverse=True
+        )
+        rows = [
+            _question_row(self.rec, q.question_id)
+            for q in qs
+            if domain is None or q.domain == domain
+        ]
         if status != "all":
             rows = [r for r in rows if r["status"] == status]
         return rows[: max(1, min(limit, MAX_ROWS))]
@@ -114,9 +120,17 @@ class Benchmark:
     def leaderboard(self, domain: str | None = None) -> dict[str, Any]:
         """Brier, log score and skill against base_rate on every scored question."""
         scored = [s for s in self.rec.scored if domain is None or s.domain == domain]
-        rows = [{"forecaster": r.forecaster_id, "name": forecaster_name(r.forecaster_id),
-                 "n": r.n, "brier": r.brier, "log_score": r.log, "skill_vs_base_rate": r.skill}
-                for r in leaderboard(scored)]  # fmt: skip
+        rows = [
+            {
+                "forecaster": r.forecaster_id,
+                "name": forecaster_name(r.forecaster_id),
+                "n": r.n,
+                "brier": r.brier,
+                "log_score": r.log,
+                "skill_vs_base_rate": r.skill,
+            }
+            for r in leaderboard(scored)
+        ]
         return {
             "domain": domain_name(domain) if domain else "all topics",
             "note": "All scored questions, rehearsal included; the site's headline boards "
@@ -150,9 +164,10 @@ def build_server(ledger: Ledger) -> Any:
 
     @server.tool(annotations=ro)
     def list_questions(
-        domain: str | None = None, status: Literal["open", "resolved", "all"] = "all",
+        domain: str | None = None,
+        status: Literal["open", "resolved", "all"] = "all",
         limit: int = 50,
-    ) -> list[dict[str, Any]]:  # fmt: skip
+    ) -> list[dict[str, Any]]:
         """List questions, newest first. domain: power, weather, attention, markets."""
         return b.list_questions(domain, status, limit)
 

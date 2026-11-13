@@ -9,8 +9,14 @@ def test_every_weather_question_gets_a_short_title() -> None:
     b = date(2026, 11, 9)
     qs = fixture_weather().generate_questions(b, datetime.combine(b, time(5, 30), tzinfo=UTC))
     titles = {q.template: plain_title(q) for q in qs}
-    assert set(titles) == {"tmax_gt", "wet_day", "frost_day", "gust_gt", "warmer_than",
-                           "wetter_than"}  # fmt: skip
+    assert set(titles) == {
+        "tmax_gt",
+        "wet_day",
+        "frost_day",
+        "gust_gt",
+        "warmer_than",
+        "wetter_than",
+    }
     for q in qs:
         t = plain_title(q)
         assert t != q.text and t.endswith("?") and len(t) < len(q.text)
@@ -36,14 +42,19 @@ def test_power_attention_markets_titles() -> None:
     base = question("DE_LU", date(2026, 11, 12))
     params = {"project": "en.wikipedia", "title": "Mount_Etna"}
     att = base.model_copy(
-        update={"domain": "attention", "template": "views_ge", "threshold": 52000.0,
-                "params": params}
-    )  # fmt: skip
+        update={
+            "domain": "attention",
+            "template": "views_ge",
+            "threshold": 52000.0,
+            "params": params,
+        }
+    )
     assert plain_title(att) == (
         "Will the English Wikipedia article “Mount Etna” get at least 52,000 views on Fri 13 Nov?"
     )
-    up = base.model_copy(update={"domain": "markets", "template": "up",
-                                 "params": {"currency": "USD"}})  # fmt: skip
+    up = base.model_copy(
+        update={"domain": "markets", "template": "up", "params": {"currency": "USD"}}
+    )
     assert plain_title(up) == "Will the euro be worth more USD at the next ECB fixing?"
 
 

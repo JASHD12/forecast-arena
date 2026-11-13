@@ -18,11 +18,19 @@ from arena.sources.ecb import easter
 def national_holidays(year: int) -> frozenset[date]:
     """The nationwide public holidays of a year."""
     e = easter(year)
-    return frozenset({
-        date(year, 1, 1), e - timedelta(days=2), e + timedelta(days=1), date(year, 5, 1),
-        e + timedelta(days=39), e + timedelta(days=50), date(year, 10, 3),
-        date(year, 12, 25), date(year, 12, 26),
-    })  # fmt: skip
+    return frozenset(
+        {
+            date(year, 1, 1),
+            e - timedelta(days=2),
+            e + timedelta(days=1),
+            date(year, 5, 1),
+            e + timedelta(days=39),
+            e + timedelta(days=50),
+            date(year, 10, 3),
+            date(year, 12, 25),
+            date(year, 12, 26),
+        }
+    )
 
 
 def is_holiday(d: date) -> bool:

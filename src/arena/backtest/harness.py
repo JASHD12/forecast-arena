@@ -67,8 +67,7 @@ class BacktestStore:
             raise BacktestError(f"{root} is inside a ledger checkout; backtests stay apart")
         self.root = root
 
-    def write(self, run_id: str, records: Sequence[BacktestRecord], meta: dict[str, Any]
-              ) -> Path:  # fmt: skip
+    def write(self, run_id: str, records: Sequence[BacktestRecord], meta: dict[str, Any]) -> Path:
         """Write a run (records + meta). Runs are never overwritten."""
         d = self.root / run_id
         if d.exists():
@@ -76,9 +75,10 @@ class BacktestStore:
         d.mkdir(parents=True)
         lines = "".join(r.model_dump_json() + "\n" for r in records)
         (d / "forecasts.jsonl").write_text(lines, encoding="utf-8")
-        (d / "meta.json").write_text(json.dumps({"label": LABEL, **meta}, indent=2,
-                                                sort_keys=True, default=str) + "\n",
-                                     encoding="utf-8")  # fmt: skip
+        (d / "meta.json").write_text(
+            json.dumps({"label": LABEL, **meta}, indent=2, sort_keys=True, default=str) + "\n",
+            encoding="utf-8",
+        )
         return d
 
     def read(self, run_id: str) -> list[BacktestRecord]:
@@ -97,14 +97,18 @@ class IncrementalHistory:
     def add(self, q: Question, r: Resolution) -> None:
         """Record a resolved question."""
         self._rows.setdefault((q.domain, q.template, q.entity), {})[q.target_date] = (
-            q.resolve_after, r.outcome)  # fmt: skip
+            q.resolve_after,
+            r.outcome,
+        )
 
-    def instances(self, domain: str, template: str, entity: str, before: date, asof: datetime
-                  ) -> Sequence[Instance]:  # fmt: skip
+    def instances(
+        self, domain: str, template: str, entity: str, before: date, asof: datetime
+    ) -> Sequence[Instance]:
         """See `History.instances`."""
         rows = self._rows.get((domain, template, entity), {})
-        return [Instance(d, o) for d, (known, o) in sorted(rows.items())
-                if d < before and known <= asof]  # fmt: skip
+        return [
+            Instance(d, o) for d, (known, o) in sorted(rows.items()) if d < before and known <= asof
+        ]
 
 
 @dataclass
@@ -165,9 +169,19 @@ def walk_forward(
                 if not isinstance(out, Forecast):
                     res.skipped[out.reason_code] = res.skipped.get(out.reason_code, 0) + 1
                     continue
-                res.records.append(BacktestRecord(
-                    run_id=run_id, question_id=q.question_id, domain=q.domain,
-                    template=q.template, entity=q.entity, batch_date=b,
-                    forecaster_id=f.forecaster_id, forecaster_version=out.forecaster_version,
-                    probability=out.probability, outcome=outcome, meta=out.meta))  # fmt: skip
+                res.records.append(
+                    BacktestRecord(
+                        run_id=run_id,
+                        question_id=q.question_id,
+                        domain=q.domain,
+                        template=q.template,
+                        entity=q.entity,
+                        batch_date=b,
+                        forecaster_id=f.forecaster_id,
+                        forecaster_version=out.forecaster_version,
+                        probability=out.probability,
+                        outcome=outcome,
+                        meta=out.meta,
+                    )
+                )
     return res

@@ -53,10 +53,15 @@ def test_each_failure_is_detected(tmp_path) -> None:
     qs = [question(entity=f"E{i}") for i in range(6)]
     t = datetime(2026, 11, 12, 5, 33, tzinfo=UTC)
     skips = [
-        Skip(question_id=x.question_id, forecaster_id="llm_plain",
-             reason_code="parse_failure", detail="not JSON", created_at=t)
+        Skip(
+            question_id=x.question_id,
+            forecaster_id="llm_plain",
+            reason_code="parse_failure",
+            detail="not JSON",
+            created_at=t,
+        )
         for x in qs[1:]
-    ]  # fmt: skip
+    ]
     led3.append(layout.questions_path(B), qs)
     led3.append(layout.forecasts_path(B), [forecast(qs[0], "llm_plain", 0.4), *skips])
     seal_batch(led3, B, FixedClock(t))

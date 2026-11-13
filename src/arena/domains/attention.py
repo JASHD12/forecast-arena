@@ -49,14 +49,49 @@ TRAJECTORY_DAYS = 7
 SOURCE = "https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article"
 
 _NAMESPACES = {
-    "de.wikipedia": ["Wikipedia", "Spezial", "Datei", "Portal", "Kategorie", "Hilfe",
-                     "Benutzer", "Benutzerin", "Vorlage", "Diskussion", "Modul", "MediaWiki",
-                     "Benutzer Diskussion", "Wikipedia Diskussion", "Special", "File",
-                     "Category", "Help", "User", "Template", "Talk", "Module"],
-    "en.wikipedia": ["Wikipedia", "Special", "File", "Portal", "Category", "Help", "User",
-                     "Template", "Talk", "Draft", "Module", "MediaWiki", "User talk",
-                     "Wikipedia talk", "TimedText", "Book"],
-}  # fmt: skip
+    "de.wikipedia": [
+        "Wikipedia",
+        "Spezial",
+        "Datei",
+        "Portal",
+        "Kategorie",
+        "Hilfe",
+        "Benutzer",
+        "Benutzerin",
+        "Vorlage",
+        "Diskussion",
+        "Modul",
+        "MediaWiki",
+        "Benutzer Diskussion",
+        "Wikipedia Diskussion",
+        "Special",
+        "File",
+        "Category",
+        "Help",
+        "User",
+        "Template",
+        "Talk",
+        "Module",
+    ],
+    "en.wikipedia": [
+        "Wikipedia",
+        "Special",
+        "File",
+        "Portal",
+        "Category",
+        "Help",
+        "User",
+        "Template",
+        "Talk",
+        "Draft",
+        "Module",
+        "MediaWiki",
+        "User talk",
+        "Wikipedia talk",
+        "TimedText",
+        "Book",
+    ],
+}
 _MAIN_PAGES = {"Main_Page", "Hauptseite", "Wikipedia:Hauptseite", "-", "Special:Search"}
 
 
@@ -75,10 +110,16 @@ class PageviewSource(Protocol):
 def load_blocklist(text: str | None = None) -> list[re.Pattern[str]]:
     """Compile the blocklist (package file by default)."""
     if text is None:
-        text = resources.files("arena.domains").joinpath("attention_blocklist.txt").read_text(
-            encoding="utf-8")  # fmt: skip
-    return [re.compile(line.strip(), re.IGNORECASE) for line in text.splitlines()
-            if line.strip() and not line.lstrip().startswith("#")]  # fmt: skip
+        text = (
+            resources.files("arena.domains")
+            .joinpath("attention_blocklist.txt")
+            .read_text(encoding="utf-8")
+        )
+    return [
+        re.compile(line.strip(), re.IGNORECASE)
+        for line in text.splitlines()
+        if line.strip() and not line.lstrip().startswith("#")
+    ]
 
 
 def is_article(project: str, title: str) -> bool:
@@ -191,17 +232,25 @@ class AttentionDomain:
                 continue
             for c in self.select(project, ref, batch_date):
                 k = round_k(c.views * median)
-                out.append(self._question(project, c, ref, k, median, freq, batch_date,
-                                          target, created, lock))  # fmt: skip
+                out.append(
+                    self._question(
+                        project, c, ref, k, median, freq, batch_date, target, created, lock
+                    )
+                )
         return out
 
     def select(self, project: str, ref: date, batch_date: date) -> list[Candidate]:
         """Seeded sample of 2 + 2 eligible articles from R's top list."""
         top = self.source.top(project, ref) or []
         recent = self.recent_titles(project, batch_date)
-        pool = [Candidate(x.article, x.rank, x.views) for x in top
-                if TOP_RANK <= x.rank <= LOW_RANK and is_article(project, x.article)
-                and not blocked(x.article, self.blocklist) and x.article not in recent]  # fmt: skip
+        pool = [
+            Candidate(x.article, x.rank, x.views)
+            for x in top
+            if TOP_RANK <= x.rank <= LOW_RANK
+            and is_article(project, x.article)
+            and not blocked(x.article, self.blocklist)
+            and x.article not in recent
+        ]
         if not pool:
             return []
         try:
@@ -218,13 +267,25 @@ class AttentionDomain:
         chosen += rng.sample(low, min(PER_BAND, len(low)))
         return sorted(chosen, key=lambda c: c.rank)
 
-    def _question(self, project: str, c: Candidate, ref: date, k: int, median: float,
-                  freq: float | None, batch_date: date, target: date, created: datetime,
-                  lock: datetime) -> Question:  # fmt: skip
+    def _question(
+        self,
+        project: str,
+        c: Candidate,
+        ref: date,
+        k: int,
+        median: float,
+        freq: float | None,
+        batch_date: date,
+        target: date,
+        created: datetime,
+        lock: datetime,
+    ) -> Question:
         title = c.title.replace("_", " ")
-        text = (f"Will the {project.split('.')[0]}.wikipedia.org article \"{title}\" get at "
-                f"least {k:,} views on {target.isoformat()} (UTC day, all access methods, "
-                f"human users only)?")  # fmt: skip
+        text = (
+            f'Will the {project.split(".")[0]}.wikipedia.org article "{title}" get at '
+            f"least {k:,} views on {target.isoformat()} (UTC day, all access methods, "
+            f"human users only)?"
+        )
         rule = (
             "Daily views of the article on D from the Wikimedia per-article pageviews API "
             "(all-access, agent=user); YES if greater than or equal to K. Void if the "
@@ -296,9 +357,12 @@ class AttentionDomain:
         url, sha, series = self.source.per_article(project, title, d, d)
         if d not in series:
             if now >= question.resolve_after + GRACE:
-                return Void(question_id=question.question_id, reason_code="source_missing",
-                            detail="article deleted, moved or day missing at end of grace",
-                            voided_at=now)  # fmt: skip
+                return Void(
+                    question_id=question.question_id,
+                    reason_code="source_missing",
+                    detail="article deleted, moved or day missing at end of grace",
+                    voided_at=now,
+                )
             return None
         views = series[d]
         assert question.threshold is not None
@@ -307,10 +371,12 @@ class AttentionDomain:
             outcome=int(views >= question.threshold),  # type: ignore[arg-type]
             observed_value=float(views),
             resolved_at=now,
-            evidence=Evidence(source_url=url, snapshot_sha256=sha,
-                              values_used={"day": d.isoformat(), "views": views,
-                                           "threshold": question.threshold}),
-        )  # fmt: skip
+            evidence=Evidence(
+                source_url=url,
+                snapshot_sha256=sha,
+                values_used={"day": d.isoformat(), "views": views, "threshold": question.threshold},
+            ),
+        )
 
     def revised(self, question: Question, first: Resolution) -> bool:
         """True if the API now reports a different view count for D."""
@@ -362,10 +428,13 @@ def top_trajectory(
     return out
 
 
-def titles_from_questions(questions: Iterable[Question], project: str, batch: date,
-                          batches: int = RECENT_BATCHES) -> set[str]:  # fmt: skip
+def titles_from_questions(
+    questions: Iterable[Question], project: str, batch: date, batches: int = RECENT_BATCHES
+) -> set[str]:
     """Titles used in the previous `batches` batches of a project (for the exclusion rule)."""
     lo = batch - timedelta(days=batches)
-    return {str(q.params.get("title")) for q in questions
-            if q.domain == DOMAIN and q.params.get("project") == project
-            and lo <= q.batch_date < batch}  # fmt: skip
+    return {
+        str(q.params.get("title"))
+        for q in questions
+        if q.domain == DOMAIN and q.params.get("project") == project and lo <= q.batch_date < batch
+    }

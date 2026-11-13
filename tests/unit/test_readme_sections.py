@@ -10,8 +10,12 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 def test_readme_generated_sections_are_current() -> None:
-    r = subprocess.run([sys.executable, "scripts/readme_sections.py", "--check"],
-                       cwd=ROOT, capture_output=True, text=True)  # fmt: skip
+    r = subprocess.run(
+        [sys.executable, "scripts/readme_sections.py", "--check"],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+    )
     assert r.returncode == 0, r.stdout + r.stderr
 
 
@@ -24,7 +28,12 @@ def test_readme_screenshots_exist_and_are_labelled() -> None:
     assert "**backtests**" in text
     # T184: the first screen carries the pitch, links, one image and generated highlights
     top = text[: text.index("<details>")]
-    for must in ("Can an LLM agent beat a classical ML model", "60-second tour",
-                 "docs/img/home.png", "<!-- highlights:start -->", "**Stack:**"):  # fmt: skip
+    for must in (
+        "Can an LLM agent beat a classical ML model",
+        "60-second tour",
+        "docs/img/home.png",
+        "<!-- highlights:start -->",
+        "**Stack:**",
+    ):
         assert must in top, must
     assert "Status (20" not in text  # no hand-written, dated status paragraph

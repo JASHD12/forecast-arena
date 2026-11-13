@@ -16,9 +16,13 @@ GOOD = json.dumps({"probability": 0.4, "rationale": "Similar days.", "key_factor
 
 
 def _res(q, outcome: int, at: datetime) -> Resolution:
-    return Resolution(question_id=q.question_id, outcome=outcome, observed_value=81.0,
-                      resolved_at=at, evidence=Evidence(source_url="https://x",
-                      snapshot_sha256="a" * 64, values_used={}))  # fmt: skip
+    return Resolution(
+        question_id=q.question_id,
+        outcome=outcome,
+        observed_value=81.0,
+        resolved_at=at,
+        evidence=Evidence(source_url="https://x", snapshot_sha256="a" * 64, values_used={}),
+    )
 
 
 def _ledger(tmp_path) -> tuple[Ledger, list, datetime]:
@@ -31,13 +35,23 @@ def _ledger(tmp_path) -> tuple[Ledger, list, datetime]:
     for d, q in zip(days, qs, strict=True):
         led.append(layout.questions_path(d), [q, bug] if d == days[0] else [q])
     asof = datetime.combine(days[3], datetime.min.time(), tzinfo=UTC) + timedelta(hours=6)
-    led.append(layout.resolutions_path(days[0]), [_res(qs[0], 1, qs[0].resolve_after),
-                                                  _res(bug, 1, bug.resolve_after)])  # fmt: skip
+    led.append(
+        layout.resolutions_path(days[0]),
+        [_res(qs[0], 1, qs[0].resolve_after), _res(bug, 1, bug.resolve_after)],
+    )
     led.append(layout.resolutions_path(days[1]), [_res(qs[1], 0, qs[1].resolve_after)])
     led.append(layout.resolutions_path(days[2]), [_res(qs[2], 1, asof + timedelta(minutes=1))])
-    led.append(layout.resolutions_path(days[0]),
-               [Void(question_id=bug.question_id, reason_code="bug", detail="test",
-                     voided_at=bug.resolve_after)])  # fmt: skip
+    led.append(
+        layout.resolutions_path(days[0]),
+        [
+            Void(
+                question_id=bug.question_id,
+                reason_code="bug",
+                detail="test",
+                voided_at=bug.resolve_after,
+            )
+        ],
+    )
     return led, qs, asof
 
 
@@ -79,8 +93,10 @@ def test_agent_offers_the_tool_only_with_a_retriever(tmp_path) -> None:
     assert SIMILAR_SPEC.name in [t.name for t in fake.calls[0][2]]
     (res,) = [t for t in fake.calls[1][1] if isinstance(t, ToolResults)]
     data = json.loads(res.results[0][1])["data"]
-    assert {m["target_date"] for m in data["matches"]} == {str(qs[0].target_date),
-                                                           str(qs[1].target_date)}  # fmt: skip
+    assert {m["target_date"] for m in data["matches"]} == {
+        str(qs[0].target_date),
+        str(qs[1].target_date),
+    }
     plain = FakeLLM([GOOD])
     AgentForecaster(plain).forecast(qs[3], {}, asof)
     assert SIMILAR_SPEC.name not in [t.name for t in plain.calls[0][2]]

@@ -10,8 +10,14 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 KIT = ROOT / "docs" / "interview"
-PROSE = ("README.md", "pitch.md", "system-design.md", "questions.md", "star-stories.md",
-         "cv-bullets.md")  # fmt: skip
+PROSE = (
+    "README.md",
+    "pitch.md",
+    "system-design.md",
+    "questions.md",
+    "star-stories.md",
+    "cv-bullets.md",
+)
 #: Method parameters, not results: interval level and the coin-flip reference.
 METHOD_PERCENTAGES = {"95%", "50%"}
 FIGURE = re.compile(r"(?<![\w.])[-+]?\d+\.\d{2,}(?![\w.])|(?<![\w.])\d+(?:\.\d+)?%")
@@ -23,8 +29,12 @@ def test_kit_files_exist() -> None:
 
 
 def test_numbers_file_is_current() -> None:
-    r = subprocess.run([sys.executable, "scripts/interview_numbers.py", "--check"],
-                       cwd=ROOT, capture_output=True, text=True)  # fmt: skip
+    r = subprocess.run(
+        [sys.executable, "scripts/interview_numbers.py", "--check"],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+    )
     assert r.returncode == 0, r.stdout + r.stderr
 
 

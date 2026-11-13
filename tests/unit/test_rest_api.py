@@ -18,13 +18,27 @@ def client(tmp_path):
     led = Ledger(tmp_path)
     q1, q2 = question(), question(template="max_gt")
     led.append(layout.questions_path(B), [q1, q2])
-    led.append(layout.forecasts_path(B), [forecast(q1, "base_rate", 0.5),
-                                          forecast(q1, "llm_context", 0.8),
-                                          forecast(q2, "base_rate", 0.5)])  # fmt: skip
+    led.append(
+        layout.forecasts_path(B),
+        [
+            forecast(q1, "base_rate", 0.5),
+            forecast(q1, "llm_context", 0.8),
+            forecast(q2, "base_rate", 0.5),
+        ],
+    )
     ev = Evidence(source_url="https://x", snapshot_sha256="a" * 64, values_used={})
-    led.append(layout.resolutions_path(B), [Resolution(
-        question_id=q1.question_id, outcome=1, observed_value=91.0,
-        resolved_at=q1.resolve_after, evidence=ev)])  # fmt: skip
+    led.append(
+        layout.resolutions_path(B),
+        [
+            Resolution(
+                question_id=q1.question_id,
+                outcome=1,
+                observed_value=91.0,
+                resolved_at=q1.resolve_after,
+                evidence=ev,
+            )
+        ],
+    )
     return TestClient(create_app(led)), q1, q2
 
 
@@ -47,7 +61,10 @@ def test_leaderboard_and_read_only_sql(client) -> None:
     assert lb["scope"] == "rehearsal" and lb["label"]
     ok = c.get("/sql", params={"q": "SELECT count(*) AS n FROM forecasts"}).json()
     assert ok["rows"] == [[3]] and ok["columns"] == ["n"]
-    for bad in ("DELETE FROM forecasts", "SELECT 1; DROP TABLE skips",
-                "SELECT * FROM read_csv('/etc/passwd')"):  # fmt: skip
+    for bad in (
+        "DELETE FROM forecasts",
+        "SELECT 1; DROP TABLE skips",
+        "SELECT * FROM read_csv('/etc/passwd')",
+    ):
         assert c.get("/sql", params={"q": bad}).status_code == 400
     assert c.get("/openapi.json").json()["info"]["title"] == "Forecast Arena API"

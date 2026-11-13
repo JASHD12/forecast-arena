@@ -113,9 +113,10 @@ def _chronos(series: tuple[float, ...], h: int) -> Callable[[float], float]:
     pipe = chronos_pipeline()
     with torch.no_grad():
         q, _ = pipe.predict_quantiles(
-            torch.tensor(series, dtype=torch.float32), prediction_length=h,
+            torch.tensor(series, dtype=torch.float32),
+            prediction_length=h,
             quantile_levels=list(LEVELS),
-        )  # fmt: skip
+        )
     values = [float(v) for v in q[0, h - 1, :]]
     return lambda t: cdf_from_quantiles(LEVELS, values, t)
 

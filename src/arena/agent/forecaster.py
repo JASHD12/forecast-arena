@@ -82,8 +82,10 @@ class AgentForecaster:
         model = self.client.model if self.client is not None else "none"
         fp = prompts.fingerprint(self.prompt_files, self.prompt_version)
         rag = f"|rag-{self.retriever.embedder.name}" if self.retriever is not None else ""
-        return (f"{model}|prompt-{self.prompt_version}-{fp}|tools-{self.max_tool_calls}{rag}"
-                f"|out-{self.max_output_tokens}")  # fmt: skip
+        return (
+            f"{model}|prompt-{self.prompt_version}-{fp}|tools-{self.max_tool_calls}{rag}"
+            f"|out-{self.max_output_tokens}"
+        )
 
     def _similar(self, q: Question, asof: datetime) -> Callable[[int, bool], dict[str, Any]] | None:
         """The RAG tool bound to this question and forecast time (I3: asof filter)."""
@@ -92,8 +94,9 @@ class AgentForecaster:
             return None
 
         def run(k: int, same_domain: bool) -> dict[str, Any]:
-            return r.tool_result(q.text, asof, k=k, exclude=q.question_id,
-                                 domain=q.domain if same_domain else None)  # fmt: skip
+            return r.tool_result(
+                q.text, asof, k=k, exclude=q.question_id, domain=q.domain if same_domain else None
+            )
 
         return run
 

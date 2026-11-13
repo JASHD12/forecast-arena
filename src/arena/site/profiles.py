@@ -39,9 +39,13 @@ def _cumulative(ss: Sequence[Scored]) -> list[tuple[str, float]]:
 
 
 def profile(
-    fid: str, rec: Record, names: dict[str, str], changelog: Sequence[dict[str, Any]],
-    usage: Sequence[UsageRow], info: dict[str, tuple[str, str]],
-) -> dict[str, Any]:  # fmt: skip
+    fid: str,
+    rec: Record,
+    names: dict[str, str],
+    changelog: Sequence[dict[str, Any]],
+    usage: Sequence[UsageRow],
+    info: dict[str, tuple[str, str]],
+) -> dict[str, Any]:
     """Everything the profile template shows for one forecaster."""
     mine = [s for s in rec.scored if s.forecaster_id == fid]
     base = {s.question_id: s for s in rec.scored if s.forecaster_id == "base_rate"}
@@ -72,15 +76,20 @@ def profile(
     out["race_rows"] = series
     if len(mine) >= 10:
         bins = calibration_bins(ps, ys)
-        out["calibration"] = {"svg": reliability_svg(fid, bins), "bins": bins,
-                              "ece": expected_calibration_error(ps, ys)}  # fmt: skip
+        out["calibration"] = {
+            "svg": reliability_svg(fid, bins),
+            "bins": bins,
+            "ece": expected_calibration_error(ps, ys),
+        }
     ranked = sorted(mine, key=lambda s: ((s.probability - s.outcome) ** 2, s.question_id))
     out["best"] = ranked[:CALLS]
     out["worst"] = list(reversed(ranked[-CALLS:])) if len(ranked) > CALLS else []
     rows = [u for u in usage if u.forecaster_id == fid]
     if rows:
         known = [u.cost_usd for u in rows if u.cost_usd is not None]
-        out["usage"] = {"calls": sum(u.calls for u in rows),
-                        "tokens": sum(u.input_tokens + u.output_tokens for u in rows),
-                        "cost": sum(known) if known else None}  # fmt: skip
+        out["usage"] = {
+            "calls": sum(u.calls for u in rows),
+            "tokens": sum(u.input_tokens + u.output_tokens for u in rows),
+            "cost": sum(known) if known else None,
+        }
     return out

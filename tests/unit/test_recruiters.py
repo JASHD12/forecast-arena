@@ -10,9 +10,18 @@ from arena.site.recruiters import PROOFS
 
 ROOT = Path(__file__).resolve().parents[2]
 #: Folders and files exercised by CI (make check, a11y, notebook, docker, kind, dbt, airflow).
-CI_COVERED = ("src/arena", "tests", "Makefile", "analytics/dbt", "apps/dashboard",
-              "tools/a11y", "Dockerfile", "deploy/k8s", "orchestration/airflow",
-              ".github/workflows")  # fmt: skip
+CI_COVERED = (
+    "src/arena",
+    "tests",
+    "Makefile",
+    "analytics/dbt",
+    "apps/dashboard",
+    "tools/a11y",
+    "Dockerfile",
+    "deploy/k8s",
+    "orchestration/airflow",
+    ".github/workflows",
+)
 
 
 def test_every_named_path_exists_and_is_run_by_ci() -> None:
@@ -20,8 +29,9 @@ def test_every_named_path_exists_and_is_run_by_ci() -> None:
         assert paths, skill
         for p in paths:
             assert (ROOT / p).exists(), (skill, p)
-            assert any(p == c or p.startswith(c + "/") or c.startswith(p + "/")
-                       for c in CI_COVERED), (skill, p)  # fmt: skip
+            assert any(
+                p == c or p.startswith(c + "/") or c.startswith(p + "/") for c in CI_COVERED
+            ), (skill, p)
 
 
 def test_page_links_resolve_and_placeholder_stays_private(tmp_path) -> None:

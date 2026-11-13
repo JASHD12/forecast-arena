@@ -77,10 +77,15 @@ def test_leaderboard_skill_on_common_questions() -> None:
     def s(qid: str, fid: str, p: float, y: int) -> Scored:
         return Scored(qid, fid, "1", "power", date(2026, 1, 1), p, y)
 
-    rows = leaderboard([
-        s("a", "base_rate", 0.5, 1), s("b", "base_rate", 0.5, 0),
-        s("a", "ml", 0.9, 1), s("b", "ml", 0.1, 0), s("c", "ml", 0.9, 0),
-    ])  # fmt: skip
+    rows = leaderboard(
+        [
+            s("a", "base_rate", 0.5, 1),
+            s("b", "base_rate", 0.5, 0),
+            s("a", "ml", 0.9, 1),
+            s("b", "ml", 0.1, 0),
+            s("c", "ml", 0.9, 0),
+        ]
+    )
     by = {r.forecaster_id: r for r in rows}
     assert by["ml"].n == 3 and by["ml"].skill_n == 2
     assert by["ml"].skill == pytest.approx(1 - 0.01 / 0.25)

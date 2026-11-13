@@ -36,10 +36,19 @@ def _not_yet(task: str) -> None:
 
 
 @click.group()
-@click.option("--ledger-dir", type=click.Path(path_type=Path), default=None,
-              help="Ledger checkout (default: ARENA_LEDGER_DIR or ./_ledger).")  # fmt: skip
-@click.option("--date", "day", type=click.DateTime(["%Y-%m-%d"]), default=None,
-              help="Batch or target date (UTC). Default: today.")  # fmt: skip
+@click.option(
+    "--ledger-dir",
+    type=click.Path(path_type=Path),
+    default=None,
+    help="Ledger checkout (default: ARENA_LEDGER_DIR or ./_ledger).",
+)
+@click.option(
+    "--date",
+    "day",
+    type=click.DateTime(["%Y-%m-%d"]),
+    default=None,
+    help="Batch or target date (UTC). Default: today.",
+)
 @click.option("--dry-run", is_flag=True, help="Do everything except write or push.")
 @click.version_option(package_name="forecast-arena")
 @click.pass_context
@@ -69,10 +78,16 @@ def health() -> None:
 
 
 @health.command("check")
-@click.option("--job", required=True,
-              type=click.Choice(["evening", "morning", "resolve", "weekly"]))  # fmt: skip
-@click.option("--report", "report_path", type=click.Path(path_type=Path), default=None,
-              help="Also write the report as JSON here.")  # fmt: skip
+@click.option(
+    "--job", required=True, type=click.Choice(["evening", "morning", "resolve", "weekly"])
+)
+@click.option(
+    "--report",
+    "report_path",
+    type=click.Path(path_type=Path),
+    default=None,
+    help="Also write the report as JSON here.",
+)
 @click.option("--force-fail", is_flag=True, help="Add a failing check (dry-run tests only).")
 @click.option("--record", is_flag=True, help="Also write the report to the ledger (health/).")
 @click.pass_obj
@@ -200,8 +215,14 @@ def data() -> None:
 
 
 @data.command("backfill")
-@click.option("--series", "keys", multiple=True, default=["price_de_lu"], show_default=True,
-              help="SMARD series key(s) to backfill.")  # fmt: skip
+@click.option(
+    "--series",
+    "keys",
+    multiple=True,
+    default=["price_de_lu"],
+    show_default=True,
+    help="SMARD series key(s) to backfill.",
+)
 @click.pass_obj
 def data_backfill(obj: Ctx, keys: tuple[str, ...]) -> None:
     """Fetch the full SMARD history into the cache and print a summary."""
@@ -251,8 +272,10 @@ def score_show(obj: Ctx) -> None:
     rec = load(obj.ledger)
     c = counts(rec)
     click.echo(format_table(leaderboard(rec.scored)))
-    click.echo(f"questions={c.questions} resolved={c.resolved} open={c.open} "
-               f"voided={c.voided} forecasts={c.forecasts} skips={c.skips}")  # fmt: skip
+    click.echo(
+        f"questions={c.questions} resolved={c.resolved} open={c.open} "
+        f"voided={c.voided} forecasts={c.forecasts} skips={c.skips}"
+    )
 
 
 @main.group()
@@ -261,8 +284,14 @@ def site() -> None:
 
 
 @site.command("build")
-@click.option("--out", "out_dir", type=click.Path(path_type=Path), default=Path("site"),
-              show_default=True, help="Output directory.")  # fmt: skip
+@click.option(
+    "--out",
+    "out_dir",
+    type=click.Path(path_type=Path),
+    default=Path("site"),
+    show_default=True,
+    help="Output directory.",
+)
 @click.option("--check-links/--no-check-links", default=True, show_default=True)
 @click.pass_obj
 def site_build(obj: Ctx, out_dir: Path, check_links: bool) -> None:
@@ -412,8 +441,9 @@ def daily_morning(obj: Ctx, push: bool) -> None:
         if guard is not None:
             guard.recorder = rec  # type: ignore[assignment]
 
-    result = morning(obj.ledger, obj.day, obj.clock, domains, forecasters,
-                     dry_run=obj.dry_run, on_record=attach)  # fmt: skip
+    result = morning(
+        obj.ledger, obj.day, obj.clock, domains, forecasters, dry_run=obj.dry_run, on_record=attach
+    )
     click.echo(result.line())
     for w in result.warnings:
         click.echo(f"warning: {w}")
@@ -474,11 +504,19 @@ def report() -> None:
 
 
 @report.command("backtest-power")
-@click.option("--challenger", "challengers", multiple=True,
-              type=click.Choice(["lgbm", "mlp", "ets", "sarimax", "chronos"]),
-              help="Add a challenger (ml/torch/ts requirements files).")  # fmt: skip
-@click.option("--card-type", type=click.Choice(["champion", "lgbm", "mlp", "ts"]),
-              default="champion", help="Which model card text to write with --card.")  # fmt: skip
+@click.option(
+    "--challenger",
+    "challengers",
+    multiple=True,
+    type=click.Choice(["lgbm", "mlp", "ets", "sarimax", "chronos"]),
+    help="Add a challenger (ml/torch/ts requirements files).",
+)
+@click.option(
+    "--card-type",
+    type=click.Choice(["champion", "lgbm", "mlp", "ts"]),
+    default="champion",
+    help="Which model card text to write with --card.",
+)
 @click.option("--first", type=click.DateTime(["%Y-%m-%d"]), required=True)
 @click.option("--last", type=click.DateTime(["%Y-%m-%d"]), required=True)
 @click.option("--out", "out_dir", type=click.Path(path_type=Path), default=Path("backtests"))
@@ -526,8 +564,12 @@ def report_backtest_power(
     if card is not None:
         from arena.backtest import cards
 
-        make = {"champion": cards.power_card, "lgbm": cards.power_lgbm_card,
-                "mlp": cards.power_mlp_card, "ts": cards.power_ts_card}[card_type]  # fmt: skip
+        make = {
+            "champion": cards.power_card,
+            "lgbm": cards.power_lgbm_card,
+            "mlp": cards.power_mlp_card,
+            "ts": cards.power_ts_card,
+        }[card_type]
         card.parent.mkdir(parents=True, exist_ok=True)
         card.write_text(make(text, run_id), encoding="utf-8")
         click.echo(f"model card written: {card}")
@@ -648,8 +690,11 @@ def llm_smoke(obj: Ctx) -> None:
         sys.exit(2)
     client = client_from_settings(obj.settings)
     if client is None:
-        click.echo("model_missing: ARENA_LLM_PROVIDER, ARENA_LLM_MODEL and ARENA_LLM_API_KEY "
-                   "must all be set", err=True)  # fmt: skip
+        click.echo(
+            "model_missing: ARENA_LLM_PROVIDER, ARENA_LLM_MODEL and ARENA_LLM_API_KEY "
+            "must all be set",
+            err=True,
+        )
         sys.exit(1)
     res = run_smoke(client, obj.settings.llm_max_output_tokens)
     for line in res.lines:
@@ -685,18 +730,27 @@ def eval_build(obj: Ctx, first: object, last: object, out: Path) -> None:
 
 @eval_group.command("run")
 @click.option("--golden", type=click.Path(exists=True, path_type=Path), required=True)
-@click.option("--variant", "variants", multiple=True,
-              type=click.Choice(["llm_plain", "llm_context", "llm_local"]),
-              default=("llm_plain", "llm_context"))  # fmt: skip
+@click.option(
+    "--variant",
+    "variants",
+    multiple=True,
+    type=click.Choice(["llm_plain", "llm_context", "llm_local"]),
+    default=("llm_plain", "llm_context"),
+)
 @click.option("--limit", type=int, default=None, help="Stratified seeded sample size.")
 @click.option("--fake", is_flag=True, help="FakeLLM answers (the CI gate; no network).")
 @click.option("--max-tokens", type=int, default=60_000, help="Hard token cap for this run.")
 @click.option("--out", "out_dir", type=click.Path(path_type=Path), default=Path("evals/results"))
 @click.pass_obj
 def eval_run(
-    obj: Ctx, golden: Path, variants: tuple[str, ...], limit: int | None, fake: bool,
-    max_tokens: int, out_dir: Path,
-) -> None:  # fmt: skip
+    obj: Ctx,
+    golden: Path,
+    variants: tuple[str, ...],
+    limit: int | None,
+    fake: bool,
+    max_tokens: int,
+    out_dir: Path,
+) -> None:
     """Run the variants on the golden set and write `evals/results/<run_id>.json`."""
     import json
     import os
@@ -713,8 +767,9 @@ def eval_run(
         clients = {v: FakeLLM(lambda s, t, tools: answer) for v in variants}
     else:
         if os.environ.get("GITHUB_ACTIONS") != "true":
-            click.echo("refused: live LLM calls run only inside GitHub Actions (AGENTS.md S8)",
-                       err=True)  # fmt: skip
+            click.echo(
+                "refused: live LLM calls run only inside GitHub Actions (AGENTS.md S8)", err=True
+            )
             sys.exit(2)
         from arena.llm.factory import client_from_settings
 
@@ -730,8 +785,11 @@ def eval_run(
         if not clients:
             click.echo("model_missing: no LLM configured", err=True)
             sys.exit(1)
-    caps = EvalCaps(max_requests=max(1, 2 * len(items) * len(clients)), max_tokens=max_tokens,
-                    max_output_tokens=obj.settings.llm_max_output_tokens)  # fmt: skip
+    caps = EvalCaps(
+        max_requests=max(1, 2 * len(items) * len(clients)),
+        max_tokens=max_tokens,
+        max_output_tokens=obj.settings.llm_max_output_tokens,
+    )
     res = run(items, clients, obj.clock, golden=golden.name, golden_sha256=sha, caps=caps)
     if fake:
         res["run_id"] = "fake-" + res["run_id"]
@@ -739,10 +797,12 @@ def eval_run(
     path = out_dir / f"{res['run_id']}.json"
     path.write_text(json.dumps(res, indent=1, sort_keys=True) + "\n", encoding="utf-8")
     for name, m in res["metrics"].items():
-        click.echo(f"{name}: answered {m['answered']}/{m['n']}, brier {m['brier']}, "
-                   f"json-valid {m['json_valid_first_try']}, tokens "
-                   f"{m['input_tokens'] + m['output_tokens']}, cost {m['cost_usd']}, "
-                   f"skips {m['skips']}, stop reasons {m['stop_reasons']}")  # fmt: skip
+        click.echo(
+            f"{name}: answered {m['answered']}/{m['n']}, brier {m['brier']}, "
+            f"json-valid {m['json_valid_first_try']}, tokens "
+            f"{m['input_tokens'] + m['output_tokens']}, cost {m['cost_usd']}, "
+            f"skips {m['skips']}, stop reasons {m['stop_reasons']}"
+        )
     click.echo(f"written: {path}")
 
 

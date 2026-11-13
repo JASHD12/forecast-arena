@@ -16,8 +16,14 @@ MODELS, EVALS = ROOT / "docs" / "models", ROOT / "evals" / "results"
 
 def _site(tmp_path):
     clock = FixedClock(datetime(2026, 11, 13, tzinfo=UTC))
-    return build_site(Ledger(tmp_path / "l"), tmp_path / "site", clock, ROOT / "site_content",
-                      models_dir=MODELS, evals_dir=EVALS).out_dir  # fmt: skip
+    return build_site(
+        Ledger(tmp_path / "l"),
+        tmp_path / "site",
+        clock,
+        ROOT / "site_content",
+        models_dir=MODELS,
+        evals_dir=EVALS,
+    ).out_dir
 
 
 def test_backtest_card_matches_the_model_card(tmp_path) -> None:

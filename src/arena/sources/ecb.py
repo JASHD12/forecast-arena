@@ -22,8 +22,10 @@ from zoneinfo import ZoneInfo
 from arena.sources.http import HttpClient
 
 BASE = "https://data-api.ecb.europa.eu/service/data/EXR"
-ATTRIBUTION = ("European Central Bank, euro foreign exchange reference rates "
-               "(log returns computed by Forecast Arena)")  # fmt: skip
+ATTRIBUTION = (
+    "European Central Bank, euro foreign exchange reference rates "
+    "(log returns computed by Forecast Arena)"
+)
 CET = ZoneInfo("Europe/Berlin")
 #: Publication is around 16:00 CET; the conservative availability time is 17:00.
 AVAILABLE_LOCAL = time(17, 0)
@@ -81,7 +83,8 @@ def parse_csv(text: str) -> dict[str, dict[date, float]]:
             if not row.get("OBS_VALUE"):
                 continue
             out.setdefault(row["CURRENCY"], {})[date.fromisoformat(row["TIME_PERIOD"])] = float(
-                row["OBS_VALUE"])  # fmt: skip
+                row["OBS_VALUE"]
+            )
     except (KeyError, ValueError) as exc:
         raise EcbError(f"malformed ECB CSV: {exc}") from exc
     if not out and text.strip() and not text.startswith("KEY"):

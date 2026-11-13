@@ -65,8 +65,11 @@ class LedgerHistory:
         return self._cached[1]
 
     def _read(self) -> tuple[dict[str, Question], list[Resolution], set[str]]:
-        questions = {r.question_id: r for _, r in self.ledger.iter_family("questions")
-                     if isinstance(r, Question)}  # fmt: skip
+        questions = {
+            r.question_id: r
+            for _, r in self.ledger.iter_family("questions")
+            if isinstance(r, Question)
+        }
         resolutions: list[Resolution] = []
         voided: set[str] = set()
         for _, r in self.ledger.iter_family("resolutions"):

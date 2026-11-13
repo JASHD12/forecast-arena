@@ -9,8 +9,10 @@ D0 = date(2026, 11, 1)
 
 
 def scored(fid, p, n=30, domain="power", y=lambda i: i % 2):
-    return [Scored(f"{domain}-q{i}", fid, "1", domain, D0 + timedelta(days=i // 3), p(i), y(i))
-            for i in range(n)]  # fmt: skip
+    return [
+        Scored(f"{domain}-q{i}", fid, "1", domain, D0 + timedelta(days=i // 3), p(i), y(i))
+        for i in range(n)
+    ]
 
 
 def test_tone_bins_and_sign() -> None:

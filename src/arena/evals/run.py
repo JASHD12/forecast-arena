@@ -78,8 +78,9 @@ def run(
 ) -> dict[str, Any]:
     """Evaluate every variant in `clients` on `items`; returns the JSON-ready result."""
     caps = caps or EvalCaps()
-    guard = BudgetGuard(Caps(caps.max_requests, caps.max_tokens, caps.max_output_tokens, 0),
-                        Usage())  # fmt: skip
+    guard = BudgetGuard(
+        Caps(caps.max_requests, caps.max_tokens, caps.max_output_tokens, 0), Usage()
+    )
     tracer = Tracer()
     rows: list[dict[str, Any]] = []
     versions: dict[str, str] = {}
@@ -90,10 +91,16 @@ def run(
         for it in items:
             with scope(name, it.question.question_id, f.prompt_version):
                 r = f.forecast(it.question, it.context, it.asof)
-            rows.append({"variant": name, "question_id": it.question.question_id,
-                         "day": it.question.batch_date.isoformat(), "outcome": it.outcome,
-                         "probability": r.probability if isinstance(r, Forecast) else None,
-                         "skip": None if isinstance(r, Forecast) else r.reason_code})  # fmt: skip
+            rows.append(
+                {
+                    "variant": name,
+                    "question_id": it.question.question_id,
+                    "day": it.question.batch_date.isoformat(),
+                    "outcome": it.outcome,
+                    "probability": r.probability if isinstance(r, Forecast) else None,
+                    "skip": None if isinstance(r, Forecast) else r.reason_code,
+                }
+            )
     started = clock.now()
     return {
         "kind": KIND,
@@ -179,6 +186,15 @@ def paired(rows: Sequence[dict[str, Any]], names: Sequence[str]) -> list[dict[st
                 [by[(b, q)]["probability"] for q in qids],
                 [by[(a, q)]["outcome"] for q in qids],
             )
-            out.append({"a": a, "b": b, "n": len(qids), "diff": iv.estimate, "lo": iv.low,
-                        "hi": iv.high, "days": iv.days})  # fmt: skip
+            out.append(
+                {
+                    "a": a,
+                    "b": b,
+                    "n": len(qids),
+                    "diff": iv.estimate,
+                    "lo": iv.low,
+                    "hi": iv.high,
+                    "days": iv.days,
+                }
+            )
     return out

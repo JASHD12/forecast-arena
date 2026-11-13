@@ -94,9 +94,21 @@ def usage_rows(spans: list[dict[str, Any]]) -> list[UsageRow]:
         price = price_for(provider, model)
         cost = None if price is None else (inp * price[0] + outp * price[1]) / 1e6
         ms = [float(s["duration_ms"]) for s in ss if s.get("error") is None]
-        rows.append(UsageRow(day, fid, model, len(ss), sum(1 for s in ss if s.get("error")),
-                             sum(1 for s in ss if s.get("repair")), inp, outp,
-                             _pct(ms, 0.5), _pct(ms, 0.95), cost))  # fmt: skip
+        rows.append(
+            UsageRow(
+                day,
+                fid,
+                model,
+                len(ss),
+                sum(1 for s in ss if s.get("error")),
+                sum(1 for s in ss if s.get("repair")),
+                inp,
+                outp,
+                _pct(ms, 0.5),
+                _pct(ms, 0.95),
+                cost,
+            )
+        )
     return sorted(rows, key=lambda r: (str(r.day), r.forecaster_id), reverse=True)
 
 

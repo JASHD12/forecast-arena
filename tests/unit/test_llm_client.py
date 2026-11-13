@@ -127,8 +127,9 @@ def test_anthropic_replays_thinking_blocks_unchanged() -> None:
     ]
     llm, seen = anthropic_with(lambda r: message(content, stop="max_tokens"))
     r = llm.complete("S", [UserText("go")], max_tokens=400, tools=[TOOL])
-    llm.complete("S", [UserText("go"), AssistantTurn(r), UserText("repair")],
-                 max_tokens=400, tools=[TOOL])  # fmt: skip
+    llm.complete(
+        "S", [UserText("go"), AssistantTurn(r), UserText("repair")], max_tokens=400, tools=[TOOL]
+    )
     assert seen[1]["body"]["messages"][1] == {"role": "assistant", "content": content}
 
 

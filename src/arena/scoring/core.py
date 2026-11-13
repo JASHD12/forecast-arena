@@ -38,8 +38,9 @@ def brier(ps: Sequence[float], ys: Sequence[int], *, clipped: bool = True) -> fl
 def log_score(ps: Sequence[float], ys: Sequence[int]) -> float:
     """Mean negative log likelihood of the outcomes (lower is better)."""
     _check(ps, ys)
-    return -sum(math.log(clip(p) if y else 1 - clip(p)) for p, y in zip(ps, ys, strict=True)
-                ) / len(ps)  # fmt: skip
+    return -sum(math.log(clip(p) if y else 1 - clip(p)) for p, y in zip(ps, ys, strict=True)) / len(
+        ps
+    )
 
 
 def brier_skill(b: float, b_ref: float) -> float | None:
@@ -81,8 +82,9 @@ class Record:
 
 def load(ledger: Ledger) -> Record:
     """Read questions, forecasts, skips, first resolutions and voids from the ledger."""
-    questions = {q.question_id: q for _, q in ledger.iter_family("questions")
-                 if isinstance(q, Question)}  # fmt: skip
+    questions = {
+        q.question_id: q for _, q in ledger.iter_family("questions") if isinstance(q, Question)
+    }
     resolutions: dict[str, Resolution] = {}
     voids: dict[str, Void] = {}
     for _, r in ledger.iter_family("resolutions"):
@@ -118,8 +120,17 @@ def scored_forecasts(rec: Record, days: Iterable[date] | None = None) -> list[Sc
             continue
         if keep is not None and q.batch_date not in keep:
             continue
-        out.append(Scored(f.question_id, f.forecaster_id, f.forecaster_version, q.domain,
-                          q.batch_date, f.probability, r.outcome))  # fmt: skip
+        out.append(
+            Scored(
+                f.question_id,
+                f.forecaster_id,
+                f.forecaster_version,
+                q.domain,
+                q.batch_date,
+                f.probability,
+                r.outcome,
+            )
+        )
     return out
 
 

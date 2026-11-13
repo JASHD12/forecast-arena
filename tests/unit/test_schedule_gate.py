@@ -55,8 +55,19 @@ def test_cli_writes_the_github_output(tmp_path, monkeypatch) -> None:
     out = tmp_path / "out.txt"
     monkeypatch.setenv("GITHUB_OUTPUT", str(out))
     monkeypatch.setattr("arena.cli.SystemClock", lambda: FixedClock(at(2, 6)))
-    r = CliRunner().invoke(main, ["--ledger-dir", str(tmp_path / "l"), "--date", "2026-11-02",
-                                  "schedule", "due", "--job", "morning"])  # fmt: skip
+    r = CliRunner().invoke(
+        main,
+        [
+            "--ledger-dir",
+            str(tmp_path / "l"),
+            "--date",
+            "2026-11-02",
+            "schedule",
+            "due",
+            "--job",
+            "morning",
+        ],
+    )
     assert r.exit_code == 0, r.output
     assert out.read_text().strip() == "due=true"
     assert r.output.startswith("morning: due (")

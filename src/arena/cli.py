@@ -671,6 +671,19 @@ def eval_run(
     click.echo(f"written: {path}")
 
 
+@main.command("api")
+@click.option("--host", default="127.0.0.1", show_default=True)
+@click.option("--port", default=8000, show_default=True, type=int)
+@click.pass_obj
+def api_command(obj: Ctx, host: str, port: int) -> None:
+    """Serve the ledger read-only over HTTP (FastAPI; OpenAPI docs at /docs)."""
+    import uvicorn
+
+    from arena.api.app import create_app
+
+    uvicorn.run(create_app(obj.ledger), host=host, port=port)
+
+
 @main.command("mcp")
 @click.pass_obj
 def mcp_command(obj: Ctx) -> None:

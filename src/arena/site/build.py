@@ -102,6 +102,8 @@ STACK_LIBRARIES = (
     ("shap", "SHAP explanations of LightGBM models"),
     ("statsmodels", "ETS and SARIMAX benchmarks in the power backtest"),
     ("llama-cpp-python", "runs the open-weights model of llm_local on the CPU (morning job)"),
+    ("fastapi", "the read-only REST API (`arena api`), served from the Docker image in CI"),
+    ("uvicorn", "the ASGI server that runs the REST API"),
     ("streamlit", "the interactive dashboard (apps/dashboard), smoke-tested with AppTest in CI"),
     ("nbclient", "executes the analysis notebook (pandas + DuckDB on the open data) in CI"),
     ("mcp", "official MCP SDK: the read-only `arena mcp` server over the ledger"),

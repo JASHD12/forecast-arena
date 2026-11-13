@@ -1,0 +1,12 @@
+# Local run of the read-only REST API (T150) on the offline end-to-end ledger:
+#   docker compose up --build    then open http://localhost:8000/docs
+# To serve the real record instead, mount a clone of the `ledger` branch at /ledger and
+# change the command to: .venv/bin/arena --ledger-dir /ledger api --host 0.0.0.0
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    command: >
+      sh -c ".venv/bin/python scripts/make_e2e_ledger.py /tmp/ledger &&
+             .venv/bin/arena --ledger-dir /tmp/ledger api --host 0.0.0.0 --port 8000"

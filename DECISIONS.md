@@ -735,6 +735,17 @@ Made by: agent
   owner's step (H19). The site links to it only when `ARENA_DASHBOARD_URL` is set.
 - Pins in `requirements-dashboard.txt`; `apps/` is now linted.
 
+## 2026-11-13 · REST API and Docker compose (T150)
+
+- `arena api` (FastAPI): /health, /questions (filters), /questions/{id}, /leaderboard
+  (per topic; official record once it starts, else rehearsal with its label) and /sql
+  (one read-only SELECT via the same locked DuckDB as `arena mcp`). Response models are
+  the static JSON API's pydantic models, so both APIs share one schema. OpenAPI at /docs.
+- Read-only snapshot loaded at start; no writes, no auth needed, nothing hosted: it runs
+  locally (`docker compose up`) and in CI, where the image serves the offline e2e ledger
+  and curl checks four endpoints, including that a DROP statement gets 400.
+- `requirements-api.txt` (uvicorn; FastAPI was already pinned through MLflow).
+
 ## Proposals for the human
 
 Ideas outside the specification. The agent lists them here and does not build them.

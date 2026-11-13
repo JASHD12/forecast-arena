@@ -27,7 +27,7 @@ jobs:
           make setup
           .venv/bin/pip install -r requirements-tracking.txt -r requirements-ml.txt
           .venv/bin/pip install -r requirements-torch.txt
-          .venv/bin/pip install -r requirements-ts.txt -r requirements-rag.txt -r requirements-graph.txt -r requirements-mcp.txt -r requirements-dashboard.txt
+          .venv/bin/pip install -r requirements-ts.txt -r requirements-rag.txt -r requirements-graph.txt -r requirements-mcp.txt -r requirements-dashboard.txt -r requirements-api.txt
       - name: make check (with test coverage)
         run: |
           set -o pipefail
@@ -78,6 +78,15 @@ jobs:
         run: docker build -t forecast-arena:ci .
       - name: Run the offline end-to-end test in the container
         run: docker run --rm --network none forecast-arena:ci
+      - name: Serve the REST API from the image and smoke-test it (T150)
+        run: |
+          docker run -d --name arena-api -p 8000:8000 forecast-arena:ci sh -c \
+            ".venv/bin/python scripts/make_e2e_ledger.py /tmp/ledger && .venv/bin/arena --ledger-dir /tmp/ledger api --host 0.0.0.0 --port 8000"
+          for i in $(seq 1 60); do curl -fsS http://127.0.0.1:8000/health && break; sleep 2; done
+          curl -fsS "http://127.0.0.1:8000/questions?limit=2" | python3 -c "import json,sys; d=json.load(sys.stdin); assert len(d)==2, d"
+          curl -fsS "http://127.0.0.1:8000/leaderboard" | python3 -c "import json,sys; d=json.load(sys.stdin); assert d['rows'], d"
+          test "$(curl -s -o /dev/null -w '%{http_code}' 'http://127.0.0.1:8000/sql?q=DROP%20TABLE%20skips')" = 400
+          docker logs arena-api | tail -5
 
   audit:
     # Vulnerability report for the pinned dependencies. Non-blocking: findings appear in
@@ -96,6 +105,6 @@ jobs:
           {
             echo "## Dependency vulnerability audit"
             echo '```'
-            pip-audit -r requirements-lock.txt -r requirements-tracking.txt -r requirements-ml.txt -r requirements-ts.txt -r requirements-rag.txt -r requirements-graph.txt -r requirements-mcp.txt -r requirements-nb.txt -r requirements-dashboard.txt --progress-spinner off 2>&1 || true
+            pip-audit -r requirements-lock.txt -r requirements-tracking.txt -r requirements-ml.txt -r requirements-ts.txt -r requirements-rag.txt -r requirements-graph.txt -r requirements-mcp.txt -r requirements-nb.txt -r requirements-dashboard.txt -r requirements-api.txt --progress-spinner off 2>&1 || true
             echo '```'
           } | tee -a "$GITHUB_STEP_SUMMARY"

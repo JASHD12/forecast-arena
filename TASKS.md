@@ -501,7 +501,7 @@ CI jobs; core `make check` stays offline and fast.
 - [x] T143 · Streamlit dashboard (deps: T045i)
   - Done when: `apps/dashboard` passes an AppTest smoke test in CI; linked only if
     `ARENA_DASHBOARD_URL` is set (H19).
-- [ ] T150 · FastAPI service and Docker compose (deps: T045i)
+- [x] T150 · FastAPI service and Docker compose (deps: T045i)
   - Done when: TestClient tests pass; the Docker image serves the API in CI.
 - [ ] T151 · Kubernetes manifests validated on kind in CI (deps: T150)
   - Done when: a CI job applies `deploy/k8s/` to kind and smoke-tests the API.

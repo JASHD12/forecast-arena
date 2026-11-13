@@ -132,7 +132,7 @@ jobs:
           kubectl rollout status deployment/arena-api --timeout=300s
       - name: Smoke-test the API through the Service
         run: |
-          kubectl port-forward service/arena-api 8000:80 >/tmp/pf.log 2>&1 &
+          kubectl port-forward service/forecast-arena-api 8000:80 >/tmp/pf.log 2>&1 &
           for i in $(seq 1 30); do curl -fsS http://127.0.0.1:8000/health && break; sleep 2; done
           curl -fsS "http://127.0.0.1:8000/leaderboard" | python3 -c "import json,sys; d=json.load(sys.stdin); assert d['rows'], d"
       - name: Run the CronJob once and check it succeeds
@@ -145,6 +145,8 @@ jobs:
         run: |
           kubectl get all
           kubectl describe pods | tail -60
+          kubectl logs deployment/arena-api --previous --tail=50 || true
+          kubectl logs deployment/arena-api --tail=50 || true
 
   audit:
     # Vulnerability report for the pinned dependencies. Non-blocking: findings appear in

@@ -23,12 +23,15 @@ def test_api_deployment_service_and_cronjob() -> None:
     assert c["readinessProbe"]["httpGet"]["path"] == "/health"
     assert "api --host 0.0.0.0 --port 8000" in " ".join(c["args"])
     assert c["resources"]["limits"] and not c["securityContext"]["allowPrivilegeEscalation"]
-    svc = d[("Service", "arena-api")]
+    assert dep["spec"]["template"]["spec"]["enableServiceLinks"] is False  # no ARENA_* env
+    svc = d[("Service", "forecast-arena-api")]
     assert svc["spec"]["selector"] == dep["spec"]["selector"]["matchLabels"]
     assert svc["spec"]["ports"][0]["targetPort"] == 8000
     cron = d[("CronJob", "arena-verify")]
     assert cron["spec"]["concurrencyPolicy"] == "Forbid"
-    job = cron["spec"]["jobTemplate"]["spec"]["template"]["spec"]["containers"][0]
+    pod = cron["spec"]["jobTemplate"]["spec"]["template"]["spec"]
+    assert pod["enableServiceLinks"] is False
+    job = pod["containers"][0]
     assert "ledger verify" in " ".join(job["args"])
 
 

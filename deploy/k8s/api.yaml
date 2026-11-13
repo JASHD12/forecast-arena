@@ -16,6 +16,9 @@ spec:
     metadata:
       labels: {app: arena-api}
     spec:
+      # No service-link variables: Kubernetes would inject e.g. ARENA_API_SERVICE_HOST,
+      # and the app rejects unknown ARENA_* settings on purpose (it catches typos).
+      enableServiceLinks: false
       containers:
         - name: api
           image: forecast-arena:ci
@@ -43,7 +46,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: arena-api
+  name: forecast-arena-api
 spec:
   selector: {app: arena-api}
   ports:

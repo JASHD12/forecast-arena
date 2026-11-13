@@ -16,6 +16,7 @@ spec:
       template:
         spec:
           restartPolicy: Never
+          enableServiceLinks: false        # see api.yaml
           containers:
             - name: verify
               image: forecast-arena:ci

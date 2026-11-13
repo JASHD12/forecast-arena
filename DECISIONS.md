@@ -755,6 +755,10 @@ Made by: agent
   the action's tags: v1.15.2, default kind v0.33.0), loads the image, applies the
   manifests, waits for the rollout, curls the API through the Service and runs the
   CronJob once (offline e2e ledger + `ledger verify`).
+- First kind run failed (CrashLoopBackOff): Kubernetes injects service-link variables
+  such as `ARENA_API_SERVICE_HOST` for a Service named `arena-api`, and the settings
+  reject unknown `ARENA_*` keys by design. Fixed with `enableServiceLinks: false` on both
+  pod specs and a Service name outside the prefix; the strict settings check stays.
 - Stated everywhere as "validated in CI, not hosted": production scheduling stays on
   GitHub Actions (free); a hosted cluster would cost money (S1, owner rule).
 

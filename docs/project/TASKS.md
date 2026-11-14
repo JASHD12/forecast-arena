@@ -215,7 +215,7 @@ Keep the first line of each task in exactly this shape; the status script parses
   - Done when: `mypy src/arena` reports no issues and runs in `make check`.
 - [x] T045m · Quantile diagnostics and site round 4 (owner request 2026-11-12) (deps: T045k)
   - Done when: tests cover pinball loss, coverage, the forest plot and the About page.
-- [ ] T046 · Enable the new domains (live) (deps: T041, T043, T045, T034)
+- [!] T046 · Enable the new domains (live) (deps: T041, T043, T045, T034) WAIT(until=2026-11-15)
   - Do: extend the e2e test to all four domains, then enable them in the live config.
   - Done when: the next real morning run writes questions for all applicable domains and
     verify passes. If that run has not happened yet, mark `WAIT(until=<date>)`.

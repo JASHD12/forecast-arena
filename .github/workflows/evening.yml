@@ -72,7 +72,7 @@ jobs:
       ARENA_CONTACT: ${{ vars.ARENA_CONTACT }}
       ARENA_DASHBOARD_URL: ${{ vars.ARENA_DASHBOARD_URL }}
       ARENA_LEDGER_REMOTE: https://github.com/${{ github.repository }}.git
-      ARENA_DOMAINS: ${{ vars.ARENA_DOMAINS || 'power' }}
+      ARENA_DOMAINS: ${{ vars.ARENA_DOMAINS || 'power,weather,attention,markets'  # T046: crypto waits for H12 }}
       ARENA_OFFICIAL_START_NOT_BEFORE: ${{ vars.ARENA_OFFICIAL_START_NOT_BEFORE || '2099-12-31' }}
     steps:
       - uses: actions/checkout@v7

@@ -157,3 +157,25 @@ def test_wiring_adds_agent_graph_only_when_switched_on(tmp_path) -> None:
     off, _ = build_forecasters(led, [], Settings.from_env({}), B, llm=FakeLLM([FINAL]))
     assert [f.forecaster_id for f in on][-1] == "agent_graph"
     assert "agent_graph" not in [f.forecaster_id for f in off]
+
+
+def _assert_every_tool_call_is_answered(calls) -> None:
+    """The API rejects a request where a tool call is not followed by its results."""
+    for _, turns, _ in calls:
+        for i, t in enumerate(turns):
+            if isinstance(t, AssistantTurn) and t.response.tool_calls:
+                nxt = turns[i + 1] if i + 1 < len(turns) else None
+                assert isinstance(nxt, ToolResults), (i, kinds(turns))
+
+
+def test_a_tool_call_in_the_plan_step_is_answered_before_the_evidence() -> None:
+    """2026-11-14 live run: HTTP 400 'tool_use ids were found without tool_result blocks'."""
+    q = question()
+    plan_with_tools = tool_reply(
+        ToolCall("p1", "get_series", {"key": "list"}), ToolCall("p2", "get_base_rate", {})
+    )
+    fake = FakeLLM([plan_with_tools, DRAFT, FINAL])
+    out = graph(fake).forecast(q, {"daily": [1, 2]}, ASOF)
+    assert isinstance(out, Forecast) and out.probability == 0.45
+    _assert_every_tool_call_is_answered(fake.calls)
+    assert out.meta["graph_path"][:3] == ["plan", "retrieve", "research"]

@@ -5,22 +5,22 @@ move older "Done log" lines to `docs/progress-archive.md`.
 
 ## Now
 
-- Phase 10 and 11 coded and pushed through T192 (T180 and the live checks wait for the
-  2026-11-14 morning run). `status.py`: OPEN_AGENT_TASKS=0, WAIT_EXPIRED=T034, T122b, T180.
-- First thing at the next session or trigger (2026-11-14, before 09:30 UTC): clone the
-  `ledger` branch and check (1) batch 2026-11-14 sealed before 09:30 with no manual run
-  (T180; the scheduled evening run at 00:45 UTC correctly did nothing, which shows the gate
-  works), (2) `agent` answers without `error` skips, `agent_graph` and `llm_local`
-  forecasts or reasoned skips, questions are `-v2` (T181, T122b), (3) the 2026-11-13 day is
-  sealed and Status shows a fully resolved batch (T034). Then T182 (smoke-site step in
-  resolve.yml), then T046, T057, T065, T068, T090, T093 in status order.
-- If no morning run has sealed the batch by 08:30 UTC: dispatch `morning.yml` from `main`
-  (`dry_run=false`). The one-shot trigger at 05:45 UTC also does this.
+- Live record (2026-11-14): batch 2026-11-14 sealed by a scheduled run at 06:24 UTC (before
+  the lock) with 24 forecasts: baselines, `llm_plain`, `llm_context`, `agent` (fixed),
+  `llm_local` (open model, first live forecasts) and one `agent_graph` error skip (bug
+  found and fixed; unproven live until the next batch). Next: T182 (smoke-site step in
+  resolve.yml), then the live-board tasks in `status.py` order (T046, T057, T065, T068,
+  T090, T093), then the first real weekly run.
+- Scheduling risk (open): GitHub never started the morning slots 00:15-05:15 UTC and the
+  first morning run began at 06:20; one lock-critical job still depends on GitHub's
+  scheduler. Owner item H20 (external scheduler calling `workflow_dispatch`) is the real
+  fix; until then a session or the 05:45 trigger dispatches `morning.yml` from `main`.
 - Rehearsal start date: 2026-11-13. Official record start: not set
   (`ARENA_OFFICIAL_START_NOT_BEFORE` is 2099-12-31 until the owner picks a date, T110).
 - Live site URL: https://jashd12.github.io/forecast-arena/
 - Waiting on the owner: H06, H15 (players' form and consent), H16 (recruiter page details,
-  the highest-value item for interviews), H17, H18 (repo description, topics, pin), H19.
+  the highest-value item for interviews), H17, H18 (repo description, topics, pin), H19,
+  H20 (external scheduler).
 
 ## In progress
 
@@ -73,6 +73,7 @@ readers the notebook really uses.
 
 ## Done log
 
+- 2026-11-14 T034, T122b, T180, T181: checked on the ledger. Batch 2026-11-14 was sealed at 06:24 UTC by a SCHEDULED morning run (first one to start: 06:20, six hours after the 00:15 slot; slots 00:15-05:15 never ran; the gate made the later ones no-ops); questions all `-v2`; 2026-11-13 fully resolved and day-sealed; `agent` 3 forecasts (thinking-block fix works), `llm_local` 3 forecasts (open model live), `agent_graph` 1 error skip = a real bug (plan-step tool calls not answered), fixed with a regression test; `ledger verify --git` PASS
 - 2026-11-14 T190: both contracts compared on the golden set (evals/results/eval-20261114T0052-*): structured outputs not better (83% first-try valid JSON for llm_context), caching raised one-shot cost; both off live; schema sent to the API stripped of unsupported keywords; metric bugs fixed
 - 2026-11-14 T192: Status page "When the scheduled jobs actually started" (first real run per job per day vs the first slot)
 - 2026-11-14 T191: OTLP/JSON export of the LLM spans (data/otlp/, linked from LLM observability) and a Polars-vs-DuckDB check in the executed notebook; polars pinned in requirements/nb.txt; named on stack and recruiter pages only now

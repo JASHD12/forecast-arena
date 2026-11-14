@@ -123,7 +123,9 @@ class GraphAgentForecaster(AgentForecaster):
             text = prompts.load("graph_evidence", v).replace(
                 "{evidence}", json.dumps(evidence, ensure_ascii=False, default=str)
             )
-            return {"turns": [*s["turns"], UserText(text)], "path": step("retrieve", s)}
+            # the plan reply may have asked for tools; the API needs results for them first
+            turns = self._close_tool_calls(s)
+            return {"turns": [*turns, UserText(text)], "path": step("retrieve", s)}
 
         def research(s: State) -> State:
             turns = s["turns"]

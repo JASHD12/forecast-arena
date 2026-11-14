@@ -128,7 +128,7 @@ Keep the first line of each task in exactly this shape; the status script parses
   - Do: the health checks and alert behaviour of section 12.
   - Done when: a deliberately failing dry run opens one `incident` issue and a following
     healthy run closes it.
-- [!] T034 · Next-day verification (deps: T032) WAIT(until=2026-11-14)
+- [x] T034 · Next-day verification (deps: T032)
   - Do: at least one day after T032, confirm questions resolved, scores appeared, the day
     seal exists and verify passes. Fix anything found. If it is too early, mark this task
     `WAIT(until=<date>)`.
@@ -446,7 +446,7 @@ CI jobs; core `make check` stays offline and fast.
   - Do: `llm_local`: small quantized model via llama-cpp-python on the runner CPU, same
     contract as `llm_context`, time limit, skips on timeout. No API cost.
   - Done when: tests with a fake backend pass; a real local run gives a valid forecast.
-- [!] T122b · llm_local live check (deps: T122a) WAIT(until=2026-11-14)
+- [x] T122b · llm_local live check (deps: T122a)
   - Do: check the first morning run with llm_local (split from T122: today's lock had
     passed when T122a was ready, so no dispatch could record forecasts).
   - Done when: the morning run of 2026-11-14 (or a dry-run dispatch before its lock)
@@ -532,14 +532,14 @@ CI jobs; core `make check` stays offline and fast.
 Source: the review plan of 2026-11-13 (scheduled jobs start hours late; repo and site
 first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the rest.
 
-- [!] T180 · Schedule hardening: due-gate and frequent crons (deps: T160) WAIT(until=2026-11-14)
+- [x] T180 · Schedule hardening: due-gate and frequent crons (deps: T160)
   - Do: `arena schedule due --job <job>` (pure function of clock and ledger: due / too
     early / already done); every scheduled workflow runs it first and skips the rest when
     not due; morning hourly 00:15-08:15 UTC, evening hourly 16:00-23:00, resolve every
     3 h, players only 08:30 to the lock; SPEC 4, Status note, Airflow mirror, DECISIONS.
   - Done when: unit tests cover each job at each hour and ledger state; a dry-run dispatch
     of each workflow passes; a later day's batch is sealed before 09:30 with no manual run.
-- [ ] T181 · Live proof of the 2026-11-13 fixes (deps: T180, T122b)
+- [x] T181 · Live proof of the 2026-11-13 fixes (deps: T180, T122b)
   - Do: from the ledger: `agent` answers (no `error` skips), `agent_graph` and
     `llm_local` forecasts or reasoned skips, evening questions are v2, morning added none.
   - Done when: the findings are in docs/project/PROGRESS.md (fix and record any failure first).

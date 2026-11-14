@@ -135,3 +135,13 @@ Keep the first line of each item in exactly this shape; the status script parses
   - After T143: create a free Streamlit Community Cloud account, deploy
     `apps/dashboard/streamlit_app.py` from this repo, and set the Actions variable
     `ARENA_DASHBOARD_URL` to its address.
+- [ ] H20 · External scheduler for the lock-critical morning job (optional, recommended)
+  - Why: on 2026-11-14 GitHub started no scheduled morning run before 06:20 UTC, although
+    the cron slots started at 00:15; the lock is 09:30 UTC, so one late day loses a batch.
+  - What: use any free cron service (or a machine you own) to call, once an hour from 05:00
+    to 08:00 UTC, `POST https://api.github.com/repos/JASHD12/forecast-arena/actions/workflows/morning.yml/dispatches`
+    with body `{"ref":"main","inputs":{"dry_run":"false"}}` and a fine-grained token that
+    has only "Actions: read and write" on this repository. The job is idempotent and the
+    gate (`arena schedule due`) is not used for dispatches, but a run after the batch is
+    sealed does nothing. Do not give the token to the agent; store it in the cron service.
+

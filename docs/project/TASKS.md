@@ -543,7 +543,7 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
   - Do: from the ledger: `agent` answers (no `error` skips), `agent_graph` and
     `llm_local` forecasts or reasoned skips, evening questions are v2, morning added none.
   - Done when: the findings are in docs/project/PROGRESS.md (fix and record any failure first).
-- [ ] T182 · Live-site smoke check (deps: T180)
+- [x] T182 · Live-site smoke check (deps: T180)
   - Do: `make smoke-site` (Playwright: key pages load, no console errors, site built
     under 26 h ago); run it as a step after deploy in `resolve.yml`.
   - Done when: the step is green on a real resolve run.

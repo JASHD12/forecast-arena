@@ -73,6 +73,8 @@ readers the notebook really uses.
 
 ## Done log
 
+- 2026-11-14 T182: scripts/smoke_site.py (pages, data files, referenced assets, CSP meta, build age under 26 h) runs after every Pages deploy in morning/evening/resolve; green on a real resolve deploy; `make smoke-site` for manual runs
+- 2026-11-14 T046 (code): weather, attention and markets on by default in morning/evening/resolve, four-domain e2e test; WAIT until the first real evening run publishes them (check set for 16:40 UTC). Lesson: a `#` comment inside `${{ }}` broke all dispatches for ~30 min; tests/unit/test_workflows_syntax.py now guards it
 - 2026-11-14 T034, T122b, T180, T181: checked on the ledger. Batch 2026-11-14 was sealed at 06:24 UTC by a SCHEDULED morning run (first one to start: 06:20, six hours after the 00:15 slot; slots 00:15-05:15 never ran; the gate made the later ones no-ops); questions all `-v2`; 2026-11-13 fully resolved and day-sealed; `agent` 3 forecasts (thinking-block fix works), `llm_local` 3 forecasts (open model live), `agent_graph` 1 error skip = a real bug (plan-step tool calls not answered), fixed with a regression test; `ledger verify --git` PASS
 - 2026-11-14 T190: both contracts compared on the golden set (evals/results/eval-20261114T0052-*): structured outputs not better (83% first-try valid JSON for llm_context), caching raised one-shot cost; both off live; schema sent to the API stripped of unsupported keywords; metric bugs fixed
 - 2026-11-14 T192: Status page "When the scheduled jobs actually started" (first real run per job per day vs the first slot)

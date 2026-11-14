@@ -52,7 +52,8 @@ function fail(msg) { console.error('FAIL ' + msg); process.exitCode = 1; }
   const home = await ctx.newPage();
   await home.goto('file://' + path.join(root, 'index.html'));
   const cd = await home.locator('.lock-countdown').textContent();
-  if (!/lock(s|ed)[^]*\d+ h \d+ min/.test(cd)) fail('countdown not running: ' + cd);
+  // the wording depends on the time of day: "lock in" before 09:30 UTC, "are locked ... lock is in" after
+  if (!/lock[^]*\d+ h \d+ min/.test(cd)) fail('countdown not running: ' + cd);
   else console.log('ok   home: lock countdown');
   const tg = home.locator('.theme-toggle');
   if (!(await tg.isVisible())) fail('theme toggle hidden with JavaScript');

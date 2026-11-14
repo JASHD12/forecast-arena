@@ -131,9 +131,17 @@ jobs:
     permissions:
       pages: write
       id-token: write
+      contents: read
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - id: deployment
         uses: actions/deploy-pages@v5
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && github.ref || 'stable' }}
+          sparse-checkout: scripts/smoke_site.py
+          persist-credentials: false
+      - name: Smoke-test the published site (T182)
+        run: python3 scripts/smoke_site.py "${{ steps.deployment.outputs.page_url }}"

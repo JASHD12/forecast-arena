@@ -109,3 +109,33 @@ Older "Done log" lines moved from docs/project/PROGRESS.md (newest first).
   restored the same day (note in the file). Edits now assert their anchors.
 - Two commits reached `main` with a failing check (lint at T024/T025, one test at T073),
   each fixed in the next commit. Commits are now chained on `make check` passing.
+
+## Moved from PROGRESS.md on 2026-11-14
+
+## Phase 11 (owner approved 2026-11-13 evening)
+
+- Review plan approved; tasks T180-T192 in docs/project/TASKS.md. First evening run dispatched by hand
+  at 19:29 UTC (scheduled one had not started): 6 power questions for 2026-11-14, all
+  `-v2`, lock 09:30 unchanged, `ledger verify` passes. T180 (due-gate, frequent crons)
+  pushed; it waits for 2026-11-14 to show a batch sealed before the lock without help.
+  A one-shot check at 05:45 UTC dispatches the morning run if no batch seal exists.
+
+## Session summary (2026-11-13, evening)
+
+- Done and pushed: T142 (README), T160 (evening publication, `evening.yml` from 18:00
+  UTC), T161 (players intake, `players.yml`, live after H15), T170 (interview kit),
+  T171 (honesty audit), and a bug fix for the live agent (Anthropic thinking blocks).
+- Learned: a manual dispatch on `stable` cannot deploy Pages (the deploy job failed while
+  the resolve itself succeeded); dispatch from `main` as AGENTS.md says. Scheduled
+  resolve runs start hours late; the twice-a-run design absorbs it.
+
+- 2026-11-13 T131: question page chart from the morning snapshot (per-domain series, threshold, observed value, data table) and previous/next links
+- 2026-11-13 T130: play.html "Can you beat the AI?" (live + practice decks, in-memory score), self-hosted app.js, CSP on every page, Playwright round test in make a11y, home teaser, nav link
+- 2026-11-13 T125: arena mcp, read-only MCP server (official SDK 2.3.0): list_questions, get_question, leaderboard, run_sql (single SELECT, DuckDB external access off); stdio test; README setup
+- 2026-11-13 T124 follow-up: first real evals showed 400-token cap truncating thinking answers; cap now from settings (workflow default 1024) and in every LLM version string
+- 2026-11-13 T124: eval harness (frozen golden set of 186 past power questions, llm_plain vs llm_context A/B, Brier/log/ECE/skill/JSON validity/repairs/cost), FakeLLM CI gate, manual llm-eval.yml, evals.html (EVALUATION banner)
+- 2026-11-13 T123: TracingLLM spans per model call in agent_traces/; trace panel on question pages; llm.html (calls, tokens, latency p50/p95, repairs, skips, estimated cost from a dated price table)
+- 2026-11-13 T122a: llm_local (Qwen2.5-1.5B GGUF via llama.cpp, JSON-schema grammar, deadlines) as llm_context on the runner CPU; real local run 0.95 in ~20 s; T122b waits for the 2026-11-14 morning run
+- 2026-11-13 T121: agent_graph, a LangGraph state machine (plan, retrieve, research/tools, critique, answer) over the guarded client; 1 question per topic per day; caps test; on in morning.yml
+- 2026-11-13 T120: RAG tool similar_past_questions (fastembed bge-small ONNX, cosine), only questions resolved before asof (leakage test); agent prompt v2; on in the morning workflow
+- 2026-11-13 T114: ETS, SARIMAX and Chronos-Bolt tiny as local power benchmarks; one-year backtest card docs/models/power-ts.md (all three lose to the champion; Chronos best of them and beats persistence)

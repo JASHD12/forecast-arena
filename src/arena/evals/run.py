@@ -48,6 +48,17 @@ class EvalCaps:
     max_output_tokens: int = 400
 
 
+def _valid_first_try(mine: list[dict[str, Any]], repaired: set[str]) -> float | None:
+    """Share of answers that parsed on the first attempt, over the calls that produced an
+    answer at all. Provider errors and budget stops say nothing about JSON validity, so
+    they are left out (a run where every call failed shows None, not 100%)."""
+    answered = [r for r in mine if r["skip"] not in ("error", "budget_exhausted")]
+    if not answered:
+        return None
+    ok = [r for r in answered if r["question_id"] not in repaired and r["skip"] != "parse_failure"]
+    return len(ok) / len(answered)
+
+
 def sample(items: Sequence[GoldenItem], limit: int | None, seed: int = 0) -> list[GoldenItem]:
     """A seeded sample stratified by template, or every item when `limit` is None."""
     if limit is None or limit >= len(items):
@@ -99,6 +110,8 @@ def run(
                     "outcome": it.outcome,
                     "probability": r.probability if isinstance(r, Forecast) else None,
                     "skip": None if isinstance(r, Forecast) else r.reason_code,
+                    # why a call failed (provider error text), so a result file names its cause
+                    "detail": None if isinstance(r, Forecast) else str(r.detail)[:300],
                 }
             )
     started = clock.now()
@@ -150,16 +163,7 @@ def metrics(
             "ece": expected_calibration_error(ps, ys) if len(ok) >= 10 else None,
             "base_rate_brier_same_items": b0,
             "skill_vs_base_rate": brier_skill(b, b0) if b is not None and b0 else None,
-            "json_valid_first_try": (
-                sum(
-                    1
-                    for r in mine
-                    if r["question_id"] not in repaired and r["skip"] != "parse_failure"
-                )
-                / len(mine)
-            )
-            if mine
-            else None,
+            "json_valid_first_try": _valid_first_try(mine, repaired),
             "repair_rate": len(repaired) / len(mine) if mine else None,
             "skips": dict(Counter(r["skip"] for r in mine if r["skip"])),
             "calls": len(spans),

@@ -122,3 +122,17 @@ def test_evals_page_shows_committed_runs_only(tmp_path) -> None:
     page = (site.out_dir / "evals.html").read_text()
     assert "EVALUATION" in page and "eval-real" in page and "fake-eval-x" not in page
     assert "interval includes zero" in page  # identical answers: no difference shown
+
+
+def test_json_validity_ignores_provider_errors() -> None:
+    """2026-11-13: a structured run where every call was rejected showed 100% valid JSON."""
+    from arena.evals.run import _valid_first_try
+
+    rows = [{"question_id": f"q{i}", "skip": "error"} for i in range(4)]
+    assert _valid_first_try(rows, set()) is None
+    rows += [
+        {"question_id": "a", "skip": None},
+        {"question_id": "b", "skip": None},
+        {"question_id": "c", "skip": "parse_failure"},
+    ]
+    assert _valid_first_try(rows, {"b"}) == 1 / 3  # only "a" parsed first time

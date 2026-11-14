@@ -37,7 +37,7 @@ from arena.llm.client import (
     Usage,
     UserText,
 )
-from arena.llm.parse import ANSWER_SCHEMA
+from arena.llm.parse import anthropic_schema
 
 #: Pinned so that only ARENA_* settings configure the client (an ambient
 #: ANTHROPIC_BASE_URL is ignored).
@@ -118,7 +118,7 @@ class AnthropicLLM:
         if self.effort:
             output_config["effort"] = self.effort
         if self.structured and not tools:
-            output_config["format"] = {"type": "json_schema", "schema": ANSWER_SCHEMA}
+            output_config["format"] = {"type": "json_schema", "schema": anthropic_schema()}
         if output_config:
             kwargs["output_config"] = output_config
         if self.cache:

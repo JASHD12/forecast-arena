@@ -20,6 +20,7 @@ from arena.llm.client import (
 )
 from arena.llm.factory import client_from_settings
 from arena.llm.openai_compatible import OpenAICompatibleLLM
+from arena.llm.parse import anthropic_schema
 
 TOOL = ToolSpec(
     "get_base_rate",
@@ -250,7 +251,6 @@ def test_effort_setting_validated() -> None:
 
 def test_anthropic_cache_and_structured_output_requests() -> None:
     """T190: request bodies follow the documented shapes; usage reads the cache fields."""
-    from arena.llm.parse import ANSWER_SCHEMA
 
     def h(r):
         return httpx2.Response(
@@ -294,7 +294,7 @@ def test_anthropic_cache_and_structured_output_requests() -> None:
     assert body["cache_control"] == {"type": "ephemeral"}
     assert body["output_config"] == {
         "effort": "low",
-        "format": {"type": "json_schema", "schema": ANSWER_SCHEMA},
+        "format": {"type": "json_schema", "schema": anthropic_schema()},
     }
     assert r.usage == Usage(1, 20, 30, 600, 0) and r.usage.total_tokens == 650
     assert r.usage.as_dict()["cache_read_tokens"] == 600
@@ -322,3 +322,17 @@ def test_structured_contract_is_visible_in_the_version() -> None:
 
     assert LLMPlain(C("json_schema")).version().endswith("|so")  # type: ignore[arg-type]
     assert not LLMPlain(C("text")).version().endswith("|so")  # type: ignore[arg-type]
+
+
+def test_structured_schema_has_no_keywords_the_api_rejects() -> None:
+    import json as _json
+
+    from arena.llm.parse import ANSWER_SCHEMA, UNSUPPORTED_KEYWORDS, anthropic_schema
+
+    sent = anthropic_schema()
+    text = _json.dumps(sent)
+    assert not any(f'"{k}"' in text for k in UNSUPPORTED_KEYWORDS), text
+    assert sent["required"] == ["probability", "rationale", "key_factors"]
+    assert sent["additionalProperties"] is False
+    assert sent["properties"]["probability"] == {"type": "number"}
+    assert "maximum" in _json.dumps(ANSWER_SCHEMA)  # the local grammar keeps the full schema

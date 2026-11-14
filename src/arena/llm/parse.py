@@ -74,3 +74,27 @@ ANSWER_SCHEMA: dict[str, Any] = {
     "required": ["probability", "rationale", "key_factors"],
     "additionalProperties": False,
 }
+
+
+#: JSON Schema keywords the Anthropic structured-output API does not accept (the official
+#: SDKs strip them before sending and validate client-side; we send raw kwargs, so we do the
+#: same; checked 2026-11-13 in the Claude API docs, "JSON Schema Limitations").
+UNSUPPORTED_KEYWORDS = frozenset(
+    {"minimum", "maximum", "exclusiveMinimum", "exclusiveMaximum", "multipleOf",
+     "minLength", "maxLength", "minItems", "maxItems"}
+)  # fmt: skip
+
+
+def _strip(node: Any) -> Any:
+    if isinstance(node, dict):
+        return {k: _strip(v) for k, v in node.items() if k not in UNSUPPORTED_KEYWORDS}
+    if isinstance(node, list):
+        return [_strip(v) for v in node]
+    return node
+
+
+def anthropic_schema() -> dict[str, Any]:
+    """`ANSWER_SCHEMA` without the keywords the API rejects. The ranges are still enforced
+    after the call by `parse_answer` (probability in [0, 1], at most 80 words)."""
+    out: dict[str, Any] = _strip(ANSWER_SCHEMA)
+    return out

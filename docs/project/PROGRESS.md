@@ -5,14 +5,22 @@ move older "Done log" lines to `docs/progress-archive.md`.
 
 ## Now
 
-- Phase 10 (portfolio roadmap) done: `status.py` prints OPEN_AGENT_TASKS=0. Still to
-  check on 2026-11-14 (WAIT): T122b (`llm_local` live forecasts) and T034, plus that the
-  `agent` answers again after the adapter fix. Waiting on the owner: H06, H15 (and the
-  optional H16, H17, H19).
-- Rehearsal start date: 2026-11-13 (first real morning run; 6 power questions, resolved).
-- Official record start date: not set; `ARENA_OFFICIAL_START_NOT_BEFORE` is 2099-12-31
-  until the owner chooses a date (T110).
+- Phase 10 and 11 coded and pushed through T192 (T180 and the live checks wait for the
+  2026-11-14 morning run). `status.py`: OPEN_AGENT_TASKS=0, WAIT_EXPIRED=T034, T122b, T180.
+- First thing at the next session or trigger (2026-11-14, before 09:30 UTC): clone the
+  `ledger` branch and check (1) batch 2026-11-14 sealed before 09:30 with no manual run
+  (T180; the scheduled evening run at 00:45 UTC correctly did nothing, which shows the gate
+  works), (2) `agent` answers without `error` skips, `agent_graph` and `llm_local`
+  forecasts or reasoned skips, questions are `-v2` (T181, T122b), (3) the 2026-11-13 day is
+  sealed and Status shows a fully resolved batch (T034). Then T182 (smoke-site step in
+  resolve.yml), then T046, T057, T065, T068, T090, T093 in status order.
+- If no morning run has sealed the batch by 08:30 UTC: dispatch `morning.yml` from `main`
+  (`dry_run=false`). The one-shot trigger at 05:45 UTC also does this.
+- Rehearsal start date: 2026-11-13. Official record start: not set
+  (`ARENA_OFFICIAL_START_NOT_BEFORE` is 2099-12-31 until the owner picks a date, T110).
 - Live site URL: https://jashd12.github.io/forecast-arena/
+- Waiting on the owner: H06, H15 (players' form and consent), H16 (recruiter page details,
+  the highest-value item for interviews), H17, H18 (repo description, topics, pin), H19.
 
 ## Phase 11 (owner approved 2026-11-13 evening)
 

@@ -577,7 +577,7 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
   - Done when: tests pass and the offline site build is byte-identical before and after.
 - [x] T188 · Coverage floor and badges (deps: T187)
   - Done when: CI fails under the current coverage; README shows coverage and test count.
-- [ ] T192 · Schedule delay on the Status page (deps: T180)
+- [x] T192 · Schedule delay on the Status page (deps: T180)
   - Do: record the scheduled time and the start time of each real run (manifest) and show
     the median delay per job on the Status page.
   - Done when: a unit test covers the delay computation; the Status page shows it.
@@ -585,7 +585,7 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
   - Do: Experiments and LLM pages show labelled backtest or evaluation results until live
     data exists; stronger home stat; "agent trace of the day" card; share preview check.
   - Done when: no page shows a bare "nothing yet"; a11y passes.
-- [ ] T190 · Structured outputs and prompt caching (deps: T124)
+- [x] T190 · Structured outputs and prompt caching (deps: T124)
   - Do: `output_config.format` for the Claude forecasters as a new contract version,
     compared with parse-and-repair in the eval harness; cache the shared system prompt and
     show cache hits on the LLM observability page.

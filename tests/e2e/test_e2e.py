@@ -120,7 +120,13 @@ def test_five_days_offline(tmp_path) -> None:
     assert "The data at forecast time" in qpage and 'class="qchart"' in qpage
     assert 'rel="next"' in qpage or 'rel="prev"' in qpage
     status = (site.out_dir / "status.html").read_text()
-    for panel in ("Missed days", "Source freshness", "LLM usage", "LLM parse failures"):
+    for panel in (
+        "Missed days",
+        "Source freshness",
+        "LLM usage",
+        "LLM parse failures",
+        "When the scheduled jobs actually started",
+    ):
         assert panel in status, panel
     from arena.site.ops_status import llm_usage, parse_failures, source_freshness
 

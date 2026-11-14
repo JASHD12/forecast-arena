@@ -5,7 +5,7 @@
 <div class="banner" role="note"><strong>EVALUATION</strong>: not the live record and never counted in any leaderboard. The questions are past days whose answers were already known when the test ran, so a model could in principle have seen similar data in training; the live record exists to rule that out.</div>
 {% for r in runs %}
 <section class="card" aria-labelledby="ev-{{ loop.index }}">
-<h2 id="ev-{{ loop.index }}">Run {{ r.run_id }}</h2>
+<h2 id="ev-{{ loop.index }}">Run {{ r.run_id }}{% if '|so' in (r.versions.values()|first) %} <span class="label">schema-constrained answers</span>{% endif %}</h2>
 <p class="note">{{ r.created_at[:16]|replace("T", " ") }} UTC · golden set <code>{{ r.golden }}</code> (sha256 <code>{{ r.golden_sha256[:12] }}</code>) · {{ r.n_items }} questions · caps: {{ "{:,}".format(r.caps.max_tokens) }} tokens, {{ r.caps.max_requests }} requests</p>
 <div class="table-scroll" tabindex="0" role="region" aria-label="Metrics of run {{ r.run_id }}"><table>
 <thead><tr><th scope="col">Variant</th><th scope="col" class="num">Answered</th><th scope="col" class="num">Brier</th><th scope="col" class="num">Base rate (same questions)</th><th scope="col" class="num">Skill</th><th scope="col" class="num">Log score</th><th scope="col" class="num">ECE</th><th scope="col" class="num">Valid JSON first try</th><th scope="col" class="num">Repairs</th><th scope="col" class="num">Tokens</th><th scope="col" class="num">Est. cost</th></tr></thead>

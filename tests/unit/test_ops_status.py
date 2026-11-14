@@ -75,3 +75,33 @@ def test_parse_failures_and_freshness(tmp_path) -> None:
     assert f.overdue == 1 and f.stale(late)
     assert not f.stale(datetime.combine(B, datetime.min.time(), tzinfo=UTC))
     assert isinstance(f.last_batch, date)
+
+
+def test_run_start_times_measure_delay_from_the_first_slot(tmp_path) -> None:
+    """T192: the first real run of each job per day, relative to its first slot."""
+    from datetime import UTC, datetime, timedelta
+
+    from arena.clock import FixedClock
+    from arena.ledger import Ledger
+    from arena.ops.jobs import evening, morning
+    from arena.site.ops_status import run_start_times
+
+    led = Ledger(tmp_path / "l")
+    from power_fixtures import fixture_domain
+
+    day = datetime(2026, 11, 2, tzinfo=UTC).date()
+    morning(led, day, FixedClock(datetime(2026, 11, 2, 5, 30, tzinfo=UTC)), [fixture_domain()], [])
+    morning(led, day, FixedClock(datetime(2026, 11, 2, 7, 0, tzinfo=UTC)), [fixture_domain()], [])
+    evening(
+        led,
+        day + timedelta(days=1),
+        FixedClock(datetime(2026, 11, 2, 18, tzinfo=UTC)),
+        [fixture_domain()],
+    )
+    rows = run_start_times(led, day, days=2)
+    m = next(r for r in rows if r.job == "morning")
+    assert m.started.hour == 5 and m.late_by == timedelta(hours=5, minutes=15)
+    assert m.after_lock is False
+    e = next(r for r in rows if r.job == "evening")
+    assert e.late_by == timedelta(hours=2) and e.after_lock is None
+    assert run_start_times(Ledger(tmp_path / "empty"), day) == []

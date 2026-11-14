@@ -5,10 +5,11 @@ from __future__ import annotations
 
 from collections import Counter
 from dataclasses import dataclass
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, time, timedelta
 
 from arena.ledger import Ledger, layout
 from arena.ledger.manifest import manifests_for_day
+from arena.ops.jobs import LOCK
 from arena.ops.official import first_day
 from arena.scoring.core import Record
 
@@ -121,3 +122,41 @@ def source_freshness(rec: Record, now: datetime) -> list[Freshness]:
         )
         out.append(Freshness(dom, max(q.batch_date for q in qs), max(res, default=None), overdue))
     return out
+
+
+#: First scheduled slot of each job's day (UTC), from the workflows' cron lines (T180).
+FIRST_SLOT = {"morning": time(0, 15), "evening": time(16, 0), "resolve": time(0, 30)}
+
+
+@dataclass(frozen=True)
+class StartRow:
+    """When the first real run of a job started on one UTC day."""
+
+    day: date
+    job: str
+    started: datetime
+    late_by: timedelta  # since the day's first scheduled slot
+    after_lock: bool | None  # morning only: started at or after that day's lock
+
+
+def run_start_times(ledger: Ledger, today: date, days: int = 7) -> list[StartRow]:
+    """For each of the last `days` days and each scheduled job, the first real (not dry)
+    run's start, relative to the job's first scheduled slot of the day. GitHub can start
+    scheduled runs hours late; the exact slot a run belongs to is not recorded, so this
+    measures the delay from the day's FIRST slot (the largest delay a run could have)."""
+    rows: list[StartRow] = []
+    for i in range(days):
+        d = today - timedelta(days=i)
+        real = [m for m in manifests_for_day(ledger, d) if not m.dry_run]
+        for job, slot in FIRST_SLOT.items():
+            runs = sorted((m for m in real if m.job == job), key=lambda m: m.started_at)
+            if not runs:
+                continue
+            first = runs[0].started_at
+            nominal = datetime.combine(d, slot, tzinfo=first.tzinfo)
+            lock = datetime.combine(d, LOCK, tzinfo=first.tzinfo)
+            rows.append(
+                StartRow(d, job, first, max(first - nominal, timedelta(0)),
+                         first >= lock if job == "morning" else None)
+            )  # fmt: skip
+    return rows

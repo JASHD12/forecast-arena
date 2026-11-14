@@ -88,7 +88,7 @@ jobs:
       ARENA_LLM_MAX_TOKENS_PER_DAY: ${{ vars.ARENA_LLM_MAX_TOKENS_PER_DAY || '150000' }}  # owner: keep cost under ~$1/month on Haiku 5.5
       ARENA_LLM_BASE_URL: ${{ vars.ARENA_LLM_BASE_URL }}
       ARENA_LLM_API_KEY: ${{ secrets.ARENA_LLM_API_KEY }}
-      ARENA_LLM_CACHE: ${{ vars.ARENA_LLM_CACHE || '1' }}  # T190: prompt caching; cost only, answers unchanged
+      ARENA_LLM_CACHE: ${{ vars.ARENA_LLM_CACHE || '0' }}  # T190: off; measured, it raised the cost of one-shot calls
       ARENA_LLM_STRUCTURED: ${{ vars.ARENA_LLM_STRUCTURED || '0' }}  # T190: off live until the eval compares both contracts
       ARENA_LLM_LOCAL: ${{ vars.ARENA_LLM_LOCAL || '1' }}  # T122: open model on the runner CPU, no API cost
       ARENA_AGENT_GRAPH: ${{ vars.ARENA_AGENT_GRAPH || '1' }}  # T121: LangGraph agent, 1 question per topic per day

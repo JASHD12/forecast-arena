@@ -262,6 +262,8 @@ def json_validity_change(
     """
     vals = []
     for r in sorted(runs, key=lambda r: str(r.get("created_at"))):
+        if any(str(x).endswith("|so") for x in r.get("versions", {}).values()):
+            continue  # a different output contract (T190), not the cap fix
         v = r.get("metrics", {}).get(fid, {}).get("json_valid_first_try")
         if v is not None:
             vals.append(v)

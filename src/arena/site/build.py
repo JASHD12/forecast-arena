@@ -58,7 +58,13 @@ from arena.site.llm_obs import (
 )
 from arena.site.matrices import MIN_N, head_to_head, heatmap
 from arena.site.methods_content import LIMITATIONS, PRINCIPLES
-from arena.site.ops_status import llm_usage, missed_days, parse_failures, source_freshness
+from arena.site.ops_status import (
+    llm_usage,
+    missed_days,
+    parse_failures,
+    run_start_times,
+    source_freshness,
+)
 from arena.site.profiles import profile
 from arena.site.recruiters import PROOFS
 from arena.site.shaping import (
@@ -303,6 +309,7 @@ def build_site(
                 "token_cap": llm_token_cap,
                 "parse": parse_failures(rec),
                 "fresh": source_freshness(rec, clock.now()),
+                "starts": run_start_times(ledger, clock.now().date()),
                 "now": clock.now(),
             },
         ),

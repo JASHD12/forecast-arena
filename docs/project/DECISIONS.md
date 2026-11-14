@@ -957,17 +957,32 @@ Ideas outside the specification. The agent lists them here and does not build th
 - Alternatives: an external scheduler calling `workflow_dispatch` (needs an account,
   human item); moving the lock (rejected: SPEC and the noon auction).
 
-## 2026-11-13 Prompt caching on, structured outputs evaluated first (T190)
+## 2026-11-14 T190 result: caching and structured outputs both stay off live
 
-- Prompt caching (`ARENA_LLM_CACHE`, on in the morning and eval workflows) changes cost,
-  never the answer, so forecaster versions do not change. Cached tokens count in full
-  towards the daily cap (the cap stays conservative); the cost estimate prices cache reads
-  at 0.1x and writes at 1.25x the input price (docs/SOURCES.md).
-- Structured outputs (`ARENA_LLM_STRUCTURED`) constrain `llm_plain` and `llm_context`
-  answers to the answer JSON Schema. That is a new output contract, so versions gain
-  `|so`. It stays off live until the eval harness has compared both contracts on the same
-  golden set (I8: improvements go through evaluation and versioning). Tool-calling turns
-  are never constrained.
+- Same golden set (12 items, seeded), same model, run on 2026-11-14 00:52 UTC; results in
+  `evals/results/eval-20261114T0052-{text,structured}.json` (both runs started in the same
+  minute and share a run id; the file names tell them apart, and the harness now ids runs
+  to the second). The page and `docs/interview/numbers.md` show every figure.
+- **Structured outputs** (schema-constrained answers, version suffix `|so`): the first
+  attempt (2026-11-13) failed on every call because the schema sent to the API carried
+  `minimum`/`maximum`/`maxLength`/`maxItems`, which the API does not accept; fixed by
+  sending a schema without them (`anthropic_schema()`; ranges are still checked after the
+  call). The second attempt ran. It was not better: `llm_context` first-try valid JSON fell
+  to 83% (two answers needed a repair, a rule the schema cannot express) and its Brier score
+  was higher than in the text run; `llm_plain` was also higher. With 12 items none of this
+  is a ranking (intervals include zero), but there is no evidence for switching. It stays
+  off live; the capability and its tests stay in the code, labelled as evaluated.
+- **Prompt caching** (automatic): for these one-shot calls each prompt differs, so almost
+  everything was written to the cache (billed at 1.25x) and little was read back. Against
+  the earlier uncached run on the same sampled items (`eval-20261113T1206`) the estimated
+  cost of `llm_context` was higher and `llm_plain`'s about the same (both runs of
+  2026-11-14 used the cache). The Brier scores of identical configurations also differ
+  between runs, which shows how much noise 12 items carry. Off by default in the morning
+  and eval workflows (`ARENA_LLM_CACHE=0`); the eval workflow has a `cache` input to
+  re-measure. It may still pay for the multi-turn agent loop, which has not been measured.
+- Two metric bugs found on the way, both fixed: an all-errors run reported 100% valid JSON
+  (provider errors now leave the denominator), and result files did not say why a call
+  failed (rows now carry the first 300 characters of the error).
 
 ## 2026-11-14 OTLP/JSON export and a Polars cell (T191)
 

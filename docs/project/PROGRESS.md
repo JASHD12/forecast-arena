@@ -82,6 +82,8 @@ readers the notebook really uses.
 
 ## Done log
 
+- 2026-11-14 T190: both contracts compared on the golden set (evals/results/eval-20261114T0052-*): structured outputs not better (83% first-try valid JSON for llm_context), caching raised one-shot cost; both off live; schema sent to the API stripped of unsupported keywords; metric bugs fixed
+- 2026-11-14 T192: Status page "When the scheduled jobs actually started" (first real run per job per day vs the first slot)
 - 2026-11-14 T191: OTLP/JSON export of the LLM spans (data/otlp/, linked from LLM observability) and a Polars-vs-DuckDB check in the executed notebook; polars pinned in requirements/nb.txt; named on stack and recruiter pages only now
 - 2026-11-13 T189: Experiments shows the labelled challenger backtests (parsed from the cards) until the first live weekly run; home KPI "days replayed in the backtests" while one topic is live; "How the AI agent worked" card from real successful traces only; a11y 0 serious
 - 2026-11-13 T188: CI coverage floor 87% (CI measures 88.95%); coverage and test-count badges in the README from docs/badges/*.json, checked in CI by scripts/badges.py --check so they never overstate

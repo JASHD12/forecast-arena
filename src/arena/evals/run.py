@@ -117,7 +117,7 @@ def run(
     started = clock.now()
     return {
         "kind": KIND,
-        "run_id": now_id() if now_id else f"eval-{started:%Y%m%dT%H%M}",
+        "run_id": now_id() if now_id else f"eval-{started:%Y%m%dT%H%M%S}",
         "created_at": started.isoformat(),
         "golden": golden,
         "golden_sha256": golden_sha256,

@@ -78,8 +78,12 @@ def highlights() -> str:
     ld, lci, lok = _diff(lgbm, "ml_lgbm - ml")
     md, mci, mok = _diff(mlp, "ml_mlp - ml")
     ts_rows = {fid: _brier(ts, fid) for fid in ("ts_chronos", "ts_sarimax", "ts_ets")}
-    evals = sorted((ROOT / "evals" / "results").glob("eval-*.json"))
-    first, last = (json.loads(f.read_text(encoding="utf-8")) for f in (evals[0], evals[-1]))
+    runs = [
+        json.loads(f.read_text(encoding="utf-8"))
+        for f in sorted((ROOT / "evals" / "results").glob("eval-*.json"))
+    ]
+    runs = [r for r in runs if not any(v.endswith("|so") for v in r["versions"].values())]
+    first, last = runs[0], runs[-1]
     pct = lambda r: f"{100 * r['metrics']['llm_plain']['json_valid_first_try']:.0f}%"  # noqa: E731
     lines = [
         f"- **A classical model that clearly beats the base rate** (backtest, {days} days of "

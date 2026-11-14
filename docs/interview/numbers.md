@@ -144,6 +144,28 @@ Source: `evals/results/eval-20261113T1206.json`
 | llm_plain | claude-haiku-5-5 | 12 | 12 | 0.2557 | 0.2380 | 100% | 0% | 0.0036 | 5719 |
 
 Paired Brier difference: llm_plain - llm_context: +0.0611 [-0.0849, +0.2158] on 12 items
+
+### Run `eval-20261114T0052` (12 items; caps 48 requests, 60000 tokens)
+
+Source: `evals/results/eval-20261114T0052-structured.json`
+
+| Forecaster | Model | n | Answered | Brier | Base rate, same items | Valid JSON first try | Repair rate | Cost (USD) | Output tokens |
+|---|---|---|---|---|---|---|---|---|---|
+| llm_context | claude-haiku-5-5 | 12 | 12 | 0.2092 | 0.2380 | 83% | 17% | 0.0071 | 6473 |
+| llm_plain | claude-haiku-5-5 | 12 | 12 | 0.2723 | 0.2380 | 100% | 0% | 0.0040 | 5411 |
+
+Paired Brier difference: llm_plain - llm_context: +0.0632 [-0.0847, +0.2247] on 12 items
+
+### Run `eval-20261114T0052` (12 items; caps 48 requests, 60000 tokens)
+
+Source: `evals/results/eval-20261114T0052-text.json`
+
+| Forecaster | Model | n | Answered | Brier | Base rate, same items | Valid JSON first try | Repair rate | Cost (USD) | Output tokens |
+|---|---|---|---|---|---|---|---|---|---|
+| llm_context | claude-haiku-5-5 | 12 | 12 | 0.1792 | 0.2380 | 100% | 0% | 0.0073 | 7851 |
+| llm_plain | claude-haiku-5-5 | 12 | 12 | 0.2634 | 0.2380 | 100% | 0% | 0.0036 | 5435 |
+
+Paired Brier difference: llm_plain - llm_context: +0.0841 [-0.0445, +0.2354] on 12 items
 <!-- evals:end -->
 
 <!-- live:start -->

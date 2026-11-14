@@ -77,7 +77,7 @@ jobs:
       ARENA_CONTACT: ${{ vars.ARENA_CONTACT }}
       ARENA_DASHBOARD_URL: ${{ vars.ARENA_DASHBOARD_URL }}  # T143: site links the dashboard only when set (H19)
       ARENA_LEDGER_REMOTE: https://github.com/${{ github.repository }}.git
-      ARENA_DOMAINS: ${{ vars.ARENA_DOMAINS || 'power,weather,attention,markets'  # T046: crypto waits for H12 }}
+      ARENA_DOMAINS: ${{ vars.ARENA_DOMAINS || 'power,weather,attention,markets' }}  # T046: crypto waits for H12 (H12)
       # T110: never start the official record before this date; replaced by a real date
       # once the roadmap's model and timing changes are live.
       ARENA_OFFICIAL_START_NOT_BEFORE: ${{ vars.ARENA_OFFICIAL_START_NOT_BEFORE || '2099-12-31' }}

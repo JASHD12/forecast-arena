@@ -7,11 +7,11 @@ debugpy==1.8.22
 executing==2.3.0
 fastjsonschema==2.22.3
 ipykernel==7.4.0
-ipython==9.18.1
 ipython-pygments-lexers==1.1.1
+ipython==9.18.1
 jedi==0.20.1
-jsonschema==4.26.0
 jsonschema-specifications==2025.9.1
+jsonschema==4.26.0
 jupyter-client==8.10.0
 jupyter-core==5.9.1
 matplotlib-inline==0.2.2
@@ -24,6 +24,8 @@ pandas==2.3.3
 parso==0.8.7
 pexpect==4.9.0
 platformdirs==4.14.5
+polars-runtime-32==2.1.0
+polars==2.1.0
 prompt-toolkit==3.0.53
 psutil==7.2.2
 ptyprocess==0.7.0

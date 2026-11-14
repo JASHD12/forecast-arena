@@ -33,7 +33,7 @@ append-only, hash-chained ledger. When the official data arrives, every forecast
 <!-- highlights:end -->
 
 <!-- stack:start -->
-**Stack:** Python, typing, testing · SQL, DuckDB, Parquet · dbt · scikit-learn, calibration · LightGBM, Optuna, SHAP · PyTorch · Time-series models · MLOps: MLflow, Evidently, champion/challenger · Statistics · LLM APIs, prompts, structured output · Agents and tool use · RAG, embeddings · LangGraph · Open-weight models (llama.cpp) · LLM evals and tracing · MCP · REST and JSON APIs · Docker, Kubernetes, Airflow · CI/CD on GitHub Actions · Data integrity · Dashboards and frontend
+**Stack:** Python, typing, testing · SQL, DuckDB, Parquet, Polars · dbt · scikit-learn, calibration · LightGBM, Optuna, SHAP · PyTorch · Time-series models · MLOps: MLflow, Evidently, champion/challenger · Statistics · LLM APIs, prompts, structured output · Agents and tool use · RAG, embeddings · LangGraph · Open-weight models (llama.cpp) · LLM evals, tracing, OpenTelemetry · MCP · REST and JSON APIs · Docker, Kubernetes, Airflow · CI/CD on GitHub Actions · Data integrity · Dashboards and frontend
 <!-- stack:end -->
 
 <details>
@@ -80,7 +80,7 @@ All numbers below are **backtests**: past days replayed through the production c
 | Skill | In this project | Code |
 |---|---|---|
 | Python, typing, testing | Typed package, mypy, hundreds of unit tests, property-based tests, offline end-to-end run on every push | `src/arena`<br>`tests`<br>`Makefile` |
-| SQL, DuckDB, Parquet | Open data as Parquet; analytics SQL with DuckDB, shown with its queries | `src/arena/analytics/sql.py` |
+| SQL, DuckDB, Parquet, Polars | Open data as Parquet; analytics SQL with DuckDB, shown with its queries; the analysis notebook cross-checks DuckDB against Polars on the same files | `src/arena/analytics/sql.py`<br>`notebooks/explore.ipynb` |
 | dbt | Staging and mart models with tests (unique, not null, accepted values, foreign keys), built in CI | `analytics/dbt` |
 | scikit-learn, calibration | Gradient-boosted quantile regression turned into calibrated probabilities | `src/arena/forecasters/ml_power.py` |
 | LightGBM, Optuna, SHAP | Challenger tuned with time-ordered cross-validation; SHAP explanations | `src/arena/forecasters/ml_power_lgbm.py`<br>`src/arena/ops/explain.py` |
@@ -93,7 +93,7 @@ All numbers below are **backtests**: past days replayed through the production c
 | RAG, embeddings | Local ONNX embeddings, similarity search over past questions with a no-leakage rule | `src/arena/agent/retrieval.py` |
 | LangGraph | The agent as a state machine (plan, retrieve, tools, critique) behind the same caps | `src/arena/agent/graph.py` |
 | Open-weight models (llama.cpp) | A 1.5B model on the CI runner's CPU, same contract as the API model, no API cost | `src/arena/llm/local.py` |
-| LLM evals and tracing | Frozen golden set, prompt A/B, JSON validity and cost; one span per model call | `src/arena/evals`<br>`src/arena/llm/tracing.py` |
+| LLM evals, tracing, OpenTelemetry | Frozen golden set, prompt A/B, JSON validity and cost; one span per model call, exported as OTLP/JSON with the OpenTelemetry GenAI attribute names | `src/arena/evals`<br>`src/arena/llm/tracing.py`<br>`src/arena/llm/otlp.py` |
 | MCP | Read-only MCP server so AI assistants can query the benchmark | `src/arena/mcp_server.py` |
 | REST and JSON APIs | FastAPI service and a static JSON API with schemas generated from pydantic models | `src/arena/api/app.py`<br>`src/arena/site/api.py` |
 | Docker, Kubernetes, Airflow | Image built and API smoke-tested in CI; manifests applied to a kind cluster; DAGs parsed by Airflow (validated in CI, not hosted) | `Dockerfile`<br>`deploy/k8s`<br>`orchestration/airflow` |

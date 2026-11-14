@@ -13,6 +13,7 @@ ROOT = Path(__file__).resolve().parents[2]
 CI_COVERED = (
     "src/arena",
     "tests",
+    "notebooks",  # executed by `make notebook` in the CI a11y job
     "Makefile",
     "analytics/dbt",
     "apps/dashboard",

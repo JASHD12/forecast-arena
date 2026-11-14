@@ -968,3 +968,16 @@ Ideas outside the specification. The agent lists them here and does not build th
   `|so`. It stays off live until the eval harness has compared both contracts on the same
   golden set (I8: improvements go through evaluation and versioning). Tool-calling turns
   are never constrained.
+
+## 2026-11-14 OTLP/JSON export and a Polars cell (T191)
+
+- OpenTelemetry: the call spans (T123) are also published as OTLP/JSON (`data/otlp/`, one
+  file per batch day, `llm/otlp.py`), written by hand against the OTLP specification and the
+  GenAI conventions (docs/SOURCES.md) instead of adding the OpenTelemetry SDK: the spans
+  already exist, the export is a pure function of them (deterministic ids), and no new
+  dependency is needed. The site says "OTLP/JSON export", not "OpenTelemetry
+  instrumentation", because nothing is instrumented through the OTel SDK.
+- Polars: one notebook section recomputes the Brier table from the Parquet files and fails
+  the CI notebook run if it disagrees with DuckDB. Pinned in `requirements/nb.txt` only
+  (notebook extra; not in the core lock), installed by the CI a11y job that runs
+  `make notebook`.

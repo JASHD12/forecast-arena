@@ -88,7 +88,12 @@ STACK_LIBRARIES = (
     ("fastapi", "the read-only REST API (`arena api`), served from the Docker image in CI"),
     ("uvicorn", "the ASGI server that runs the REST API"),
     ("streamlit", "the interactive dashboard (apps/dashboard), smoke-tested with AppTest in CI"),
-    ("nbclient", "executes the analysis notebook (pandas + DuckDB on the open data) in CI"),
+    ("nbclient", "executes the analysis notebook (pandas, DuckDB, Polars on the open data) in CI"),
+    (
+        "polars",
+        "the notebook's second engine: the Brier table from the Parquet files, checked"
+        " against DuckDB",
+    ),
     ("mcp", "official MCP SDK: the read-only `arena mcp` server over the ledger"),
     ("langgraph", "the agent_graph forecaster's state machine (plan, retrieve, tools, critique)"),
     ("fastembed", "local ONNX text embeddings for the agent's similar-questions tool (RAG)"),

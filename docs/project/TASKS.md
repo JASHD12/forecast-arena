@@ -590,6 +590,6 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
     compared with parse-and-repair in the eval harness; cache the shared system prompt and
     show cache hits on the LLM observability page.
   - Done when: an eval result file compares both contracts; cache hits appear in traces.
-- [ ] T191 · Polars notebook section and OpenTelemetry export (deps: T138, T123)
+- [x] T191 · Polars notebook section and OpenTelemetry export (deps: T138, T123)
   - Done when: the notebook runs in CI with a Polars section; spans export as OTLP JSON
     validated by a test; the stack page names both only after that.

@@ -19,10 +19,11 @@ PROOFS: tuple[tuple[str, str, str, tuple[str, ...]], ...] = (
         ("src/arena", "tests", "Makefile"),
     ),
     (
-        "SQL, DuckDB, Parquet",
-        "Open data as Parquet; analytics SQL with DuckDB, shown with its queries",
+        "SQL, DuckDB, Parquet, Polars",
+        "Open data as Parquet; analytics SQL with DuckDB, shown with its queries; the "
+        "analysis notebook cross-checks DuckDB against Polars on the same files",
         "data.html",
-        ("src/arena/analytics/sql.py",),
+        ("src/arena/analytics/sql.py", "notebooks/explore.ipynb"),
     ),
     (
         "dbt",
@@ -99,10 +100,11 @@ PROOFS: tuple[tuple[str, str, str, tuple[str, ...]], ...] = (
         ("src/arena/llm/local.py",),
     ),
     (
-        "LLM evals and tracing",
-        "Frozen golden set, prompt A/B, JSON validity and cost; one span per model call",
-        "evals.html",
-        ("src/arena/evals", "src/arena/llm/tracing.py"),
+        "LLM evals, tracing, OpenTelemetry",
+        "Frozen golden set, prompt A/B, JSON validity and cost; one span per model call, "
+        "exported as OTLP/JSON with the OpenTelemetry GenAI attribute names",
+        "llm.html",
+        ("src/arena/evals", "src/arena/llm/tracing.py", "src/arena/llm/otlp.py"),
     ),
     (
         "MCP",

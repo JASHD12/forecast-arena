@@ -27,6 +27,7 @@ from arena.clock import Clock
 from arena.config import DEFAULT_REPO_URL, DEFAULT_SITE_URL
 from arena.ledger import Ledger
 from arena.ledger.verify import verify
+from arena.llm.otlp import otlp_names, write_otlp
 from arena.models import Question
 from arena.ops.official import STREAK, update_official_start
 from arena.ops.weekly import summaries as weekly_summaries
@@ -183,7 +184,9 @@ def build_site(
     archive = sorted(
         rec.questions.values(), key=lambda q: (q.batch_date, q.question_id), reverse=True
     )
-    urows = usage_rows(load_spans(ledger))
+    all_spans = load_spans(ledger)
+    urows = usage_rows(all_spans)
+    otlp_files = otlp_names(all_spans)
     runs_w = weekly_summaries(ledger)
     game = {"live": live_deck(rec), "practice": practice_deck(golden_path)}
     info = {fid: (sees, cadence) for fid, sees, cadence in INFORMATION_SETS}
@@ -310,6 +313,7 @@ def build_site(
                 "total": totals(urows),
                 "price_source": PRICE_SOURCE,
                 "cache_read_mult": CACHE_READ_MULT,
+                "otlp_files": otlp_files,
                 "parse": parse_failures(rec),
             },
         ),
@@ -367,6 +371,7 @@ def build_site(
     (tmp / "forecasters").mkdir()
     (tmp / "topics").mkdir()
     (tmp / "data").mkdir(exist_ok=True)
+    write_otlp(all_spans, tmp / "data" / "otlp")
     (tmp / "data" / "game.json").write_text(game_payload + "\n", encoding="utf-8")
     pages["data.html"] = (
         "Open data & SQL",

@@ -82,6 +82,7 @@ readers the notebook really uses.
 
 ## Done log
 
+- 2026-11-14 T191: OTLP/JSON export of the LLM spans (data/otlp/, linked from LLM observability) and a Polars-vs-DuckDB check in the executed notebook; polars pinned in requirements/nb.txt; named on stack and recruiter pages only now
 - 2026-11-13 T189: Experiments shows the labelled challenger backtests (parsed from the cards) until the first live weekly run; home KPI "days replayed in the backtests" while one topic is live; "How the AI agent worked" card from real successful traces only; a11y 0 serious
 - 2026-11-13 T188: CI coverage floor 87% (CI measures 88.95%); coverage and test-count badges in the README from docs/badges/*.json, checked in CI by scripts/badges.py --check so they never overstate
 - 2026-11-13 T187: docs/CODE_TOUR.md; all 218 `# fmt: skip` removed (ruff format); site/build.py split into content.py + shaping.py (877 -> 474 lines); cli.py -> cli/ package (record, jobs, reports, llm_cmds; 28 commands kept); e2e site byte-identical except data.html, where SQL tie-breakers fixed a real nondeterminism

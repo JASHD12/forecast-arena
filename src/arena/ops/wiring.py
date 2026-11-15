@@ -22,6 +22,7 @@ from arena.domains.weather import WeatherDomain, weather_domain_from_responses
 from arena.forecasters.base import Forecaster, LedgerHistory
 from arena.forecasters.baselines import BaseRate, Persistence
 from arena.forecasters.llm import LLMContext, LLMPlain
+from arena.forecasters.ml import DomainModel, MLForecaster, ModelLoadFailure
 from arena.forecasters.replay import CombinedHistory, ReplayHistory
 from arena.ledger import Ledger
 from arena.llm.budget import BudgetGuard, Caps, GuardedLLM, usage_from_manifests
@@ -168,6 +169,47 @@ def _local_forecaster(settings: Settings, n: int, tracer: Tracer, clock: Clock) 
     return LLMLocal(TracingLLM(local.LlamaCppLLM(backend), tracer, clock), n)
 
 
+def live_ml(ledger: Ledger, domains: Sequence[Domain], asof: datetime) -> MLForecaster:
+    """Load the visible champions once; one bad artifact only disables its own domain."""
+    from arena.forecasters import registry
+    from arena.forecasters.ml_crypto import CryptoModel
+    from arena.forecasters.ml_markets import MarketsModel
+    from arena.forecasters.ml_weather import WeatherRules
+
+    rules: dict[str, Callable[[], DomainModel]] = {
+        "weather": WeatherRules,
+        "markets": MarketsModel,
+        "crypto": CryptoModel,
+    }
+    models: dict[str, DomainModel] = {}
+    errors: dict[str, ModelLoadFailure] = {}
+    hashes: dict[str, str] = {}
+    for name in sorted({d.name for d in domains}):
+        if name in rules:
+            models[name] = rules[name]()
+            continue
+        version = None
+        try:
+            version = registry.current_version(ledger, name, asof=asof)
+            if version is None:
+                continue
+            info = registry.model_info(ledger, name, version)
+            created = datetime.fromisoformat(info.meta["created_at"])
+            if created.tzinfo is None or created > asof:
+                raise registry.RegistryError("model artifact was not available at forecast time")
+            model = registry.load(ledger, name, version)
+            train_end = getattr(model, "train_end", None)
+            if train_end is not None and train_end > asof.date():
+                raise registry.RegistryError("model training cutoff is after forecast time")
+            models[name] = model
+            hashes[name] = info.sha256
+        except Exception as exc:
+            errors[name] = ModelLoadFailure(
+                version, f"{name} model load failed: {type(exc).__name__}: {exc}"[:300]
+            )
+    return MLForecaster(models, load_errors=errors, artifact_hashes=hashes)
+
+
 def build_forecasters(
     ledger: Ledger,
     domains: Sequence[Domain],
@@ -183,7 +225,9 @@ def build_forecasters(
     never reach the ledger, so their usage could not be counted against the caps."""
     replays = [ReplayHistory(d) for d in domains if getattr(d, "replayable", True)]
     history = CombinedHistory(LedgerHistory(ledger), replays)
-    out: list[Forecaster] = [BaseRate(history), Persistence(history)]
+    clk = clock if clock is not None else SystemClock()
+    ml = live_ml(ledger, domains, clk.now())
+    out: list[Forecaster] = [BaseRate(history), Persistence(history), ml]
     guard = None
     if settings is None:
         return out, None
@@ -192,7 +236,6 @@ def build_forecasters(
         guard = BudgetGuard(Caps.from_settings(settings), usage_from_manifests(ledger, day))
         client = GuardedLLM(client, guard)
     tracer = Tracer()  # T123: one span per model call, written with the day's traces
-    clk = clock if clock is not None else SystemClock()
     if client is not None:
         client = TracingLLM(client, tracer, clk)
     n = settings.llm_questions_per_domain
@@ -208,7 +251,7 @@ def build_forecasters(
         client,
         per_domain=n,
         max_tool_calls=settings.agent_max_tool_calls,
-        peers={"base_rate": out[0]},
+        peers={"base_rate": out[0], "ml": ml},
         retriever=retriever,
         prompt_version="v2" if retriever is not None else "v1",
         news=None if llm is not None else GdeltBackend(http),
@@ -225,7 +268,7 @@ def build_forecasters(
             GraphAgentForecaster(
                 client,
                 max_tool_calls=settings.agent_max_tool_calls,
-                peers={"base_rate": out[0]},
+                peers={"base_rate": out[0], "ml": ml},
                 news=agent.news,
                 wiki=agent.wiki,
                 retriever=retriever,

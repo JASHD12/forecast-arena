@@ -1,4 +1,5 @@
 name: evening
+run-name: "evening / ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run && 'dry-run' || 'live' }}"
 
 # T160: publish tomorrow's questions tonight, so people can answer before the 09:30 UTC
 # lock. No forecasts here: the machine forecasters answer in the morning job, before the
@@ -109,6 +110,9 @@ jobs:
           git config --global http.https://github.com/.extraheader "AUTHORIZATION: basic $header"
           git config --global user.name forecast-arena-bot
           git config --global user.email forecast-arena-bot@users.noreply.github.com
+      - name: Record application execution identity
+        if: steps.mode.outputs.dry_run == 'false'
+        run: .venv/bin/arena health execution --job evening --push
       - name: evening job
         run: |
           if [ "${{ steps.mode.outputs.dry_run }}" = "true" ]; then
@@ -134,12 +138,15 @@ jobs:
           set -o pipefail  # keep the check's exit code through tee
           .venv/bin/arena health check --job evening --report health.json ${{ steps.mode.outputs.dry_run == 'false' && '--record' || '' }} | tee -a "$GITHUB_STEP_SUMMARY"
       - name: Open, update or close the incident issue
-        if: always()
+        if: always() && steps.mode.outputs.dry_run == 'false'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           .venv/bin/arena health incident --report health.json --job-status "${{ job.status }}" \
             --run-url "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+      - name: Persist evening health (including failed checks)
+        if: always() && steps.mode.outputs.dry_run == 'false'
+        run: .venv/bin/arena official update --push
       - name: Fail the run when a health check failed
         if: always() && steps.health.outcome == 'failure'
         run: exit 1

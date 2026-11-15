@@ -21,6 +21,7 @@ from arena.ledger.manifest import RunRecorder, manifests_for_day
 from arena.llm.client import (
     AssistantTurn,
     LLMClient,
+    LLMError,
     LLMResponse,
     ToolResults,
     ToolSpec,
@@ -63,7 +64,13 @@ def usage_from_manifests(ledger: Ledger, day: date) -> Usage:
     for m in manifests_for_day(ledger, day):
         u = m.llm_usage
         total = total + Usage(
-            u.get("requests", 0), u.get("input_tokens", 0), u.get("output_tokens", 0)
+            u.get("requests", 0),
+            u.get("input_tokens", 0),
+            u.get("output_tokens", 0),
+            u.get("cache_read_tokens", 0),
+            u.get("cache_write_tokens", 0),
+            u.get("reserved_tokens", 0),
+            u.get("unreported_requests", 0),
         )
     return total
 
@@ -96,12 +103,12 @@ class BudgetGuard:
         """Usage today including this run."""
         return self.already + self.this_run
 
-    def check(self, input_estimate: int, max_output: int) -> None:
+    def check(self, input_estimate: int, max_output: int, attempts: int = 1) -> None:
         """Raise BudgetExhausted unless one more call of this size fits."""
         u = self.used
-        if u.requests + 1 > self.caps.max_requests_per_day:
+        if u.requests + attempts > self.caps.max_requests_per_day:
             raise BudgetExhausted(f"request cap {self.caps.max_requests_per_day} reached")
-        if u.total_tokens + input_estimate + max_output > self.caps.max_tokens_per_day:
+        if u.total_tokens + attempts * (input_estimate + max_output) > self.caps.max_tokens_per_day:
             raise BudgetExhausted(
                 f"token cap {self.caps.max_tokens_per_day} would be exceeded "
                 f"(used {u.total_tokens}, next call up to {input_estimate + max_output})"
@@ -132,7 +139,19 @@ class GuardedLLM:
     ) -> LLMResponse:
         """Check the caps, call, record usage (also when the call fails after billing)."""
         out_cap = min(max_tokens, self.guard.caps.max_output_tokens)
-        self.guard.check(estimate_input_tokens(system, turns, tools), out_cap)
-        resp = self.inner.complete(system, turns, max_tokens=out_cap, tools=tools)
-        self.guard.record(resp.usage)
+        estimate = estimate_input_tokens(system, turns, tools) + out_cap
+        attempts = int(getattr(self.inner, "max_attempts", 1))
+        self.guard.check(estimate - out_cap, out_cap, attempts)
+        try:
+            resp = self.inner.complete(system, turns, max_tokens=out_cap, tools=tools)
+        except Exception as exc:
+            known = exc.usage if isinstance(exc, LLMError) else None
+            usage = known or Usage(requests=attempts, unreported_requests=attempts)
+            self._record(usage, estimate)
+            raise
+        self._record(resp.usage, estimate)
         return resp
+
+    def _record(self, usage: Usage, estimate: int) -> None:
+        # Unknown usage is reserved, never represented as zero provider token usage.
+        self.guard.record(usage + Usage(reserved_tokens=usage.unreported_requests * estimate))

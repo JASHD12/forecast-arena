@@ -139,3 +139,30 @@ Older "Done log" lines moved from docs/project/PROGRESS.md (newest first).
 - 2026-11-13 T121: agent_graph, a LangGraph state machine (plan, retrieve, research/tools, critique, answer) over the guarded client; 1 question per topic per day; caps test; on in morning.yml
 - 2026-11-13 T120: RAG tool similar_past_questions (fastembed bge-small ONNX, cosine), only questions resolved before asof (leakage test); agent prompt v2; on in the morning workflow
 - 2026-11-13 T114: ETS, SARIMAX and Chronos-Bolt tiny as local power benchmarks; one-year backtest card docs/models/power-ts.md (all three lose to the champion; Chronos best of them and beats persistence)
+
+
+## Honesty audit (T171, 2026-11-13)
+
+Every technology named on `stack.html`, `recruiters.html`, `de.html` and `README.md`,
+with the code that uses it and the workflow that runs that code. Status: no open item.
+
+| Technology | Used in | Run by |
+|---|---|---|
+| Python, mypy, ruff, Hypothesis, pydantic, click, Jinja2, numpy, scipy, joblib | `src/arena`, `tests` | CI `check` (`make check`) |
+| DuckDB, Parquet, pandas | `analytics/sql.py` (Parquet via DuckDB `COPY`), `notebooks/explore.ipynb` | CI `check`; notebook in CI `a11y` (`make notebook`) |
+| dbt (dbt-duckdb) | `analytics/dbt/` | CI `dbt` |
+| scikit-learn, LightGBM, Optuna, SHAP, PyTorch | `forecasters/ml_power*.py`, `ops/explain.py` | CI `check` (requirements-ml, -torch); weekly |
+| statsmodels, Chronos-Bolt | `forecasters/ts_bench.py` | CI `check` (Chronos through a fake pipeline); the real model in the committed backtest card only, labelled "backtest only" |
+| MLflow, Evidently | `ops/weekly.py`, `ops/drift.py` | CI `check` (requirements-tracking); weekly |
+| Claude (anthropic SDK) | `llm/anthropic_adapter.py` | CI with mocked HTTP; real calls in morning, llm-eval |
+| LangGraph, fastembed (ONNX) | `agent/graph.py`, `agent/retrieval.py` | CI `check`; morning |
+| llama.cpp (llama-cpp-python), Qwen GGUF | `llm/local.py` | CI with a fake backend; real runtime built in the morning workflow (first live forecasts: T122b) |
+| MCP | `mcp_server.py` | CI `check` (SDK client) |
+| FastAPI, uvicorn | `api/app.py` | CI `check` (TestClient); CI `docker` smoke test |
+| Docker, Kubernetes (kind), Airflow | `Dockerfile`, `deploy/k8s/`, `orchestration/airflow/` | CI `docker`, `kubernetes`, `airflow` (DagBag) |
+| Streamlit | `apps/dashboard/` | CI `check` (AppTest) |
+| Chromium, axe (Playwright) | `tools/a11y/` | CI `a11y` |
+
+Fixed in this audit: `stack.html` said the Parquet files were "ready for pandas, Polars,
+Spark or DuckDB"; the project uses neither Polars nor Spark, so it now names only the
+readers the notebook really uses.

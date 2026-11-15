@@ -225,3 +225,5 @@ def weekly_run(obj: Ctx, push: bool, only: tuple[str, ...]) -> None:
     for line in res.lines():
         click.echo(line)
     _push(obj, remote, "weekly", obj.clock.now().date())
+    if not res.ok:
+        raise click.ClickException("weekly evaluation failed; see the published decisions")

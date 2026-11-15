@@ -9,6 +9,7 @@ from datetime import date, datetime, time, timedelta
 
 from arena.ledger import Ledger, layout
 from arena.ledger.manifest import manifests_for_day
+from arena.llm.budget import usage_from_manifests
 from arena.ops.jobs import LOCK
 from arena.ops.official import first_day
 from arena.scoring.core import Record
@@ -40,11 +41,14 @@ class UsageDay:
     requests: int
     input_tokens: int
     output_tokens: int
+    cached_tokens: int = 0
+    reserved_tokens: int = 0
+    unreported_requests: int = 0
 
     @property
     def total(self) -> int:
-        """Input plus output tokens."""
-        return self.input_tokens + self.output_tokens
+        """All reported and conservatively reserved tokens counted by the guard."""
+        return self.input_tokens + self.output_tokens + self.cached_tokens + self.reserved_tokens
 
 
 def llm_usage(ledger: Ledger, today: date, days: int = 7) -> list[UsageDay]:
@@ -52,12 +56,18 @@ def llm_usage(ledger: Ledger, today: date, days: int = 7) -> list[UsageDay]:
     out = []
     for i in range(days):
         d = today - timedelta(days=i)
-        req = inp = outp = 0
-        for m in manifests_for_day(ledger, d):
-            req += m.llm_usage.get("requests", 0)
-            inp += m.llm_usage.get("input_tokens", 0)
-            outp += m.llm_usage.get("output_tokens", 0)
-        out.append(UsageDay(d, req, inp, outp))
+        u = usage_from_manifests(ledger, d)
+        out.append(
+            UsageDay(
+                d,
+                u.requests,
+                u.input_tokens,
+                u.output_tokens,
+                u.cache_read_tokens + u.cache_write_tokens,
+                u.reserved_tokens,
+                u.unreported_requests,
+            )
+        )
     return out
 
 

@@ -25,7 +25,7 @@
 {% endfor %}</ol>
 <p class="st-foot"><a href="leaderboard.html">Intervals and details →</a></p>
 {% else %}
-<p class="st-note">The lineup. Standings appear here as soon as the first answers arrive.</p>
+<p class="st-note">Standings require resolved questions answered by every registered headline forecaster.{% if board.missing_forecasters %} Still missing scored forecasts from {% for fid in board.missing_forecasters %}{{ fname(fid) }}{% if not loop.last %}, {% endif %}{% endfor %}.{% else %} No questions in this scope have complete coverage yet.{% endif %}</p>
 <ul class="lineup">
 {% for fid in ("base_rate", "persistence", "ml", "llm_plain", "llm_context", "agent") %}<li><span class="dot-key {{ series_class(fid) }}" aria-hidden="true"></span>{{ fname(fid) }}{% if is_ai(fid) %} <span class="label">AI</span>{% endif %}{% if fid == "ml" and not ml_live %} <span class="label">backtest only</span>{% endif %}</li>{% endfor %}
 </ul>

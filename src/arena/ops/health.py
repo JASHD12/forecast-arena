@@ -22,14 +22,16 @@ from __future__ import annotations
 
 import json
 import subprocess
+from collections import Counter
 from collections.abc import Callable, Sequence
 from dataclasses import asdict, dataclass, field
 from datetime import UTC, datetime, time, timedelta
 from typing import Any
 
+from arena.config import Settings
 from arena.ledger import Ledger, layout
 from arena.ledger.verify import verify
-from arena.models import BatchSeal
+from arena.models import BatchSeal, Forecast, Skip
 
 LOCK = time(9, 30)
 OVERDUE_AFTER = timedelta(days=5)
@@ -40,6 +42,18 @@ MIN_LLM_ANSWERS = 5
 LLM_FORECASTERS = frozenset({"llm_plain", "llm_context", "llm_local", "agent", "agent_graph"})
 INCIDENT_LABEL = "incident"
 INCIDENT_TITLE = "Forecast Arena incident: a job or health check failed"
+CORE_FORECASTERS = frozenset(
+    {"base_rate", "persistence", "ml", "llm_plain", "llm_context", "agent"}
+)
+
+
+def expected_forecasters(settings: Settings) -> frozenset[str]:
+    """Declared production roster, independent of what the factory actually registered."""
+    return (
+        CORE_FORECASTERS
+        | ({"llm_local"} if settings.llm_local else set())
+        | ({"agent_graph"} if settings.agent_graph else set())
+    )
 
 
 @dataclass(frozen=True)
@@ -87,7 +101,12 @@ class HealthReport:
 
 
 def run_checks(
-    ledger: Ledger, job: str, now: datetime, *, force_fail: bool = False
+    ledger: Ledger,
+    job: str,
+    now: datetime,
+    *,
+    force_fail: bool = False,
+    roster: frozenset[str] = CORE_FORECASTERS,
 ) -> HealthReport:
     """Run every health check against the ledger at `now` (UTC)."""
     from arena.scoring.core import load
@@ -159,6 +178,34 @@ def run_checks(
     )
 
     todays_ids = {q.question_id for q in todays}
+    if job == "morning" or now >= lock:
+        records: list[Forecast | Skip] = [*rec.forecasts, *rec.skips]
+        pairs = Counter(
+            (r.question_id, r.forecaster_id) for r in records if r.question_id in todays_ids
+        )
+        bad = sorted(
+            f"{qid}::{fid}" for qid in todays_ids for fid in roster if pairs[qid, fid] != 1
+        )
+        rep.checks.append(
+            Check(
+                "forecaster_coverage",
+                bool(todays_ids) and not bad,
+                f"expected {len(todays_ids) * len(roster)} forecast-or-skip pairs; "
+                + (f"missing/duplicate: {', '.join(bad[:5])}" if bad else "complete"),
+            )
+        )
+        unavailable = [
+            s
+            for s in rec.skips
+            if s.question_id in todays_ids
+            and s.forecaster_id == "ml"
+            and s.reason_code in {"model_missing", "error"}
+        ]
+        rep.checks.append(
+            Check(
+                "ml_available", not unavailable, f"{len(unavailable)} ML model_missing/error skips"
+            )
+        )
     answers = sum(
         1
         for f in rec.forecasts

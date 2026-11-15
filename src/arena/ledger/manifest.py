@@ -17,7 +17,16 @@ from arena.ledger import layout
 from arena.ledger.store import Ledger
 from arena.models import RunManifest
 
-TRACKED_PACKAGES = ("forecast-arena", "pydantic", "click")
+TRACKED_PACKAGES = (
+    "forecast-arena",
+    "pydantic",
+    "click",
+    "numpy",
+    "scikit-learn",
+    "lightgbm",
+    "torch",
+    "joblib",
+)
 MAX_ERROR_CHARS = 500
 
 
@@ -45,10 +54,11 @@ class RunRecorder:
 
 
 def code_sha(repo_dir: Path | None = None) -> str:
-    """Commit SHA of the running code: `GITHUB_SHA` in Actions, else `git rev-parse`."""
-    env_sha = os.environ.get("GITHUB_SHA")
-    if env_sha:
-        return env_sha
+    """Application checkout HEAD, never the event SHA or the ledger checkout's HEAD.
+
+    Packaged installs can supply FORECAST_ARENA_CODE_SHA explicitly. GITHUB_SHA is the
+    triggering commit and is incorrect when a scheduled workflow checks out stable.
+    """
     try:
         res = subprocess.run(
             ["git", "rev-parse", "HEAD"],
@@ -58,8 +68,12 @@ def code_sha(repo_dir: Path | None = None) -> str:
             check=False,
         )
     except OSError:
-        return "unknown"
-    return res.stdout.strip() if res.returncode == 0 else "unknown"
+        return os.environ.get("FORECAST_ARENA_CODE_SHA", "unknown")
+    return (
+        res.stdout.strip()
+        if res.returncode == 0
+        else os.environ.get("FORECAST_ARENA_CODE_SHA", "unknown")
+    )
 
 
 def package_versions() -> dict[str, str]:

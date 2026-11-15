@@ -14,6 +14,8 @@
 {% elif void %}<div class="verdict verdict-void" role="status"><span class="verdict-big">Void</span><span>{{ void.reason_code }}: {{ void.detail }}</span></div>
 {% else %}<div class="verdict verdict-open" role="status"><span class="verdict-big">Open</span><span>Published {{ q.created_at.strftime("%Y-%m-%d %H:%M UTC") }}. {% if before_lock %}Forecasts lock at {{ q.lock_time.strftime("%Y-%m-%d %H:%M UTC") }}{% else %}Forecasts locked at {{ q.lock_time.strftime("%Y-%m-%d %H:%M UTC") }}{% endif %}. The answer is expected after {{ q.resolve_after.strftime("%Y-%m-%d %H:%M UTC") }}.</span></div>{% endif %}
 
+{% if resolution and void and void.reason_code == "source_revised" %}<p class="note">Source revision warning: {{ void.detail }}. The first recorded outcome and its score are retained.</p>{% endif %}
+
 <h2>{% if resolution %}Who was closest?{% else %}What the forecasters said{% endif %}</h2>
 {% if scores %}
 <ul class="bars bars-wide" aria-label="Forecasts">

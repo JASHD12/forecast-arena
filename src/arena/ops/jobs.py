@@ -451,7 +451,8 @@ def resolve(
                 rec.warn(f"{qid}: revision check failed: {_short(exc)}")
         if out:
             res.written["resolutions"] = led.append(layout.resolutions_path(now.date()), out)
-        sealed = seal_pending_days(led, clock)
+        # Its manifest is written on context exit and belongs to the start day.
+        sealed = seal_pending_days(led, clock, before=now.date())
         if sealed:
             res.written["day_seals"] = len(sealed)
         if after is not None:

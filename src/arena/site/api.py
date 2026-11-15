@@ -16,7 +16,7 @@ from typing import Any, Literal
 from pydantic import BaseModel, Field
 
 from arena.scoring.boards import Board
-from arena.scoring.core import Record
+from arena.scoring.core import Record, excluded
 from arena.site.titles import plain_title
 
 API_VERSION = "v1"
@@ -42,7 +42,12 @@ class QuestionOut(BaseModel):
     target_date: date
     lock_time: datetime
     status: Literal["open", "resolved", "void"]
-    outcome: Literal[0, 1] | None = Field(None, description="1 = YES, 0 = NO; null if open")
+    outcome: Literal[0, 1] | None = Field(
+        None, description="First outcome: 1 = YES, 0 = NO; null if open or excluded from scoring"
+    )
+    revision_reason: Literal["source_revised"] | None = Field(
+        None, description="Source revision warning; the first outcome remains valid for scoring"
+    )
     forecasts: list[ForecastOut]
     url: str = Field(description="The question page, relative to the site root")
 
@@ -84,6 +89,7 @@ class LeaderboardFile(BaseModel):
 def _question(rec: Record, qid: str, url: str) -> QuestionOut:
     q = rec.questions[qid]
     res, void = rec.resolutions.get(qid), rec.voids.get(qid)
+    is_excluded = excluded(rec, qid)
     fs = sorted((f for f in rec.forecasts if f.question_id == qid), key=lambda f: f.forecaster_id)
     return QuestionOut(
         question_id=qid,
@@ -93,8 +99,11 @@ def _question(rec: Record, qid: str, url: str) -> QuestionOut:
         batch_date=q.batch_date,
         target_date=q.target_date,
         lock_time=q.lock_time,
-        status="void" if void else "resolved" if res else "open",
-        outcome=None if res is None or void else res.outcome,
+        status="void" if is_excluded else "resolved" if res else "open",
+        outcome=None if res is None or is_excluded else res.outcome,
+        revision_reason="source_revised"
+        if void is not None and void.reason_code == "source_revised"
+        else None,
         forecasts=[
             ForecastOut(
                 forecaster_id=f.forecaster_id,

@@ -19,6 +19,7 @@ when MLflow is installed, and a JSON summary is written to the ledger under
 from __future__ import annotations
 
 import json
+import math
 from collections.abc import Callable, Mapping
 from dataclasses import asdict, dataclass, field
 from datetime import UTC, date, datetime, time, timedelta
@@ -84,6 +85,8 @@ class Decision:
     reason: str = ""
     best_family: str | None = None
     candidates: list[dict[str, Any]] = field(default_factory=list)
+    error: str | None = None
+    evaluation_question_ids: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -97,6 +100,11 @@ class WeeklyResult:
     shap: list[dict[str, Any]] = field(default_factory=list)
     conformal: list[dict[str, Any]] = field(default_factory=list)
     quantiles: list[dict[str, Any]] = field(default_factory=list)
+
+    @property
+    def ok(self) -> bool:
+        """Every requested domain completed a valid comparison and decision."""
+        return bool(self.decisions) and not any(d.error for d in self.decisions)
 
     def lines(self) -> list[str]:
         """Printable summary."""
@@ -123,11 +131,23 @@ def window(today: date) -> tuple[date, date]:
 
 
 def evaluate(
-    domain: Domain, models: Mapping[str, Any], first: date, last: date
+    domain: Domain,
+    models: Mapping[str, Any],
+    first: date,
+    last: date,
+    *,
+    errors: dict[str, str] | None = None,
+    question_ids: list[str] | None = None,
 ) -> dict[str, tuple[float, int]]:
-    """Brier of each model on the window's resolved questions (same questions for all)."""
+    """Score complete, valid candidates on the same resolved questions.
+
+    One prediction failure disqualifies that model for the whole window, not the
+    question for everyone else. The first failure identifies the model and question.
+    Source/context failures propagate: no model may benefit from a broken evaluation.
+    """
     ps: dict[str, list[float]] = {k: [] for k in models}
     ys: list[int] = []
+    failed: dict[str, str] = {}
     b = first
     while b <= last:
         asof = datetime.combine(b, MORNING, tzinfo=UTC)
@@ -136,17 +156,25 @@ def evaluate(
             if not isinstance(r, Resolution):
                 continue
             ctx = domain.context(q, asof)
-            try:
-                probs = {k: float(m.probability(q, ctx)) for k, m in models.items()}
-            except (ValueError, KeyError):
-                continue
-            for k, p in probs.items():
-                ps[k].append(p)
+            if question_ids is not None:
+                question_ids.append(q.question_id)
+            for k, model in models.items():
+                if k in failed:
+                    continue
+                try:
+                    p = float(model.probability(q, ctx))
+                    if not math.isfinite(p) or not 0.0 <= p <= 1.0:
+                        raise ValueError(f"invalid probability {p!r}")
+                    ps[k].append(p)
+                except Exception as exc:
+                    failed[k] = f"{q.question_id}: {type(exc).__name__}: {exc}"[:300]
             ys.append(r.outcome)
         b += timedelta(days=1)
+    if errors is not None:
+        errors.update(failed)
     if not ys:
         return {}
-    return {k: (brier(v, ys), len(ys)) for k, v in ps.items()}
+    return {k: (brier(v, ys), len(ys)) for k, v in ps.items() if k not in failed}
 
 
 def weekly(
@@ -174,7 +202,7 @@ def weekly(
             res.decisions.append(d)
             dom = domains.get(name)
             if dom is None:
-                d.reason = "domain not loaded"
+                d.error = d.reason = "domain not loaded"
                 continue
             fitted: dict[str, Any] = {}
             for fam, trainer in families.items():
@@ -187,41 +215,56 @@ def weekly(
                     )
                     rec.warn(f"weekly/{name}/{fam}: {msg}")
             if not fitted:
-                d.reason = "training failed for every candidate"
+                d.error = d.reason = "training failed for every candidate"
                 continue
-            current = registry.load_current(led, [name]).get(name)
+            try:
+                current = registry.load_current(led, [name]).get(name)
+            except Exception as exc:
+                d.error = d.reason = f"current model load failed: {type(exc).__name__}: {exc}"[:300]
+                rec.warn(f"weekly/{name}: {d.error}")
+                continue
             d.current_version = current.version if current is not None else None
             models = {f"cand:{f}": m for f, m in fitted.items()}
             if current is not None:
                 models["current"] = current
-            scores = evaluate(dom, models, first, last)
-            if not scores:
-                d.candidates += [
-                    {
-                        "family": f,
-                        "version": m.version,
-                        "brier": None,
-                        "n": 0,
-                        "error": None,
-                        "params": _params(m),
-                    }
-                    for f, m in fitted.items()
-                ]
-                d.reason = "no resolved questions in the window; nothing promoted"
+            errors: dict[str, str] = {}
+            try:
+                scores = evaluate(
+                    dom, models, first, last, errors=errors, question_ids=d.evaluation_question_ids
+                )
+            except Exception as exc:
+                d.error = d.reason = f"evaluation data failed: {type(exc).__name__}: {exc}"[:300]
+                rec.warn(f"weekly/{name}: {d.error}")
                 continue
             for f, m in fitted.items():
-                b, n = scores[f"cand:{f}"]
+                score = scores.get(f"cand:{f}")
+                error = errors.get(f"cand:{f}")
+                if error:
+                    rec.warn(f"weekly/{name}/{f}: prediction failed: {error}")
                 d.candidates.append(
                     {
                         "family": f,
                         "version": m.version,
-                        "brier": round(b, 6),
-                        "n": n,
-                        "error": None,
+                        "brier": round(score[0], 6) if score else None,
+                        "n": score[1] if score else 0,
+                        "error": error,
                         "params": _params(m),
                     }
                 )
-            best = min(fitted, key=lambda f: (scores[f"cand:{f}"][0], f))
+            if "current" in errors:
+                d.error = d.reason = f"current model prediction failed: {errors['current']}"
+                rec.warn(f"weekly/{name}: {d.error}")
+                continue
+            eligible = [f for f in fitted if f"cand:{f}" in scores]
+            if not eligible:
+                d.error = d.reason = (
+                    "prediction failed for every candidate; nothing promoted"
+                    if errors
+                    else "no resolved questions in the window; nothing promoted"
+                )
+                rec.warn(f"weekly/{name}: {d.error}")
+                continue
+            best = min(eligible, key=lambda f: (scores[f"cand:{f}"][0], f))
             d.best_family = best
             d.candidate_version = fitted[best].version
             d.n = scores[f"cand:{best}"][1]
@@ -230,7 +273,26 @@ def weekly(
             if d.brier_current is not None and d.brier_candidate > d.brier_current:
                 d.reason = f"best candidate ({best}) worse than current; kept current"
                 continue
-            final = families[best](today - timedelta(days=LAG_DAYS))
+            try:
+                final = families[best](today - timedelta(days=LAG_DAYS))
+                # Validate the refitted artifact too; its score is never used to select
+                # or promote the candidate (it has seen this window during refitting).
+                refit_errors: dict[str, str] = {}
+                refit_ids: list[str] = []
+                refit_scores = evaluate(
+                    dom,
+                    {"refit": final},
+                    first,
+                    last,
+                    errors=refit_errors,
+                    question_ids=refit_ids,
+                )
+                if "refit" not in refit_scores or refit_ids != d.evaluation_question_ids:
+                    raise ValueError(refit_errors.get("refit", "refit validation set changed"))
+            except Exception as exc:
+                d.error = d.reason = f"refit failed validation: {type(exc).__name__}: {exc}"[:300]
+                rec.warn(f"weekly/{name}: {d.error}")
+                continue
             card = cards[name](d) if cards and name in cards else None
             if final.version not in registry.versions(led, name):
                 registry.save_model(
@@ -283,6 +345,7 @@ def weekly(
         summary = {
             "day": today.isoformat(),
             "dry_run": dry_run,
+            "ok": res.ok,
             "decisions": [asdict(x) for x in res.decisions],
             "drift": res.drift,
             "importance": {"power": res.importance},
@@ -291,10 +354,16 @@ def weekly(
             "quantile_diagnostics": {"power": res.quantiles},
         }
         rel = f"models/weekly/{today.isoformat()}-summary.json"
-        if not led.exists(rel):
-            led.write_raw(
-                rel, (json.dumps(summary, sort_keys=True, indent=1, default=str) + "\n").encode()
-            )
+        attempt = 1
+        while led.exists(rel):
+            attempt += 1
+            rel = f"models/weekly/{today.isoformat()}-{attempt:04d}-summary.json"
+        summary["attempt"] = attempt
+        led.write_raw(
+            rel, (json.dumps(summary, sort_keys=True, indent=1, default=str) + "\n").encode()
+        )
+        if not res.ok:
+            rec.count("weekly_failed_domains", sum(d.error is not None for d in res.decisions))
         log_mlflow(res, mlruns)
     return res
 
@@ -329,4 +398,4 @@ def summaries(ledger: Ledger) -> list[dict[str, Any]]:
     for rel in sorted(ledger.list_files("models/weekly"), reverse=True):
         if rel.endswith("-summary.json"):
             out.append(json.loads(ledger.read_bytes(rel)))
-    return out
+    return sorted(out, key=lambda s: (s["day"], s.get("attempt", 1)), reverse=True)

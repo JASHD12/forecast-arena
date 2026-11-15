@@ -4,8 +4,9 @@ A ledger day is *clean* when all of these hold for it:
 
 - a real (not dry-run) morning run succeeded;
 - no real run failed;
-- at least one health report was recorded and every recorded report passed (a failed
-  report is exactly what opens the `incident` issue, so this also means "no incident");
+- every recorded health report passed;
+- a complete workflow inventory confirms all due work, including deployment, succeeded
+  and no incident was open (missing evidence blocks readiness);
 - the day is sealed into the hash chain.
 
 The official record starts on the day after the first run of `STREAK` consecutive clean
@@ -23,6 +24,7 @@ from typing import Any
 
 from arena.ledger import Ledger, layout
 from arena.models import RunManifest
+from arena.ops.workflow_evidence import audits, workflow_day_reasons
 
 STREAK = 5
 
@@ -63,6 +65,7 @@ def day_statuses(ledger: Ledger, first: date, last: date) -> list[DayStatus]:
     """Clean-day status of every day from `first` to `last`."""
     runs = _by_day(ledger, "runs")
     health = _by_day(ledger, "health")
+    observations = audits(ledger)
     out = []
     d = first
     while d <= last:
@@ -83,6 +86,7 @@ def day_statuses(ledger: Ledger, first: date, last: date) -> list[DayStatus]:
             st.reasons.append("a health check failed (incident)")
         if not ledger.exists(layout.day_seal_path(d)):
             st.reasons.append("day not sealed")
+        st.reasons.extend(workflow_day_reasons(observations, d))
         out.append(st)
         d += timedelta(days=1)
     return out
@@ -147,7 +151,15 @@ def update_official_start(
     rule = rule_start(statuses)
     start = None if rule is None else max(rule, not_before) if not_before else rule
     dec = StartDecision(None, streak, rule, start, statuses=statuses)
-    if write and start is not None and today >= start:
+    # A historical streak must not open the record while today's incident state is
+    # unknown. The observer refreshes this evidence after completed workflows and daily.
+    observations = audits(ledger)
+    current = bool(
+        observations
+        and observations[-1].observed_at.date() == today
+        and not observations[-1].open_incident_numbers
+    )
+    if write and current and start is not None and today >= start:
         payload: dict[str, Any] = {
             "official_start": start.isoformat(),
             "rule_start": rule.isoformat() if rule else None,

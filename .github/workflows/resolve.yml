@@ -1,4 +1,5 @@
 name: resolve
+run-name: "resolve / ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run && 'dry-run' || 'live' }}"
 
 # Resolve what has become resolvable, seal finished days, rebuild the site.
 # Scheduled runs use the stable branch (last commit of main that passed CI); a manual
@@ -86,6 +87,9 @@ jobs:
           git config --global http.https://github.com/.extraheader "AUTHORIZATION: basic $header"
           git config --global user.name forecast-arena-bot
           git config --global user.email forecast-arena-bot@users.noreply.github.com
+      - name: Record application execution identity
+        if: steps.mode.outputs.dry_run == 'false'
+        run: .venv/bin/arena health execution --job resolve --push
       - name: resolve job
         run: |
           if [ "${{ steps.mode.outputs.dry_run }}" = "true" ]; then
@@ -111,7 +115,7 @@ jobs:
           set -o pipefail  # keep the check's exit code through tee
           .venv/bin/arena health check --job resolve --report health.json ${{ (github.event_name == 'workflow_dispatch' && inputs.fail_health) && '--force-fail' || '' }} ${{ steps.mode.outputs.dry_run == 'false' && '--record' || '' }} | tee -a "$GITHUB_STEP_SUMMARY"
       - name: Open, update or close the incident issue
-        if: always()
+        if: always() && steps.mode.outputs.dry_run == 'false'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |

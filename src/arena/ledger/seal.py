@@ -102,10 +102,11 @@ def seal_day(ledger: Ledger, day: date, clock: Clock) -> DaySeal:
     return seal
 
 
-def seal_pending_days(ledger: Ledger, clock: Clock) -> list[DaySeal]:
+def seal_pending_days(ledger: Ledger, clock: Clock, *, before: date | None = None) -> list[DaySeal]:
     """Seal, in order, every finished day from the first ledger day that is not yet sealed.
 
-    Days without files are sealed too, so the chain has no gaps.
+    Days without files are sealed too, so the chain has no gaps. ``before`` excludes an
+    active run's start day even when its work crosses UTC midnight.
     """
     days = [d for d in (layout.day_of(r) for r in ledger.list_files()) if d is not None]
     if not days:
@@ -113,6 +114,8 @@ def seal_pending_days(ledger: Ledger, clock: Clock) -> list[DaySeal]:
     seals = day_seals(ledger)
     start = date.fromordinal(seals[-1].day.toordinal() + 1) if seals else min(days)
     yesterday = date.fromordinal(clock.now().date().toordinal() - 1)
+    if before is not None:
+        yesterday = min(yesterday, date.fromordinal(before.toordinal() - 1))
     written = []
     for ordinal in range(start.toordinal(), yesterday.toordinal() + 1):
         written.append(seal_day(ledger, date.fromordinal(ordinal), clock))

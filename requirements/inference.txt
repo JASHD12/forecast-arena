@@ -1,0 +1,4 @@
+# Runtimes needed to deserialize every family the weekly job can promote.
+# Keep these pins aligned with ml.txt and torch.txt; tuning/tracking extras are unnecessary.
+lightgbm==4.7.0
+-r torch.txt

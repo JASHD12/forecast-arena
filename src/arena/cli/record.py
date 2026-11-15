@@ -3,7 +3,10 @@ official start."""
 
 from __future__ import annotations
 
+import json
+import os
 import sys
+from datetime import date, datetime, timedelta
 from pathlib import Path
 
 import click
@@ -11,6 +14,7 @@ import click
 from arena.cli import (
     Ctx,
     _push,
+    _sync,
     health,
     ledger,
     official,
@@ -35,17 +39,84 @@ def health_check(
     obj: Ctx, job: str, report_path: Path | None, force_fail: bool, record: bool
 ) -> None:
     """Run the health checks against the ledger; exit 1 if any fails."""
-    from arena.ops.health import run_checks
+    from arena.ops.health import expected_forecasters, run_checks
     from arena.ops.official import record_health
 
     now = obj.clock.now()
-    rep = run_checks(obj.ledger, job, now, force_fail=force_fail)
+    rep = run_checks(
+        obj.ledger, job, now, force_fail=force_fail, roster=expected_forecasters(obj.settings)
+    )
+    payload = json.loads(rep.to_json())
+    payload["workflow_run_id"] = os.environ.get("GITHUB_RUN_ID")
+    payload["workflow_attempt"] = os.environ.get("GITHUB_RUN_ATTEMPT")
+    report_json = json.dumps(payload, indent=1)
     click.echo(rep.markdown())
     if report_path is not None:
-        report_path.write_text(rep.to_json(), encoding="utf-8")
+        report_path.write_text(report_json, encoding="utf-8")
     if record:
-        click.echo(f"recorded: {record_health(obj.ledger, rep.to_json(), job, now.date())}")
+        click.echo(f"recorded: {record_health(obj.ledger, report_json, job, now.date())}")
     sys.exit(0 if rep.ok else 1)
+
+
+@health.command("execution")
+@click.option(
+    "--job",
+    required=True,
+    type=click.Choice(["morning", "evening", "resolve", "weekly", "players"]),
+)
+@click.option("--push", is_flag=True)
+@click.pass_obj
+def health_execution(obj: Ctx, job: str, push: bool) -> None:
+    """Publish executed-code identity before the live application setup starts."""
+    from arena.ledger.manifest import code_sha
+    from arena.ops.health import expected_forecasters
+    from arena.ops.workflow_evidence import record_execution
+
+    if obj.dry_run:
+        return
+    remote = _sync(obj, push)
+    now = obj.clock.now()
+    data = {
+        "workflow_run_id": os.environ["GITHUB_RUN_ID"],
+        "workflow_attempt": os.environ["GITHUB_RUN_ATTEMPT"],
+        "job": job,
+        "intended_date": now.date().isoformat(),
+        "started_at": now.isoformat(),
+        "code_sha": code_sha(),
+        "event_sha": os.environ.get("GITHUB_SHA"),
+        "roster": sorted(expected_forecasters(obj.settings)),
+    }
+    click.echo(record_execution(obj.ledger, data, now))
+    _push(obj, remote, "execution", now.date())
+
+
+@health.command("audit-workflows")
+@click.option("--repo", required=True, help="GitHub repository owner/name.")
+@click.option("--days", default=1, type=click.IntRange(1, 30), show_default=True)
+@click.option("--include-created-at", default=None, help="Also reconcile the triggering run's day.")
+@click.option("--push", is_flag=True)
+@click.pass_obj
+def health_audit_workflows(
+    obj: Ctx, repo: str, days: int, include_created_at: str | None, push: bool
+) -> None:
+    """Persist complete workflow outcomes; API/permission errors never mean success."""
+    from arena.ops.workflow_evidence import collect_audit, save_audit
+
+    if obj.dry_run:
+        raise click.UsageError("workflow auditing requires durable evidence; omit --dry-run")
+    remote = _sync(obj, push)
+    now = obj.clock.now()
+    targets: set[date] = {now.date() - timedelta(days=i) for i in range(1, days + 1)}
+    if include_created_at:
+        target = datetime.fromisoformat(include_created_at.replace("Z", "+00:00")).date()
+        if target < now.date():
+            targets.add(target)
+    for day in sorted(targets):
+        audit = collect_audit(
+            obj.ledger, repo, day, now, players_required=bool(obj.settings.players_csv_url)
+        )
+        click.echo(save_audit(obj.ledger, audit))
+    _push(obj, remote, "workflow_audit", now.date())
 
 
 @official.command("update")

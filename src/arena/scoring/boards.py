@@ -58,6 +58,7 @@ class Board:
     days: int
     rows: list[BoardRow] = field(default_factory=list)
     label: str | None = None
+    missing_forecasters: list[str] = field(default_factory=list)
 
 
 def official(scored: Sequence[Scored], start: date | None) -> list[Scored]:
@@ -100,10 +101,13 @@ def board(
     by: dict[str, dict[str, Scored]] = {}
     for s in pool:
         by.setdefault(s.forecaster_id, {})[s.question_id] = s
+    missing = []
     if kind == "common":
-        active = [f for f in group if f in by]
-        qs = sorted(set.intersection(*(set(by[f]) for f in active))) if active else []
-        by = {f: by[f] for f in active}
+        missing = [f for f in group if f not in by]
+        # The registered group is fixed even when a member has no scored forecasts.
+        # An empty member makes the common set empty, rather than changing its meaning.
+        by = {f: by.get(f, {}) for f in group}
+        qs = sorted(set.intersection(*(set(by[f]) for f in group)))
     else:
         qs = sorted(set(by.get(REFERENCE, {})))
         by = {f: v for f, v in by.items() if set(qs) <= set(v)}
@@ -113,6 +117,7 @@ def board(
         sorted(by),
         len(qs),
         len({by[REFERENCE][q].batch_date for q in qs}) if REFERENCE in by else 0,
+        missing_forecasters=missing,
     )
     if qs and REFERENCE in by:
         b.rows = _rows(by, qs)

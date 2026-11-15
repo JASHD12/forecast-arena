@@ -30,5 +30,6 @@ def client_from_settings(settings: Settings) -> LLMClient | None:
             key,
             settings.llm_base_url or "",
             temperature=settings.llm_temperature,
+            retries=0,
         )
     raise ValueError(f"unknown ARENA_LLM_PROVIDER {settings.llm_provider!r}")

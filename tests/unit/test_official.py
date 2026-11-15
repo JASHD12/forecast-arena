@@ -3,12 +3,14 @@ from datetime import UTC, date, datetime, time, timedelta
 
 import pytest
 from factories import forecast, question
+from workflow_fixtures import healthy_audit
 
 from arena.clock import FixedClock
 from arena.ledger import Ledger, LedgerError, layout
 from arena.ledger.manifest import run_manifest
 from arena.ledger.seal import seal_batch, seal_day
 from arena.ops.official import STREAK, day_statuses, record_health, update_official_start
+from arena.ops.workflow_evidence import save_audit
 
 D0 = date(2026, 11, 13)
 
@@ -26,6 +28,7 @@ def _day(led: Ledger, d: date, *, healthy: bool = True, failed_run: bool = False
             raise RuntimeError("boom")
     record_health(led, json.dumps({"ok": healthy, "checks": []}), "morning", d)
     seal_day(led, d, FixedClock(datetime.combine(d + timedelta(days=1), time(3, 30), tzinfo=UTC)))
+    save_audit(led, healthy_audit(d))
 
 
 def _days(led: Ledger, n: int, bad: dict[int, str] | None = None) -> None:
@@ -83,3 +86,18 @@ def test_not_before_gate_only_delays(tmp_path) -> None:
     _days(led2, STREAK)
     dec2 = update_official_start(led2, at(STREAK), not_before=D0)  # earlier gate: no effect
     assert dec2.start == rule and dec2.written
+
+
+def test_current_open_incident_blocks_start_even_after_historical_clean_streak(tmp_path) -> None:
+    led = Ledger(tmp_path)
+    _days(led, STREAK)
+    audit = healthy_audit(D0 + timedelta(days=STREAK - 1), at(STREAK))
+    audit.open_incident_numbers = [7]
+    save_audit(led, audit)
+    dec = update_official_start(led, at(STREAK))
+    assert dec.rule == D0 + timedelta(days=STREAK) and not dec.written
+    assert not led.exists(layout.OFFICIAL_START_PATH)
+    audit.open_incident_numbers = []
+    audit.observed_at += timedelta(seconds=1)
+    save_audit(led, audit)
+    assert update_official_start(led, at(STREAK) + timedelta(seconds=2)).written

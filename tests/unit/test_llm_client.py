@@ -171,7 +171,7 @@ def ok(msg, finish="stop"):
 def test_openai_compatible_text_tools_retry() -> None:
     llm, seen = oai([(503, b"busy"), ok({"role": "assistant", "content": "hi"})])
     r = llm.complete("S", [UserText("q")], max_tokens=300)
-    assert r.text == "hi" and r.usage == Usage(1, 50, 7) and len(seen) == 2
+    assert r.text == "hi" and r.usage == Usage(2, 50, 7, unreported_requests=1) and len(seen) == 2
     url, headers, body = seen[1]
     assert url == "https://llm.example/v1/chat/completions"
     assert headers["Authorization"] == "Bearer k-1"
@@ -336,3 +336,65 @@ def test_structured_schema_has_no_keywords_the_api_rejects() -> None:
     assert sent["additionalProperties"] is False
     assert sent["properties"]["probability"] == {"type": "number"}
     assert "maximum" in _json.dumps(ANSWER_SCHEMA)  # the local grammar keeps the full schema
+
+
+def test_guarded_adapter_retries_cannot_bypass_request_cap() -> None:
+    from arena.llm.budget import BudgetExhausted, BudgetGuard, Caps, GuardedLLM
+
+    inner, seen = oai([(503, b"busy"), ok({"role": "assistant", "content": "hi"})])
+    guard = BudgetGuard(Caps(3, 10000, 50, 4), Usage())
+    llm = GuardedLLM(inner, guard)
+    llm.complete("s", [], max_tokens=50)
+    assert guard.used.requests == 2
+    assert guard.used.unreported_requests == 1
+    assert guard.used.reserved_tokens == 51
+    with pytest.raises(BudgetExhausted, match="request cap"):
+        llm.complete("s", [], max_tokens=50)
+    assert len(seen) == 2
+
+
+def test_guarded_provider_refusal_keeps_reported_usage() -> None:
+    from arena.llm.budget import BudgetGuard, Caps, GuardedLLM
+
+    anthropic_llm, _ = anthropic_with(lambda r: message([], stop="refusal"))
+    compatible, _ = oai([ok({"role": "assistant", "content": ""}, "content_filter")])
+    for inner, expected in [(anthropic_llm, Usage(1, 123, 45)), (compatible, Usage(1, 50, 7))]:
+        guard = BudgetGuard(Caps(10, 10000, 50, 4), Usage())
+        with pytest.raises(LLMRefusal):
+            GuardedLLM(inner, guard).complete("s", [], max_tokens=50)
+        assert guard.used == expected
+
+
+def test_anthropic_sdk_retries_disabled_per_guarded_attempt() -> None:
+    seen = []
+
+    def handler(request):
+        seen.append(request)
+        return httpx2.Response(503, json={"error": {"type": "overloaded_error", "message": "busy"}})
+
+    sdk = anthropic.Anthropic(
+        api_key="test",
+        max_retries=2,
+        http_client=httpx2.Client(transport=httpx2.MockTransport(handler)),
+    )
+    with pytest.raises(LLMError):
+        AnthropicLLM("test", "test", client=sdk).complete("s", [], max_tokens=5)
+    assert len(seen) == 1
+
+
+def test_guarded_failed_retries_and_missing_usage_are_reserved() -> None:
+    from arena.llm.budget import BudgetGuard, Caps, GuardedLLM
+
+    inner, seen = oai([(503, b"busy")] * 3)
+    guard = BudgetGuard(Caps(3, 10000, 50, 4), Usage())
+    with pytest.raises(LLMError):
+        GuardedLLM(inner, guard).complete("s", [], max_tokens=50)
+    assert guard.used == Usage(3, reserved_tokens=153, unreported_requests=3)
+    assert len(seen) == 3
+
+    raw = json.loads(ok({"role": "assistant", "content": "hi"})[1])
+    del raw["usage"]
+    inner, _ = oai([(200, json.dumps(raw).encode())])
+    guard = BudgetGuard(Caps(3, 10000, 50, 4), Usage())
+    GuardedLLM(inner, guard).complete("s", [], max_tokens=50)
+    assert guard.used == Usage(1, reserved_tokens=51, unreported_requests=1)

@@ -5,16 +5,18 @@ move older "Done log" lines to `docs/progress-archive.md`.
 
 ## Now
 
-- Live record (2026-11-14): batch 2026-11-14 sealed by a scheduled run at 06:24 UTC (before
-  the lock) with 24 forecasts: baselines, `llm_plain`, `llm_context`, `agent` (fixed),
-  `llm_local` (open model, first live forecasts) and one `agent_graph` error skip (bug
-  found and fixed; unproven live until the next batch). Next: T182 (smoke-site step in
-  resolve.yml), then the live-board tasks in `status.py` order (T046, T057, T065, T068,
-  T090, T093), then the first real weekly run.
+- Audit repair T193 (2026-11-15): daily ML wiring, isolated/validated weekly evaluation,
+  complete workflow readiness evidence, score/output consistency, budget accounting,
+  midnight safety and executed-code provenance are implemented. Offline checks pass: 600 unit + 7 E2E tests, 89.39% coverage; lint/type checks and
+  offline/live-snapshot site link checks pass. CI and live workflow validation follow. T057 needs the next unsealed morning batch.
+- Live snapshot (2026-11-15): 29 questions (power 6, weather 15, attention 8; markets closed
+  on Sunday), no ML records in the already sealed batch. Weekly run 43695904785 published
+  real power/attention champions. Both load with the repaired runtime; ledger verify --git
+  passes (72 files, 3 batch seals, 3 day seals, 139 forecasts). Never backfill this batch.
 - Scheduling risk (open): GitHub never started the morning slots 00:15-05:15 UTC and the
   first morning run began at 06:20; one lock-critical job still depends on GitHub's
   scheduler. Owner item H20 (external scheduler calling `workflow_dispatch`) is the real
-  fix; until then a session or the 05:45 trigger dispatches `morning.yml` from `main`.
+  fix; until then manual fallback should dispatch the CI-approved `stable` ref.
 - Rehearsal start date: 2026-11-13. Official record start: not set
   (`ARENA_OFFICIAL_START_NOT_BEFORE` is 2099-12-31 until the owner picks a date, T110).
 - Live site URL: https://jashd12.github.io/forecast-arena/
@@ -24,32 +26,12 @@ move older "Done log" lines to `docs/progress-archive.md`.
 
 ## In progress
 
+- T193e: publish the tested repairs, verify CI/stable and run the workflow observer.
+  - Today's champions load successfully; no retraining is needed merely to bootstrap.
+  - Next real ML batch is 2026-11-16; T057 remains WAIT until its pre-lock ledger evidence exists.
+  - Do not backfill the sealed 15 November batch or change the official not-before gate.
 
-## Honesty audit (T171, 2026-11-13)
-
-Every technology named on `stack.html`, `recruiters.html`, `de.html` and `README.md`,
-with the code that uses it and the workflow that runs that code. Status: no open item.
-
-| Technology | Used in | Run by |
-|---|---|---|
-| Python, mypy, ruff, Hypothesis, pydantic, click, Jinja2, numpy, scipy, joblib | `src/arena`, `tests` | CI `check` (`make check`) |
-| DuckDB, Parquet, pandas | `analytics/sql.py` (Parquet via DuckDB `COPY`), `notebooks/explore.ipynb` | CI `check`; notebook in CI `a11y` (`make notebook`) |
-| dbt (dbt-duckdb) | `analytics/dbt/` | CI `dbt` |
-| scikit-learn, LightGBM, Optuna, SHAP, PyTorch | `forecasters/ml_power*.py`, `ops/explain.py` | CI `check` (requirements-ml, -torch); weekly |
-| statsmodels, Chronos-Bolt | `forecasters/ts_bench.py` | CI `check` (Chronos through a fake pipeline); the real model in the committed backtest card only, labelled "backtest only" |
-| MLflow, Evidently | `ops/weekly.py`, `ops/drift.py` | CI `check` (requirements-tracking); weekly |
-| Claude (anthropic SDK) | `llm/anthropic_adapter.py` | CI with mocked HTTP; real calls in morning, llm-eval |
-| LangGraph, fastembed (ONNX) | `agent/graph.py`, `agent/retrieval.py` | CI `check`; morning |
-| llama.cpp (llama-cpp-python), Qwen GGUF | `llm/local.py` | CI with a fake backend; real runtime built in the morning workflow (first live forecasts: T122b) |
-| MCP | `mcp_server.py` | CI `check` (SDK client) |
-| FastAPI, uvicorn | `api/app.py` | CI `check` (TestClient); CI `docker` smoke test |
-| Docker, Kubernetes (kind), Airflow | `Dockerfile`, `deploy/k8s/`, `orchestration/airflow/` | CI `docker`, `kubernetes`, `airflow` (DagBag) |
-| Streamlit | `apps/dashboard/` | CI `check` (AppTest) |
-| Chromium, axe (Playwright) | `tools/a11y/` | CI `a11y` |
-
-Fixed in this audit: `stack.html` said the Parquet files were "ready for pandas, Polars,
-Spark or DuckDB"; the project uses neither Polars nor Spark, so it now names only the
-readers the notebook really uses.
+T171 honesty-audit details are in `docs/progress-archive.md`.
 
 ## Open risks and surprises
 
@@ -72,6 +54,8 @@ readers the notebook really uses.
   output, not acted on (S11).
 
 ## Done log
+
+- 2026-11-15 T193a-d: implemented handoff F1-F9; 600 unit and 7 E2E tests pass, 89.39% coverage; isolated HGB/LightGBM/PyTorch inference CI job; real read-only GitHub audit finds 17 attempts and fails closed on old missing evidence; current ledger and champion loading verified
 
 - 2026-11-14 T182: scripts/smoke_site.py (pages, data files, referenced assets, CSP meta, build age under 26 h) runs after every Pages deploy in morning/evening/resolve; green on a real resolve deploy; `make smoke-site` for manual runs
 - 2026-11-14 T046 (code): weather, attention and markets on by default in morning/evening/resolve, four-domain e2e test; WAIT until the first real evening run publishes them (check set for 16:40 UTC). Lesson: a `#` comment inside `${{ }}` broke all dispatches for ~30 min; tests/unit/test_workflows_syntax.py now guards it

@@ -1,0 +1,70 @@
+name: workflow-evidence
+
+# Observe whole workflows from a separate runner: setup/deploy/smoke failures cannot
+# disappear just because the application never reached its manifest or finalizer.
+on:
+  workflow_run:
+    workflows: [morning, evening, resolve, weekly, players]
+    types: [completed]
+  schedule:
+    - cron: "10 4,12 * * *"
+  workflow_dispatch:
+    inputs:
+      days:
+        description: "Completed UTC days to reconcile (1-30)"
+        type: number
+        default: 7
+
+permissions:
+  contents: write
+  actions: read
+  issues: read
+
+concurrency:
+  group: arena-ledger
+  cancel-in-progress: false
+
+jobs:
+  observe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      GH_TOKEN: ${{ github.token }}
+      ARENA_LEDGER_REMOTE: https://github.com/${{ github.repository }}.git
+      ARENA_OFFICIAL_START_NOT_BEFORE: ${{ vars.ARENA_OFFICIAL_START_NOT_BEFORE || '2099-12-31' }}
+      ARENA_PLAYERS_CSV_URL: ${{ vars.ARENA_PLAYERS_CSV_URL }}
+      REPOSITORY: ${{ github.repository }}
+      AUDIT_DAYS: ${{ inputs.days || '1' }}
+      TRIGGER_CREATED_AT: ${{ github.event.workflow_run.created_at }}
+      OMP_NUM_THREADS: "2"
+    steps:
+      # Never check out or execute artifacts from the triggering run. Only CI-approved
+      # application code observes the API response as data.
+      - uses: actions/checkout@v7
+        with:
+          ref: stable
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements/*.txt
+      - name: Install pinned dependencies
+        run: make setup
+      - name: Let git push the ledger branch with the built-in token
+        env:
+          TOKEN: ${{ github.token }}
+        run: |
+          header=$(printf 'x-access-token:%s' "$TOKEN" | base64 -w0)
+          echo "::add-mask::$header"
+          git config --global http.https://github.com/.extraheader "AUTHORIZATION: basic $header"
+          git config --global user.name forecast-arena-bot
+          git config --global user.email forecast-arena-bot@users.noreply.github.com
+      - name: Reconcile completed days and every run attempt
+        run: |
+          .venv/bin/arena health audit-workflows --repo "$REPOSITORY" --days "$AUDIT_DAYS" \
+            --include-created-at "$TRIGGER_CREATED_AT" --push
+      - name: Evaluate official readiness from complete workflow evidence
+        run: .venv/bin/arena official update --push
+      - name: Verify all append-only evidence
+        run: .venv/bin/arena ledger verify --git

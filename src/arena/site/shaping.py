@@ -20,7 +20,7 @@ from markupsafe import Markup
 
 from arena.ledger import Ledger, layout
 from arena.models import Question, RunManifest
-from arena.scoring.core import Scored, clip
+from arena.scoring.core import Scored, clip, excluded
 from arena.scoring.stats import calibration_bins, expected_calibration_error, murphy
 from arena.site.charts import reliability_svg
 from arena.site.content import (
@@ -100,7 +100,7 @@ def domain_stats(rec: Any) -> list[dict[str, Any]]:
     for q in rec.questions.values():
         d = out.setdefault(q.domain, {"domain": q.domain, "questions": 0, "resolved": 0})
         d["questions"] += 1
-        if q.question_id in rec.resolutions:
+        if q.question_id in rec.resolutions and not excluded(rec, q.question_id):
             d["resolved"] += 1
     return [out[k] for k in sorted(out)]
 
@@ -150,9 +150,10 @@ def _rows(questions: Sequence[Question], rec: Any) -> tuple[list[dict[str, Any]]
         fids.add(f.forecaster_id)
     rows = []
     for q in questions:
-        r = rec.resolutions.get(q.question_id)
         v = rec.voids.get(q.question_id)
-        state = f"void ({v.reason_code})" if v is not None and r is None else "open"
+        is_excluded = excluded(rec, q.question_id)
+        r = None if is_excluded else rec.resolutions.get(q.question_id)
+        state = f"void ({v.reason_code})" if v is not None and is_excluded else "open"
         rows.append(
             {
                 "qid": q.question_id,

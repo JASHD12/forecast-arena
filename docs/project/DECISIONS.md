@@ -996,3 +996,27 @@ Ideas outside the specification. The agent lists them here and does not build th
   the CI notebook run if it disagrees with DuckDB. Pinned in `requirements/nb.txt` only
   (notebook extra; not in the core lock), installed by the CI a11y job that runs
   `make notebook`.
+
+
+## 2026-11-15 Audit repairs (T193)
+
+The owner requested implementation of the audited handoff. Preserve ledger bytes,
+question meanings, clipping/statistical thresholds, the promotion rule and the owner-controlled
+official not-before date. Repair missing execution paths and enforce the registered coverage
+and evidence requirements. Do not backfill historical ML forecasts.
+
+- ML inference uses each domain's promoted champion; unavailable or invalid artifacts produce
+  explicit skips. Candidate inference failures disqualify that candidate on the fixed evaluation
+  population instead of deleting questions for healthy models.
+- Missing required common-set members make the headline incomplete. Hypotheses with absent
+  comparisons or inconclusive evidence remain undecided; no equivalence margin is introduced.
+- Public SQL exports omit excluded resolutions but retain source revisions' first outcomes,
+  matching the canonical scorer. APIs preserve that outcome and expose revision diagnostics.
+- Provider refusals carry structured usage to the guard. Unreported attempts reserve their
+  estimated input plus full output cap in a separately named reserved_tokens field, while
+  unreported_requests distinguishes this from provider-reported zero usage. Cache and reserved
+  tokens count after restarts. Production adapters disable hidden retries; explicit compatible
+  adapter retries reserve allowance for all possible attempts and report actual attempts.
+- Workflow completion evidence is recorded independently from application manifests so missing
+  setup/finalization and deployment failures cannot be assumed healthy. Historical ledger
+  records remain readable and are never rewritten to add new fields.

@@ -86,3 +86,23 @@ Filled in per source by T023, T040, T042, T044.
   published by midday of X+1). `arena.sources.wikimedia.pageviews_available_at`.
 - **ECB fixing** of day X: available from 17:00 Europe/Berlin on X (published ~16:00 CET).
   `arena.sources.ecb.fixing_available_at`.
+
+
+## 2026-11-15 Audit repair verification
+
+- Anthropic Python SDK documents automatic retries and the per-request
+  `client.with_options(max_retries=0)` override:
+  https://github.com/anthropics/anthropic-sdk-python#retries . Production requests disable
+  hidden retries so each guarded attempt consumes an observable request allowance (T193d).
+- Chat Completions returns prompt/completion token usage on the completion object:
+  https://developers.openai.com/api/reference/resources/chat . The compatible adapter retains
+  these reported fields on content-filter refusals and distinguishes absent usage from zero.
+- GitHub workflow-run completion events fire regardless of workflow conclusion; the observer
+  executes CI-approved stable code, never artifacts from a triggering run:
+  https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#workflow_run .
+- GitHub REST exposes individual run attempts and per-attempt jobs/steps, allowing failed
+  attempts to remain visible after a successful rerun:
+  https://docs.github.com/en/rest/actions/workflow-runs#get-a-workflow-run-attempt and
+  https://docs.github.com/en/rest/actions/workflow-jobs#list-jobs-for-a-workflow-run-attempt .
+- GitHub CLI supports `gh api --paginate --slurp` to collect complete JSON pages:
+  https://cli.github.com/manual/gh_api . Incomplete or inaccessible evidence blocks readiness.

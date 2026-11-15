@@ -59,3 +59,57 @@ def test_usage_summed_across_runs_of_the_day(tmp_path) -> None:
     guard = BudgetGuard(Caps(4, 10_000, 50, 4), usage_from_manifests(led, date(2026, 11, 12)))
     with pytest.raises(BudgetExhausted):
         guard.check(10, 50)
+
+
+def test_cached_and_reserved_usage_survives_restart(tmp_path) -> None:
+    led = Ledger(tmp_path)
+    clock = FixedClock(datetime(2026, 11, 12, 6, tzinfo=UTC))
+    usage = Usage(2, 10, 5, 900, 100, reserved_tokens=40, unreported_requests=1)
+    with run_manifest(led, "morning", date(2026, 11, 12), clock) as rec:
+        rec.add_llm_usage(**usage.as_dict())
+    assert usage_from_manifests(led, date(2026, 11, 12)) == usage
+    guard = BudgetGuard(Caps(10, 1100, 50, 4), usage)
+    with pytest.raises(BudgetExhausted, match="token cap"):
+        guard.check(10, 50)
+
+
+def test_refusal_usage_consumes_allowance_once(tmp_path) -> None:
+    from arena.llm.client import LLMRefusal
+
+    fake = FakeLLM([LLMRefusal("refused", usage=Usage(1, 123, 45))])
+    with run_manifest(
+        Ledger(tmp_path),
+        "morning",
+        date(2026, 11, 12),
+        FixedClock(datetime(2026, 11, 12, 6, tzinfo=UTC)),
+    ) as rec:
+        guard = BudgetGuard(Caps(1, 10000, 50, 4), Usage(), rec)
+        llm = GuardedLLM(fake, guard)
+        with pytest.raises(LLMRefusal):
+            llm.complete("s", [], max_tokens=50)
+        with pytest.raises(BudgetExhausted, match="request cap"):
+            llm.complete("s", [], max_tokens=50)
+        assert guard.used == Usage(1, 123, 45)
+        assert len(fake.calls) == 1
+        assert rec.llm_usage == Usage(1, 123, 45).as_dict()
+
+
+def test_unknown_usage_reserves_tokens_and_persists_failure(tmp_path) -> None:
+    from arena.llm.client import LLMError
+
+    led = Ledger(tmp_path)
+    with (
+        pytest.raises(LLMError),
+        run_manifest(
+            led,
+            "morning",
+            date(2026, 11, 12),
+            FixedClock(datetime(2026, 11, 12, 6, tzinfo=UTC)),
+        ) as rec,
+    ):
+        guard = BudgetGuard(CAPS, Usage(), rec)
+        GuardedLLM(FakeLLM([LLMError("timeout")]), guard).complete("s", [], max_tokens=50)
+    used = usage_from_manifests(led, date(2026, 11, 12))
+    assert used.requests == used.unreported_requests == 1
+    assert used.input_tokens == used.output_tokens == 0
+    assert used.reserved_tokens == 51

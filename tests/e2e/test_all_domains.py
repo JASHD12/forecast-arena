@@ -71,6 +71,12 @@ def test_four_domains_evening_then_morning_then_verify(tmp_path) -> None:
     m = morning(led, BATCH, clock, doms, fcs)
     assert "questions" not in m.written  # the evening already published every domain
     recs = [x for _, x in led.iter_family("forecasts")]
+    expected = {"base_rate", "persistence", "ml", "llm_plain", "llm_context", "agent"}
+    assert {f.forecaster_id for f in fcs} == expected
+    assert {(r.question_id, r.forecaster_id) for r in recs} == {
+        (q.question_id, fid) for q in qs for fid in expected
+    }
+    assert len(recs) == len(qs) * len(expected)
     forecasts = [x for x in recs if isinstance(x, Forecast)]
     base = {f.question_id for f in forecasts if f.forecaster_id == "base_rate"}
     assert base == {q.question_id for q in qs}  # the base rate answers every question
@@ -78,5 +84,12 @@ def test_four_domains_evening_then_morning_then_verify(tmp_path) -> None:
     assert {q.domain for q in qs if q.question_id in sampled} == set(by_domain)  # per domain
     reasons = {x.reason_code for x in recs if isinstance(x, Skip)}
     assert reasons <= {"not_sampled", "model_missing"}, reasons
+    ml = {r.question_id: r for r in recs if r.forecaster_id == "ml"}
+    for q in qs:
+        if q.domain in {"weather", "markets"}:
+            assert isinstance(ml[q.question_id], Forecast)
+        else:
+            assert isinstance(ml[q.question_id], Skip)
+            assert ml[q.question_id].reason_code == "model_missing"
     rep = verify(led)
     assert rep.ok, rep.summary()

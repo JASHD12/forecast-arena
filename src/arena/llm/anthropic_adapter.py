@@ -48,6 +48,7 @@ class AnthropicLLM:
     """`LLMClient` for the Anthropic Messages API."""
 
     provider = "anthropic"
+    max_attempts = 1
 
     def __init__(
         self,
@@ -129,7 +130,7 @@ class AnthropicLLM:
                 for t in tools
             ]
         try:
-            msg = self.client.messages.create(**kwargs)
+            msg = self.client.with_options(max_retries=0).messages.create(**kwargs)
         except anthropic.APIStatusError as exc:
             raise LLMError(f"anthropic HTTP {exc.status_code}: {exc.message}") from exc
         except anthropic.APIConnectionError as exc:
@@ -143,7 +144,7 @@ class AnthropicLLM:
             int(getattr(u, "cache_creation_input_tokens", None) or 0),
         )
         if msg.stop_reason == "refusal":
-            raise LLMRefusal(f"model declined (usage {usage.as_dict()})")
+            raise LLMRefusal("model declined", usage=usage)
         text = "".join(b.text for b in msg.content if b.type == "text")
         calls = tuple(
             ToolCall(b.id, b.name, dict(b.input)) for b in msg.content if b.type == "tool_use"

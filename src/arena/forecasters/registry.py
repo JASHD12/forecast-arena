@@ -102,12 +102,25 @@ def versions(ledger: Ledger, domain: str) -> list[str]:
     return sorted(out)
 
 
-def current_version(ledger: Ledger, domain: str) -> str | None:
-    """The version named by the latest promotion, or None."""
+def current_version(ledger: Ledger, domain: str, *, asof: datetime | None = None) -> str | None:
+    """The latest promotion visible at `asof` (all promotions when omitted)."""
     files = sorted(ledger.list_files(f"models/{domain}/promotions"))
-    if not files:
-        return None
-    return str(json.loads(ledger.read_bytes(files[-1]))["version"])
+    for rel in reversed(files):
+        promotion = json.loads(ledger.read_bytes(rel))
+        at = datetime.fromisoformat(promotion["promoted_at"])
+        if at.tzinfo is None or promotion["domain"] != domain:
+            raise RegistryError(f"invalid promotion for {domain}: {rel}")
+        if asof is None or at <= asof:
+            return str(promotion["version"])
+    return None
+
+
+def model_info(ledger: Ledger, domain: str, version: str) -> ModelInfo:
+    """Read the metadata identifying a registered artifact."""
+    meta = json.loads(ledger.read_bytes(f"{_dir(domain, version)}/metadata.json"))
+    if meta["domain"] != domain or meta["version"] != version:
+        raise RegistryError(f"metadata identity mismatch for {domain}/{version}")
+    return ModelInfo(domain, version, str(meta["artefact_sha256"]), meta)
 
 
 def load(ledger: Ledger, domain: str, version: str) -> Any:
@@ -116,10 +129,17 @@ def load(ledger: Ledger, domain: str, version: str) -> Any:
     if not ledger.exists(f"{d}/{ARTEFACT}"):
         raise RegistryError(f"no artefact for {domain}/{version}")
     blob = ledger.read_bytes(f"{d}/{ARTEFACT}")
-    meta = json.loads(ledger.read_bytes(f"{d}/metadata.json"))
-    if hashlib.sha256(blob).hexdigest() != meta["artefact_sha256"]:
+    info = model_info(ledger, domain, version)
+    if hashlib.sha256(blob).hexdigest() != info.sha256:
         raise RegistryError(f"artefact hash mismatch for {domain}/{version}")
-    return joblib.load(io.BytesIO(blob))
+    model = joblib.load(io.BytesIO(blob))
+    if (
+        getattr(model, "version", None) != version
+        or not callable(getattr(model, "probability", None))
+        or not callable(getattr(model, "model_hash", None))
+    ):
+        raise RegistryError(f"invalid model interface or version for {domain}/{version}")
+    return model
 
 
 def load_current(ledger: Ledger, domains: list[str]) -> dict[str, Any]:

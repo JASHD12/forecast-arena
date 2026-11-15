@@ -17,7 +17,7 @@ from typing import Any, Literal
 
 from arena.analytics.sql import connect as sql_connect
 from arena.ledger import Ledger
-from arena.scoring.core import Record, leaderboard, load
+from arena.scoring.core import Record, excluded, leaderboard, load
 from arena.site.titles import domain_name, forecaster_name, plain_title
 
 MAX_ROWS = 200
@@ -47,6 +47,7 @@ def _question_row(rec: Record, qid: str) -> dict[str, Any]:
     q = rec.questions[qid]
     res = rec.resolutions.get(qid)
     void = rec.voids.get(qid)
+    is_excluded = excluded(rec, qid)
     return {
         "question_id": qid,
         "title": plain_title(q),
@@ -54,8 +55,11 @@ def _question_row(rec: Record, qid: str) -> dict[str, Any]:
         "batch_date": q.batch_date.isoformat(),
         "target_date": q.target_date.isoformat(),
         "lock_time": q.lock_time.isoformat(),
-        "status": "void" if void else "resolved" if res else "open",
-        "outcome": None if res is None else ("YES" if res.outcome else "NO"),
+        "status": "void" if is_excluded else "resolved" if res else "open",
+        "outcome": None if res is None or is_excluded else ("YES" if res.outcome else "NO"),
+        "revision_reason": "source_revised"
+        if void is not None and void.reason_code == "source_revised"
+        else None,
     }
 
 

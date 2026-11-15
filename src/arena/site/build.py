@@ -32,7 +32,7 @@ from arena.models import Question
 from arena.ops.official import STREAK, update_official_start
 from arena.ops.weekly import summaries as weekly_summaries
 from arena.scoring.boards import MIN_DAYS, all_boards, official
-from arena.scoring.core import counts, load
+from arena.scoring.core import counts, excluded, load
 from arena.scoring.findings import findings, power_table
 from arena.site.api import ENDPOINTS, build_api
 from arena.site.cards_page import challenger_backtests, headline_backtest, load_cards
@@ -200,6 +200,10 @@ def build_site(
     changelog = version_changelog(rec)
     fids = sorted({f.forecaster_id for f in rec.forecasts} | {s.forecaster_id for s in rec.skips})
     profiles = [profile(fid, rec, FORECASTER_NAMES, changelog, urows, info) for fid in fids]
+    cards = load_cards(models_dir)
+    card_stems = {card["stem"] for card in cards}
+    for p in profiles:
+        p["cards"] = [(label, path) for label, path in p["cards"] if Path(path).stem in card_stems]
     game_payload = json.dumps({**game, "names": FORECASTER_NAMES}, sort_keys=True)
     # A JSON data block is never executed; "</" is escaped so it cannot end the element.
     game_json = Markup(game_payload.replace("</", "<\\/"))
@@ -325,7 +329,7 @@ def build_site(
             },
         ),
         "evals.html": ("LLM evals", {"runs": eval_runs(evals_dir)}),
-        "backtests.html": ("Backtests", {"cards": load_cards(models_dir)}),
+        "backtests.html": ("Backtests", {"cards": cards}),
         "api.html": ("JSON API", {"endpoints": ENDPOINTS}),
         "de.html": (
             "Auf Deutsch",
@@ -437,7 +441,7 @@ def build_site(
         sk = sorted(
             (s for s in rec.skips if s.question_id == q.question_id), key=lambda s: s.forecaster_id
         )
-        res_q = rec.resolutions.get(q.question_id)
+        res_q = None if excluded(rec, q.question_id) else rec.resolutions.get(q.question_id)
         html_text = qtpl.render(
             title=plain_title(q),
             scores=question_scores(fs, None if res_q is None else res_q.outcome),
@@ -446,7 +450,7 @@ def build_site(
             q=q,
             forecasts=fs,
             skips=sk,
-            resolution=rec.resolutions.get(q.question_id),
+            resolution=res_q,
             void=rec.voids.get(q.question_id),
             before_lock=clock.now() < q.lock_time,
             traces=qtraces.get(q.question_id, []),

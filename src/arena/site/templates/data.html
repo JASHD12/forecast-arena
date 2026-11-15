@@ -13,7 +13,7 @@
 {% if dashboard_url %}<p><a class="btn btn-accent" href="{{ dashboard_url }}">Open the interactive dashboard</a> <span class="note">(Streamlit, hosted separately; reads these same files)</span></p>{% endif %}
 <p>Prefer JSON? The same data is available as a small static <a href="api.html">JSON API</a> with schemas.</p>
 <h2>Data dictionary</h2>
-<p class="note">Every column of every file. Probabilities are stored exactly as published; scores clip them to [0.01, 0.99]. Voided questions have no resolution row.</p>
+<p class="note">Every column of every file. Probabilities are stored exactly as published; scores clip them to [0.01, 0.99]. Questions excluded by a void have no resolution row. A source revision keeps the first resolution and its score; revision warnings remain visible on the question page and in the JSON API. The original ledger retains every resolution and void.</p>
 {% for table, cols in dictionary.items() %}<h3><code>{{ table }}.parquet</code></h3>
 <div class="table-scroll" tabindex="0" role="region" aria-label="Columns of {{ table }}"><table>
 <thead><tr><th scope="col">Column</th><th scope="col">Type</th><th scope="col">Meaning</th></tr></thead>

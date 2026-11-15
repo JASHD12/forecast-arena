@@ -21,6 +21,7 @@ _DATED_JSONL = re.compile(
 )
 _RUN = re.compile(r"^runs/(\d{4})/(\d{2})/(\d{2})-[a-z0-9_]+-\d+\.json$")
 _HEALTH = re.compile(r"^health/(\d{4})/(\d{2})/(\d{2})-[a-z0-9_]+-\d+\.json$")
+_WORKFLOW = re.compile(r"^workflow_(?:audits|executions)/(\d{4})/(\d{2})/(\d{2})/.+\.json$")
 _SNAPSHOT = re.compile(r"^snapshots/[a-z0-9_]+/(\d{4})/(\d{2})/(\d{2})/.+$")
 _BATCH_SEAL = re.compile(r"^chain/batch/(\d{4})-(\d{2})-(\d{2})\.json$")
 _DAY_SEAL = re.compile(r"^chain/day/(\d{4})-(\d{2})-(\d{2})\.json$")
@@ -93,7 +94,7 @@ def family_of(path: str) -> str | None:
 
 def day_of(path: str) -> date | None:
     """The ledger day a file belongs to, for day sealing. Day seals themselves: None."""
-    for pattern in (_DATED_JSONL, _RUN, _HEALTH, _SNAPSHOT, _BATCH_SEAL):
+    for pattern in (_DATED_JSONL, _RUN, _HEALTH, _WORKFLOW, _SNAPSHOT, _BATCH_SEAL):
         m = pattern.match(path)
         if m:
             y, mo, d = (int(g) for g in m.groups()[-3:])

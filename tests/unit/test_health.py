@@ -7,7 +7,13 @@ from arena.clock import FixedClock
 from arena.ledger import Ledger, layout
 from arena.ledger.seal import seal_batch
 from arena.models import Skip
-from arena.ops.health import INCIDENT_LABEL, INCIDENT_TITLE, run_checks, sync_incident
+from arena.ops.health import (
+    CORE_FORECASTERS,
+    INCIDENT_LABEL,
+    INCIDENT_TITLE,
+    run_checks,
+    sync_incident,
+)
 
 AFTER_LOCK = datetime(2026, 11, 12, 12, 30, tzinfo=UTC)
 
@@ -16,7 +22,9 @@ def _ledger(tmp_path, seal_at=datetime(2026, 11, 12, 5, 35, tzinfo=UTC), skips=(
     led = Ledger(tmp_path / "l")
     q = question()
     led.append(layout.questions_path(B), [q])
-    led.append(layout.forecasts_path(B), [forecast(q), *skips])
+    led.append(
+        layout.forecasts_path(B), [*[forecast(q, fid) for fid in sorted(CORE_FORECASTERS)], *skips]
+    )
     seal_batch(led, B, FixedClock(seal_at))
     return led, q
 

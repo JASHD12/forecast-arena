@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from arena.scoring.core import Record
+from arena.scoring.core import Record, excluded
 from arena.site.titles import plain_title
 from arena.sources.brightsky import ATTRIBUTION as WX_ATTRIBUTION
 from arena.sources.brightsky import LICENCE as WX_LICENCE
@@ -77,7 +77,9 @@ def topic(domain: str, rec: Record) -> dict[str, Any]:
         "terms": terms,
         "url": url,
         "n_questions": len(qs),
-        "n_resolved": sum(1 for q in qs if q.question_id in rec.resolutions),
+        "n_resolved": sum(
+            1 for q in qs if q.question_id in rec.resolutions and not excluded(rec, q.question_id)
+        ),
         "kinds": [
             {**k, "title": plain_title(k["example"]), "rule": k["example"].resolution_rule}
             for k in sorted(kinds.values(), key=lambda k: k["template"])

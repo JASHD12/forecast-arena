@@ -2,14 +2,24 @@ import json
 import random
 from datetime import date, timedelta
 
+import pytest
 from factories import question
 
 from arena.ledger import Ledger, layout
 from arena.models import Evidence, Forecast, Resolution
+from arena.scoring.boards import COMMON_GROUP
 from arena.scoring.cv import cv_lines
 
 
-def fill(led: Ledger, days: int, per_day: int, ml_skill: float, start: date) -> None:
+def fill(
+    led: Ledger,
+    days: int,
+    per_day: int,
+    ml_skill: float,
+    start: date,
+    *,
+    omit: str | None = None,
+) -> None:
     rng = random.Random(1)
     for d in range(days):
         b = start + timedelta(days=d)
@@ -18,7 +28,10 @@ def fill(led: Ledger, days: int, per_day: int, ml_skill: float, start: date) -> 
         fs, rs = [], []
         for q in qs:
             y = int(rng.random() < 0.5)
-            for fid, sk in (("base_rate", 0.0), ("ml", ml_skill)):
+            for fid in COMMON_GROUP:
+                if fid == omit:
+                    continue
+                sk = ml_skill if fid == "ml" else 0.0
                 fs.append(
                     Forecast(
                         forecast_id=f"{q.question_id}::{fid}",
@@ -64,3 +77,12 @@ def test_no_win_without_interval_excluding_zero(tmp_path) -> None:
     fill(led, days=35, per_day=10, ml_skill=0.0, start=date(2026, 1, 1))
     text = "\n".join(cv_lines(led))
     assert "beat base_rate" not in text and "no supported difference" in text
+
+
+@pytest.mark.parametrize("missing", ["ml", "agent"])
+def test_missing_registered_member_cannot_produce_a_cv_win(tmp_path, missing) -> None:
+    led = Ledger(tmp_path)
+    fill(led, days=35, per_day=10, ml_skill=0.3, start=date(2026, 1, 1), omit=missing)
+    text = "\n".join(cv_lines(led))
+    assert "Headline (common set, official record): 0 questions" in text
+    assert "too early to tell" in text and "beat base_rate" not in text

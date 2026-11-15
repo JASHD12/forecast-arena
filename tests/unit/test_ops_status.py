@@ -105,3 +105,26 @@ def test_run_start_times_measure_delay_from_the_first_slot(tmp_path) -> None:
     e = next(r for r in rows if r.job == "evening")
     assert e.late_by == timedelta(hours=2) and e.after_lock is None
     assert run_start_times(Ledger(tmp_path / "empty"), day) == []
+
+
+def test_usage_status_matches_guard_including_cache_and_reservations(tmp_path) -> None:
+    from arena.clock import FixedClock
+    from arena.ledger.manifest import run_manifest
+    from arena.llm.budget import usage_from_manifests
+
+    led = Ledger(tmp_path)
+    with run_manifest(
+        led, "morning", B, FixedClock(datetime.combine(B, datetime.min.time(), UTC))
+    ) as rec:
+        rec.add_llm_usage(
+            requests=2,
+            input_tokens=10,
+            output_tokens=5,
+            cache_read_tokens=100,
+            cache_write_tokens=20,
+            reserved_tokens=50,
+            unreported_requests=1,
+        )
+    row = llm_usage(led, B, days=1)[0]
+    assert row.total == usage_from_manifests(led, B).total_tokens == 185
+    assert row.cached_tokens == 120 and row.reserved_tokens == 50 and row.unreported_requests == 1

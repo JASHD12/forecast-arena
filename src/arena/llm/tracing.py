@@ -20,7 +20,7 @@ from dataclasses import asdict, dataclass, field
 from typing import Any
 
 from arena.clock import Clock
-from arena.llm.client import LLMClient, LLMResponse, ToolSpec, Turn, UserText
+from arena.llm.client import LLMClient, LLMError, LLMResponse, ToolSpec, Turn, Usage, UserText
 
 _SCOPE: contextvars.ContextVar[tuple[str, str, str]] = contextvars.ContextVar(
     "arena_llm_scope", default=("", "", "")
@@ -132,8 +132,17 @@ class TracingLLM:
             resp = self.inner.complete(system, turns, max_tokens=max_tokens, tools=tools)
         except Exception as exc:
             ms = round((self.clock.now() - start).total_seconds() * 1000, 1)
+            usage = (exc.usage if isinstance(exc, LLMError) else None) or Usage()
             self.tracer.spans.append(
-                Span(**base, duration_ms=ms, error=f"{type(exc).__name__}: {exc}"[:200])
+                Span(
+                    **base,
+                    duration_ms=ms,
+                    error=f"{type(exc).__name__}: {exc}"[:200],
+                    input_tokens=usage.input_tokens,
+                    output_tokens=usage.output_tokens,
+                    cache_read_tokens=usage.cache_read_tokens,
+                    cache_write_tokens=usage.cache_write_tokens,
+                )
             )
             raise
         ms = round((self.clock.now() - start).total_seconds() * 1000, 1)

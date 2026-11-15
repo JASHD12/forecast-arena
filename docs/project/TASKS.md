@@ -215,7 +215,8 @@ Keep the first line of each task in exactly this shape; the status script parses
   - Done when: `mypy src/arena` reports no issues and runs in `make check`.
 - [x] T045m · Quantile diagnostics and site round 4 (owner request 2026-11-12) (deps: T045k)
   - Done when: tests cover pinball loss, coverage, the forest plot and the About page.
-- [!] T046 · Enable the new domains (live) (deps: T041, T043, T045, T034) WAIT(until=2026-11-15)
+- [x] T046 · Enable the new domains (live) (deps: T041, T043, T045, T034)
+  - Verified 2026-11-15: 29 questions across power/weather/attention; markets closed Sunday; ledger verification passes.
   - Do: extend the e2e test to all four domains, then enable them in the live config.
   - Done when: the next real morning run writes questions for all applicable domains and
     verify passes. If that run has not happened yet, mark `WAIT(until=<date>)`.
@@ -251,7 +252,8 @@ Keep the first line of each task in exactly this shape; the status script parses
   - Do: `weekly.yml` per section 12: retrain, compare, promote by rule, model card, MLflow
     file-backed run with a published summary.
   - Done when: a `dry_run=true` dispatch succeeds and prints the promotion decision.
-- [ ] T057 · Enable the ML forecaster (live) (deps: T056, T046)
+- [!] T057 · Enable the ML forecaster (live) (deps: T056, T046) WAIT(until=2026-11-16)
+  - T193a implements activation; the already sealed 15 November batch is immutable. Verify the next actual pre-lock batch.
   - Do: turn on `ml` in the live config after the e2e test includes it (models: power,
     attention from the registry; weather `WeatherRules`, markets `MarketsModel`, crypto
     `CryptoModel`).
@@ -593,3 +595,23 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
 - [x] T191 · Polars notebook section and OpenTelemetry export (deps: T138, T123)
   - Done when: the notebook runs in CI with a Polars section; spans export as OTLP JSON
     validated by a test; the stack page names both only after that.
+
+
+## Audit repair (owner request 2026-11-15)
+
+- [x] T193a · Live ML wiring and safe weekly evaluation (handoff F1/F2; completes code for T057)
+  - Done when: production factory always includes ML, artifact/runtime failures are explicit
+    per-domain skips, every promotable family survives fresh-process inference, and invalid
+    candidates cannot score or remove healthy comparisons. T057 still requires a real batch.
+- [x] T193b · Durable workflow evidence, coverage health, midnight safety and provenance (F3/F8/F9)
+  - Done when: setup/deployment failures and missing evidence cannot count as a clean day;
+    evening health persists; roster checks catch absent ML; midnight and executed-SHA tests pass.
+- [x] T193c · Registered comparison coverage and public scoring consistency (F4/F5/F6)
+  - Done when: missing members cannot shrink the headline group; hypotheses require sufficient
+    evidence; canonical/SQL/API/Parquet eligibility agrees for ordinary, void and revised outcomes.
+- [x] T193d · Durable conservative LLM accounting (F7)
+  - Done when: refusals, unknown usage and retry attempts consume allowance; cache/reservation
+    fields survive manifest restoration; mocked provider and restart regression tests pass.
+- [ ] T193e · Integrate and verify audit repairs live (deps: T193a, T193b, T193c, T193d)
+  - Done when: make check/site-e2e and CI pass; stable uses the verified code; live registry
+    publication and the next actual pre-lock ML batch are verified with immutable run references.

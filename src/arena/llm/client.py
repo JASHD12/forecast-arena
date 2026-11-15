@@ -14,7 +14,11 @@ from typing import Any, Protocol
 
 
 class LLMError(Exception):
-    """The provider call failed (after the adapter's own retries)."""
+    """A failed provider call, carrying reported usage when it is known."""
+
+    def __init__(self, message: str, *, usage: Usage | None = None) -> None:
+        super().__init__(message)
+        self.usage = usage
 
 
 class LLMRefusal(LLMError):
@@ -49,6 +53,9 @@ class Usage:
     #: T190: prompt-cache reads and writes, reported separately by providers that cache.
     cache_read_tokens: int = 0
     cache_write_tokens: int = 0
+    # Conservative token reservations for attempts without provider-reported usage.
+    reserved_tokens: int = 0
+    unreported_requests: int = 0
 
     @property
     def total_tokens(self) -> int:
@@ -59,6 +66,7 @@ class Usage:
             + self.output_tokens
             + self.cache_read_tokens
             + self.cache_write_tokens
+            + self.reserved_tokens
         )
 
     def __add__(self, other: Usage) -> Usage:
@@ -68,6 +76,8 @@ class Usage:
             self.output_tokens + other.output_tokens,
             self.cache_read_tokens + other.cache_read_tokens,
             self.cache_write_tokens + other.cache_write_tokens,
+            self.reserved_tokens + other.reserved_tokens,
+            self.unreported_requests + other.unreported_requests,
         )
 
     def as_dict(self) -> dict[str, int]:
@@ -80,6 +90,9 @@ class Usage:
         if self.cache_read_tokens or self.cache_write_tokens:
             out["cache_read_tokens"] = self.cache_read_tokens
             out["cache_write_tokens"] = self.cache_write_tokens
+        if self.reserved_tokens or self.unreported_requests:
+            out["reserved_tokens"] = self.reserved_tokens
+            out["unreported_requests"] = self.unreported_requests
         return out
 
 

@@ -1,5 +1,6 @@
 {% macro board_table(b, caption) %}
 <p class="note">{{ caption }}. {{ b.questions }} questions on {{ b.days }} days{% if b.forecasters %}; forecasters: {{ b.forecasters|join(", ") }}{% endif %}.{% if b.label %} <span class="label">{{ b.label }}</span>{% endif %}</p>
+{% if b.missing_forecasters %}<p class="note">Incomplete common set: no scored forecasts from {{ b.missing_forecasters|join(", ") }} in this scope. All registered members are required for the headline comparison.</p>{% endif %}
 <div class="table-scroll" tabindex="0" role="region" aria-label="Table (scrolls sideways on small screens)"><table class="board">
 <thead><tr><th scope="col">Forecaster</th><th scope="col" class="num">n</th><th scope="col" class="num">Brier</th><th scope="col"><span class="sr-only">Brier bar, </span>lower is better</th><th scope="col" class="num">95% interval</th><th scope="col" class="num">Log score</th><th scope="col" class="num">Brier vs base_rate</th><th scope="col">Reading</th></tr></thead>
 <tbody>

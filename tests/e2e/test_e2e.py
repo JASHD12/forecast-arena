@@ -81,7 +81,10 @@ def test_five_days_offline(tmp_path) -> None:
     assert led.exists(layout.agent_traces_path(FIRST))
     assert len(llm["llm_plain"]) == 3 * DAYS
     skips = [r for _, r in led.iter_family("forecasts") if isinstance(r, Skip)]
-    assert {s.reason_code for s in skips} == {"not_sampled"}
+    assert {s.reason_code for s in skips} == {"not_sampled", "model_missing"}
+    missing_ml = [s for s in skips if s.forecaster_id == "ml"]
+    assert {s.question_id for s in missing_ml} == {q.question_id for q in qs}
+    assert all(s.reason_code == "model_missing" for s in missing_ml)
     assert {r.question_id for r in rs} == {q.question_id for q in qs}
     for d in range(DAYS):
         assert led.exists(layout.batch_seal_path(FIRST + timedelta(days=d)))

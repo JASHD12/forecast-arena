@@ -44,6 +44,23 @@ jobs:
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
 
+  ml-inference:
+    # The morning environment must load every promotable artifact without training extras.
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Install the morning inference runtimes
+        run: |
+          make setup
+          .venv/bin/pip install -r requirements/inference.txt
+          .venv/bin/python -c "import lightgbm, torch"
+      - name: Publish models then forecast in fresh processes
+        run: .venv/bin/python -m pytest tests/e2e/test_ml_inference.py
+
   a11y:
     needs: check
     runs-on: ubuntu-latest

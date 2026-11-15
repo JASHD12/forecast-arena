@@ -15,7 +15,7 @@ from typing import Any
 
 import duckdb
 
-from arena.scoring.core import CLIP_HIGH, CLIP_LOW
+from arena.scoring.core import CLIP_HIGH, CLIP_LOW, Record, excluded
 
 TABLES: dict[str, str] = {
     "questions": (
@@ -114,7 +114,9 @@ COLUMN_DOCS: dict[str, dict[str, str]] = {
     },
     "resolutions": {
         "question_id": "Which question",
-        "outcome": "1 = YES, 0 = NO (the first recorded resolution)",
+        "outcome": (
+            "1 = YES, 0 = NO (first resolution; excluded voids omitted, source revisions kept)"
+        ),
         "observed_value": "The measured value the outcome was computed from",
     },
     "skips": {
@@ -132,8 +134,8 @@ def _insert(con: duckdb.DuckDBPyConnection, table: str, rows: list[tuple[Any, ..
         con.executemany(f"INSERT INTO {table} VALUES ({marks})", rows)
 
 
-def connect(rec: Any) -> duckdb.DuckDBPyConnection:
-    """An in-memory DuckDB database holding the ledger's tables."""
+def connect(rec: Record) -> duckdb.DuckDBPyConnection:
+    """Ledger tables, with only scoring-eligible first resolutions in `resolutions`."""
     con = duckdb.connect(":memory:")
     for name, cols in TABLES.items():
         con.execute(f"CREATE TABLE {name} ({cols})")
@@ -166,7 +168,11 @@ def connect(rec: Any) -> duckdb.DuckDBPyConnection:
     _insert(
         con,
         "resolutions",
-        [(r.question_id, r.outcome, r.observed_value) for r in rec.resolutions.values()],
+        [
+            (r.question_id, r.outcome, r.observed_value)
+            for r in rec.resolutions.values()
+            if not excluded(rec, r.question_id)
+        ],
     )
     _insert(
         con,

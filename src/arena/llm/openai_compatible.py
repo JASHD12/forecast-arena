@@ -69,6 +69,7 @@ class OpenAICompatibleLLM:
         self.temperature = temperature
         self.post = post
         self.retries = retries
+        self.max_attempts = retries + 1
 
     def sampling(self) -> dict[str, Any]:
         """Temperature actually sent."""
@@ -119,7 +120,9 @@ class OpenAICompatibleLLM:
         headers = {"Content-Type": "application/json", "Authorization": f"Bearer {self.api_key}"}
         data = json.dumps(body).encode()
         status, raw = 0, b""
-        for _ in range(self.retries + 1):
+        attempts = 0
+        for _ in range(self.max_attempts):
+            attempts += 1
             try:
                 status, raw = self.post(self.url, headers, data)
             except (OSError, TimeoutError, HttpError) as exc:
@@ -128,13 +131,23 @@ class OpenAICompatibleLLM:
             if status not in (408, 409, 429) and status < 500:
                 break
         if status != 200:
-            raise LLMError(f"openai_compatible HTTP {status}: {raw[:200]!r}")
+            raise LLMError(
+                f"openai_compatible HTTP {status}: {raw[:200]!r}",
+                usage=Usage(requests=attempts, unreported_requests=attempts),
+            )
+        usage = Usage(requests=attempts, unreported_requests=attempts)
         try:
             doc = json.loads(raw)
             choice = doc["choices"][0]
             msg = choice["message"]
             u = doc.get("usage") or {}
-            usage = Usage(1, int(u.get("prompt_tokens", 0)), int(u.get("completion_tokens", 0)))
+            if "prompt_tokens" in u and "completion_tokens" in u:
+                usage = Usage(
+                    attempts,
+                    int(u["prompt_tokens"]),
+                    int(u["completion_tokens"]),
+                    unreported_requests=attempts - 1,
+                )
             calls = []
             for tc in msg.get("tool_calls") or []:
                 try:
@@ -143,9 +156,9 @@ class OpenAICompatibleLLM:
                     args = {"_unparseable_arguments": tc["function"]["arguments"]}
                 calls.append(ToolCall(tc["id"], tc["function"]["name"], args))
         except (KeyError, IndexError, TypeError, ValueError) as exc:
-            raise LLMError(f"malformed chat-completions response: {exc}") from exc
+            raise LLMError(f"malformed chat-completions response: {exc}", usage=usage) from exc
         if choice.get("finish_reason") == "content_filter":
-            raise LLMRefusal("content filtered by the provider")
+            raise LLMRefusal("content filtered by the provider", usage=usage)
         raw_msg = {"role": "assistant", "content": msg.get("content")}
         if msg.get("tool_calls"):
             raw_msg["tool_calls"] = msg["tool_calls"]

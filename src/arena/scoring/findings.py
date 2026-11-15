@@ -24,6 +24,7 @@ HYPOTHESES = {
     "H4": "The ensemble is at least as good as the best single forecaster.",
 }
 LLMS = ("llm_plain", "llm_context", "agent")
+NUMERIC_DOMAINS = frozenset({"power", "weather"})
 TOO_EARLY = "too early to tell"
 SUPPORTED, CONTRADICTED, UNDECIDED = "supported", "contradicted", "not decided by the data"
 
@@ -36,15 +37,17 @@ class Comparison:
     b: str
     n: int
     interval: Interval
+    domains: tuple[str, ...] = ()
 
     def sentence(self) -> str:
         """Plain description; 'lower' only when the interval excludes zero."""
         iv = self.interval
         nums = f"{iv.estimate:+.4f} [{iv.low:+.4f}, {iv.high:+.4f}], n = {self.n}"
+        scope = f" on {', '.join(self.domains)}" if self.domains else ""
         if not iv.excludes_zero:
-            return f"{self.a} vs {self.b}: no supported difference in Brier score ({nums})."
+            return f"{self.a} vs {self.b}{scope}: no supported difference in Brier score ({nums})."
         better = self.a if iv.estimate < 0 else self.b
-        return f"{self.a} vs {self.b}: {better} had the lower Brier score ({nums})."
+        return f"{self.a} vs {self.b}{scope}: {better} had the lower Brier score ({nums})."
 
 
 @dataclass
@@ -83,7 +86,7 @@ def compare(
         [fb[q].probability for q in qs],
         [fa[q].outcome for q in qs],
     )
-    return Comparison(a, b, len(qs), iv)
+    return Comparison(a, b, len(qs), iv, tuple(sorted({fa[q].domain for q in qs})))
 
 
 def findings(scored: Sequence[Scored], official_days: int) -> list[Finding]:
@@ -100,11 +103,22 @@ def findings(scored: Sequence[Scored], official_days: int) -> list[Finding]:
         ]
     out = []
     # H1: ml beats each LLM forecaster on power and weather.
-    cs = [c for f in LLMS if (c := compare(scored, "ml", f, {"power", "weather"}))]
-    out.append(_all_better("H1", cs, "ml"))
+    cs = []
+    missing = []
+    for f in LLMS:
+        c = compare(scored, "ml", f, set(NUMERIC_DOMAINS))
+        if c is None:
+            missing.append(f"ml vs {f}")
+            continue
+        cs.append(c)
+        absent_domains = NUMERIC_DOMAINS - set(c.domains)
+        if absent_domains:
+            missing.append(f"ml vs {f} on {', '.join(sorted(absent_domains))}")
+    # Keep the registered pooled comparison; coverage is a prerequisite, not a new test.
+    out.append(_all_better("H1", cs, missing))
     # H2: agent beats ml on attention.
     c = compare(scored, "agent", "ml", {"attention"})
-    out.append(_all_better("H2", [c] if c else [], "agent"))
+    out.append(_all_better("H2", [c] if c else []))
     # H3: no forecaster beats base_rate on markets `up`.
     others = sorted({s.forecaster_id for s in scored if s.domain == "markets"} - {"base_rate"})
     cs = [c for f in others if (c := compare(scored, f, "base_rate", {"markets"}, {"up"}))]
@@ -112,14 +126,16 @@ def findings(scored: Sequence[Scored], official_days: int) -> list[Finding]:
         out.append(Finding("H3", HYPOTHESES["H3"], UNDECIDED, note="no comparable forecasts"))
     else:
         beats = [c for c in cs if c.interval.excludes_zero and c.interval.estimate < 0]
+        all_worse = len(cs) == len(others) and all(c.interval.low > 0 for c in cs)
         out.append(
             Finding(
                 "H3",
                 HYPOTHESES["H3"],
-                CONTRADICTED if beats else SUPPORTED,
+                CONTRADICTED if beats else SUPPORTED if all_worse else UNDECIDED,
                 cs,
-                "Supported here means: no forecaster's advantage over the base "
-                "rate has an interval that excludes zero.",
+                "Support requires every observed competitor to have a paired interval "
+                "entirely above zero against the base rate. An inconclusive or missing "
+                "comparison does not establish that nobody beats it.",
             )
         )
     # H4: ensemble not worse than the best single forecaster.
@@ -129,26 +145,29 @@ def findings(scored: Sequence[Scored], official_days: int) -> list[Finding]:
         out.append(Finding("H4", HYPOTHESES["H4"], UNDECIDED, note="the ensemble is not active"))
     else:
         worse = [c for c in cs if c.interval.excludes_zero and c.interval.estimate > 0]
+        all_better = len(cs) == len(singles) and all(c.interval.high < 0 for c in cs)
         out.append(
             Finding(
                 "H4",
                 HYPOTHESES["H4"],
-                CONTRADICTED if worse else SUPPORTED,
+                CONTRADICTED if worse else SUPPORTED if all_better else UNDECIDED,
                 cs,
-                "Supported here means: no single forecaster is better than the "
-                "ensemble with an interval that excludes zero.",
+                "Support requires the ensemble's paired interval against every observed "
+                "single forecaster to lie entirely below zero. Inconclusive or missing "
+                "comparisons do not establish equivalence or noninferiority.",
             )
         )
     return out
 
 
-def _all_better(key: str, cs: list[Comparison], who: str) -> Finding:
+def _all_better(key: str, cs: list[Comparison], missing: Sequence[str] = ()) -> Finding:
+    note = "Missing comparable forecasts: " + "; ".join(missing) + "." if missing else ""
     if not cs:
-        return Finding(key, HYPOTHESES[key], UNDECIDED, note="no comparable forecasts yet")
+        return Finding(key, HYPOTHESES[key], UNDECIDED, note=note or "no comparable forecasts yet")
     wins = [c.interval.excludes_zero and c.interval.estimate < 0 for c in cs]
     losses = [c.interval.excludes_zero and c.interval.estimate > 0 for c in cs]
-    status = SUPPORTED if all(wins) else CONTRADICTED if any(losses) else UNDECIDED
-    return Finding(key, HYPOTHESES[key], status, cs)
+    status = CONTRADICTED if any(losses) else SUPPORTED if all(wins) and not missing else UNDECIDED
+    return Finding(key, HYPOTHESES[key], status, cs, note)
 
 
 #: Pairs whose comparison decides a hypothesis, then fallbacks while `ml` is not live.

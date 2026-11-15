@@ -1,0 +1,384 @@
+{
+ "conformal": {
+  "power": [
+   {
+    "conformal80": 0.643,
+    "conformal90": 0.929,
+    "margin80": 0.12,
+    "margin90": 0.34,
+    "n_cal": 28,
+    "n_eval": 28,
+    "raw80": 0.643,
+    "raw90": 0.929,
+    "stat": "mean"
+   },
+   {
+    "conformal80": 0.893,
+    "conformal90": 1.0,
+    "margin80": 0.94,
+    "margin90": 49.44,
+    "n_cal": 28,
+    "n_eval": 28,
+    "raw80": 0.857,
+    "raw90": 0.893,
+    "stat": "max"
+   },
+   {
+    "conformal80": 0.857,
+    "conformal90": 0.964,
+    "margin80": 1.02,
+    "margin90": 2.96,
+    "n_cal": 28,
+    "n_eval": 28,
+    "raw80": 0.75,
+    "raw90": 0.893,
+    "stat": "min"
+   },
+   {
+    "conformal80": 0.893,
+    "conformal90": 0.786,
+    "margin80": 3.99,
+    "margin90": -3.14,
+    "n_cal": 28,
+    "n_eval": 28,
+    "raw80": 0.75,
+    "raw90": 0.929,
+    "stat": "spread"
+   },
+   {
+    "conformal80": 0.893,
+    "conformal90": 0.893,
+    "margin80": 7.88,
+    "margin90": 0.34,
+    "n_cal": 28,
+    "n_eval": 28,
+    "raw80": 0.821,
+    "raw90": 0.893,
+    "stat": "evening"
+   }
+  ]
+ },
+ "day": "2026-11-15",
+ "decisions": [
+  {
+   "best_family": "lgbm",
+   "brier_candidate": 0.10534384750520383,
+   "brier_current": null,
+   "candidate_version": "attention-lgbc-r1-2026-10-10",
+   "candidates": [
+    {
+     "brier": 0.106738,
+     "error": null,
+     "family": "hgb",
+     "n": 224,
+     "params": {},
+     "version": "attention-hgb-r1-2026-10-10"
+    },
+    {
+     "brier": 0.105344,
+     "error": null,
+     "family": "lgbm",
+     "n": 224,
+     "params": {},
+     "version": "attention-lgbc-r1-2026-10-10"
+    }
+   ],
+   "current_version": null,
+   "domain": "attention",
+   "n": 224,
+   "promoted": "attention-lgbc-r1-2026-11-07",
+   "reason": "promoted attention-lgbc-r1-2026-11-07 (first model; family lgbm)",
+   "window_first": "2026-10-16",
+   "window_last": "2026-11-12"
+  },
+  {
+   "best_family": "hgb",
+   "brier_candidate": 0.13950686466104695,
+   "brier_current": null,
+   "candidate_version": "power-gbq-r1-2026-10-15",
+   "candidates": [
+    {
+     "brier": 0.139507,
+     "error": null,
+     "family": "hgb",
+     "n": 168,
+     "params": {},
+     "version": "power-gbq-r1-2026-10-15"
+    },
+    {
+     "brier": 0.143346,
+     "error": null,
+     "family": "lgbm",
+     "n": 168,
+     "params": {
+      "learning_rate": 0.012595210983287145,
+      "min_child_samples": 59,
+      "n_estimators": 376,
+      "num_leaves": 54,
+      "reg_lambda": 0.008163153181226028
+     },
+     "version": "power-lgbq-r1-2026-10-15"
+    },
+    {
+     "brier": 0.139617,
+     "error": null,
+     "family": "mlp",
+     "n": 168,
+     "params": {
+      "epochs": 400,
+      "hidden": 64,
+      "lr": 0.001,
+      "weight_decay": 0.0001
+     },
+     "version": "power-mlpq-r1-2026-10-15"
+    }
+   ],
+   "current_version": null,
+   "domain": "power",
+   "n": 168,
+   "promoted": "power-gbq-r1-2026-11-12",
+   "reason": "promoted power-gbq-r1-2026-11-12 (first model; family hgb)",
+   "window_first": "2026-10-16",
+   "window_last": "2026-11-12"
+  }
+ ],
+ "drift": [
+  {
+   "domain": "power",
+   "metric": "DriftedColumnsCount(drift_share=0.5)",
+   "value": "count=26, share=0.897"
+  },
+  {
+   "domain": "power",
+   "metric": "ValueDrift(column=season_sin,method=K-S p_value,threshold=0.05)",
+   "value": "2.709e-16"
+  },
+  {
+   "domain": "power",
+   "metric": "ValueDrift(column=season_cos,method=K-S p_value,threshold=0.05)",
+   "value": "7.666e-09"
+  },
+  {
+   "domain": "power",
+   "metric": "ValueDrift(column=gap_days,method=Z-test p_value,threshold=0.05)",
+   "value": "1"
+  },
+  {
+   "domain": "power",
+   "metric": "ValueDrift(column=mean_last,method=K-S p_value,threshold=0.05)",
+   "value": "4.101e-15"
+  },
+  {
+   "domain": "power",
+   "metric": "ValueDrift(column=mean_mean7,method=K-S p_value,threshold=0.05)",
+   "value": "6.625e-17"
+  },
+  {
+   "domain": "power",
+   "metric": "ValueDrift(column=mean_median28,method=K-S p_value,threshold=0.05)",
+   "value": "2.498e-36"
+  },
+  {
+   "domain": "power",
+   "metric": "ValueDrift(column=mean_std7,method=K-S p_value,threshold=0.05)",
+   "value": "0.0004565"
+  },
+  {
+   "domain": "power",
+   "metric": "ValueDrift(column=mean_week_ago,method=K-S p_value,threshold=0.05)",
+   "value": "6.927e-11"
+  },
+  {
+   "domain": "power",
+   "metric": "ValueDrift(column=max_last,method=K-S p_value,threshold=0.05)",
+   "value": "2.177e-13"
+  },
+  {
+   "domain": "power",
+   "metric": "ValueDrift(column=max_mean7,method=K-S p_value,threshold=0.05)",
+   "value": "1.761e-15"
+  },
+  {
+   "domain": "power",
+   "metric": "ValueDrift(column=max_median28,method=K-S p_value,threshold=0.05)",
+   "value": "6.227e-34"
+  },
+  {
+   "domain": "power",
+   "metric": "ValueDrift(column=max_std7,method=K-S p_value,threshold=0.05)",
+   "value": "0.002767"
+  },
+  {
+   "domain": "power",
+   "metric": "ValueDrift(column=max_week_ago,method=K-S p_value,threshold=0.05)",
+   "value": "8.647e-11"
+  },
+  {
+   "domain": "power",
+   "metric": "ValueDrift(column=min_last,method=K-S p_value,threshold=0.05)",
+   "value": "7.422e-14"
+  },
+  {
+   "domain": "power",
+   "metric": "ValueDrift(column=min_mean7,method=K-S p_value,threshold=0.05)",
+   "value": "3.033e-15"
+  },
+  {
+   "domain": "power",
+   "metric": "ValueDrift(column=min_median28,method=K-S p_value,threshold=0.05)",
+   "value": "1.376e-21"
+  },
+  {
+   "domain": "power",
+   "metric": "ValueDrift(column=min_std7,method=K-S p_value,threshold=0.05)",
+   "value": "0.01592"
+  },
+  {
+   "domain": "power",
+   "metric": "ValueDrift(column=min_week_ago,method=K-S p_value,threshold=0.05)",
+   "value": "1.132e-08"
+  },
+  {
+   "domain": "power",
+   "metric": "ValueDrift(column=spread_last,method=K-S p_value,threshold=0.05)",
+   "value": "0.1391"
+  },
+  {
+   "domain": "power",
+   "metric": "ValueDrift(column=spread_mean7,method=K-S p_value,threshold=0.05)",
+   "value": "0.002494"
+  },
+  {
+   "domain": "power",
+   "metric": "ValueDrift(column=spread_median28,method=K-S p_value,threshold=0.05)",
+   "value": "0.0001148"
+  },
+  {
+   "domain": "power",
+   "metric": "ValueDrift(column=spread_std7,method=K-S p_value,threshold=0.05)",
+   "value": "0.01943"
+  },
+  {
+   "domain": "power",
+   "metric": "ValueDrift(column=spread_week_ago,method=K-S p_value,threshold=0.05)",
+   "value": "0.1139"
+  },
+  {
+   "domain": "power",
+   "metric": "ValueDrift(column=evening_last,method=K-S p_value,threshold=0.05)",
+   "value": "2.869e-18"
+  },
+  {
+   "domain": "power",
+   "metric": "ValueDrift(column=evening_mean7,method=K-S p_value,threshold=0.05)",
+   "value": "3.242e-22"
+  },
+  {
+   "domain": "power",
+   "metric": "ValueDrift(column=evening_median28,method=K-S p_value,threshold=0.05)",
+   "value": "4.622e-35"
+  },
+  {
+   "domain": "power",
+   "metric": "ValueDrift(column=evening_std7,method=K-S p_value,threshold=0.05)",
+   "value": "2.553e-05"
+  },
+  {
+   "domain": "power",
+   "metric": "ValueDrift(column=evening_week_ago,method=K-S p_value,threshold=0.05)",
+   "value": "3.81e-13"
+  },
+  {
+   "domain": "power",
+   "metric": "ValueDrift(column=prediction_mean_median,method=K-S p_value,threshold=0.05)",
+   "value": "1.196e-17"
+  }
+ ],
+ "dry_run": false,
+ "importance": {
+  "power": [
+   {
+    "feature": "evening_last",
+    "mae_increase": 18.6953,
+    "std": 2.3972
+   },
+   {
+    "feature": "mean_last",
+    "mae_increase": 14.2491,
+    "std": 1.8875
+   },
+   {
+    "feature": "min_last",
+    "mae_increase": 6.5211,
+    "std": 1.3241
+   },
+   {
+    "feature": "weekday_0",
+    "mae_increase": 4.8077,
+    "std": 1.996
+   },
+   {
+    "feature": "spread_std7",
+    "mae_increase": 1.6756,
+    "std": 0.4843
+   },
+   {
+    "feature": "weekday_5",
+    "mae_increase": 1.2046,
+    "std": 0.7102
+   },
+   {
+    "feature": "max_last",
+    "mae_increase": 1.1613,
+    "std": 1.2828
+   },
+   {
+    "feature": "min_week_ago",
+    "mae_increase": 0.6224,
+    "std": 0.279
+   }
+  ]
+ },
+ "quantile_diagnostics": {
+  "power": [
+   {
+    "coverage80": 0.643,
+    "coverage90": 0.929,
+    "n": 28,
+    "pinball": 8.592,
+    "stat": "mean"
+   },
+   {
+    "coverage80": 0.857,
+    "coverage90": 0.893,
+    "n": 28,
+    "pinball": 14.607,
+    "stat": "max"
+   },
+   {
+    "coverage80": 0.75,
+    "coverage90": 0.893,
+    "n": 28,
+    "pinball": 9.255,
+    "stat": "min"
+   },
+   {
+    "coverage80": 0.75,
+    "coverage90": 0.929,
+    "n": 28,
+    "pinball": 13.306,
+    "stat": "spread"
+   },
+   {
+    "coverage80": 0.821,
+    "coverage90": 0.893,
+    "n": 28,
+    "pinball": 13.921,
+    "stat": "evening"
+   }
+  ]
+ },
+ "shap": {
+  "power": []
+ }
+}

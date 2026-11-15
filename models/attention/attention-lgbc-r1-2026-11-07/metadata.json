@@ -1,0 +1,44 @@
+{
+ "artefact_bytes": 122684,
+ "artefact_sha256": "ad59dbe9a6f8ddcbf232d8f22241dffe92abcf62fb59b22f3d91bf9a454d7df0",
+ "code_sha": "aa411b1eb6e7e232c6aec3290ad65216d58afdb4",
+ "created_at": "2026-11-15T08:46:26.313107+00:00",
+ "domain": "attention",
+ "evaluation": {
+  "best_family": "lgbm",
+  "brier_candidate": 0.10534384750520383,
+  "brier_current": null,
+  "candidate_version": "attention-lgbc-r1-2026-10-10",
+  "candidates": [
+   {
+    "brier": 0.106738,
+    "error": null,
+    "family": "hgb",
+    "n": 224,
+    "params": {},
+    "version": "attention-hgb-r1-2026-10-10"
+   },
+   {
+    "brier": 0.105344,
+    "error": null,
+    "family": "lgbm",
+    "n": 224,
+    "params": {},
+    "version": "attention-lgbc-r1-2026-10-10"
+   }
+  ],
+  "current_version": null,
+  "domain": "attention",
+  "n": 224,
+  "promoted": null,
+  "reason": "",
+  "window_first": "2026-10-16",
+  "window_last": "2026-11-12"
+ },
+ "package_versions": {
+  "click": "8.5.0",
+  "forecast-arena": "0.1.0",
+  "pydantic": "2.13.5"
+ },
+ "version": "attention-lgbc-r1-2026-11-07"
+}

@@ -1,0 +1,63 @@
+{
+ "artefact_bytes": 3057436,
+ "artefact_sha256": "c767e096bc316608d0ad4911039a0f19da4a9182cf92e6d368e2307b87efc280",
+ "code_sha": "aa411b1eb6e7e232c6aec3290ad65216d58afdb4",
+ "created_at": "2026-11-15T08:51:44.216850+00:00",
+ "domain": "power",
+ "evaluation": {
+  "best_family": "hgb",
+  "brier_candidate": 0.13950686466104695,
+  "brier_current": null,
+  "candidate_version": "power-gbq-r1-2026-10-15",
+  "candidates": [
+   {
+    "brier": 0.139507,
+    "error": null,
+    "family": "hgb",
+    "n": 168,
+    "params": {},
+    "version": "power-gbq-r1-2026-10-15"
+   },
+   {
+    "brier": 0.143346,
+    "error": null,
+    "family": "lgbm",
+    "n": 168,
+    "params": {
+     "learning_rate": 0.012595210983287145,
+     "min_child_samples": 59,
+     "n_estimators": 376,
+     "num_leaves": 54,
+     "reg_lambda": 0.008163153181226028
+    },
+    "version": "power-lgbq-r1-2026-10-15"
+   },
+   {
+    "brier": 0.139617,
+    "error": null,
+    "family": "mlp",
+    "n": 168,
+    "params": {
+     "epochs": 400,
+     "hidden": 64,
+     "lr": 0.001,
+     "weight_decay": 0.0001
+    },
+    "version": "power-mlpq-r1-2026-10-15"
+   }
+  ],
+  "current_version": null,
+  "domain": "power",
+  "n": 168,
+  "promoted": null,
+  "reason": "",
+  "window_first": "2026-10-16",
+  "window_last": "2026-11-12"
+ },
+ "package_versions": {
+  "click": "8.5.0",
+  "forecast-arena": "0.1.0",
+  "pydantic": "2.13.5"
+ },
+ "version": "power-gbq-r1-2026-11-12"
+}

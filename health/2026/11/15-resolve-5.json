@@ -1,0 +1,44 @@
+{
+ "job": "resolve",
+ "at": "2026-11-15T23:02:38.002392+00:00",
+ "ok": false,
+ "checks": [
+  {
+   "name": "batch_sealed",
+   "ok": true,
+   "detail": "29 questions sealed at 06:37 UTC"
+  },
+  {
+   "name": "nothing_overdue",
+   "ok": true,
+   "detail": "none"
+  },
+  {
+   "name": "sources_fresh",
+   "ok": true,
+   "detail": "4 domain(s) fresh"
+  },
+  {
+   "name": "forecaster_coverage",
+   "ok": false,
+   "detail": "expected 174 forecast-or-skip pairs; missing/duplicate: attention-views_ge-dewiki.Gremium_MC-2026-11-16-v2::ml, attention-views_ge-dewiki.Martinstag-2026-11-16-v2::ml, attention-views_ge-dewiki.Nvidia-2026-11-16-v2::ml, attention-views_ge-dewiki.Teilungsvertrag_zu_Hildburghausen-2026-11-16-v2::ml, attention-views_ge-enwiki.Archive_of_Our_Own-2026-11-16-v2::ml"
+  },
+  {
+   "name": "ml_available",
+   "ok": true,
+   "detail": "0 ML model_missing/error skips"
+  },
+  {
+   "name": "parse_failures",
+   "ok": true,
+   "detail": "0 of 39 LLM answers unparseable (0%)"
+  },
+  {
+   "name": "ledger_verify",
+   "ok": true,
+   "detail": "ledger verify: PASS: 91 files, 3 batch seals, 3 day seals, 139 forecasts checked"
+  }
+ ],
+ "workflow_run_id": "43772524162",
+ "workflow_attempt": "1"
+}

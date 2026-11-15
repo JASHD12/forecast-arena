@@ -8,7 +8,7 @@ move older "Done log" lines to `docs/progress-archive.md`.
 - Audit repair T193 (2026-11-15): daily ML wiring, isolated/validated weekly evaluation,
   complete workflow readiness evidence, score/output consistency, budget accounting,
   midnight safety and executed-code provenance are implemented. Offline checks pass: 600 unit + 7 E2E tests, 89.39% coverage; lint/type checks and
-  offline/live-snapshot site link checks pass. CI and live workflow validation follow. T057 needs the next unsealed morning batch.
+  offline/live-snapshot site link checks pass. CI, isolated inference, stable promotion, workflow observer and Pages deploy/smoke are verified. T057 needs the next unsealed morning batch.
 - Live snapshot (2026-11-15): 29 questions (power 6, weather 15, attention 8; markets closed
   on Sunday), no ML records in the already sealed batch. Weekly run 43695904785 published
   real power/attention champions. Both load with the repaired runtime; ledger verify --git
@@ -16,7 +16,7 @@ move older "Done log" lines to `docs/progress-archive.md`.
 - Scheduling risk (open): GitHub never started the morning slots 00:15-05:15 UTC and the
   first morning run began at 06:20; one lock-critical job still depends on GitHub's
   scheduler. Owner item H20 (external scheduler calling `workflow_dispatch`) is the real
-  fix; until then manual fallback should dispatch the CI-approved `stable` ref.
+  fix; manual deploy fallback uses `main` only after checking it equals CI-approved `stable`.
 - Rehearsal start date: 2026-11-13. Official record start: not set
   (`ARENA_OFFICIAL_START_NOT_BEFORE` is 2099-12-31 until the owner picks a date, T110).
 - Live site URL: https://jashd12.github.io/forecast-arena/
@@ -26,10 +26,12 @@ move older "Done log" lines to `docs/progress-archive.md`.
 
 ## In progress
 
-- T193e: publish the tested repairs, verify CI/stable and run the workflow observer.
-  - Today's champions load successfully; no retraining is needed merely to bootstrap.
-  - Next real ML batch is 2026-11-16; T057 remains WAIT until its pre-lock ledger evidence exists.
-  - Do not backfill the sealed 15 November batch or change the official not-before gate.
+- T193e / T057: WAIT until 2026-11-16 for the first actual pre-lock ML batch.
+  - Repair code 5cfebf0 passed CI 43737672954 and promotion 43738753112; main/stable matched.
+  - Observer 43739000811 passed; resolve 43739259441 deployed Pages and passed smoke.
+  - Resolve health correctly fails only forecaster_coverage (today's immutable batch lacks ML).
+  - Ledger verifies at 86d650a (83 files, 3 batch/day seals, 139 forecasts). Full evidence:
+    `docs/project/AUDIT_REPAIR_VALIDATION.md`. Never backfill the 15 November batch.
 
 T171 honesty-audit details are in `docs/progress-archive.md`.
 
@@ -92,6 +94,11 @@ T171 honesty-audit details are in `docs/progress-archive.md`.
 - 2026-11-13 T132: forecaster profile pages (what it sees, model cards, score over time vs base rate, calibration, best/worst calls, skips, LLM usage, version history) linked from the leaderboard
 
 ## Session summaries
+
+- 2026-11-15 T193: all nine handoff repair areas implemented and pushed; 600 unit + 7 E2E
+  tests, 89.39% coverage, CI/stable and live observer verified. Pages deploy/smoke succeeds;
+  current-batch missing ML now surfaces as a failed health check. First real ML forecasts
+  still require 16 November's unsealed batch; no old ledger bytes or official gate changed.
 
 - 2026-11-12 (session 2, cloud sandbox with GitHub, PyPI and the data sources reachable
   through a personal environment `forecast-arena`): built T021-T029, T040-T045, T050-T056,

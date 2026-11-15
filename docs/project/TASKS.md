@@ -612,6 +612,7 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
 - [x] T193d · Durable conservative LLM accounting (F7)
   - Done when: refusals, unknown usage and retry attempts consume allowance; cache/reservation
     fields survive manifest restoration; mocked provider and restart regression tests pass.
-- [ ] T193e · Integrate and verify audit repairs live (deps: T193a, T193b, T193c, T193d)
+- [!] T193e · Integrate and verify audit repairs live (deps: T193a, T193b, T193c, T193d) WAIT(until=2026-11-16)
+  - CI/stable, live observer and Pages deploy/smoke verified on 2026-11-15; see AUDIT_REPAIR_VALIDATION.md. Only next-batch ML evidence remains.
   - Done when: make check/site-e2e and CI pass; stable uses the verified code; live registry
     publication and the next actual pre-lock ML batch are verified with immutable run references.

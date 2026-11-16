@@ -1,7 +1,11 @@
 {% extends "base.html" %}
 {% from "macros.html" import page_head %}
 {% block content %}
-{{ page_head("For recruiters", "Forecast Arena in 60 seconds", "A live benchmark that asks whether AI agents beat classical machine learning at forecasting tomorrow. Designed and directed by me, implemented together with an AI coding agent; every claim on this site is computed from the public record and can be checked.") }}
+<section class="hero"><p class="kicker">Jashdeep Singh · Werkstudent AI / Machine Learning / Data Science</p>
+<h1>Python forecasting, evaluated in public.</h1><p>Forecast Arena compares classical models and LLM agents using forecasts published before outcomes are known.</p>
+{% if backtest %}<p><strong>Electricity backtest: {{ backtest.days }} days.</strong> {% for fid, value, numeric in backtest.rows %}{{ fname(fid) }} {{ value }}{% if not loop.last %} · {% endif %}{% endfor %} <a href="backtests.html#card-power">View model scores, paired comparisons and limitations</a>.</p>{% endif %}
+<p class="actions"><a class="btn" href="backtests.html{% if backtest %}#card-power{% endif %}">View the evidence</a> <a class="btn btn-ghost" href="{{ repo_url }}">Read the code</a></p>
+<p class="note">AI-assisted development. The project was specified and directed by its owner and implemented with AI coding agents. Personal contributions and recruitment details require owner confirmation.</p></section>
 <div class="kpis">
 <div class="kpi"><span class="kpi-n">{{ k.questions }}</span><span class="kpi-l">questions asked</span></div>
 <div class="kpi"><span class="kpi-n">{{ k.forecasts }}</span><span class="kpi-l">forecasts published before the answer</span></div>
@@ -9,7 +13,7 @@
 <div class="kpi"><span class="kpi-n">{{ k.days }}</span><span class="kpi-l">days of data</span></div>
 </div>
 <section class="card" aria-labelledby="r-what"><h2 id="r-what">What it is</h2>
-<p>Every day the system publishes yes/no questions about the near future from public data (electricity prices first), the evening before they lock. Baselines, a gradient-boosting model, LLM forecasters and two LLM agents each publish a probability <strong>before</strong> the answer exists, into an append-only, hash-chained public record. The next day the answers arrive and every forecast is scored with proper scoring rules. It runs entirely on GitHub Actions and Pages for about one US dollar a month of AI usage.</p>
+<p>Every day the system publishes yes/no questions about the near future from public data (electricity prices first), the evening before they lock. Baselines, a gradient-boosting model, LLM forecasters and two LLM agents each publish a probability <strong>before</strong> the answer exists, into an append-only, hash-chained public record. The next day the answers arrive and every forecast is scored with proper scoring rules. It runs entirely on GitHub Actions and Pages under hard token and request caps; recorded usage and list-price estimates appear on the LLM observability page.</p>
 <p><strong>Measured so far:</strong> see the <a href="backtests.html">backtests</a> (a year of replayed past days, clearly labelled as not live), the <a href="evals.html">LLM evaluation</a> (it found and fixed a real bug) and the <a href="leaderboard.html">live leaderboard</a>, which says "too early to tell" until the statistics can decide.</p>
 </section>
 <section class="card" aria-labelledby="r-five"><h2 id="r-five">Five things worth 30 seconds</h2>

@@ -14,6 +14,7 @@ Licence: CC BY 4.0, attribution "Bundesnetzagentur | SMARD.de".
 from __future__ import annotations
 
 import json
+import math
 from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
 from datetime import UTC, date, datetime, time, timedelta
@@ -91,7 +92,11 @@ def parse_chunk(payload: object) -> tuple[Point, ...]:
         if not (isinstance(row, list) and len(row) == 2 and isinstance(row[0], int)):
             raise SmardError(f"malformed series row: {row!r}")
         value = row[1]
-        if value is not None and not isinstance(value, int | float):
+        if value is not None and (
+            isinstance(value, bool)
+            or not isinstance(value, int | float)
+            or not math.isfinite(value)
+        ):
             raise SmardError(f"non-numeric value: {row!r}")
         points.append(Point(_ms_to_utc(row[0]), None if value is None else float(value)))
     return tuple(sorted(points))

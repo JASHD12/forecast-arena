@@ -65,6 +65,7 @@ from arena.site.ops_status import (
     run_start_times,
     source_freshness,
 )
+from arena.site.participation import participants, sample_links
 from arena.site.profiles import profile
 from arena.site.recruiters import PROOFS
 from arena.site.shaping import (
@@ -186,6 +187,7 @@ def build_site(
         "site_url": site_url.rstrip("/") + "/",
         "repo_url": DEFAULT_REPO_URL,
         "dashboard_url": dashboard_url,
+        "participants": participants(rec),
     }
     archive = sorted(
         rec.questions.values(), key=lambda q: (q.batch_date, q.question_id), reverse=True
@@ -347,6 +349,7 @@ def build_site(
             {
                 "proofs": PROOFS,
                 "personal": read_content("recruiters.md"),
+                "backtest": headline_backtest(models_dir),
                 "json_change": json_validity_change(eval_runs(evals_dir)),
                 "k": {
                     "questions": len(rec.questions),
@@ -449,6 +452,7 @@ def build_site(
             **{**common, "root": "../"},
             q=q,
             forecasts=fs,
+            graph_samples=sample_links(rec, q),
             skips=sk,
             resolution=res_q,
             void=rec.voids.get(q.question_id),

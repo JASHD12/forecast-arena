@@ -15,6 +15,7 @@ open-source gateway to it.
 
 from __future__ import annotations
 
+import math
 from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import UTC, date, datetime, time, timedelta
@@ -62,7 +63,7 @@ class WxResponse:
 def _num(v: Any) -> float | None:
     if v is None:
         return None
-    if isinstance(v, bool) or not isinstance(v, int | float):
+    if isinstance(v, bool) or not isinstance(v, int | float) or not math.isfinite(v):
         raise BrightSkyError(f"non-numeric value {v!r}")
     return float(v)
 

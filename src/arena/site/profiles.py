@@ -61,7 +61,13 @@ def profile(
         "n": len(mine),
         "brier": brier(ps, ys) if mine else None,
         "log": log_score(ps, ys) if mine else None,
-        "topics": sorted({s.domain for s in mine}),
+        "topics": sorted(
+            {
+                rec.questions[f.question_id].domain
+                for f in rec.forecasts
+                if f.forecaster_id == fid and f.question_id in rec.questions
+            }
+        ),
     }
     pairs = [(s, base[s.question_id]) for s in mine if s.question_id in base]
     if pairs and fid != "base_rate":

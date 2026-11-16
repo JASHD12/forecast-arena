@@ -10,7 +10,6 @@ import click
 
 from arena.cli import (
     Ctx,
-    _not_yet,
     _push,
     _sync,
     daily,
@@ -38,7 +37,10 @@ def questions_list(obj: Ctx) -> None:
 @questions.command("generate")
 def questions_generate() -> None:
     """Generate questions for --date (built in T024/T027)."""
-    _not_yet("T027")
+    raise click.ClickException(
+        "Use daily evening (questions), daily morning (forecasts), or daily resolve. "
+        "Inspect --help and --dry-run before running a job."
+    )
 
 
 @data.command("backfill")
@@ -65,13 +67,19 @@ def data_backfill(obj: Ctx, keys: tuple[str, ...]) -> None:
 @forecast.command("run")
 def forecast_run() -> None:
     """Run all forecasters for the batch --date (built in T027)."""
-    _not_yet("T027")
+    raise click.ClickException(
+        "Use daily evening (questions), daily morning (forecasts), or daily resolve. "
+        "Inspect --help and --dry-run before running a job."
+    )
 
 
 @resolve.command("run")
 def resolve_run() -> None:
     """Resolve whatever is resolvable now (built in T027)."""
-    _not_yet("T027")
+    raise click.ClickException(
+        "Use daily evening (questions), daily morning (forecasts), or daily resolve. "
+        "Inspect --help and --dry-run before running a job."
+    )
 
 
 @score.command("show")

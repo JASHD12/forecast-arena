@@ -9,7 +9,7 @@
 <h2>Architecture</h2>
 {% include "_arch.html" %}
 <h2>Forecasters and models</h2>
-<p class="note">Status: baselines and the LLM forecasters run live; the classical ML models are trained and backtested (and retrained weekly) and join the live record together with the remaining topics. The table "Running right now" below shows exactly what is live.</p>
+<p class="note">Status: baselines and the LLM forecasters run live; the numerical models use a separate model per topic; the table below identifies published versions and their domains. The table "Running right now" below shows exactly what is live.</p>
 <div class="grid-cards">
 <div class="card"><h3>LLM forecasters (Anthropic Claude)</h3><p>Three designs on the same questions: zero-shot (question only), data-grounded (as-of data in the prompt), and a <strong>tool-using agent</strong> (news-headline search via GDELT, Wikipedia summaries; at most 4 tool calls, 90 s). Strict JSON output contract with one repair attempt, prompt-injection hygiene, versioned prompts, and a hard daily token and request budget enforced in code.</p></div>
 <div class="card"><h3>Electricity: quantile gradient boosting</h3><p>scikit-learn <code>HistGradientBoostingRegressor</code> with quantile loss predicts the full distribution of tomorrow's price statistics; probabilities are read off the predicted CDF and <strong>Platt-calibrated</strong> on out-of-fold predictions from expanding windows with a gap (no shuffling, no leakage).</p></div>
@@ -24,7 +24,7 @@
 <p class="note">Read from the latest forecasts in the public ledger; updates automatically.</p>
 <div class="table-scroll" tabindex="0" role="region" aria-label="Live forecaster versions"><table>
 <thead><tr><th scope="col">Forecaster</th><th scope="col">Model / version in production</th></tr></thead>
-<tbody>{% for r in live %}<tr><th scope="row">{{ fname(r.id) }}{% if is_ai(r.id) %} <span class="label">AI</span>{% endif %}</th><td><code>{{ r.model }}</code>{% if r.model != r.version %}<br><span class="note">{{ r.version }}</span>{% endif %}</td></tr>{% endfor %}</tbody></table></div>
+<tbody>{% for r in live %}<tr><th scope="row">{{ fname(r.id) }} · {{ dname(r.domain) }}{% if is_ai(r.id) %} <span class="label">AI</span>{% endif %}</th><td><code>{{ r.model }}</code>{% if r.model != r.version %}<br><span class="note">{{ r.version }}</span>{% endif %}</td></tr>{% endfor %}</tbody></table></div>
 {% else %}<p class="empty">The first forecasts have not been published yet; this table fills in automatically.</p>{% endif %}
 {% if weekly %}<p class="note">Latest weekly retraining: {{ weekly[0].day }} (<a href="experiments.html">details</a>).</p>{% endif %}
 
@@ -63,9 +63,9 @@
 
 <h2>Infrastructure and quality</h2>
 <ul class="checks">
-<li><strong>GitHub Actions</strong> schedules (morning, resolve four times a day, weekly), <strong>GitHub Pages</strong> hosting, Docker image.</li>
+<li><strong>GitHub Actions</strong> schedules (morning, resolve every three hours, weekly), <strong>GitHub Pages</strong> hosting, Docker image.</li>
 <li><strong>CI:</strong> ruff lint, <strong>mypy</strong> static type checking, hundreds of unit tests, an offline end-to-end run, accessibility checks (axe-core), dependency audit; code reaches production only after a green run (a separate <code>stable</code> branch).</li>
-<li><strong>Static, private-by-design site:</strong> no JavaScript, cookies or third-party requests.</li>
+<li><strong>Static, private-by-design site:</strong> small self-hosted JavaScript enhancements, no cookies or third-party requests.</li>
 </ul>
 
 <h2>Libraries</h2>

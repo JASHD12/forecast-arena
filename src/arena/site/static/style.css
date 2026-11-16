@@ -656,3 +656,11 @@ ul.plain { list-style: none; padding: 0; margin: 0; display: grid; gap: .45rem; 
 .agent-steps li { background: var(--surface-2, rgba(127, 127, 127, .08)); border: 1px solid var(--line);
   border-radius: 999px; padding: .2rem .7rem; font-size: .9rem; }
 .agent-steps li + li::before { content: "→ "; color: var(--muted); }
+
+/* Keep source paths and inline commands inside narrow viewports. */
+main code { overflow-wrap: anywhere; }
+pre code { overflow-wrap: normal; }
+@media (max-width: 48rem) {
+  .site-header nav > ul { flex-wrap: wrap; overflow: visible; }
+  .site-header nav { align-items: flex-start; }
+}

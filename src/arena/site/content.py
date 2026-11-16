@@ -63,7 +63,7 @@ SKIP_HELP = {
     "not_sampled": "the AI forecasters answer a fixed daily sample per topic, to cap cost",
     "budget_exhausted": "the daily AI token or request cap was reached",
     "parse_failure": "the AI answer did not match the required JSON format, even after a repair",
-    "model_missing": "no AI model or key configured",
+    "model_missing": "no model or required configuration available",
     "error": "the forecaster raised an error (for example missing input data)",
 }
 
@@ -106,27 +106,27 @@ STACK_LIBRARIES = (
 INFORMATION_SETS = (
     ("base_rate", "Trailing outcomes of the same template and entity", "all questions"),
     ("persistence", "Yesterday's outcome of the same template and entity", "all questions"),
-    ("ml", "The full as-of context", "all questions (planned)"),
+    ("ml", "The full as-of context", "all questions"),
     (
         "llm_plain",
         "Question text, resolution rule, current date; no data, no tools",
-        "daily sample (planned)",
+        "daily sample",
     ),
     (
         "llm_context",
         "The above plus a compact rendering of the as-of context",
-        "daily sample (planned)",
+        "daily sample",
     ),
-    ("agent", "As llm_context, plus read-only tools", "daily sample (planned)"),
+    ("agent", "As llm_context, plus read-only tools", "daily sample"),
     (
         "llm_local",
         "As llm_context, answered by an open model (Qwen2.5-1.5B) on the runner's CPU",
-        "daily sample (planned)",
+        "daily sample",
     ),
     (
         "agent_graph",
         "As agent, run as a LangGraph graph: plan, retrieved evidence, tools, self-check",
-        "1 question per topic per day (planned)",
+        "1 question per topic per day",
     ),
 )
 

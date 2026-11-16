@@ -30,7 +30,7 @@ _ENTITY_RE = re.compile(r"^[A-Za-z0-9_.%~+]+$")
 class Record(BaseModel):
     """Common base: immutable, no unknown fields, versioned."""
 
-    model_config = ConfigDict(frozen=True, extra="forbid")
+    model_config = ConfigDict(frozen=True, extra="forbid", allow_inf_nan=False)
 
     schema_version: Literal[1] = SCHEMA_VERSION
 
@@ -136,7 +136,7 @@ class Skip(Record):
 class Evidence(BaseModel):
     """Where an outcome came from."""
 
-    model_config = ConfigDict(frozen=True, extra="forbid")
+    model_config = ConfigDict(frozen=True, extra="forbid", allow_inf_nan=False)
 
     source_url: str
     snapshot_sha256: Sha256
@@ -247,8 +247,15 @@ ALL_MODELS: tuple[type[Record], ...] = (
 
 def canonical_json(record: BaseModel) -> str:
     """Serialise one record as canonical JSON: sorted keys, UTF-8, no spaces, one `\\n`."""
+    # Validate native values before pydantic can serialize nonfinite Any values as null.
+    json.dumps(record.model_dump(), allow_nan=False, default=str)
     payload = record.model_dump(mode="json")
-    return json.dumps(payload, sort_keys=True, ensure_ascii=False, separators=(",", ":")) + "\n"
+    return (
+        json.dumps(
+            payload, sort_keys=True, ensure_ascii=False, allow_nan=False, separators=(",", ":")
+        )
+        + "\n"
+    )
 
 
 def parse_record(line: str) -> Record:

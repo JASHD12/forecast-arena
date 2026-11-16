@@ -17,6 +17,7 @@ from pydantic import BaseModel, Field
 
 from arena.scoring.boards import Board
 from arena.scoring.core import Record, excluded
+from arena.site.participation import participants
 from arena.site.titles import plain_title
 
 API_VERSION = "v1"
@@ -48,6 +49,7 @@ class QuestionOut(BaseModel):
     revision_reason: Literal["source_revised"] | None = Field(
         None, description="Source revision warning; the first outcome remains valid for scoring"
     )
+    skips: list[dict[str, str]] = Field(default_factory=list)
     forecasts: list[ForecastOut]
     url: str = Field(description="The question page, relative to the site root")
 
@@ -83,6 +85,7 @@ class LeaderboardFile(BaseModel):
     label: str | None = Field(description='e.g. "too early to tell"')
     questions: int
     days: int
+    participants: list[dict[str, Any]] = Field(default_factory=list)
     rows: list[LeaderboardRow]
 
 
@@ -104,6 +107,11 @@ def _question(rec: Record, qid: str, url: str) -> QuestionOut:
         revision_reason="source_revised"
         if void is not None and void.reason_code == "source_revised"
         else None,
+        skips=[
+            {"forecaster_id": s.forecaster_id, "reason": s.reason_code}
+            for s in rec.skips
+            if s.question_id == qid
+        ],
         forecasts=[
             ForecastOut(
                 forecaster_id=f.forecaster_id,
@@ -157,6 +165,7 @@ def build_api(
         questions=board.questions if board else 0,
         days=board.days if board else 0,
         rows=rows,
+        participants=participants(rec),
     )
     files = {"questions": allq, "latest": latest, "leaderboard": lb}
     out = []

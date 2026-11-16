@@ -12,8 +12,9 @@ start with SELECT or WITH, results are capped at `MAX_ROWS`, and DuckDB's extern
 
 from __future__ import annotations
 
-import re
 from typing import Any, Literal
+
+import duckdb
 
 from arena.analytics.sql import connect as sql_connect
 from arena.ledger import Ledger
@@ -21,7 +22,6 @@ from arena.scoring.core import Record, excluded, leaderboard, load
 from arena.site.titles import domain_name, forecaster_name, plain_title
 
 MAX_ROWS = 200
-_SQL_START = re.compile(r"^\s*(select|with)\b", re.IGNORECASE)
 INSTRUCTIONS = (
     "Forecast Arena: daily yes/no questions about public data, forecasts by baselines, an "
     "ML model and LLMs published before the answer exists, and their scores. Read-only. "
@@ -35,12 +35,13 @@ class SqlRefused(ValueError):
 
 def check_sql(query: str) -> str:
     """The query if it is a single SELECT/WITH statement, else SqlRefused."""
-    q = query.strip().rstrip(";").strip()
-    if not _SQL_START.match(q):
+    try:
+        statements = duckdb.extract_statements(query)
+    except duckdb.Error as exc:
+        raise SqlRefused("invalid SQL query") from exc
+    if len(statements) != 1 or statements[0].type != duckdb.StatementType.SELECT:
         raise SqlRefused("only a single SELECT (or WITH ... SELECT) query is allowed")
-    if ";" in q:
-        raise SqlRefused("only one statement is allowed")
-    return q
+    return statements[0].query
 
 
 def _question_row(rec: Record, qid: str) -> dict[str, Any]:

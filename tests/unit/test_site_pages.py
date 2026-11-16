@@ -167,9 +167,10 @@ def test_stack_page_reads_versions_from_environment_and_ledger(tmp_path) -> None
     f = forecast(question(), "llm_context", 0.3).model_copy(
         update={"forecaster_version": "claude-opus-5-5|prompt-v1-abc"}
     )
-    assert live_versions(SimpleNamespace(forecasts=[f])) == [
+    assert live_versions(SimpleNamespace(forecasts=[f], questions={f.question_id: question()})) == [
         {
             "id": "llm_context",
+            "domain": "power",
             "version": "claude-opus-5-5|prompt-v1-abc",
             "model": "claude-opus-5-5",
         }

@@ -47,15 +47,23 @@ def library_versions() -> list[dict[str, str]]:
 
 def live_versions(rec: Any) -> list[dict[str, str]]:
     """The most recent version string each forecaster published, from the ledger."""
-    latest: dict[str, tuple[Any, str]] = {}
+    latest: dict[tuple[str, str], tuple[Any, str]] = {}
     for f in rec.forecasts:
-        cur = latest.get(f.forecaster_id)
+        key = (f.forecaster_id, rec.questions[f.question_id].domain)
+        cur = latest.get(key)
         if cur is None or f.created_at > cur[0]:
-            latest[f.forecaster_id] = (f.created_at, f.forecaster_version)
+            latest[key] = (f.created_at, f.forecaster_version)
     rows = []
-    for fid in sorted(latest):
-        v = latest[fid][1]
-        rows.append({"id": fid, "version": v, "model": v.split("|", 1)[0] if "|" in v else v})
+    for fid, domain in sorted(latest):
+        v = latest[(fid, domain)][1]
+        rows.append(
+            {
+                "id": fid,
+                "domain": domain,
+                "version": v,
+                "model": v.split("|", 1)[0] if "|" in v else v,
+            }
+        )
     return rows
 
 

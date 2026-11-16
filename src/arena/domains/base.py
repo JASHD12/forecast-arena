@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import bisect
+import math
 from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta
@@ -55,6 +56,8 @@ class AsOfStore:
 
     def add(self, obs: Observation) -> None:
         """Insert an observation (times must be timezone-aware)."""
+        if obs.value is not None and (isinstance(obs.value, bool) or not math.isfinite(obs.value)):
+            raise ValueError("observation must be a finite number or None")
         ensure_utc(obs.available_at)
         ensure_utc(obs.observed_at)
         rows = self._by_key.setdefault(obs.key, [])

@@ -26,6 +26,13 @@ move older "Done log" lines to `docs/progress-archive.md`.
 
 ## In progress
 
+- T194: implementing the 16 November audit plan on codex/forecast-arena-repairs.
+  - Numeric/SQL boundaries, participation/API states, ML provenance/graph sampling links,
+    per-domain versions, promotion labels and initial recruiter/mobile improvements are local.
+  - Validation in progress; do not claim the full R01–R17 plan complete or deployed.
+  - Remaining: final-stage incidents, dependency triage, scheduler package, pinned eval
+    comparison, prospective diagnostics/grounding, complete presentation QA and rollout.
+
 - T193e / T057: WAIT until 2026-11-16 for the first actual pre-lock ML batch.
   - Repair code 5cfebf0 passed CI 43737672954 and promotion 43738753112; main/stable matched.
   - Observer 43739000811 passed; resolve 43739259441 deployed Pages and passed smoke.

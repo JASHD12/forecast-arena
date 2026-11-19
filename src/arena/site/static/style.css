@@ -684,3 +684,5 @@ pre code { overflow-wrap: normal; }
 .recruiter-hero .hero-result { font-size: 1.1rem; max-width: 46rem; }
 .roles { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 1rem; margin: 1.25rem 0; }
 .role-card h2 { margin-top: 0; font-size: 1.1rem; }
+.bars-rest { margin: .5rem 0 0; font-size: .82rem; }
+.more-link { margin: 1rem 0 0; display: flex; flex-wrap: wrap; gap: .5rem 1rem; align-items: center; }

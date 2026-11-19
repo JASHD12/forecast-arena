@@ -111,3 +111,38 @@ def test_no_unfinished_placeholder_text_on_any_page(tmp_path) -> None:
         text = page.read_text()
         assert "owner confirmation" not in text, page.name
         assert "[FILL IN" not in text, page.name
+
+
+def _row(qid: str, domain: str, pn: dict[str, float], outcome=None, state: str = "open") -> dict:
+    return {"qid": qid, "domain": domain, "pn": pn, "outcome": outcome, "state": state}
+
+
+def test_home_cards_prefer_answered_questions_and_spread_over_topics() -> None:
+    """Home page diet: six full cards, the best-answered first, one topic does not take them all."""
+    from arena.site.shaping import pick_cards, split_outcomes
+
+    rows = [_row(f"w{i}", "weather", {"a": 0.5}) for i in range(8)]
+    rows += [_row("p1", "power", {"a": 0.2, "b": 0.8, "c": 0.5}), _row("p2", "power", {"a": 0.5})]
+    rows += [_row("m1", "markets", {"a": 0.4, "b": 0.45})]
+    picked = pick_cards(rows, 4)
+    assert [r["qid"] for r in picked][:1] == ["p1"] and len(picked) == 4
+    assert {r["domain"] for r in picked} == {"power", "markets", "weather"}
+    assert pick_cards([], 6) == [] and len(pick_cards(rows, 20)) == len(rows)
+
+    done = [_row(f"d{i}", "power", {}, outcome=i % 2) for i in range(10)]
+    out = split_outcomes(
+        done + [_row("o", "power", {}), _row("v", "power", {}, state="void (bug)")], 8
+    )
+    assert (
+        len(out["shown"]) == 8 and out["resolved"] == 10 and out["open"] == 1 and out["total"] == 12
+    )
+
+
+def test_home_page_lists_only_answered_forecasters_on_cards(tmp_path) -> None:
+    """Rows without a forecast ('–') are replaced by one summary line."""
+    home = (_site(tmp_path) / "index.html").read_text()
+    assert 'class="bars bars-rest"' not in home  # the empty-ledger build has no cards at all
+    import re
+
+    card_html = "".join(re.findall(r'<li class="qcard">.*?</li>', home, re.S))
+    assert "<abbr" not in card_html  # no dash placeholders inside cards

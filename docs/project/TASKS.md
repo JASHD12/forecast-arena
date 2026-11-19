@@ -631,11 +631,11 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
   - Done when: a test finds no "owner confirmation" or "[FILL IN" in any built page; recruiter page uses a neutral authorship line.
 - [x] T203 · Leaderboard overflow fixed; page-width check in the a11y run (F4) (deps: T202)
   - Done when: every built page has scrollWidth <= innerWidth at 390 and 1366 px, checked by the a11y script.
-- [ ] T204 · Dispatch-only scheduling documented; H20 steps exact (F1) (deps: T203)
+- [x] T204 · Dispatch-only scheduling documented; H20 steps exact (F1) (deps: T203)
   - Done when: RUNBOOK and H20 give the exact external-scheduler steps; a test shows a manual morning dispatch after the seal is a no-op.
-- [ ] T205 · Players feature states when it runs manually only (F1) (deps: T204)
+- [x] T205 · Players feature states when it runs manually only (F1) (deps: T204)
   - Done when: Play and Status say intake is manual until H15 and H20, computed from config and the last players run.
-- [ ] T206 · API leaderboard has a `common` block equal to the home board (F7) (deps: T205)
+- [x] T206 · API leaderboard has a `common` block equal to the home board (F7) (deps: T205)
   - Done when: `api/v1/leaderboard.json` has common {questions, days, label, rows}; a test asserts equality with the home board.
 - [ ] T210 · Recruiter first screen (P1) (deps: T202)
   - Done when: kicker, H1, generated result line, primary and secondary buttons visible at 1366x768 and 390x844; missing H16 fields are omitted, tested.

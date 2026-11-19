@@ -2,6 +2,7 @@
 {% from "macros.html" import page_head %}
 {% block content %}
 {{ page_head("Play", "Can you beat the AI?", "Give your own probability for real questions, then see the answer and how your score compares with the AI, the ML model and the base rate. Lower Brier score is better; 0.25 is what a coin-flip 50% always earns.") }}
+<p class="note players-note" data-state="{{ players.state }}">Players' leaderboard: {{ players.text }}</p>
 <div id="game" class="game" data-root="{{ root }}" hidden>
 <div class="game-decks" role="group" aria-label="Choose questions">
 <button type="button" class="deck" data-deck="live" aria-pressed="true">Live record ({{ live_n }})</button>

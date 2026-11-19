@@ -62,6 +62,7 @@ from arena.site.ops_status import (
     llm_usage,
     missed_days,
     parse_failures,
+    players_state,
     run_start_times,
     source_freshness,
 )
@@ -324,6 +325,7 @@ def build_site(
                 "parse": parse_failures(rec),
                 "fresh": source_freshness(rec, clock.now()),
                 "starts": run_start_times(ledger, clock.now().date()),
+                "players": players_state(ledger, clock.now().date()),
                 "now": clock.now(),
             },
         ),
@@ -372,6 +374,7 @@ def build_site(
         "play.html": (
             "Can you beat the AI?",
             {
+                "players": players_state(ledger, clock.now().date()),
                 "live": game["live"],
                 "live_n": len(game["live"]),
                 "practice_n": len(game["practice"]),
@@ -492,6 +495,7 @@ def build_site(
         "official" if off else "rehearsal",
         clock.now(),
         question_href,
+        (headline if off else rehearsal_boards)[0],
     )
     ttpl = env.get_template("topic.html")
     scope = "official record" if off else "rehearsal days"

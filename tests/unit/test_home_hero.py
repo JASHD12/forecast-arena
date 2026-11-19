@@ -131,7 +131,7 @@ def test_home_cards_prefer_answered_questions_and_spread_over_topics() -> None:
 
     done = [_row(f"d{i}", "power", {}, outcome=i % 2) for i in range(10)]
     out = split_outcomes(
-        done + [_row("o", "power", {}), _row("v", "power", {}, state="void (bug)")], 8
+        [*done, _row("o", "power", {}), _row("v", "power", {}, state="void (bug)")], 8
     )
     assert (
         len(out["shown"]) == 8 and out["resolved"] == 10 and out["open"] == 1 and out["total"] == 12

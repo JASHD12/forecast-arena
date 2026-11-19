@@ -204,7 +204,7 @@ def test_home_race_spotlight_and_honest_ml_status(tmp_path) -> None:
     assert r["n"] == 2  # q3 is not in the common set
     assert r["series"]["base_rate"] == [("2026-11-01", 0.25)]
     assert abs(r["series"]["ml"][0][1] - 0.01) < 1e-12
-    # one day is too little for a chart: a note, not a picture (the full chart is in test_race_chart)
+    # one day is too little for a chart: a note, not a picture (see test_race_chart for the chart)
     note = race_svg(r["series"], {"ml": "ML model"}, r["days"])
     assert "race chart appears after 7 days" in note and "<svg" not in note
 

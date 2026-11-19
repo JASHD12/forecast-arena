@@ -254,6 +254,9 @@
     if (t.length) initTheme(Array.prototype.slice.call(t));
     var c = document.querySelector('.lock-countdown');
     if (c) initCountdown(c);
+    // the contents list starts closed on phones, where it would push the page down
+    var toc = document.querySelector('.toc details');
+    if (toc && window.matchMedia('(max-width: 640px)').matches) toc.open = false;
     var s = document.getElementById('qsearch');
     if (s) initSearch(s);
   });

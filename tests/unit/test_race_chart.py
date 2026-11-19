@@ -35,7 +35,7 @@ def test_chart_has_two_layouts_a_sorted_legend_and_a_coin_reference() -> None:
     assert "always 50% = 0.25" in out
     legend = re.findall(r'<span class="lg-name">([^<]+)</span> <span class="lg-val">([\d.]+)', out)
     vals = [float(v) for _, v in legend]
-    assert [n for n, _ in legend][0] == "ML model" and vals == sorted(vals)
+    assert next(n for n, _ in legend) == "ML model" and vals == sorted(vals)
     assert len(legend) == len(series)  # every forecaster is in the list, none only on the lines
     assert "<title>ML model: " in out  # tooltips kept
 
@@ -52,7 +52,7 @@ def test_end_labels_fit_inside_the_wide_viewbox_and_the_phone_layout_has_none() 
     series, ds = _series(8)
     names = {**FORECASTER_NAMES, "agent": "A very long forecaster name for an agent with tools"}
     out = race_svg(series, names, ds)
-    wide_w, _, (_, right, _, left) = RACE_WIDE
+    wide_w = RACE_WIDE[0]
     labels = re.findall(r'<text class="endlabel[^"]*" x="([\d.]+)"[^>]*>([^<]+)</text>', out)
     assert len(labels) == 3  # ML model, base rate and the best AI forecaster
     for x, text in labels:

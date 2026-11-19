@@ -669,12 +669,13 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
     run on 2026-11-19 (run 44586958389) hit its own 60,000-token cap: `llm_plain` answered all of its
     items, `llm_context` was cut off by `budget_exhausted` skips at 58,104 tokens, so that run is not
     committed as a comparison (an unequal item set would be misleading).
-- [ ] T223b · LLM ablation with the agent variants and a larger set (C3, part 2) (deps: T223a)
-  - Do: extend `src/arena/evals/run.py` to `agent` and `agent_graph` (tool calls need the as-of
-    context per golden question), and size the token cap to the number of variants and questions
-    (about 4,000 tokens per question for plain plus context, more for agents).
-  - Done when: one eval run completes with no budget skips for any variant, its result JSON is in
-    `evals/results/`, and the Evals page shows the table. Needs the owner's decision to raise the
-    eval token cap above 60,000 (a spending limit), see HUMAN_TODO H22.
+- [ ] T223b · LLM ablation: agent variants (C3, part 2) (deps: T223a)
+  - Done 2026-11-19 (owner decision H22): plain vs context on 24 golden questions, 100,000-token cap,
+    run 44592033036, result `evals/results/eval-20261119T185324.json`, no skips for either variant.
+    Brier 0.3483 (plain) vs 0.1855 (context); paired difference plain - context +0.1628
+    [+0.0603, +0.2679] on 24 items from 21 days; cost 0.0071 and 0.0129 USD. Evaluation, not live.
+  - Still open: extend `src/arena/evals/run.py` to `agent` and `agent_graph` (tool calls need the
+    as-of context per golden question), then one more run sized to the variants.
+  - Done when: one eval run covers the agent variants with no budget skips and its result is committed.
 - [x] T224 · 90-second EN/DE walkthrough draft (P6) (deps: T223)
   - Done when: docs/interview/pitch.md has a 90-second EN and DE walkthrough with no figures (the interview-kit test passes); the owner rehearses it (human).

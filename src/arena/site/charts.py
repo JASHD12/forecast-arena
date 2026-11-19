@@ -242,7 +242,7 @@ def race_svg(
 
 FOREST_W, FOREST_ROW = 680, 34
 FOREST_PAD = (28, 24, 34, 170)  # top, right, bottom, left
-FOREST_NARROW = (360, 40, (30, 12, 36, 118))  # phone layout: width, row height, pad
+FOREST_NARROW = (360, 40, (30, 22, 36, 118))  # phone layout: width, row height, pad
 FOREST_LABEL_CHARS = 16  # longest row label on the phone layout (the tooltip has the full name)
 
 

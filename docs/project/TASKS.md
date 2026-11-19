@@ -674,14 +674,12 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
     run on 2026-11-19 (run 44586958389) hit its own 60,000-token cap: `llm_plain` answered all of its
     items, `llm_context` was cut off by `budget_exhausted` skips at 58,104 tokens, so that run is not
     committed as a comparison (an unequal item set would be misleading).
-- [!] T223b · LLM ablation: agent variants (C3, part 2) (deps: T223a) BLOCKED(needs H23)
-  - 2026-11-19: the harness and CLI now take `--variant agent` (live agent prompt and loop with series and base-rate tools only; no news, Wikipedia or ML peer in a replay, so those tool calls are recorded as errors), and `llm-eval.yml` has an `agent` input. The paid run waits for the owner's decision H23.
-  - Done 2026-11-19 (owner decision H22): plain vs context on 24 golden questions, 100,000-token cap,
-    run 44592033036, result `evals/results/eval-20261119T185324.json`, no skips for either variant.
-    Brier 0.3483 (plain) vs 0.1855 (context); paired difference plain - context +0.1628
-    [+0.0603, +0.2679] on 24 items from 21 days; cost 0.0071 and 0.0129 USD. Evaluation, not live.
-  - Still open: extend `src/arena/evals/run.py` to `agent` and `agent_graph` (tool calls need the
-    as-of context per golden question), then one more run sized to the variants.
-  - Done when: one eval run covers the agent variants with no budget skips and its result is committed.
+- [x] T223b · LLM ablation: agent variants (C3, part 2) (deps: T223a)
+  - Done 2026-11-19 (owner decision H23): run 44611596780 on `main`, 12 golden questions, plain, context and
+    agent (series and base-rate tools only; no news, Wikipedia or ML peer in a replay), 200,000-token cap,
+    no skips. Brier: plain 0.2255, context 0.1923, agent 0.2056 (same-items base rate 0.2380). No
+    difference is supported (all paired intervals include zero); agent minus context is -0.0133 [-0.0443,
+    +0.0180] in the other direction (context slightly better). Cost about 1.8 US cents in total.
+    Evaluation, not live. Result: `evals/results/eval-20261119T204603.json`.
 - [x] T224 · 90-second EN/DE walkthrough draft (P6) (deps: T223a)
   - Done when: docs/interview/pitch.md has a 90-second EN and DE walkthrough with no figures (the interview-kit test passes); the owner rehearses it (human).

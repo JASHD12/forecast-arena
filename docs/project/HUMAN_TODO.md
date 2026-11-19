@@ -187,10 +187,11 @@ curl -X POST -H "Authorization: Bearer TOKEN" -H "Accept: application/vnd.github
   - Decision for you: allow the `max_tokens` input of `llm-eval.yml` to go up to 150,000 for one run?
     Reply yes (and the agent dispatches it from `main`) or no (T223b stays at the 60,000-token size).
   - Decided 2026-11-19 (yes, same model): one run with `max_tokens=100000` was dispatched from `main` (about 2 US cents). A free model was considered; the free options need an account or a much weaker local model.
-- [ ] H23 · Decision: one paid eval run of the agent variant (T223b)
+- [x] H23 · Decision: one paid eval run of the agent variant (T223b)
   - What: dispatch `llm-eval.yml` from `main` with `agent=true`, `limit=12`, `max_tokens=200000`,
     plus the default plain and context variants. The agent makes up to 6 requests per question.
   - Estimated cost: 24 questions of plain plus context cost about 2 US cents; the agent is
     roughly 5 times heavier per question, so about 8 US cents at most for 12 questions (hard cap
     200,000 tokens).
   - Reply yes and the agent dispatches it, reads the result from the job log and commits it; or no.
+  - Decided 2026-11-19 (yes): run 44611596780 dispatched from `main` (`agent=true`, 12 questions, 200,000-token cap); it cost about 1.8 US cents.

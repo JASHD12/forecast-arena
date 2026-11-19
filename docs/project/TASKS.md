@@ -677,5 +677,5 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
   - Still open: extend `src/arena/evals/run.py` to `agent` and `agent_graph` (tool calls need the
     as-of context per golden question), then one more run sized to the variants.
   - Done when: one eval run covers the agent variants with no budget skips and its result is committed.
-- [x] T224 · 90-second EN/DE walkthrough draft (P6) (deps: T223)
+- [x] T224 · 90-second EN/DE walkthrough draft (P6) (deps: T223a)
   - Done when: docs/interview/pitch.md has a 90-second EN and DE walkthrough with no figures (the interview-kit test passes); the owner rehearses it (human).

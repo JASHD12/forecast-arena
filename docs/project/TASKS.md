@@ -359,7 +359,8 @@ Keep the first line of each task in exactly this shape; the status script parses
 
 ## Phase 8 - Ensemble and human panel
 
-- [ ] T090 · Ensemble forecaster (deps: T071, T057)
+- [x] T090 · Ensemble forecaster (deps: T071, T057)
+  - Done 2026-11-19: `src/arena/forecasters/ensemble.py` (logistic regression on the logits of the common-set members plus domain indicators; weekly fit on official-record rows only; threshold 300 resolved common-set forecasts), the morning job passes peer forecasts, `live_ensemble` registers it only when active. Tests: inactive without an official start or below the threshold, trains only on official rows resolved before the week's fit, a skip when a member is missing.
   - Do: section 8.6 with walk-forward training and the activation threshold.
   - Done when: tests show it stays inactive below the threshold and trains only on
     resolved official-record forecasts.
@@ -370,7 +371,8 @@ Keep the first line of each task in exactly this shape; the status script parses
 - [ ] T092 · Enable the human panel (live) (deps: T091, T046; needs: H06)
   - Do: enable intake in the morning job.
   - Done when: a real morning run ingests panel rows, or `WAIT(until=<date>)`.
-- [ ] T093 · Enable the ensemble (live) (deps: T090, T068)
+- [!] T093 · Enable the ensemble (live) (deps: T090, T068) WAIT(until=2026-12-31)
+  - 2026-11-19: wired and tested, inactive by rule: the official record has not started (owner's not-before date, T110), so the eligible set is 0 resolved common-set forecasts of the 300 needed. It registers itself the first morning after the threshold is met; no further code change is needed. Re-check on the date above.
   - Do: enable once the activation threshold is met on the real ledger.
   - Done when: the ensemble appears on the leaderboard, or `WAIT(until=<date>)` with the
     current count recorded in `docs/project/PROGRESS.md`.
@@ -392,7 +394,7 @@ Keep the first line of each task in exactly this shape; the status script parses
 - [x] T103 · Demo outline (deps: T100)
   - Do: `docs/DEMO.md`: a 90-second screen-recording script for the human to record.
   - Done when: the file exists.
-- [ ] T104 · Final audit (deps: T100, T101, T102, T103, T085, T075, T069, T058, T047, T036)
+- [x] T104 · Final audit (deps: T100, T101, T102, T103, T085, T075, T069, T058, T047, T036)
   - Do: run verify on the real ledger, the full check suite and the link check; confirm
     every explainer exists; summarise state, open risks and suggested next steps in
     `docs/project/PROGRESS.md`.
@@ -658,7 +660,8 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
     evidence on when day-ahead generation forecasts appear is in DECISIONS. Result 2026-11-19:
     the forecasts for D+1 were not yet published at 16:06 UTC on D, so they cannot be a feature
     at the 09:30 UTC lock; building the archive as first specified would store nothing useful.
-- [ ] T222b · Measure when SMARD forecasts for D+1 appear (C2, corrected) (deps: T222a)
+- [!] T222b · Measure when SMARD forecasts for D+1 appear (C2, corrected) (deps: T222a) WAIT(until=2026-11-27)
+  - 2026-11-19: `arena data smard-forecasts` (T222b probe, measurement only) runs after the morning and evening jobs and writes one line per series (when SMARD rewrote its newest chunk, last hour with a value, whether tomorrow is covered) to the run summary. Second manual observation: on 2026-11-19 the PV forecast for 2026-11-20 had been published at 17:16 UTC, after the 09:30 UTC lock, as on 2026-11-18 (17:06 UTC). Read the summaries after 7 days and decide in DECISIONS.
   - Do: a small read-only job step (morning, evening and resolve runs) records, per forecast series
     (ids 123, 3791, 125), the chunk's `created` time and the last non-null hour, as a run-manifest
     count or warning; no model change and no new ledger family.
@@ -671,7 +674,8 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
     run on 2026-11-19 (run 44586958389) hit its own 60,000-token cap: `llm_plain` answered all of its
     items, `llm_context` was cut off by `budget_exhausted` skips at 58,104 tokens, so that run is not
     committed as a comparison (an unequal item set would be misleading).
-- [ ] T223b · LLM ablation: agent variants (C3, part 2) (deps: T223a)
+- [!] T223b · LLM ablation: agent variants (C3, part 2) (deps: T223a) BLOCKED(needs H23)
+  - 2026-11-19: the harness and CLI now take `--variant agent` (live agent prompt and loop with series and base-rate tools only; no news, Wikipedia or ML peer in a replay, so those tool calls are recorded as errors), and `llm-eval.yml` has an `agent` input. The paid run waits for the owner's decision H23.
   - Done 2026-11-19 (owner decision H22): plain vs context on 24 golden questions, 100,000-token cap,
     run 44592033036, result `evals/results/eval-20261119T185324.json`, no skips for either variant.
     Brier 0.3483 (plain) vs 0.1855 (context); paired difference plain - context +0.1628

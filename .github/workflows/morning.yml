@@ -152,6 +152,9 @@ jobs:
           else
             .venv/bin/arena daily morning --push
           fi
+      - name: Measure when SMARD publishes tomorrow's generation forecasts (T222b, measurement only)
+        continue-on-error: true
+        run: .venv/bin/arena data smard-forecasts | tee -a "$GITHUB_STEP_SUMMARY"
       - name: Verify the ledger
         if: steps.mode.outputs.dry_run == 'false'
         run: .venv/bin/arena ledger verify --git

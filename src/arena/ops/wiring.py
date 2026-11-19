@@ -24,7 +24,7 @@ from arena.forecasters.baselines import BaseRate, Persistence
 from arena.forecasters.llm import LLMContext, LLMPlain
 from arena.forecasters.ml import DomainModel, MLForecaster, ModelLoadFailure
 from arena.forecasters.replay import CombinedHistory, ReplayHistory
-from arena.ledger import Ledger
+from arena.ledger import Ledger, layout
 from arena.llm.budget import BudgetGuard, Caps, GuardedLLM, usage_from_manifests
 from arena.llm.client import LLMClient
 from arena.llm.factory import client_from_settings
@@ -210,6 +210,25 @@ def live_ml(ledger: Ledger, domains: Sequence[Domain], asof: datetime) -> MLFore
     return MLForecaster(models, load_errors=errors, artifact_hashes=hashes)
 
 
+def live_ensemble(ledger: Ledger, asof: datetime) -> Forecaster | None:
+    """The ensemble (SPEC 8.6) once it is active, else None (inactive is not a failure).
+
+    Needs the official record to have started and at least 300 resolved common-set forecasts
+    from it; rehearsal days never train it."""
+    import json
+
+    from arena.forecasters.ensemble import EnsembleForecaster, train
+    from arena.scoring.core import load
+
+    if not ledger.exists(layout.OFFICIAL_START_PATH):
+        return None
+    value = json.loads(ledger.read_bytes(layout.OFFICIAL_START_PATH)).get("official_start")
+    if not value:
+        return None
+    model = train(load(ledger).scored, date.fromisoformat(str(value)), asof)
+    return EnsembleForecaster(model) if model is not None else None
+
+
 def build_forecasters(
     ledger: Ledger,
     domains: Sequence[Domain],
@@ -274,6 +293,9 @@ def build_forecasters(
                 retriever=retriever,
             )
         )
+    ens = live_ensemble(ledger, clk.now())
+    if ens is not None:  # listed last: it combines the forecasts the others just wrote
+        out.append(ens)
     for f in out:  # per-call output cap from the settings (thinking counts against it)
         if hasattr(f, "max_output_tokens"):
             f.max_output_tokens = settings.llm_max_output_tokens

@@ -136,3 +136,43 @@ def test_json_validity_ignores_provider_errors() -> None:
         {"question_id": "c", "skip": "parse_failure"},
     ]
     assert _valid_first_try(rows, {"b"}) == 1 / 3  # only "a" parsed first time
+
+
+def test_agent_variant_runs_tools_over_the_golden_context_and_base_rate() -> None:
+    """T223b: the agent answers the golden items with series and base-rate tools only."""
+    import re
+
+    from arena.llm.client import AssistantTurn, LLMResponse, ToolCall, Usage
+
+    items, sha = load(GOLDEN)
+    items = sample(items, 3)
+    tool_results: list[str] = []
+
+    def scripted(system, turns, tools):
+        names = {t.name for t in tools or ()}
+        assert {"get_series", "get_base_rate"} <= names
+        if not any(isinstance(t, AssistantTurn) for t in turns):  # first turn: use a tool
+            qid = re.search(
+                r"([a-z]+-[a-z_]+-[A-Za-z_]+-\d{4}-\d\d-\d\d-v\d)", turns[0].text
+            ).group(1)
+            call = ToolCall("t1", "get_base_rate", {"question_id": qid})
+            return LLMResponse("", (call,), "tool_use", "fake", Usage(1, 10, 5))
+        tool_results.append(str(turns[-1]))
+        return GOOD
+
+    res = run(
+        items,
+        {"agent": FakeLLM(scripted)},
+        FixedClock(NOW),
+        golden="g",
+        golden_sha256=sha,
+        caps=EvalCaps(max_requests=60, max_tokens=10**9),
+    )
+    rows = res["rows"]
+    assert {r["variant"] for r in rows} == {"agent"} and len(rows) == 3
+    assert all(r["skip"] is None and r["probability"] == 0.7 for r in rows)
+    assert "tools-4" in res["versions"]["agent"]
+    # the golden base rate reached the model as the tool result
+    assert all(
+        "probability" in t and "None" not in t.split("probability")[1][:6] for t in tool_results
+    )

@@ -70,7 +70,7 @@ def eval_build(obj: Ctx, first: object, last: object, out: Path) -> None:
     "--variant",
     "variants",
     multiple=True,
-    type=click.Choice(["llm_plain", "llm_context", "llm_local"]),
+    type=click.Choice(["llm_plain", "llm_context", "llm_local", "agent"]),
     default=("llm_plain", "llm_context"),
 )
 @click.option("--limit", type=int, default=None, help="Stratified seeded sample size.")
@@ -92,7 +92,7 @@ def eval_run(
     import os
 
     from arena.evals.golden import load
-    from arena.evals.run import EvalCaps, run, sample
+    from arena.evals.run import AGENT_REQUESTS_PER_QUESTION, EvalCaps, run, sample
     from arena.llm.client import FakeLLM, LLMClient
 
     items, sha = load(golden)
@@ -122,7 +122,10 @@ def eval_run(
             click.echo("model_missing: no LLM configured", err=True)
             sys.exit(1)
     caps = EvalCaps(
-        max_requests=max(1, 2 * len(items) * len(clients)),
+        max_requests=max(
+            1,
+            len(items) * sum(AGENT_REQUESTS_PER_QUESTION if v == "agent" else 2 for v in clients),
+        ),
         max_tokens=max_tokens,
         max_output_tokens=obj.settings.llm_max_output_tokens,
     )

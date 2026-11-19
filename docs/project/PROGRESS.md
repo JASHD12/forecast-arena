@@ -13,13 +13,13 @@ move older "Done log" lines to `docs/progress-archive.md`.
   ledger with link check PASS; README and interview numbers regenerate clean; explainers 01-07 exist.
 - **Live (verified on the ledger):** four domains, `ml` 33/33 per batch since 2026-11-16, plain, context,
   agent, agent_graph and local LLM forecasters within the caps, health green, no open incidents.
-- **Waiting:** T093 ensemble (built and tested, inactive until the official record starts and 300
+- **Waiting:** H24 (owner sets the official start 2026-11-23); T093 ensemble (built and tested, inactive until the official record starts and 300
   resolved common-set forecasts exist); T222b (SMARD publication-time measurement, 7 days);
   T092 panel (H06); T162 players (H15).
 - **Open risks:** GitHub starts scheduled runs hours late (H20); `main` needs pull requests (H21); the
   SMARD day-ahead generation forecast for D+1 appears after the lock, so renewables are probably not a
   usable feature (two observations).
-- **Owner items:** H06, H15, H16, H17, H18, H19, H20.
+- **Owner items:** H24 (start the official record), H06, H15, H16, H17, H18, H19, H20.
 
 - Audit repair T193 (2026-11-15): daily ML wiring, isolated/validated weekly evaluation,
   complete workflow readiness evidence, score/output consistency, budget accounting,
@@ -36,7 +36,7 @@ move older "Done log" lines to `docs/progress-archive.md`.
 - Rehearsal start date: 2026-11-13. Official record start: not set
   (`ARENA_OFFICIAL_START_NOT_BEFORE` is 2099-12-31 until the owner picks a date, T110).
 - Live site URL: https://jashd12.github.io/forecast-arena/
-- Waiting on the owner: H06, H15 (players' form and consent), H16 (recruiter page details,
+- Waiting on the owner: H24 (official start variable), H06, H15 (players' form and consent), H16 (recruiter page details,
   the highest-value item for interviews), H17, H18 (repo description, topics, pin), H19,
   H20 (external scheduler).
 
@@ -66,6 +66,7 @@ Nothing. See the session summary above and `python scripts/status.py`.
 
 ## Done log
 
+- 2026-11-19 T093 (prepared): owner said yes to enabling the ensemble with an official start on 2026-11-23. Only the Actions variable ARENA_OFFICIAL_START_NOT_BEFORE needs the owner (H24); the ensemble registers itself after 60 official common-set questions (expected 2026-11-30). Added a test that the switch works on a real ledger folder. #16 and #17 merged
 - 2026-11-19 T223b (agent): llm-eval run 44611596780 (12 golden questions, plain/context/agent, cap 200,000 tokens, owner-approved H23) completed with no skips: Brier 0.2255 / 0.1923 / 0.2056; no paired difference is supported, the agent is not better than context here (evaluation set, small, not live). Result committed; numbers.md regenerated
 - 2026-11-19 T090, T093, T222b, T223b, T104: ensemble built and tested (inactive until the official record starts and 300 resolved common-set forecasts exist; T093 waits); SMARD forecast-publication probe after the morning and evening jobs; `--variant agent` in the eval harness and workflow (the paid run waits for H23); final audit passed on a fresh ledger clone
 - 2026-11-19 T047, T058, T069: explainers 03 (question design and baselines), 04 (ML models, leakage, calibration, promotion) and 05 (LLM forecasters and agent) written from the code, each with ten interview questions; T065 and T068 ticked from the ledger (plain, context, agent and agent_graph forecast daily within the caps). Next ready: T090 ensemble

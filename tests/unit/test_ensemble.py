@@ -5,7 +5,9 @@ from datetime import UTC, date, datetime, timedelta
 
 import pytest
 from factories import question
+from power_fixtures import fixture_domain
 
+from arena.clock import FixedClock
 from arena.forecasters.ensemble import (
     MEMBERS,
     EnsembleForecaster,
@@ -132,3 +134,63 @@ def test_morning_job_gives_a_combining_forecaster_the_peers_forecasts(tmp_path) 
     assert qs and set(seen) == {q.question_id for q in qs}
     for peers in seen.values():
         assert set(peers) == {"base_rate", "persistence"}  # the broken forecaster wrote a skip
+
+
+def _ledger_with_official_rows(tmp_path, official_start: date | None, days: int = 12):
+    """A real ledger folder: `days` batch days x 6 power questions, all five members answered
+    and every question resolved; `meta/official_start.json` is written when a date is given."""
+    import json
+
+    from factories import forecast, resolution
+
+    from arena.ledger import Ledger, layout
+
+    led = Ledger(tmp_path / "ledger")
+    templates = ["mean_gt", "max_gt", "min_lt", "spread_gt", "evening_gt", "up_vs_today"]
+    rng = random.Random(7)
+    for i in range(days):
+        d = date(2026, 11, 23) + timedelta(days=i)
+        qs = [question(batch=d, template=t) for t in templates]
+        fs, rs = [], []
+        for q in qs:
+            y = rng.randint(0, 1)
+            rs.append(resolution(q, y))
+            for m in MEMBERS:
+                fs.append(
+                    forecast(q, m, min(0.95, max(0.05, 0.5 + (0.3 if y else -0.3) * rng.random())))
+                )
+        led.append(layout.questions_path(d), qs)
+        led.append(layout.forecasts_path(d), fs)
+        led.append(layout.resolutions_path(d), rs)
+    if official_start is not None:
+        led.write_raw(
+            layout.OFFICIAL_START_PATH,
+            json.dumps({"official_start": official_start.isoformat()}).encode(),
+        )
+    return led
+
+
+def test_live_ensemble_is_registered_last_only_with_an_official_start(tmp_path) -> None:
+    """T093: the switch is the official start; no code or flag change is needed after it."""
+    from arena.ops.wiring import build_forecasters, live_ensemble
+
+    asof = datetime(2026, 12, 7, 7, 30, tzinfo=UTC)  # Monday after 12 official days
+    none = _ledger_with_official_rows(tmp_path / "a", None)
+    assert live_ensemble(none, asof) is None  # rehearsal only: inactive
+
+    led = _ledger_with_official_rows(tmp_path / "b", date(2026, 11, 23))
+    ens = live_ensemble(led, asof)
+    assert ens is not None and ens.forecaster_id == "ensemble"
+    assert ens.version().startswith("ensemble-lr-r1-2026-12-05-n")  # cutoff: Monday minus 2 days
+
+    early = datetime(2026, 11, 30, 7, 30, tzinfo=UTC)  # first Monday: 6 days x 6 = 36 questions
+    assert live_ensemble(led, early) is None  # under 60 questions: still inactive
+
+    from arena.config import Settings
+
+    settings = Settings(llm_local=False, agent_graph=False)
+    kw = {"dry_run": True, "clock": FixedClock(asof)}
+    forecasters, _ = build_forecasters(led, [fixture_domain()], settings, **kw)
+    assert [f.forecaster_id for f in forecasters][-1] == "ensemble"
+    forecasters, _ = build_forecasters(none, [fixture_domain()], settings, **kw)
+    assert "ensemble" not in [f.forecaster_id for f in forecasters]

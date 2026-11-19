@@ -31,6 +31,12 @@ extra dispatches are safe.
 SMARD forecast timing (T222b): the morning and evening run summaries contain `smard-forecast` lines
 (when SMARD rewrote its forecast chunk and whether tomorrow is covered). It is a measurement only.
 
+Starting the official record (owner item H24): set the Actions variable `ARENA_OFFICIAL_START_NOT_BEFORE`
+to the chosen date (it is read by the morning, evening and resolve workflows; default `2099-12-31`). The
+start is the later of that date and the day after five clean days; `meta/official_start.json` is written once
+and never changed. The ensemble (SPEC 8.6) needs no switch: it registers itself in the morning job once 60
+questions answered by all five common-set members have resolved in the official record (Monday cutoff).
+
 What to look at (a few minutes):
 
 1. The site's **Home** page: today's batch is there, and "ledger verification" says PASS.

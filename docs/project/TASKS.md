@@ -371,14 +371,15 @@ Keep the first line of each task in exactly this shape; the status script parses
 - [ ] T092 · Enable the human panel (live) (deps: T091, T046; needs: H06)
   - Do: enable intake in the morning job.
   - Done when: a real morning run ingests panel rows, or `WAIT(until=<date>)`.
-- [!] T093 · Enable the ensemble (live) (deps: T090, T068) WAIT(until=2026-12-31)
-  - 2026-11-19: wired and tested, inactive by rule: the official record has not started (owner's not-before date, T110), so the eligible set is 0 resolved common-set forecasts of the 300 needed. It registers itself the first morning after the threshold is met; no further code change is needed. Re-check on the date above.
-  - Do: enable once the activation threshold is met on the real ledger.
-  - Done when: the ensemble appears on the leaderboard, or `WAIT(until=<date>)` with the
-    current count recorded in `docs/project/PROGRESS.md`.
-
-## Phase 9 - Finish
-
+- [!] T093 · Enable the ensemble (live) (deps: T090, T068) WAIT(until=2026-11-30)
+  - 2026-11-19 (owner: yes, start 2026-11-23): nothing is left to code. The ensemble registers itself once
+    `meta/official_start.json` exists and 300 resolved common-set forecasts (60 questions answered by all
+    five members, about 12 a day) exist from the official record, using the weekly cutoff (Monday minus 2
+    days). Owner action H24 sets `ARENA_OFFICIAL_START_NOT_BEFORE=2026-11-23`. Expected: official start
+    2026-11-23 if 19 to 22 Nov are clean days; first ensemble forecasts in the batch of Monday 2026-11-30.
+    `tests/unit/test_ensemble.py::test_live_ensemble_is_registered_last_only_with_an_official_start` covers
+    the switch on a real ledger folder. Done when: the ensemble appears on the Leaderboard; record the
+    date in PROGRESS, or move the WAIT date.
 - [x] T100 · README (deps: T072)
   - Do: what it is, live link, architecture diagram, how it works, how to reproduce, data
     attribution, limitations, how it was built.
@@ -408,6 +409,7 @@ site that CI does not run (I5). Heavy extras use optional requirement files and 
 CI jobs; core `make check` stays offline and fast.
 
 - [x] T110 · Official-start gate (deps: T035)
+  - 2026-11-19: the roadmap models and timing changes are live (ML since 2026-11-16, evening questions, LLMs, four domains), so the not-before date can be set; see H24.
   - Do: `ARENA_OFFICIAL_START_NOT_BEFORE` (date); the official start is the later of the
     5-clean-days rule and this date. Owner: not before Phases 1-2 and T160 are live.
   - Done when: tests show the gate delays the start and never advances it.

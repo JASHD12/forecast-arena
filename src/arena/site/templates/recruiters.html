@@ -5,7 +5,7 @@
 <h1>Python forecasting, evaluated in public.</h1><p>Forecast Arena compares classical models and LLM agents using forecasts published before outcomes are known.</p>
 {% if backtest %}<p><strong>Electricity backtest: {{ backtest.days }} days.</strong> {% for fid, value, numeric in backtest.rows %}{{ fname(fid) }} {{ value }}{% if not loop.last %} · {% endif %}{% endfor %} <a href="backtests.html#card-power">View model scores, paired comparisons and limitations</a>.</p>{% endif %}
 <p class="actions"><a class="btn" href="backtests.html{% if backtest %}#card-power{% endif %}">View the evidence</a> <a class="btn btn-ghost" href="{{ repo_url }}">Read the code</a></p>
-<p class="note">AI-assisted development. The project was specified and directed by its owner and implemented with AI coding agents. Personal contributions and recruitment details require owner confirmation.</p></section>
+<p class="note">AI-assisted development: specified and directed by Jashdeep Singh, implemented with AI coding agents. Every figure on this site is computed from the public record.</p></section>
 <div class="kpis">
 <div class="kpi"><span class="kpi-n">{{ k.questions }}</span><span class="kpi-l">questions asked</span></div>
 <div class="kpi"><span class="kpi-n">{{ k.forecasts }}</span><span class="kpi-l">forecasts published before the answer</span></div>

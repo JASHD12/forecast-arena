@@ -139,7 +139,7 @@ h3 { font-size: 1.05rem; margin: 0; line-height: 1.35; }
   padding: 1.5rem; color: var(--muted); text-align: center; }
 
 /* Tables */
-.table-scroll { overflow-x: auto; margin-bottom: 1.25rem; background: var(--surface); border: 1px solid var(--line);
+.table-scroll { position: relative; overflow-x: auto; margin-bottom: 1.25rem; background: var(--surface); border: 1px solid var(--line);
   border-radius: var(--radius); box-shadow: var(--shadow); }
 table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
 th, td { text-align: left; padding: .55rem .75rem; border-bottom: 1px solid var(--line);
@@ -664,3 +664,4 @@ pre code { overflow-wrap: normal; }
   .site-header nav > ul { flex-wrap: wrap; overflow: visible; }
   .site-header nav { align-items: flex-start; }
 }
+.standings .st-n { font-variant-numeric: tabular-nums; font-weight: 600; }

@@ -86,6 +86,23 @@ function fail(msg) { console.error('FAIL ' + msg); process.exitCode = 1; }
   if (!(await p2.locator('.game-static').isVisible())) fail('static fallback hidden without JavaScript');
   console.log('ok   without JavaScript: the static table is shown');
 
+  // T203: no top-level page may scroll sideways at phone or laptop width.
+  const fs = require('fs');
+  const tops = fs.readdirSync(root).filter((f) => f.endsWith('.html') && f !== '404.html');
+  for (const width of [390, 1366]) {
+    const wctx = await browser.newContext({ viewport: { width, height: 800 } });
+    const wp = await wctx.newPage();
+    const wide = [];
+    for (const f of tops) {
+      await wp.goto('file://' + path.join(root, f));
+      const [sw, iw] = await wp.evaluate(() => [document.documentElement.scrollWidth, window.innerWidth]);
+      if (sw > iw) wide.push(`${f} (${sw} > ${iw})`);
+    }
+    if (wide.length) fail(`page wider than the viewport at ${width}px: ${wide.join(', ')}`);
+    else console.log(`ok   no horizontal page scroll at ${width}px (${tops.length} pages)`);
+    await wctx.close();
+  }
+
   await browser.close();
   console.log(process.exitCode ? 'play: FAIL' : 'play: PASS');
 })();

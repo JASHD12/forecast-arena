@@ -252,7 +252,8 @@ Keep the first line of each task in exactly this shape; the status script parses
   - Do: `weekly.yml` per section 12: retrain, compare, promote by rule, model card, MLflow
     file-backed run with a published summary.
   - Done when: a `dry_run=true` dispatch succeeds and prints the promotion decision.
-- [!] T057 · Enable the ML forecaster (live) (deps: T056, T046) WAIT(until=2026-11-16)
+- [x] T057 · Enable the ML forecaster (live) (deps: T056, T046)
+  - Verified 2026-11-19 on the ledger: `ml` 33 of 33 forecasts in each batch 2026-11-16 to 2026-11-19, with artifact SHA and version.
   - T193a implements activation; the already sealed 15 November batch is immutable. Verify the next actual pre-lock batch.
   - Do: turn on `ml` in the live config after the e2e test includes it (models: power,
     attention from the registry; weather `WeatherRules`, markets `MarketsModel`, crypto
@@ -612,7 +613,47 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
 - [x] T193d · Durable conservative LLM accounting (F7)
   - Done when: refusals, unknown usage and retry attempts consume allowance; cache/reservation
     fields survive manifest restoration; mocked provider and restart regression tests pass.
-- [!] T193e · Integrate and verify audit repairs live (deps: T193a, T193b, T193c, T193d) WAIT(until=2026-11-16)
+- [x] T193e · Integrate and verify audit repairs live (deps: T193a, T193b, T193c, T193d)
+  - Verified 2026-11-19: batches 2026-11-16 to 2026-11-19 have complete ML coverage, health passes, ledger verify passes.
   - CI/stable, live observer and Pages deploy/smoke verified on 2026-11-15; see AUDIT_REPAIR_VALIDATION.md. Only next-batch ML evidence remains.
   - Done when: make check/site-e2e and CI pass; stable uses the verified code; live registry
     publication and the next actual pre-lock ML batch are verified with immutable run references.
+
+
+## Phase 12 - Audit 2026-11-19 (plan: docs/project/AUDIT_2026-11-19.md)
+
+- [x] T200 · Official-start wording names the not-before rule; Status lists clean days (F2)
+  - Done when: one shared macro is used by findings, leaderboard, guide and the header tooltip;
+    Status lists each day as clean or not with its first reason; unit test covers no/past/future not-before. `official.py` logic is unchanged.
+- [x] T201 · Home standings show the question and day counts (F3) (deps: T200)
+  - Done when: the home standings card renders "N questions · D days" from the board; a test asserts it.
+- [x] T202 · No unfinished placeholder text on public pages (F5) (deps: T201)
+  - Done when: a test finds no "owner confirmation" or "[FILL IN" in any built page; recruiter page uses a neutral authorship line.
+- [x] T203 · Leaderboard overflow fixed; page-width check in the a11y run (F4) (deps: T202)
+  - Done when: every built page has scrollWidth <= innerWidth at 390 and 1366 px, checked by the a11y script.
+- [ ] T204 · Dispatch-only scheduling documented; H20 steps exact (F1) (deps: T203)
+  - Done when: RUNBOOK and H20 give the exact external-scheduler steps; a test shows a manual morning dispatch after the seal is a no-op.
+- [ ] T205 · Players feature states when it runs manually only (F1) (deps: T204)
+  - Done when: Play and Status say intake is manual until H15 and H20, computed from config and the last players run.
+- [ ] T206 · API leaderboard has a `common` block equal to the home board (F7) (deps: T205)
+  - Done when: `api/v1/leaderboard.json` has common {questions, days, label, rows}; a test asserts equality with the home board.
+- [ ] T210 · Recruiter first screen (P1) (deps: T202)
+  - Done when: kicker, H1, generated result line, primary and secondary buttons visible at 1366x768 and 390x844; missing H16 fields are omitted, tested.
+- [ ] T211 · Recruiter role-chooser cards with deep links (P2) (deps: T210)
+  - Done when: three cards, two links each; a test checks every link resolves.
+- [ ] T212 · README opening (P3) (deps: T211)
+  - Done when: `scripts/readme_sections.py --check` passes; first 15 lines hold result, caveat and live status; stack inside a details block.
+- [ ] T213 · README screenshot from a real-ledger build (P4) (deps: T212)
+  - Done when: `scripts/screenshots.py LEDGER_DIR` regenerates docs/img/home.png with a dated caption.
+- [ ] T214 · Social preview image and og/twitter meta (P5) (deps: T213)
+  - Done when: image 1280x640 is in the build; meta tags tested.
+- [ ] T220 · Backtest slice table (C1) (deps: T214)
+  - Done when: Brier by template, month, holiday and negative-price days with day-block intervals, unit-tested; generated statement of where persistence wins.
+- [ ] T221 · Methods note on a base rate scoring above 0.25 early (C4) (deps: T220)
+  - Done when: Methods has one sentence, and a test pins it.
+- [ ] T222 · SMARD forecast-vintage archive (C2) (deps: T221)
+  - Done when: wind/solar/load forecasts stored with fetch time through the as-of gateway; SMARD terms noted in SOURCES; no model change.
+- [ ] T223 · LLM ablation on the frozen golden set (C3) (deps: T222)
+  - Done when: one llm-eval dispatch within caps; result committed; Evals page labels it "evaluation set, not live".
+- [ ] T224 · 90-second EN/DE walkthrough draft (P6) (deps: T223)
+  - Done when: docs/interview/pitch.md updated with live ML facts; the owner rehearses it (human).

@@ -19,7 +19,7 @@
 <aside class="standings" aria-labelledby="st-title">
 <h2 id="st-title">Standings <span class="st-scope">{{ "official" if official_start else "rehearsal" }}</span></h2>
 {% if board.rows %}
-<p class="st-note">Average Brier score on the same questions, lower is better.{% if board.label %} <span class="label">{{ board.label }}</span>{% endif %}</p>
+<p class="st-note">Average Brier score on the same questions, lower is better. <span class="st-n">{{ board.questions }} questions · {{ board.days }} day{{ "" if board.days == 1 else "s" }}</span>{% if board.label %} <span class="label">{{ board.label }}</span>{% endif %}</p>
 <ol class="st-list">
 {% for r in board.rows|sort(attribute="brier.estimate") %}<li><span class="st-rank">{{ loop.index }}</span><span class="st-name">{{ fname(r.forecaster_id) }}{% if is_ai(r.forecaster_id) %} <span class="label">AI</span>{% endif %}</span><span class="st-bar" aria-hidden="true"><span class="st-fill {{ series_class(r.forecaster_id) }}" style="width: {{ '%.1f'|format([r.brier.estimate / 0.35, 1]|min * 100) }}%"></span></span><span class="st-val">{{ "%.3f"|format(r.brier.estimate) }}</span></li>
 {% endfor %}</ol>

@@ -108,6 +108,31 @@ def highlights() -> str:
     return "\n".join(lines)
 
 
+def headline() -> str:
+    """The README's 'Result so far' block (P3): one backtest result, its caveat, live status."""
+    power = _card("power")
+    span = re.search(r"\((\d+) batch days\)", power)
+    n = re.search(r"^\| ml \| (\d+) \|", power, re.M)
+    days = int(span.group(1)) if span else 0
+    d, ci, ok = _diff(power, "ml - persistence")
+    per_day = round(int(n.group(1)) / days) if n and days else 0
+    return (
+        f"**Result so far (backtest, not the live record):** over {days} days of German "
+        f"day-ahead electricity, the gradient-boosted model scores Brier {_brier(power, 'ml')} "
+        f'against {_brier(power, "persistence")} for "same as last time" and '
+        f"{_brier(power, 'base_rate')} for the base rate (lower is better; always saying 50% "
+        f"scores 0.25). Paired difference to persistence: {d} {ci}"
+        f"{', supported' if ok else ', interval includes zero'}. "
+        f"Caveat: the {n.group(1) if n else '?'} questions come from only {days} independent "
+        f"days (about {per_day} correlated questions per day), so intervals resample "
+        "whole days.\n\n"
+        "**Live record:** running in rehearsal since 2026-11-13. Whether LLM agents beat the "
+        "classical model is **too early to tell**; the "
+        "[Status page](https://jashd12.github.io/forecast-arena/status.html) shows the "
+        "current counts."
+    )
+
+
 def stack() -> str:
     return "**Stack:** " + " · ".join(skill for skill, _, _, _ in PROOFS)
 
@@ -122,6 +147,7 @@ def skills() -> str:
 
 def render(readme: str) -> str:
     blocks = (
+        ("headline", headline()),
         ("highlights", highlights()),
         ("stack", stack()),
         ("results", results()),

@@ -84,6 +84,10 @@ Code: `src/arena/forecasters/llm.py`, `src/arena/agent/` (`forecaster.py`, `tool
 - **Evaluation result, 24 questions (not live):** with the data, `llm_context` scored a Brier of
   0.1855 against 0.3483 for `llm_plain`; the paired difference interval excludes zero but is
   wide. That says the data helps, not by how much.
+- **Agent in the eval (12 questions, series and base-rate tools only, not live):** Brier 0.2056 against
+  0.1923 for `llm_context` and 0.2255 for `llm_plain`. No paired difference is supported (every interval
+  includes zero), and the agent was not better than the data-fed model. The sample is far too small to
+  conclude anything beyond "no sign that tools help here".
 - **One provider and model family** (Claude Haiku in production); results may not carry over.
 - **Local model is weak and slow** and is therefore a sampled, supplemental forecaster.
 
@@ -123,4 +127,5 @@ Code: `src/arena/forecasters/llm.py`, `src/arena/agent/` (`forecaster.py`, `tool
 10. **What would you change with a bigger budget?**
     Answer every question with the LLMs, add a second provider to check that results do not
     depend on one vendor, and run the agent variants in the eval harness so the ablation covers
-    the whole ladder (still open as task T223b).
+    the whole ladder with news and ML tools in a replay (the eval already covers the agent with series and
+    base-rate tools only).

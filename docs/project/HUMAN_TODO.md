@@ -179,10 +179,11 @@ curl -X POST -H "Authorization: Bearer TOKEN" -H "Accept: application/vnd.github
   - You decide: (a) merge that branch yourself via a pull request (the agent does not merge), or
     (b) change the branch rule or the standing approval so the agent may push to `main` again.
     Until then Phase 12 tasks stay on the branch and CI/promote results for them are unconfirmed.
-- [ ] H22 · Decision: raise the LLM eval token cap for the larger ablation (T223b)
+- [x] H22 · Decision: raise the LLM eval token cap for the larger ablation (T223b)
   - Why: the 24-question run of 2026-11-19 stopped at the default 60,000-token cap (about 14
     questions for two variants). A fair 24-question comparison of plain and context needs about
     100,000 tokens (roughly 2 US cents on the current model); adding the agent variants needs
     more.
   - Decision for you: allow the `max_tokens` input of `llm-eval.yml` to go up to 150,000 for one run?
     Reply yes (and the agent dispatches it from `main`) or no (T223b stays at the 60,000-token size).
+  - Decided 2026-11-19 (yes, same model): one run with `max_tokens=100000` was dispatched from `main` (about 2 US cents). A free model was considered; the free options need an account or a much weaker local model.

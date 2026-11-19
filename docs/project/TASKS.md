@@ -685,3 +685,19 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
     Evaluation, not live. Result: `evals/results/eval-20261119T204603.json`.
 - [x] T224 · 90-second EN/DE walkthrough draft (P6) (deps: T223a)
   - Done when: docs/interview/pitch.md has a 90-second EN and DE walkthrough with no figures (the interview-kit test passes); the owner rehearses it (human).
+
+## Phase 13 - Website usability (owner request 2026-11-19: "make the website user-friendly")
+
+- [x] T230 · Usability pass on the site (deps: T214)
+  - Done 2026-11-19: race chart redesigned (phone layout, three coloured lines, sorted legend, shown from 7 days);
+    home page diet (six answered cards, resolved questions first; 10,745 to 5,104 px on a laptop, 24,035 to
+    10,347 px on a phone); leaderboard (standings and one table first, the rest in disclosures; 8,054 to 2,770 px);
+    Status without internal jargon or run-id walls and with the real schedule; questions archive with folded days
+    and a state filter (26,012 to about 12,000 px on a phone); phone header with one Menu button; chart text at
+    least 11 px as rendered, checked in the browser tests; table of contents on the long reference pages.
+- [ ] T231 · Usability pass, second part (deps: T230)
+  - Not started: a one-line glossary (Brier score, base rate, "too early to tell") linked from the hero; folding the
+    long reference pages (methods, backtests, experiments, tech stack) into sections on phones; "answer due" instead
+    of the "open" pill on question cards.
+  - Done when: the three items are in and page heights on a phone for those four pages are under 10,000 px.
+

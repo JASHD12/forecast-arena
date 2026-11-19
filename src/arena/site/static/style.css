@@ -122,7 +122,7 @@ h3 { font-size: 1.05rem; margin: 0; line-height: 1.35; }
 .chip-markets::before { background: var(--c-markets); }
 .chip-crypto::before { background: var(--c-crypto); }
 .bars { list-style: none; margin: 0; padding: 0; display: grid; gap: .35rem; }
-.bars li { display: grid; grid-template-columns: 9.5rem 1fr 3rem; gap: .5rem; align-items: center;
+.bars li { display: grid; grid-template-columns: 11rem 1fr 3rem; gap: .5rem; align-items: center;
   font-size: .85rem; }
 .bars .who { color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .bars .track { height: .55rem; background: var(--track); border-radius: 999px; overflow: hidden; }
@@ -176,7 +176,7 @@ footer { background: var(--surface); border-top: 1px solid var(--line); padding:
 footer strong { color: var(--fg); }
 
 @media (max-width: 40rem) {
-  .bars li { grid-template-columns: 7.5rem 1fr 2.6rem; }
+  .bars li { grid-template-columns: 9.5rem 1fr 2.6rem; }
   .qgrid { grid-template-columns: 1fr; }
   .stats { grid-template-columns: repeat(2, 1fr); }
   .stat .big { font-size: 1.3rem; }

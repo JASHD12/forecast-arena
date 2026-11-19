@@ -1084,3 +1084,16 @@ and evidence requirements. Do not backfill historical ML forecasts.
   after the morning and evening jobs with `continue-on-error`, so it can never fail a job.
 - The eval agent has series and base-rate tools only: a replay of a past day has no as-of news or
   Wikipedia snapshot, and offering today's news would leak (I3). Its result will be labelled that way.
+
+## 2026-11-19 T230: website usability decisions
+
+- Race chart: only from 7 days of results (fewer points are noise); three coloured lines (ML model, base rate,
+  best AI forecaster), the others grey; values in a sorted legend instead of colliding end labels; separate phone layout.
+- Home: six cards chosen by `pick_cards` (most forecasters answered, then most disagreement, spread over topics);
+  rows with no forecast replaced by one line. Display only; no number changes.
+- Leaderboard: reordered and folded; the statistics and labels are unchanged. The "supported" wording under a
+  "too early to tell" label is left for the owner (H25, SPEC 10).
+- Public text no longer names owner items (H15, H20); the Status schedule describes the real gated hourly runs.
+- Tests: browser checks for chart text (inside its picture, at least 10.5 px as rendered), the archive state filter and
+  page width; the leaderboard heatmap test opens the disclosure first.
+

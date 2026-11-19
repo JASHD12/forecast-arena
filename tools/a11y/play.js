@@ -68,17 +68,19 @@ function fail(msg) { console.error('FAIL ' + msg); process.exitCode = 1; }
   const qs = await ctx.newPage();
   await qs.goto('file://' + path.join(root, 'questions', 'index.html'));
   const total = await qs.locator('.qlist li').count();
+  // folded days are not 'visible' to the browser, so count the rows the filter has not hidden
+  const shown = () => qs.evaluate(() => document.querySelectorAll('.qlist li:not([hidden])').length);
   await qs.locator('#qsearch').fill('zzzz-no-match');
-  if ((await qs.locator('.qlist li:visible').count()) !== 0) fail('search did not filter');
+  if ((await shown()) !== 0) fail('search did not filter');
   await qs.locator('#qsearch').fill('');
-  if ((await qs.locator('.qlist li:visible').count()) !== total) fail('search did not reset');
+  if ((await shown()) !== total) fail('search did not reset');
   else console.log('ok   archive search filters ' + total + ' questions');
   // the state filter narrows the list and opens the days it keeps
   await qs.locator('.state-filter button[data-state="answered"]').click();
-  const answered = await qs.locator('.qlist li:visible').count();
-  if (answered > total || (await qs.locator('.qlist li:visible:not([data-state="answered"])').count()) !== 0) fail('state filter did not filter');
+  const answered = await shown();
+  if (answered > total || (await qs.evaluate(() => document.querySelectorAll('.qlist li:not([hidden]):not([data-state="answered"])').length)) !== 0) fail('state filter did not filter');
   await qs.locator('.state-filter button[data-state="all"]').click();
-  if ((await qs.locator('.qlist li:visible').count()) !== total) fail('state filter did not reset');
+  if ((await shown()) !== total) fail('state filter did not reset');
   else console.log('ok   archive state filter: ' + answered + ' answered of ' + total);
 
   const noJs = await browser.newContext({ javaScriptEnabled: false });

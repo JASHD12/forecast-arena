@@ -66,6 +66,7 @@ Nothing. See the session summary above and `python scripts/status.py`.
 
 ## Done log
 
+- 2026-11-19 T230: website usability pass (see TASKS): race chart, home, leaderboard, Status, archive, phone menu, chart text sizes with browser checks, contents lists. Page heights measured before and after on the real ledger; wording decision H25 and the second part (T231) are open
 - 2026-11-19 T093 (prepared): owner said yes to enabling the ensemble with an official start on 2026-11-23. Only the Actions variable ARENA_OFFICIAL_START_NOT_BEFORE needs the owner (H24); the ensemble registers itself after 60 official common-set questions (expected 2026-11-30). Added a test that the switch works on a real ledger folder. #16 and #17 merged
 - 2026-11-19 T223b (agent): llm-eval run 44611596780 (12 golden questions, plain/context/agent, cap 200,000 tokens, owner-approved H23) completed with no skips: Brier 0.2255 / 0.1923 / 0.2056; no paired difference is supported, the agent is not better than context here (evaluation set, small, not live). Result committed; numbers.md regenerated
 - 2026-11-19 T090, T093, T222b, T223b, T104: ensemble built and tested (inactive until the official record starts and 300 resolved common-set forecasts exist; T093 waits); SMARD forecast-publication probe after the morning and evening jobs; `--variant agent` in the eval harness and workflow (the paid run waits for H23); final audit passed on a fresh ledger clone

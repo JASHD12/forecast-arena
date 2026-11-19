@@ -125,6 +125,16 @@ Keep the first line of each item in exactly this shape; the status script parses
 - [ ] H16 · Recruiter page details
   - Put your degree, university, expected graduation, availability (hours/week, start
     date), languages and LinkedIn URL into `site_content/recruiters.md`, or tell the agent.
+  - Short facts for the first screen go into `site_content/recruiter_facts.json`; every key
+    is optional and anything missing is simply not shown (https links only):
+
+```json
+{"city": "Berlin", "availability": "20 h/week from 2027-01-04", "languages": "German B2, English C1",
+ "linkedin": "https://www.linkedin.com/in/YOUR-NAME", "cv_url": "https://YOUR-HOST/cv.pdf",
+ "email": "you@example.org"}
+```
+
+  - With `cv_url` the main button becomes "Download CV (PDF)"; otherwise LinkedIn or email.
 - [ ] H17 · Proofread the German page
   - Ask a German speaker to read `site_content/de.md` / the "Auf Deutsch" page once it
     exists (T141).

@@ -102,6 +102,7 @@ def headline_backtest(models_dir: Path | None, stem: str = "power") -> dict[str,
         for m in re.finditer(r"^\| (\w+) \| (\d+) \| ([0-9.]+) \| \[", text, re.M)
     }
     diff = re.search(r"^\| ml - base_rate \| ([-+0-9.]+) \| (\[[^\]]+\]) \| (yes|no)", text, re.M)
+    vs_p = re.search(r"^\| ml - persistence \| ([-+0-9.]+) \| (\[[^\]]+\]) \| (yes|no)", text, re.M)
     span = re.search(r"Batches (\S+) to (\S+) \((\d+) batch days\)", text)
     if not rows.get("ml") or not rows.get("base_rate") or diff is None or span is None:
         return None
@@ -110,6 +111,13 @@ def headline_backtest(models_dir: Path | None, stem: str = "power") -> dict[str,
         "diff": diff.group(1),
         "interval": diff.group(2),
         "supported": diff.group(3) == "yes",
+        "vs_persistence": None
+        if vs_p is None
+        else {
+            "diff": vs_p.group(1),
+            "interval": vs_p.group(2),
+            "supported": vs_p.group(3) == "yes",
+        },
         "start": span.group(1),
         "end": span.group(2),
         "days": int(span.group(3)),

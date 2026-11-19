@@ -64,6 +64,7 @@ T171 honesty-audit details are in `docs/progress-archive.md`.
 
 ## Done log
 
+- 2026-11-19 T224: 90-second EN/DE walkthrough (one batch from question to score) added to docs/interview/pitch.md, no figures; the owner has to rehearse it
 - 2026-11-19 T222a: checked the audit's SMARD forecast-vintage premise before building it. Terms (CC BY 4.0, HEDWIG review) and forecast series ids recorded; one live observation shows D+1 forecasts not yet published at 16:06 UTC on D, so they probably cannot be used at the 09:30 UTC lock. Archive not built; T222b measures publication time over 7 days. T223 now depends on T222a
 - 2026-11-19 T220: backtest slice card (`docs/models/power-slices.md`, shown on the Backtests page): ml vs persistence by template, month and target-day type with paired day-block intervals and a generated statement of where persistence is not worse (evening_gt, holidays and several single months: no supported difference); negative-price days not covered (DECISIONS)
 - 2026-11-19 T214, T221: the social preview image (1200x630) and og/twitter meta already existed; now tested, and H18 says where to upload it. Methods explains why a base rate can score above 0.25 early (audit F9)

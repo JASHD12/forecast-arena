@@ -64,6 +64,7 @@ T171 honesty-audit details are in `docs/progress-archive.md`.
 
 ## Done log
 
+- 2026-11-19 T223a: dispatched llm-eval from main (24 questions, 60,000-token cap, run 44586958389): plain answered everything, context hit the cap (budget_exhausted skips), so the run is not committed. T223 split; T223b needs the owner's decision on a higher eval token cap (H22). All of PRs #5-#12 are merged
 - 2026-11-19 T224: 90-second EN/DE walkthrough (one batch from question to score) added to docs/interview/pitch.md, no figures; the owner has to rehearse it
 - 2026-11-19 T222a: checked the audit's SMARD forecast-vintage premise before building it. Terms (CC BY 4.0, HEDWIG review) and forecast series ids recorded; one live observation shows D+1 forecasts not yet published at 16:06 UTC on D, so they probably cannot be used at the 09:30 UTC lock. Archive not built; T222b measures publication time over 7 days. T223 now depends on T222a
 - 2026-11-19 T220: backtest slice card (`docs/models/power-slices.md`, shown on the Backtests page): ml vs persistence by template, month and target-day type with paired day-block intervals and a generated statement of where persistence is not worse (evening_gt, holidays and several single months: no supported difference); negative-price days not covered (DECISIONS)

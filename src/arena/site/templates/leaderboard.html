@@ -2,15 +2,7 @@
 {% from "macros.html" import board_table, page_head with context %}
 {% block content %}
 {{ page_head("Who forecasts best?", "Leaderboard", "Lower is better. A forecaster that always says 50% scores 0.25 (the line on each bar). The base rate is the yardstick to beat.") }}
-<h2>Participation and score availability</h2>
-<p>Published forecasts appear here before outcomes are available. A dash in score tables is not a zero score. Registered headline comparisons retain their fixed membership and coverage rules; LangGraph is a supplemental sampled forecaster.</p>
-<div class="table-scroll" tabindex="0" role="region" aria-label="Forecaster participation"><table><thead><tr><th>Forecaster</th><th>Published</th><th>Scored</th><th>Awaiting outcomes</th><th>Outside sample</th><th>Other skips</th></tr></thead><tbody>
-{% for p in participants %}<tr><th><a href="forecasters/{{ p.id }}.html">{{ fname(p.id) }}</a></th><td>{{ p.published }}</td><td>{{ p.scored }}{% if not p.scored %} · no score yet{% endif %}</td><td>{{ p.pending }}</td><td>{{ p.sampled_out }}</td><td>{{ p.failed }}</td></tr>{% endfor %}</tbody></table></div>
-<p class="note">Counts cover all published history, rehearsal included. Old absent records are not newly classified as skips. Models lacking full reference-population coverage can remain ineligible for the all-questions board even after some forecasts resolve.</p>
 {% if not official_start %}<p class="rehearsal-note" role="note"><strong>Rehearsal phase.</strong> {{ start_rule }}</p>{% endif %}
-<details class="faq"><summary>How the scores are computed</summary>
-<p>Brier and log scores are lower-is-better, on probabilities clipped to [0.01, 0.99]. Intervals are 95% day-block bootstrap intervals (questions from the same day are correlated, so days are resampled). A difference is called supported only when its interval excludes zero. With fewer than 30 official days or 300 resolved common-set forecasts every board says "too early to tell". The common set contains only the questions every forecaster in the group answered, so the comparison is fair.</p>
-</details>
 {% set main = headline[0] if official_start else rehearsal[0] %}
 {% if main and main.rows %}
 {% set ranked = main.rows|sort(attribute="brier.estimate") %}
@@ -25,6 +17,25 @@
 </figure>
 </section>
 {% endif %}
+{% macro boards(list, note, suffix="", overall=True) %}
+{% for b in list if (b.domain == "overall") == overall %}
+<h3>{{ "Same questions for everyone" if b.kind == "common" else "All questions" }} · {{ "All topics" if b.domain == "overall" else dname(b.domain) }}{{ suffix }}</h3>
+{{ board_table(b, note if note else ("Common set: only questions answered by every forecaster in the group" if b.kind == "common" else "All questions: forecasters that answer everything")) }}
+{% endfor %}
+{% endmacro %}
+{% if official_start %}
+<h2>Official record (since {{ official_start }}, {{ official_days }} days)</h2>
+{{ boards(headline, None) }}
+<details class="lb-more"><summary>Official scores by topic</summary>{{ boards(headline, None, "", False) }}</details>
+<h2>Rehearsal days (excluded from the headline)</h2>
+<details class="lb-more"><summary>Rehearsal scores</summary>{{ boards(rehearsal, "Rehearsal days, shown for transparency and not part of the official record", " (rehearsal)") }}
+<details class="lb-more"><summary>Rehearsal scores by topic</summary>{{ boards(rehearsal, "Rehearsal days, shown for transparency and not part of the official record", " (rehearsal)", False) }}</details></details>
+{% else %}
+<h2>Rehearsal scores</h2>
+{{ boards(rehearsal, "Rehearsal days, shown for transparency and not part of the official record") }}
+<details class="lb-more"><summary>Scores by topic</summary>{{ boards(rehearsal, "Rehearsal days, shown for transparency and not part of the official record", "", False) }}</details>
+{% endif %}
+<details class="lb-more"><summary>Skill by topic (which forecaster is good at what)</summary>
 {% if heat.fids %}
 <section aria-labelledby="hm-title">
 <div class="section-head"><h2 id="hm-title">Skill by topic</h2><span class="note">{{ matrix_scope|capitalize }}</span></div>
@@ -34,29 +45,27 @@
 <tbody>{% for f in heat.fids %}<tr><th scope="row"><a href="{{ root }}forecasters/{{ f }}.html">{{ fname(f) }}</a></th>{% for d in heat.domains %}{% set c = heat.cells[f][d] %}<td class="num hm {{ c.tone }}" data-sort="{{ c.skill if c.skill is not none else '' }}">{% if c.skill is none %}–{% else %}{{ "%+.2f"|format(c.skill) }}{% if c.few %} <span class="hm-few">few</span>{% endif %}<span class="sr-only"> on {{ c.n }} questions</span>{% endif %}</td>{% endfor %}</tr>{% endfor %}</tbody></table></div>
 </section>
 {% endif %}
+</details>
+<details class="lb-more"><summary>Head to head (who beat whom)</summary>
 {% if h2h.fids|length > 1 %}
 <section aria-labelledby="h2h-title">
 <div class="section-head"><h2 id="h2h-title">Head to head</h2><span class="note">{{ matrix_scope|capitalize }}</span></div>
 <p class="note">Each cell: Brier score of the row minus the column on the questions both answered, with its 95% day-block interval. Negative (blue) means the row forecaster did better. Coloured only when the interval excludes zero; gray means the data cannot tell them apart yet. Pairs with fewer than {{ min_n }} shared questions are left out.</p>
+<p class="scroll-hint">Scroll the table sideways to see every column →</p>
 <div class="table-scroll" tabindex="0" role="region" aria-label="Head to head"><table class="heatmap h2h">
 <thead><tr><th scope="col">Row minus column</th>{% for b in h2h.fids %}<th scope="col" class="num">{{ fname(b) }}</th>{% endfor %}</tr></thead>
 <tbody>{% for a in h2h.fids %}<tr><th scope="row">{{ fname(a) }}</th>{% for b in h2h.fids %}{% set c = h2h.cells[a][b] %}{% if c is none %}<td class="hm-self" aria-label="same forecaster">·</td>{% elif c.diff is none %}<td class="num hm-n">–<span class="sr-only"> only {{ c.n }} shared questions</span></td>{% else %}<td class="num hm {{ c.tone }}">{{ "%+.3f"|format(c.diff) }}<br><span class="hm-ci">[{{ "%+.3f"|format(c.lo) }}, {{ "%+.3f"|format(c.hi) }}]</span>{% if c.excludes_zero %}<span class="sr-only"> interval excludes zero</span>{% endif %}</td>{% endif %}{% endfor %}</tr>{% endfor %}</tbody></table></div>
 </section>
 {% endif %}
-{% macro boards(list, note, suffix="") %}
-{% for b in list %}
-<h3>{{ "Same questions for everyone" if b.kind == "common" else "All questions" }} · {{ "All topics" if b.domain == "overall" else dname(b.domain) }}{{ suffix }}</h3>
-{{ board_table(b, note if note else ("Common set: only questions answered by every forecaster in the group" if b.kind == "common" else "All questions: forecasters that answer everything")) }}
-{% endfor %}
-{% endmacro %}
-{% if official_start %}
-<h2>Official record (since {{ official_start }}, {{ official_days }} days)</h2>
-{{ boards(headline, None) }}
-<h2>Rehearsal days (excluded from the headline)</h2>
-{{ boards(rehearsal, "Rehearsal days, shown for transparency and not part of the official record", " (rehearsal)") }}
-{% else %}
-<p class="notice"><strong>The official record has not started yet.</strong> Below are rehearsal scores, shown for transparency only. They will not count towards the headline results.</p>
-<h2>Rehearsal scores</h2>
-{{ boards(rehearsal, "Rehearsal days, shown for transparency and not part of the official record") }}
-{% endif %}
+</details>
+<details class="lb-more"><summary>Participation and score availability</summary>
+<h2>Participation and score availability</h2>
+<p>Published forecasts appear here before outcomes are available. A dash in score tables is not a zero score. Registered headline comparisons retain their fixed membership and coverage rules; LangGraph is a supplemental sampled forecaster.</p>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Forecaster participation"><table><thead><tr><th>Forecaster</th><th>Published</th><th>Scored</th><th>Awaiting outcomes</th><th>Outside sample</th><th>Other skips</th></tr></thead><tbody>
+{% for p in participants %}<tr><th><a href="forecasters/{{ p.id }}.html">{{ fname(p.id) }}</a></th><td>{{ p.published }}</td><td>{{ p.scored }}{% if not p.scored %} · no score yet{% endif %}</td><td>{{ p.pending }}</td><td>{{ p.sampled_out }}</td><td>{{ p.failed }}</td></tr>{% endfor %}</tbody></table></div>
+<p class="note">Counts cover all published history, rehearsal included. Old absent records are not newly classified as skips. Models lacking full reference-population coverage can remain ineligible for the all-questions board even after some forecasts resolve.</p>
+</details>
+<details class="faq"><summary>How the scores are computed</summary>
+<p>Brier and log scores are lower-is-better, on probabilities clipped to [0.01, 0.99]. Intervals are 95% day-block bootstrap intervals (questions from the same day are correlated, so days are resampled). A difference is called supported only when its interval excludes zero. With fewer than 30 official days or 300 resolved common-set forecasts every board says "too early to tell". The common set contains only the questions every forecaster in the group answered, so the comparison is fair.</p>
+</details>
 {% endblock %}

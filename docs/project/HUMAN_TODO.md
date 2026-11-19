@@ -141,6 +141,9 @@ Keep the first line of each item in exactly this shape; the status script parses
 - [ ] H18 · Repository presentation on GitHub
   - Repo settings (owner only): description, website link, topics (e.g. forecasting,
     machine-learning, llm, mlops, rag), and pin the repo on your profile.
+  - Suggested description: "Live public benchmark: classical ML vs LLM agents forecasting tomorrow, with forecasts locked in a hash-chained ledger before the answer exists."
+    Topics: forecasting, machine-learning, llm, llm-agents, mlops, time-series, data-science, python, github-actions, langgraph.
+    Social preview (Settings > General > Social preview): upload `src/arena/site/static/og.png` (1200x630).
 - [ ] H19 · Streamlit dashboard hosting (optional, free)
   - After T143: create a free Streamlit Community Cloud account, deploy
     `apps/dashboard/streamlit_app.py` from this repo, and set the Actions variable

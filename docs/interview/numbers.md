@@ -166,6 +166,17 @@ Source: `evals/results/eval-20261114T0052-text.json`
 | llm_plain | claude-haiku-5-5 | 12 | 12 | 0.2634 | 0.2380 | 100% | 0% | 0.0036 | 5435 |
 
 Paired Brier difference: llm_plain - llm_context: +0.0841 [-0.0445, +0.2354] on 12 items
+
+### Run `eval-20261119T185324` (24 items; caps 96 requests, 100000 tokens)
+
+Source: `evals/results/eval-20261119T185324.json`
+
+| Forecaster | Model | n | Answered | Brier | Base rate, same items | Valid JSON first try | Repair rate | Cost (USD) | Output tokens |
+|---|---|---|---|---|---|---|---|---|---|
+| llm_context | claude-haiku-5-5 | 24 | 24 | 0.1855 | 0.2081 | 100% | 0% | 0.0129 | 15061 |
+| llm_plain | claude-haiku-5-5 | 24 | 24 | 0.3483 | 0.2081 | 100% | 0% | 0.0071 | 11310 |
+
+Paired Brier difference: llm_plain - llm_context: +0.1628 [+0.0603, +0.2679] on 24 items
 <!-- evals:end -->
 
 <!-- live:start -->

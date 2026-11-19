@@ -1,0 +1,507 @@
+{
+ "caps": {
+  "max_requests": 96,
+  "max_tokens": 100000
+ },
+ "created_at": "2026-11-19T18:53:24.550727+00:00",
+ "golden": "power-2026-10.jsonl",
+ "golden_sha256": "29939ca9268558fc6e153e3859fa57924536d00ed5530a83808d26a8bdcf8194",
+ "kind": "evaluation",
+ "metrics": {
+  "llm_context": {
+   "answered": 24,
+   "base_rate_brier_same_items": 0.20814626654064272,
+   "brier": 0.1854625,
+   "cache_read_tokens": 0,
+   "cache_write_tokens": 0,
+   "calls": 24,
+   "cost_usd": 0.012859200000000001,
+   "ece": 0.22375,
+   "input_tokens": 53287,
+   "json_valid_first_try": 1.0,
+   "log_score": 0.5461600739552025,
+   "model": "claude-haiku-5-5",
+   "n": 24,
+   "output_tokens": 15061,
+   "repair_rate": 0.0,
+   "skill_vs_base_rate": 0.10897993472399603,
+   "skips": {},
+   "stop_reasons": {
+    "end_turn": 24
+   }
+  },
+  "llm_plain": {
+   "answered": 24,
+   "base_rate_brier_same_items": 0.20814626654064272,
+   "brier": 0.34826666666666667,
+   "cache_read_tokens": 0,
+   "cache_write_tokens": 0,
+   "calls": 24,
+   "cost_usd": 0.0071278,
+   "ece": 0.36,
+   "input_tokens": 14728,
+   "json_valid_first_try": 1.0,
+   "log_score": 0.9605368637898245,
+   "model": "claude-haiku-5-5",
+   "n": 24,
+   "output_tokens": 11310,
+   "repair_rate": 0.0,
+   "skill_vs_base_rate": -0.6731823849392176,
+   "skips": {},
+   "stop_reasons": {
+    "end_turn": 24
+   }
+  }
+ },
+ "n_items": 24,
+ "paired": [
+  {
+   "a": "llm_plain",
+   "b": "llm_context",
+   "days": 21,
+   "diff": 0.16280416666666667,
+   "hi": 0.26786823369565205,
+   "lo": 0.06031876811594204,
+   "n": 24
+  }
+ ],
+ "rows": [
+  {
+   "day": "2026-10-13",
+   "detail": null,
+   "outcome": 1,
+   "probability": 0.2,
+   "question_id": "power-evening_gt-DE_LU-2026-10-14-v1",
+   "skip": null,
+   "variant": "llm_plain"
+  },
+  {
+   "day": "2026-10-14",
+   "detail": null,
+   "outcome": 1,
+   "probability": 0.25,
+   "question_id": "power-evening_gt-DE_LU-2026-10-15-v1",
+   "skip": null,
+   "variant": "llm_plain"
+  },
+  {
+   "day": "2026-10-25",
+   "detail": null,
+   "outcome": 1,
+   "probability": 0.2,
+   "question_id": "power-evening_gt-DE_LU-2026-10-26-v1",
+   "skip": null,
+   "variant": "llm_plain"
+  },
+  {
+   "day": "2026-10-28",
+   "detail": null,
+   "outcome": 1,
+   "probability": 0.2,
+   "question_id": "power-evening_gt-DE_LU-2026-10-29-v1",
+   "skip": null,
+   "variant": "llm_plain"
+  },
+  {
+   "day": "2026-10-11",
+   "detail": null,
+   "outcome": 1,
+   "probability": 0.15,
+   "question_id": "power-max_gt-DE_LU-2026-10-12-v1",
+   "skip": null,
+   "variant": "llm_plain"
+  },
+  {
+   "day": "2026-10-12",
+   "detail": null,
+   "outcome": 0,
+   "probability": 0.2,
+   "question_id": "power-max_gt-DE_LU-2026-10-13-v1",
+   "skip": null,
+   "variant": "llm_plain"
+  },
+  {
+   "day": "2026-10-14",
+   "detail": null,
+   "outcome": 1,
+   "probability": 0.14,
+   "question_id": "power-max_gt-DE_LU-2026-10-15-v1",
+   "skip": null,
+   "variant": "llm_plain"
+  },
+  {
+   "day": "2026-10-20",
+   "detail": null,
+   "outcome": 1,
+   "probability": 0.12,
+   "question_id": "power-max_gt-DE_LU-2026-10-21-v1",
+   "skip": null,
+   "variant": "llm_plain"
+  },
+  {
+   "day": "2026-10-05",
+   "detail": null,
+   "outcome": 1,
+   "probability": 0.12,
+   "question_id": "power-mean_gt-DE_LU-2026-10-06-v1",
+   "skip": null,
+   "variant": "llm_plain"
+  },
+  {
+   "day": "2026-10-08",
+   "detail": null,
+   "outcome": 0,
+   "probability": 0.12,
+   "question_id": "power-mean_gt-DE_LU-2026-10-09-v1",
+   "skip": null,
+   "variant": "llm_plain"
+  },
+  {
+   "day": "2026-10-26",
+   "detail": null,
+   "outcome": 0,
+   "probability": 0.07,
+   "question_id": "power-mean_gt-DE_LU-2026-10-27-v1",
+   "skip": null,
+   "variant": "llm_plain"
+  },
+  {
+   "day": "2026-10-30",
+   "detail": null,
+   "outcome": 1,
+   "probability": 0.12,
+   "question_id": "power-mean_gt-DE_LU-2026-10-31-v1",
+   "skip": null,
+   "variant": "llm_plain"
+  },
+  {
+   "day": "2026-10-06",
+   "detail": null,
+   "outcome": 0,
+   "probability": 0.3,
+   "question_id": "power-min_lt-DE_LU-2026-10-07-v1",
+   "skip": null,
+   "variant": "llm_plain"
+  },
+  {
+   "day": "2026-10-07",
+   "detail": null,
+   "outcome": 0,
+   "probability": 0.55,
+   "question_id": "power-min_lt-DE_LU-2026-10-08-v1",
+   "skip": null,
+   "variant": "llm_plain"
+  },
+  {
+   "day": "2026-10-10",
+   "detail": null,
+   "outcome": 0,
+   "probability": 0.45,
+   "question_id": "power-min_lt-DE_LU-2026-10-11-v1",
+   "skip": null,
+   "variant": "llm_plain"
+  },
+  {
+   "day": "2026-10-27",
+   "detail": null,
+   "outcome": 0,
+   "probability": 0.3,
+   "question_id": "power-min_lt-DE_LU-2026-10-28-v1",
+   "skip": null,
+   "variant": "llm_plain"
+  },
+  {
+   "day": "2026-10-15",
+   "detail": null,
+   "outcome": 0,
+   "probability": 0.17,
+   "question_id": "power-spread_gt-DE_LU-2026-10-16-v1",
+   "skip": null,
+   "variant": "llm_plain"
+  },
+  {
+   "day": "2026-10-16",
+   "detail": null,
+   "outcome": 0,
+   "probability": 0.35,
+   "question_id": "power-spread_gt-DE_LU-2026-10-17-v1",
+   "skip": null,
+   "variant": "llm_plain"
+  },
+  {
+   "day": "2026-10-21",
+   "detail": null,
+   "outcome": 1,
+   "probability": 0.36,
+   "question_id": "power-spread_gt-DE_LU-2026-10-22-v1",
+   "skip": null,
+   "variant": "llm_plain"
+  },
+  {
+   "day": "2026-10-22",
+   "detail": null,
+   "outcome": 0,
+   "probability": 0.3,
+   "question_id": "power-spread_gt-DE_LU-2026-10-23-v1",
+   "skip": null,
+   "variant": "llm_plain"
+  },
+  {
+   "day": "2026-10-02",
+   "detail": null,
+   "outcome": 0,
+   "probability": 0.15,
+   "question_id": "power-up_vs_today-DE_LU-2026-10-03-v1",
+   "skip": null,
+   "variant": "llm_plain"
+  },
+  {
+   "day": "2026-10-19",
+   "detail": null,
+   "outcome": 0,
+   "probability": 0.4,
+   "question_id": "power-up_vs_today-DE_LU-2026-10-20-v1",
+   "skip": null,
+   "variant": "llm_plain"
+  },
+  {
+   "day": "2026-10-21",
+   "detail": null,
+   "outcome": 0,
+   "probability": 0.42,
+   "question_id": "power-up_vs_today-DE_LU-2026-10-22-v1",
+   "skip": null,
+   "variant": "llm_plain"
+  },
+  {
+   "day": "2026-10-27",
+   "detail": null,
+   "outcome": 1,
+   "probability": 0.42,
+   "question_id": "power-up_vs_today-DE_LU-2026-10-28-v1",
+   "skip": null,
+   "variant": "llm_plain"
+  },
+  {
+   "day": "2026-10-13",
+   "detail": null,
+   "outcome": 1,
+   "probability": 0.45,
+   "question_id": "power-evening_gt-DE_LU-2026-10-14-v1",
+   "skip": null,
+   "variant": "llm_context"
+  },
+  {
+   "day": "2026-10-14",
+   "detail": null,
+   "outcome": 1,
+   "probability": 0.56,
+   "question_id": "power-evening_gt-DE_LU-2026-10-15-v1",
+   "skip": null,
+   "variant": "llm_context"
+  },
+  {
+   "day": "2026-10-25",
+   "detail": null,
+   "outcome": 1,
+   "probability": 0.45,
+   "question_id": "power-evening_gt-DE_LU-2026-10-26-v1",
+   "skip": null,
+   "variant": "llm_context"
+  },
+  {
+   "day": "2026-10-28",
+   "detail": null,
+   "outcome": 1,
+   "probability": 0.56,
+   "question_id": "power-evening_gt-DE_LU-2026-10-29-v1",
+   "skip": null,
+   "variant": "llm_context"
+  },
+  {
+   "day": "2026-10-11",
+   "detail": null,
+   "outcome": 1,
+   "probability": 0.42,
+   "question_id": "power-max_gt-DE_LU-2026-10-12-v1",
+   "skip": null,
+   "variant": "llm_context"
+  },
+  {
+   "day": "2026-10-12",
+   "detail": null,
+   "outcome": 0,
+   "probability": 0.42,
+   "question_id": "power-max_gt-DE_LU-2026-10-13-v1",
+   "skip": null,
+   "variant": "llm_context"
+  },
+  {
+   "day": "2026-10-14",
+   "detail": null,
+   "outcome": 1,
+   "probability": 0.5,
+   "question_id": "power-max_gt-DE_LU-2026-10-15-v1",
+   "skip": null,
+   "variant": "llm_context"
+  },
+  {
+   "day": "2026-10-20",
+   "detail": null,
+   "outcome": 1,
+   "probability": 0.45,
+   "question_id": "power-max_gt-DE_LU-2026-10-21-v1",
+   "skip": null,
+   "variant": "llm_context"
+  },
+  {
+   "day": "2026-10-05",
+   "detail": null,
+   "outcome": 1,
+   "probability": 0.56,
+   "question_id": "power-mean_gt-DE_LU-2026-10-06-v1",
+   "skip": null,
+   "variant": "llm_context"
+  },
+  {
+   "day": "2026-10-08",
+   "detail": null,
+   "outcome": 0,
+   "probability": 0.5,
+   "question_id": "power-mean_gt-DE_LU-2026-10-09-v1",
+   "skip": null,
+   "variant": "llm_context"
+  },
+  {
+   "day": "2026-10-26",
+   "detail": null,
+   "outcome": 0,
+   "probability": 0.5,
+   "question_id": "power-mean_gt-DE_LU-2026-10-27-v1",
+   "skip": null,
+   "variant": "llm_context"
+  },
+  {
+   "day": "2026-10-30",
+   "detail": null,
+   "outcome": 1,
+   "probability": 0.6,
+   "question_id": "power-mean_gt-DE_LU-2026-10-31-v1",
+   "skip": null,
+   "variant": "llm_context"
+  },
+  {
+   "day": "2026-10-06",
+   "detail": null,
+   "outcome": 0,
+   "probability": 0.08,
+   "question_id": "power-min_lt-DE_LU-2026-10-07-v1",
+   "skip": null,
+   "variant": "llm_context"
+  },
+  {
+   "day": "2026-10-07",
+   "detail": null,
+   "outcome": 0,
+   "probability": 0.12,
+   "question_id": "power-min_lt-DE_LU-2026-10-08-v1",
+   "skip": null,
+   "variant": "llm_context"
+  },
+  {
+   "day": "2026-10-10",
+   "detail": null,
+   "outcome": 0,
+   "probability": 0.35,
+   "question_id": "power-min_lt-DE_LU-2026-10-11-v1",
+   "skip": null,
+   "variant": "llm_context"
+  },
+  {
+   "day": "2026-10-27",
+   "detail": null,
+   "outcome": 0,
+   "probability": 0.1,
+   "question_id": "power-min_lt-DE_LU-2026-10-28-v1",
+   "skip": null,
+   "variant": "llm_context"
+  },
+  {
+   "day": "2026-10-15",
+   "detail": null,
+   "outcome": 0,
+   "probability": 0.32,
+   "question_id": "power-spread_gt-DE_LU-2026-10-16-v1",
+   "skip": null,
+   "variant": "llm_context"
+  },
+  {
+   "day": "2026-10-16",
+   "detail": null,
+   "outcome": 0,
+   "probability": 0.3,
+   "question_id": "power-spread_gt-DE_LU-2026-10-17-v1",
+   "skip": null,
+   "variant": "llm_context"
+  },
+  {
+   "day": "2026-10-21",
+   "detail": null,
+   "outcome": 1,
+   "probability": 0.3,
+   "question_id": "power-spread_gt-DE_LU-2026-10-22-v1",
+   "skip": null,
+   "variant": "llm_context"
+  },
+  {
+   "day": "2026-10-22",
+   "detail": null,
+   "outcome": 0,
+   "probability": 0.37,
+   "question_id": "power-spread_gt-DE_LU-2026-10-23-v1",
+   "skip": null,
+   "variant": "llm_context"
+  },
+  {
+   "day": "2026-10-02",
+   "detail": null,
+   "outcome": 0,
+   "probability": 0.14,
+   "question_id": "power-up_vs_today-DE_LU-2026-10-03-v1",
+   "skip": null,
+   "variant": "llm_context"
+  },
+  {
+   "day": "2026-10-19",
+   "detail": null,
+   "outcome": 0,
+   "probability": 0.35,
+   "question_id": "power-up_vs_today-DE_LU-2026-10-20-v1",
+   "skip": null,
+   "variant": "llm_context"
+  },
+  {
+   "day": "2026-10-21",
+   "detail": null,
+   "outcome": 0,
+   "probability": 0.38,
+   "question_id": "power-up_vs_today-DE_LU-2026-10-22-v1",
+   "skip": null,
+   "variant": "llm_context"
+  },
+  {
+   "day": "2026-10-27",
+   "detail": null,
+   "outcome": 1,
+   "probability": 0.47,
+   "question_id": "power-up_vs_today-DE_LU-2026-10-28-v1",
+   "skip": null,
+   "variant": "llm_context"
+  }
+ ],
+ "run_id": "eval-20261119T185324",
+ "versions": {
+  "llm_context": "claude-haiku-5-5|prompt-v1-b60acd4b5b85|out-1024",
+  "llm_plain": "claude-haiku-5-5|prompt-v1-288e95dbe344|out-1024"
+ }
+}

@@ -135,16 +135,27 @@ Keep the first line of each item in exactly this shape; the status script parses
   - After T143: create a free Streamlit Community Cloud account, deploy
     `apps/dashboard/streamlit_app.py` from this repo, and set the Actions variable
     `ARENA_DASHBOARD_URL` to its address.
-- [ ] H20 · External scheduler for the lock-critical morning job (optional, recommended)
-  - Why: on 2026-11-14 GitHub started no scheduled morning run before 06:20 UTC, although
-    the cron slots started at 00:15; the lock is 09:30 UTC, so one late day loses a batch.
-  - What: use any free cron service (or a machine you own) to call, once an hour from 05:00
-    to 08:00 UTC, `POST https://api.github.com/repos/JASHD12/forecast-arena/actions/workflows/morning.yml/dispatches`
-    with body `{"ref":"main","inputs":{"dry_run":"false"}}` and a fine-grained token that
-    has only "Actions: read and write" on this repository. The job is idempotent and the
-    gate (`arena schedule due`) is not used for dispatches, but a run after the batch is
-    sealed does nothing. Do not give the token to the agent; store it in the cron service.
+- [ ] H20 · External scheduler for the lock-critical jobs (optional, recommended)
+  - Why: GitHub starts scheduled runs hours late on this repository (morning slot 00:15 started
+    06:20 to 07:53 UTC; evening runs 22:52 to 04:00; players runs 17:31 to 19:37, after the
+    lock). The lock is 09:30 UTC, so one very late day loses a batch.
+  - What: in a free cron service (or on a machine you own), create these calls with a
+    fine-grained token that has only "Actions: read and write" on this repository:
+    - morning: every hour from 05:00 to 08:00 UTC, `workflow_dispatch` of `morning.yml`;
+    - evening: once at 20:00 UTC, `workflow_dispatch` of `evening.yml`;
+    - players (only after H15): once at 09:00 UTC, `workflow_dispatch` of `players.yml`.
+  - Request for each (replace WORKFLOW and TOKEN; keep the token in the cron service):
 
+```bash
+curl -X POST -H "Authorization: Bearer TOKEN" -H "Accept: application/vnd.github+json" \
+  https://api.github.com/repos/JASHD12/forecast-arena/actions/workflows/WORKFLOW.yml/dispatches \
+  -d '{"ref":"main","inputs":{"dry_run":"false"}}'
+```
+
+  - Safe to repeat: a morning run after the batch is sealed does nothing, an evening run after
+    questions exist does nothing, and a players row already written is never replaced.
+  - Do not give the token to the agent (AGENTS.md S2, S3). Done when the Status page shows
+    seven days of morning runs starting before 08:30 UTC.
 - [ ] H21 · `main` now rejects direct pushes (found 2026-11-19)
   - What happened: `git push origin main` was refused: "Protected branch update failed ...
     Changes must be made through a pull request. 2 of 2 required status checks are expected."

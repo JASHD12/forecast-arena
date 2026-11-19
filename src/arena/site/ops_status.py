@@ -170,3 +170,50 @@ def run_start_times(ledger: Ledger, today: date, days: int = 7) -> list[StartRow
                          first >= lock if job == "morning" else None)
             )  # fmt: skip
     return rows
+
+
+@dataclass(frozen=True)
+class PlayersState:
+    """What the players' intake did last (T205): computed from the run manifests only."""
+
+    state: str  # never_ran | not_configured | late | refused | nothing | wrote
+    text: str
+    last_run: datetime | None = None
+
+
+def players_state(ledger: Ledger, today: date, days: int = 14) -> PlayersState:
+    """Say honestly whether the public players' intake is working.
+
+    It writes forecasts only when a CSV is configured (H15) and the run starts between 08:30
+    UTC and the lock; GitHub's scheduler often starts the cron later than that, so the
+    last real run's own warnings decide the wording, never the configuration alone."""
+    real = [
+        m
+        for i in range(days)
+        for m in manifests_for_day(ledger, today - timedelta(days=i))
+        if m.job == "players" and not m.dry_run
+    ]
+    if not real:
+        return PlayersState(
+            "never_ran",
+            f"The players' intake has not run in the last {days} days. It needs the players' "
+            "form (owner item H15) and a start between 08:30 UTC and the 09:30 UTC lock.",
+        )
+    last = max(real, key=lambda m: m.started_at)
+    warns = " ".join(last.warnings)
+    if "no players CSV configured" in warns:
+        state, text = "not_configured", "The players' form is not configured yet (owner item H15)."
+    elif "late run" in warns or "lock passed" in warns:
+        state, text = (
+            "late",
+            "The last intake run started after the lock, so it wrote nothing. GitHub starts "
+            "scheduled runs late; until an external scheduler calls it (owner item H20) the "
+            "intake effectively runs only when started by hand.",
+        )
+    elif "refused" in warns:
+        state, text = "refused", "The last intake run was refused (wrong batch date)."
+    elif last.counts.get("players", 0) or last.counts.get("forecasts", 0):
+        state, text = "wrote", "The last intake run wrote the players' forecasts."
+    else:
+        state, text = "nothing", "The last intake run found nothing to write."
+    return PlayersState(state, text, last.started_at)

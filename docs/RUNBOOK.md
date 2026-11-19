@@ -8,13 +8,25 @@ Everything runs on GitHub Actions from the `stable` branch (the last commit of `
 that passed CI; `promote.yml` fast-forwards it after every green CI run). All ledger
 writers share the concurrency group `arena-ledger`, so two jobs never push at once.
 
-| Time (UTC) | Workflow | What it does |
+| Cron slots (UTC) | Workflow | What it does |
 |---|---|---|
-| 05:30, 07:00 | `morning.yml` | Generates the day's questions, runs every forecaster, snapshots the inputs, seals the batch, pushes the `ledger` branch, verifies it, rebuilds and deploys the site. The second run is a no-op if the first succeeded. |
+| hourly 00:15 to 08:15 | `morning.yml` | A `gate` job asks `arena schedule due --job morning` whether the batch is still unsealed and before the lock; only then does the run generate any missing questions, run every forecaster, snapshot the inputs, seal the batch, push the `ledger` branch, verify it, and rebuild and deploy the site. Later slots are no-ops. |
 | 09:30 | (lock) | Every question of the day locks. A run after this writes nothing ("late run" in its manifest). |
-| 12:30, 16:30, 20:30, 03:30 | `resolve.yml` | Resolves whatever has become resolvable, records source revisions, seals finished days, verifies, rebuilds and deploys the site. |
+| hourly 16:00 to 23:00 | `evening.yml` | Publishes tomorrow's questions (template v2) once, via the same gate. |
+| 08:40, 09:00, 09:15 | `players.yml` | Writes the public players' forecasts shortly before the lock (needs H15). |
+| every 3 hours at :30 | `resolve.yml` | Resolves whatever has become resolvable, records source revisions, seals finished days, verifies, rebuilds and deploys the site. |
 | Sunday 02:00 | `weekly.yml` | Retrains models, promotes them only by the rule in `src/arena/ops/weekly.py`, writes a summary and drift metrics to the ledger. |
 | 1st of the month 06:17 | `deps.yml` | Lists outdated dependency pins in the run summary. |
+
+**GitHub starts scheduled runs late.** On this repository the 00:15 morning slot has
+started between about 06:20 and 07:53 UTC, evening runs between 22:52 and 04:00, and
+players runs between 17:31 and 19:37 (after the lock, so intake cannot work from the
+cron alone). That is why the jobs are scheduled hourly behind a gate. The Status page shows
+when scheduled jobs actually started. The fix that does not depend on GitHub's scheduler
+is owner item H20 (an external scheduler that calls `workflow_dispatch`, see
+`docs/project/HUMAN_TODO.md`). A dispatch is always "due", but a morning run after the seal
+does nothing (`tests/unit/test_jobs.py::test_morning_writes_seals_and_is_idempotent`), so
+extra dispatches are safe.
 
 What to look at (a few minutes):
 

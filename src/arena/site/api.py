@@ -76,6 +76,19 @@ class LeaderboardRow(BaseModel):
     )
 
 
+class CommonBoardOut(BaseModel):
+    """The common-set board shown on the home page: only questions that every registered
+    headline forecaster answered, so the comparison is fair. Empty `rows` means no question
+    has complete coverage yet."""
+
+    questions: int
+    days: int
+    label: str | None = Field(description='e.g. "too early to tell"')
+    forecasters: list[str]
+    missing_forecasters: list[str]
+    rows: list[LeaderboardRow]
+
+
 class LeaderboardFile(BaseModel):
     """The headline all-questions board (official record, or rehearsal before it starts)."""
 
@@ -87,6 +100,12 @@ class LeaderboardFile(BaseModel):
     days: int
     participants: list[dict[str, Any]] = Field(default_factory=list)
     rows: list[LeaderboardRow]
+    common: CommonBoardOut | None = Field(
+        default=None,
+        description="The common-set board (same as the home page). `rows` above is the "
+        "all-questions board, where forecasters that started later (for example ml) are "
+        "absent because they did not answer every base_rate question.",
+    )
 
 
 def _question(rec: Record, qid: str, url: str) -> QuestionOut:
@@ -125,6 +144,24 @@ def _question(rec: Record, qid: str, url: str) -> QuestionOut:
     )
 
 
+def _board_rows(board: Board | None) -> list[LeaderboardRow]:
+    """Rows of one board as API rows (empty for no board)."""
+    if board is None:
+        return []
+    return [
+        LeaderboardRow(
+            forecaster_id=r.forecaster_id,
+            n=r.n,
+            brier=r.brier.estimate,
+            brier_low=r.brier.low,
+            brier_high=r.brier.high,
+            log_score=r.log,
+            brier_minus_base_rate=None if r.vs_reference is None else r.vs_reference.estimate,
+        )
+        for r in board.rows
+    ]
+
+
 def build_api(
     out_dir: Path,
     rec: Record,
@@ -132,6 +169,7 @@ def build_api(
     scope: Literal["official", "rehearsal"],
     now: datetime,
     href: Any,
+    common: Board | None = None,
 ) -> list[str]:
     """Write the three files and their schemas under `out_dir/api/v1`; returns their paths."""
     base = out_dir / "api" / API_VERSION
@@ -142,22 +180,7 @@ def build_api(
     latest_day = qs[0].batch_date if qs else None
     newest = [x for x in items if x.batch_date == latest_day]
     latest = QuestionsFile(generated_at=now, questions=newest)
-    rows = []
-    if board is not None:
-        for r in board.rows:
-            rows.append(
-                LeaderboardRow(
-                    forecaster_id=r.forecaster_id,
-                    n=r.n,
-                    brier=r.brier.estimate,
-                    brier_low=r.brier.low,
-                    brier_high=r.brier.high,
-                    log_score=r.log,
-                    brier_minus_base_rate=None
-                    if r.vs_reference is None
-                    else r.vs_reference.estimate,
-                )
-            )
+    rows = _board_rows(board)
     lb = LeaderboardFile(
         generated_at=now,
         scope=scope,
@@ -166,6 +189,16 @@ def build_api(
         days=board.days if board else 0,
         rows=rows,
         participants=participants(rec),
+        common=None
+        if common is None
+        else CommonBoardOut(
+            questions=common.questions,
+            days=common.days,
+            label=common.label,
+            forecasters=list(common.forecasters),
+            missing_forecasters=list(common.missing_forecasters),
+            rows=_board_rows(common),
+        ),
     )
     files = {"questions": allq, "latest": latest, "leaderboard": lb}
     out = []
@@ -183,5 +216,9 @@ def build_api(
 ENDPOINTS = (
     ("questions", "Every question, newest first, with every forecast and the outcome."),
     ("latest", "Only the most recent batch day (small; good for polling once a day)."),
-    ("leaderboard", "The headline all-questions board with 95% intervals and its scope."),
+    (
+        "leaderboard",
+        "The all-questions board and the common-set board (as on the home page), "
+        "with 95% intervals and their scope.",
+    ),
 )

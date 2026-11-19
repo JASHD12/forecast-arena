@@ -99,6 +99,10 @@ def test_site_json_and_mcp_preserve_revised_outcome_and_report_missing_members(
     # The API intentionally remains the all-questions board, while the common set is empty.
     assert {r.forecaster_id for r in lb.rows} == {"base_rate", "ml"}
     assert all(r.n == 2 for r in lb.rows)
+    # T206: the common block is the home page's board (here an incomplete common set)
+    assert lb.common is not None
+    assert lb.common.rows == [] and lb.common.questions == 0
+    assert set(lb.common.missing_forecasters) == {"llm_plain", "llm_context", "agent"}
     html = (result.out_dir / "leaderboard.html").read_text()
     assert "Incomplete common set: no scored forecasts from llm_plain, llm_context, agent" in html
     assert 'class="podium"' not in html
@@ -151,3 +155,24 @@ def test_rest_matches_static_eligibility_and_keeps_all_questions_board(eligibili
     assert all(r["n"] == 2 for r in lb["rows"])
     sql = client.get("/sql", params={"q": "SELECT count(*) FROM resolutions"}).json()
     assert sql["rows"] == [[2]]
+
+
+def test_api_common_block_matches_the_board() -> None:
+    """T206: rows, counts and label of `common` are taken from the same Board object."""
+    from datetime import UTC, datetime
+    from pathlib import Path
+    from tempfile import TemporaryDirectory
+
+    from arena.scoring.boards import Board
+    from arena.scoring.core import Record
+    from arena.site.api import LeaderboardFile, build_api
+
+    board = Board("common", "overall", ["agent", "base_rate"], 0, 0, label="too early to tell")
+    with TemporaryDirectory() as d:
+        build_api(
+            Path(d), Record({}, {}, {}, [], []), None, "rehearsal",
+            datetime(2026, 11, 19, tzinfo=UTC), lambda q: q, board,
+        )  # fmt: skip
+        lb = LeaderboardFile.model_validate_json((Path(d) / "api/v1/leaderboard.json").read_text())
+    assert lb.common is not None and lb.common.label == board.label
+    assert lb.common.forecasters == board.forecasters and lb.rows == []

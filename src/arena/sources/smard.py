@@ -39,6 +39,13 @@ FILTERS: dict[str, int] = {
     "solar": 4068,
 }
 
+#: Forecast series (not used by any model): ids from the bundesAPI spec, checked 2026-11-19.
+FORECAST_FILTERS: dict[str, int] = {
+    "wind_onshore_forecast": 123,
+    "wind_offshore_forecast": 3791,
+    "solar_forecast": 125,
+}
+
 #: Day-ahead prices for delivery day D are published around 13:00 Berlin on D-1. The
 #: conservative availability rule for historical replays uses 14:00 Berlin on D-1.
 PRICE_AVAILABLE_LOCAL = time(14, 0)
@@ -67,6 +74,7 @@ class Chunk:
     url: str
     sha256: str
     points: tuple[Point, ...]
+    created_ms: int | None = None  # `meta_data.created`: when SMARD last rewrote the chunk
 
 
 def _ms_to_utc(ms: int) -> datetime:
@@ -147,8 +155,12 @@ class SmardClient:
                 filter_id, ts, url, json.loads(meta)["sha256"], parse_chunk(json.loads(body))
             )
         resp = self.http.get(url)
-        points = parse_chunk(resp.json())
-        chunk = Chunk(filter_id, ts, url, resp.sha256, points)
+        payload = resp.json()
+        points = parse_chunk(payload)
+        created = payload.get("meta_data", {}).get("created") if isinstance(payload, dict) else None
+        chunk = Chunk(
+            filter_id, ts, url, resp.sha256, points, created if isinstance(created, int) else None
+        )
         if cached is not None and points and all(p.value is not None for p in points):
             cached.parent.mkdir(parents=True, exist_ok=True)
             tmp = cached.with_suffix(".tmp")
@@ -236,3 +248,37 @@ def latest_complete_day(points: Sequence[Point]) -> date | None:
         if complete_day(points, d) is not None:
             return d
     return None
+
+
+def forecast_probe(
+    client: SmardClient,
+    now: datetime,
+    filters: dict[str, int] | None = None,
+) -> list[dict[str, object]]:
+    """When do SMARD's generation forecasts for tomorrow appear? (T222b, a measurement only.)
+
+    For each forecast series, reads the newest weekly chunk and reports when SMARD last
+    rewrote it (`created`), the last hour that has a value, and whether tomorrow's Berlin
+    day is fully covered at `now`. Nothing here feeds a model; a failing series is reported
+    with its error instead of raising."""
+    tomorrow = now.astimezone(BERLIN).date() + timedelta(days=1)
+    start, end = berlin_day_bounds(tomorrow)
+    out: list[dict[str, object]] = []
+    for name, fid in (filters or FORECAST_FILTERS).items():
+        row: dict[str, object] = {"series": name, "filter": fid, "checked_at": now.isoformat()}
+        try:
+            index = client.index(fid)
+            chunk = client.chunk(fid, index[-1])
+            known = [p for p in chunk.points if p.value is not None]
+            tomorrow_pts = [p for p in chunk.points if start <= p.start < end]
+            row["created"] = (
+                None if chunk.created_ms is None else _ms_to_utc(chunk.created_ms).isoformat()
+            )
+            row["last_value_hour"] = known[-1].start.isoformat() if known else None
+            row["tomorrow_covered"] = bool(tomorrow_pts) and all(
+                p.value is not None for p in tomorrow_pts
+            )
+        except Exception as exc:  # report, never fail the job step
+            row["error"] = f"{type(exc).__name__}: {exc}"[:200]
+        out.append(row)
+    return out

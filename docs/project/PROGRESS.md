@@ -5,6 +5,22 @@ move older "Done log" lines to `docs/progress-archive.md`.
 
 ## Now
 
+## Session summary (2026-11-19)
+
+- **State:** all agent-doable tasks are done or blocked on an owner item. `status.py`: OPEN_AGENT_TASKS=0.
+  Final audit (T104): `ledger verify --git` PASS on a fresh clone (215 files, 7 batch seals, 7 day seals,
+  739 forecasts); `make check` 640 unit + 7 e2e tests, `make a11y` 0 serious, site built from the real
+  ledger with link check PASS; README and interview numbers regenerate clean; explainers 01-07 exist.
+- **Live (verified on the ledger):** four domains, `ml` 33/33 per batch since 2026-11-16, plain, context,
+  agent, agent_graph and local LLM forecasters within the caps, health green, no open incidents.
+- **Waiting:** T093 ensemble (built and tested, inactive until the official record starts and 300
+  resolved common-set forecasts exist); T222b (SMARD publication-time measurement, 7 days);
+  T223b agent eval run (H23); T092 panel (H06); T162 players (H15).
+- **Open risks:** GitHub starts scheduled runs hours late (H20); `main` needs pull requests (H21); the
+  SMARD day-ahead generation forecast for D+1 appears after the lock, so renewables are probably not a
+  usable feature (two observations).
+- **Owner items:** H06, H15, H16, H17, H18, H19, H20, H23.
+
 - Audit repair T193 (2026-11-15): daily ML wiring, isolated/validated weekly evaluation,
   complete workflow readiness evidence, score/output consistency, budget accounting,
   midnight safety and executed-code provenance are implemented. Offline checks pass: 600 unit + 7 E2E tests, 89.39% coverage; lint/type checks and
@@ -26,21 +42,7 @@ move older "Done log" lines to `docs/progress-archive.md`.
 
 ## In progress
 
-- T194: implementing the 16 November audit plan on codex/forecast-arena-repairs.
-  - Numeric/SQL boundaries, participation/API states, ML provenance/graph sampling links,
-    per-domain versions, promotion labels and initial recruiter/mobile improvements are local.
-  - Validation in progress; do not claim the full R01–R17 plan complete or deployed.
-  - Remaining: final-stage incidents, dependency triage, scheduler package, pinned eval
-    comparison, prospective diagnostics/grounding, complete presentation QA and rollout.
-
-- T193e / T057: WAIT until 2026-11-16 for the first actual pre-lock ML batch.
-  - Repair code 5cfebf0 passed CI 43737672954 and promotion 43738753112; main/stable matched.
-  - Observer 43739000811 passed; resolve 43739259441 deployed Pages and passed smoke.
-  - Resolve health correctly fails only forecaster_coverage (today's immutable batch lacks ML).
-  - Ledger verifies at 86d650a (83 files, 3 batch/day seals, 139 forecasts). Full evidence:
-    `docs/project/AUDIT_REPAIR_VALIDATION.md`. Never backfill the 15 November batch.
-
-T171 honesty-audit details are in `docs/progress-archive.md`.
+Nothing. See the session summary above and `python scripts/status.py`.
 
 ## Open risks and surprises
 
@@ -64,6 +66,7 @@ T171 honesty-audit details are in `docs/progress-archive.md`.
 
 ## Done log
 
+- 2026-11-19 T090, T093, T222b, T223b, T104: ensemble built and tested (inactive until the official record starts and 300 resolved common-set forecasts exist; T093 waits); SMARD forecast-publication probe after the morning and evening jobs; `--variant agent` in the eval harness and workflow (the paid run waits for H23); final audit passed on a fresh ledger clone
 - 2026-11-19 T047, T058, T069: explainers 03 (question design and baselines), 04 (ML models, leakage, calibration, promotion) and 05 (LLM forecasters and agent) written from the code, each with ten interview questions; T065 and T068 ticked from the ledger (plain, context, agent and agent_graph forecast daily within the caps). Next ready: T090 ensemble
 - 2026-11-19 T223b (plain vs context): llm-eval run 44592033036 (24 golden questions, cap 100,000 tokens, owner-approved H22) completed with no skips: Brier 0.3483 plain vs 0.1855 context, paired difference +0.1628 [+0.0603, +0.2679] (evaluation set, not live). Result committed; numbers.md regenerated. Agent variants in the harness remain open
 - 2026-11-19 T223a: dispatched llm-eval from main (24 questions, 60,000-token cap, run 44586958389): plain answered everything, context hit the cap (budget_exhausted skips), so the run is not committed. T223 split; T223b needs the owner's decision on a higher eval token cap (H22). All of PRs #5-#12 are merged
@@ -76,7 +79,6 @@ T171 honesty-audit details are in `docs/progress-archive.md`.
 - 2026-11-19 T204-T206: RUNBOOK schedule table now matches the gated hourly crons and documents GitHub's late starts; H20 has exact dispatch steps for morning, evening and players; Status and Play say whether the players' intake works (from run manifests); `api/v1/leaderboard.json` has a `common` block equal to the home board (rows of the all-questions board stay as before)
 - 2026-11-19 T200-T203 (audit plan docs/project/AUDIT_2026-11-19.md): official-start wording names the not-before rule; home standings show questions and days; placeholder sentence removed from the recruiter page (test over all built pages); leaderboard overflow fixed (sr-only spans escaped the scroll container) with a page-width check in `make a11y`. T057 and T193e ticked from the ledger (ml 33/33 each batch 11-16 to 11-19)
 - 2026-11-15 T193a-d: implemented handoff F1-F9; 600 unit and 7 E2E tests pass, 89.39% coverage; isolated HGB/LightGBM/PyTorch inference CI job; real read-only GitHub audit finds 17 attempts and fails closed on old missing evidence; current ledger and champion loading verified
-
 - 2026-11-14 T182: scripts/smoke_site.py (pages, data files, referenced assets, CSP meta, build age under 26 h) runs after every Pages deploy in morning/evening/resolve; green on a real resolve deploy; `make smoke-site` for manual runs
 - 2026-11-14 T046 (code): weather, attention and markets on by default in morning/evening/resolve, four-domain e2e test; WAIT until the first real evening run publishes them (check set for 16:40 UTC). Lesson: a `#` comment inside `${{ }}` broke all dispatches for ~30 min; tests/unit/test_workflows_syntax.py now guards it
 - 2026-11-14 T034, T122b, T180, T181: checked on the ledger. Batch 2026-11-14 was sealed at 06:24 UTC by a SCHEDULED morning run (first one to start: 06:20, six hours after the 00:15 slot; slots 00:15-05:15 never ran; the gate made the later ones no-ops); questions all `-v2`; 2026-11-13 fully resolved and day-sealed; `agent` 3 forecasts (thinking-block fix works), `llm_local` 3 forecasts (open model live), `agent_graph` 1 error skip = a real bug (plan-step tool calls not answered), fixed with a regression test; `ledger verify --git` PASS
@@ -87,46 +89,3 @@ T171 honesty-audit details are in `docs/progress-archive.md`.
 - 2026-11-13 T188: CI coverage floor 87% (CI measures 88.95%); coverage and test-count badges in the README from docs/badges/*.json, checked in CI by scripts/badges.py --check so they never overstate
 - 2026-11-13 T187: docs/CODE_TOUR.md; all 218 `# fmt: skip` removed (ruff format); site/build.py split into content.py + shaping.py (877 -> 474 lines); cli.py -> cli/ package (record, jobs, reports, llm_cmds; 28 commands kept); e2e site byte-identical except data.html, where SQL tie-breakers fixed a real nondeterminism
 - 2026-11-13 T186: home hero: "joining soon" gone; labelled BACKTEST card (one year of electricity, parsed from docs/models/power.md) beside live standings; recruiter page: honest authorship line, "five things worth 30 seconds" (figures from eval files); README screenshots regenerated
-- 2026-11-13 T185: one-row header (7 primary links + "More" disclosure reaching Backtests, Experiments, LLM evals/observability, Data, API); rehearsal band -> pill, full sentence on Leaderboard/Findings/Methods; phone header 2 short rows; a11y 0 serious
-- 2026-11-13 T184: README first screen: pitch, tour links, one image, five generated highlights (cards + evals), stack line; detail tables collapsed
-- 2026-11-13 T183: repo root cleaned: requirements/ and docs/project/ (references, AGENTS.md, CLAUDE.md, scripts, Makefile, workflows, Dockerfile updated); dry runs of morning, evening, players, resolve and weekly all green
-- 2026-11-13 T171: honesty audit of stack, recruiters, de and README (table in docs/project/PROGRESS.md); removed the Polars/Spark wording from stack.html; no open item
-- 2026-11-13 T170: docs/interview/ (pitch EN/DE, system design, 40 Q&A, 6 STAR stories, CV/LinkedIn text); every figure checked against the generated docs/interview/numbers.md (cards, evals, live ledger via arena report cv)
-- 2026-11-13 T161: players intake (form CSV -> players/B.jsonl at 09:00/09:15 UTC, random-code pseudonyms, consent, latest row before the run, never replaced); tests cover late, duplicate and invalid rows; live once H15 is done
-- 2026-11-13 T160: evening job (18:00/19:30 UTC on B-1, evening.yml) publishes the next batch's questions as template v2; morning only fills missed domains (v1) and forecasts; lock unchanged; e2e covers it; Methods lists template versions
-- 2026-11-13 T142: README badges, labelled demo screenshots, backtest results and skills blocks generated by scripts/readme_sections.py (checked in make check), Docker quickstart
-- 2026-11-13 T141: de.html (lang="de", footer link with hreflang) and a German README section; proofreading is H17
-- 2026-11-13 T140: recruiters.html (60-second summary, live counts, skill -> page -> code table tested against the repo and CI, print layout); personal section waits for H16
-- 2026-11-13 T153: Airflow 3 DAGs mirroring morning/resolve/weekly (same commands, schedules, one ledger pool), DagBag check in a CI job with official constraints; T151 kind and T152 dbt jobs green in CI
-- 2026-11-13 T152: dbt-duckdb project (staging, fct, marts, 21 tests) built in CI in its own venv; Data page executes the mart SQL; marts match scoring in a unit test
-- 2026-11-13 T151: deploy/k8s (API Deployment+Service, CronJob) applied to a kind cluster in CI with API smoke test and one CronJob run; validated, not hosted
-- 2026-11-13 T150: FastAPI read-only REST API (arena api) reusing the JSON API models and the locked DuckDB; TestClient tests; Docker image serves it in CI (curl smoke test); compose.yaml
-- 2026-11-13 T143: Streamlit dashboard over the open Parquet (filters, Brier, running chart, calibration, skips), AppTest smoke test in CI, site link only when ARENA_DASHBOARD_URL is set (H19)
-- 2026-11-13 T139: static JSON API api/v1/{questions,latest,leaderboard}.json with JSON Schemas generated from pydantic models, api.html, validated in tests
-- 2026-11-13 T138: worked scoring example (Methods), verification walkthrough (Guide), data dictionary (Data), notebooks/explore.ipynb executed in CI on the e2e export
-- 2026-11-13 T137: lock countdown, archive search, theme toggle (no storage), og:image, sticky header; app.js on every page; Playwright checks with and without JS
-- 2026-11-13 T136: Experiments page adds a model timeline, tuned settings per candidate (Optuna best params now in the weekly summary) and a drift badge; test renders every view from summaries written by the real weekly job
-- 2026-11-13 T135: backtests.html renders every committed model card (safe Markdown subset with tables) under a permanent BACKTEST banner; linked from Status and forecaster profiles
-- 2026-11-13 T134: leaderboard skill-by-topic heatmap and head-to-head matrix (validated diverging palette, light/dark), sortable tables in app.js, Playwright sort check
-- 2026-11-13 T133: topic pages (source and verified terms, kinds of question with rules, per-topic boards and race, latest questions), linked from Home; fixed unencoded question links and macro context
-- 2026-11-13 T132: forecaster profile pages (what it sees, model cards, score over time vs base rate, calibration, best/worst calls, skips, LLM usage, version history) linked from the leaderboard
-
-## Session summaries
-
-- 2026-11-15 T193: all nine handoff repair areas implemented and pushed; 600 unit + 7 E2E
-  tests, 89.39% coverage, CI/stable and live observer verified. Pages deploy/smoke succeeds;
-  current-batch missing ML now surfaces as a failed health check. First real ML forecasts
-  still require 16 November's unsealed batch; no old ledger bytes or official gate changed.
-
-- 2026-11-12 (session 2, cloud sandbox with GitHub, PyPI and the data sources reachable
-  through a personal environment `forecast-arena`): built T021-T029, T040-T045, T050-T056,
-  T060-T063, T066-T067, T070-T075, T083, T091, T100-T103; 358 unit tests + 2 e2e green;
-  fresh-clone `make setup && make check` verified on Python 3.12 and 3.13. Backtests:
-  power ml beats both baselines, markets nothing beats the base rate, attention ml beats
-  the (weak, per-article) baselines. Blocked on H10 (Actions never starts a job): T002,
-  T056, T074, T083; every live task also waits on H03/H04/H06. Next session: once H10 is
-  fixed, check CI on main, then T030 (needs H03) onwards. Work was pushed to `main` as the
-  owner approved; the session branch `claude/relaxed-bardeen-rmhyal` was not updated.
-- 2026-11-12 (cloud sandbox, no network to PyPI/GitHub): built Phase 0 except T002 and all
-  of Phase 1. `make check` green: 57 unit tests + e2e placeholder. Next: T002 locally,
-  then T020/T022 (offline) and T021 (needs live SMARD docs).

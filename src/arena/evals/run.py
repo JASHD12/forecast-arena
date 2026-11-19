@@ -20,13 +20,14 @@ from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from typing import Any
 
+from arena.agent.forecaster import AgentForecaster
 from arena.clock import Clock
 from arena.evals.golden import GoldenItem
 from arena.forecasters.llm import LLMContext, LLMForecaster, LLMLocal, LLMPlain
 from arena.llm.budget import BudgetGuard, Caps, GuardedLLM
 from arena.llm.client import LLMClient, Usage
 from arena.llm.tracing import Tracer, TracingLLM, scope
-from arena.models import Forecast
+from arena.models import Forecast, Question, Skip
 from arena.scoring.core import brier, brier_skill, log_score
 from arena.scoring.stats import expected_calibration_error, paired_brier_difference
 from arena.site.llm_obs import CACHE_READ_MULT, CACHE_WRITE_MULT, price_for
@@ -37,6 +38,41 @@ VARIANTS: dict[str, type[LLMForecaster]] = {
     "llm_context": LLMContext,
     "llm_local": LLMLocal,
 }
+
+
+#: Tool-using variant: the live agent's prompt and loop with the tools a replay can honour
+#: (series from the stored as-of context, and the golden base rate). There is no news or
+#: Wikipedia backend (a replay of a past day would need as-of snapshots of both), no ML peer
+#: and no retriever, so a tool call to those is recorded as an error, and the result is labelled.
+AGENT_VARIANT = "agent"
+AGENT_REQUESTS_PER_QUESTION = 6  # up to 4 tool turns, the final answer and one repair
+
+
+class GoldenBaseRate:
+    """A peer that answers with each golden item's own base rate (replayed history only)."""
+
+    forecaster_id = "base_rate"
+
+    def __init__(self, items: Sequence[GoldenItem]) -> None:
+        self.by_question = {it.question.question_id: it.base_rate for it in items}
+
+    def version(self) -> str:
+        """Fixed."""
+        return "golden"
+
+    def forecast(self, q: Question, ctx: dict[str, Any], asof: Any) -> Forecast | Skip:
+        """The golden base rate of the question, or a skip when it has none."""
+        p = self.by_question.get(q.question_id)
+        if p is None:
+            return Skip(
+                question_id=q.question_id, forecaster_id=self.forecaster_id,
+                reason_code="model_missing", detail="no golden base rate", created_at=asof,
+            )  # fmt: skip
+        return Forecast(
+            forecast_id=f"{q.question_id}::base_rate", question_id=q.question_id,
+            forecaster_id=self.forecaster_id, forecaster_version="golden", probability=p,
+            created_at=asof,
+        )  # fmt: skip
 
 
 @dataclass(frozen=True)
@@ -96,7 +132,12 @@ def run(
     rows: list[dict[str, Any]] = []
     versions: dict[str, str] = {}
     for name, client in clients.items():
-        f = VARIANTS[name](TracingLLM(GuardedLLM(client, guard), tracer, clock))
+        traced = TracingLLM(GuardedLLM(client, guard), tracer, clock)
+        f: Any
+        if name == AGENT_VARIANT:
+            f = AgentForecaster(traced, peers={"base_rate": GoldenBaseRate(items)})
+        else:
+            f = VARIANTS[name](traced)
         f.max_output_tokens = caps.max_output_tokens
         versions[name] = f.version()
         for it in items:

@@ -28,6 +28,9 @@ is owner item H20 (an external scheduler that calls `workflow_dispatch`, see
 does nothing (`tests/unit/test_jobs.py::test_morning_writes_seals_and_is_idempotent`), so
 extra dispatches are safe.
 
+SMARD forecast timing (T222b): the morning and evening run summaries contain `smard-forecast` lines
+(when SMARD rewrote its forecast chunk and whether tomorrow is covered). It is a measurement only.
+
 What to look at (a few minutes):
 
 1. The site's **Home** page: today's batch is there, and "ledger verification" says PASS.

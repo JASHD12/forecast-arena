@@ -64,6 +64,27 @@ def data_backfill(obj: Ctx, keys: tuple[str, ...]) -> None:
         click.echo(backfill(client, key, until=obj.clock.now()).line())
 
 
+@data.command("smard-forecasts")
+@click.pass_obj
+def data_smard_forecasts(obj: Ctx) -> None:
+    """Report when SMARD's generation forecasts for tomorrow appear (T222b; measurement only).
+
+    Prints one line per series: when SMARD last rewrote its newest chunk, the last hour with
+    a value, and whether tomorrow's Berlin day is covered right now."""
+    from arena.sources.http import HttpClient
+    from arena.sources.smard import SmardClient, forecast_probe
+
+    client = SmardClient(HttpClient(obj.settings.user_agent()))
+    now = obj.clock.now()
+    for row in forecast_probe(client, now):
+        click.echo(
+            f"smard-forecast {row['series']}: checked {now:%Y-%m-%d %H:%M} UTC, "
+            f"created {row.get('created')}, last value {row.get('last_value_hour')}, "
+            f"tomorrow covered {row.get('tomorrow_covered')}"
+            + (f", error {row['error']}" if "error" in row else "")
+        )
+
+
 @forecast.command("run")
 def forecast_run() -> None:
     """Run all forecasters for the batch --date (built in T027)."""

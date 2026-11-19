@@ -146,6 +146,12 @@ def morning(
         by_domain = {d.name: d for d in domains}
         records: list[Forecast | Skip] = []
         contexts: dict[str, dict[str, Any]] = {}
+        # Probabilities already written for each question (this batch's earlier runs), so a
+        # forecaster that combines the others (the ensemble) sees only forecasts that exist.
+        peer_probs: dict[str, dict[str, float]] = {}
+        for r in led.read(fpath):
+            if isinstance(r, Forecast):
+                peer_probs.setdefault(r.question_id, {})[r.forecaster_id] = r.probability
         for q in all_qs:
             qdom = by_domain.get(q.domain)
             if qdom is None:
@@ -161,7 +167,13 @@ def morning(
                 fid = f"{q.question_id}::{f.forecaster_id}"
                 if fid in done:
                     continue
-                records.append(_run_forecaster(f, q, ctx, clock, rec))
+                f_ctx = ctx
+                if getattr(f, "needs_peers", False):  # listed last: the others have run
+                    f_ctx = {**ctx, "peer_forecasts": dict(peer_probs.get(q.question_id, {}))}
+                result = _run_forecaster(f, q, f_ctx, clock, rec)
+                records.append(result)
+                if isinstance(result, Forecast):
+                    peer_probs.setdefault(q.question_id, {})[f.forecaster_id] = result.probability
                 done.add(fid)
         if records:
             if clock.now() >= deadline:

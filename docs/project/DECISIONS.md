@@ -1059,3 +1059,28 @@ and evidence requirements. Do not backfill historical ML forecasts.
 - Decision: the byte-for-byte check of `docs/models/power-slices.md` against the stored run now skips
   when the run is missing. CI still checks that the card names the same run as `power.md` and holds
   all three tables. Backtest runs stay uncommitted (I4: they live in their own place).
+
+## 2026-11-19 T090/T093: the ensemble is built, tested and inactive by rule
+
+- Context: SPEC 8.6 asks for a logistic regression on the other forecasters' logits plus domain
+  indicators, retrained weekly on official-record forecasts only, active from 300 resolved
+  common-set forecasts.
+- Decision: `forecasters/ensemble.py` takes the common-set members (`COMMON_GROUP`) as features
+  (probabilities clipped to [0.01, 0.99]) and one indicator per domain. The model for a week is fitted
+  from rows of batch days up to 2 days before that ISO week's Monday and from the official start on,
+  so rehearsal days never train it and every training outcome was known at the fit. A question
+  becomes a row only if every member forecast it. The job passes the forecasts already written for
+  the same question as `ctx["peer_forecasts"]`; the ensemble is listed last. A missing member or an
+  unseen domain is a `model_missing` skip. Below the threshold it is simply not registered (inactive is
+  not a failure), so the health roster is unchanged until it has run once.
+- Alternatives: fit at forecast time on everything resolved so far (rejected: not weekly, and it moves
+  daily); include `persistence` and the local/graph LLMs (rejected: not in the registered common set,
+  and sampled forecasters would shrink the training set).
+- Status: it cannot activate until the owner sets the official-start date, so T093 waits.
+
+## 2026-11-19 T222b / T223b: measurement step and agent variant in the eval
+
+- The SMARD probe only reads and prints; it adds no ledger family and feeds no model (I8). It runs
+  after the morning and evening jobs with `continue-on-error`, so it can never fail a job.
+- The eval agent has series and base-rate tools only: a replay of a past day has no as-of news or
+  Wikipedia snapshot, and offering today's news would leak (I3). Its result will be labelled that way.

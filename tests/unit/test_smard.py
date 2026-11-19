@@ -103,3 +103,20 @@ def test_bad_index_rejected(payload) -> None:
 def test_bad_chunk_rejected(payload) -> None:
     with pytest.raises(SmardError):
         parse_chunk(payload)
+
+
+def test_forecast_probe_reports_publication_state_and_survives_errors() -> None:
+    """T222b: a measurement only; a real recorded PV-forecast chunk (2026-11-19) is the fixture."""
+    from datetime import UTC, datetime
+
+    from arena.sources.smard import forecast_probe
+
+    client, _ = fixture_client()
+    # the chunk had values up to 2026-11-20 22:00 UTC and was rewritten at 17:16 UTC on the 19th
+    now = datetime(2026, 11, 19, 19, 30, tzinfo=UTC)
+    rows = forecast_probe(client, now, {"solar_forecast": 125, "missing": 4711})
+    ok, bad = rows
+    assert ok["created"] == "2026-11-19T17:16:53.474000+00:00"
+    assert ok["last_value_hour"] == "2026-11-20T22:00:00+00:00"
+    assert ok["tomorrow_covered"] is True
+    assert "error" in bad and "series" in bad

@@ -624,9 +624,9 @@ ul.plain { list-style: none; padding: 0; margin: 0; display: grid; gap: .45rem; 
 }
 
 /* T185: one-row header with a "More" disclosure; rehearsal notice as a pill */
-.site-header .wrap { flex-wrap: nowrap; gap: .5rem 1rem; padding: .6rem 1rem; }
+.site-header .wrap { flex-wrap: nowrap; gap: .5rem 1rem; padding: .6rem 1rem; max-width: 84rem; }
 .site-header nav { display: flex; align-items: center; gap: .25rem; margin-left: auto; min-width: 0; }
-.site-header nav > ul { flex-wrap: nowrap; }
+.site-header nav > ul { flex-wrap: wrap; justify-content: flex-end; }  /* a wider fallback font wraps, never overlaps */
 .site-header nav a { white-space: nowrap; font-size: .92rem; padding: .35rem .6rem; }
 .phase-pill { font-size: .72rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
   color: var(--banner-fg); background: var(--banner); border-radius: 999px; padding: .15rem .55rem;
@@ -645,11 +645,11 @@ ul.plain { list-style: none; padding: 0; margin: 0; display: grid; gap: .45rem; 
   border: 1px solid rgba(255, 255, 255, .15); border-radius: 12px; box-shadow: 0 10px 30px rgba(0, 0, 0, .35); }
 .site-header .nav-more > ul a { display: block; border-radius: 8px; }
 .brand { white-space: nowrap; }
-@media (max-width: 72rem) {
+@media (max-width: 80rem) {
   .site-header .wrap { flex-wrap: wrap; }
   .site-header nav { flex: 1 1 100%; width: 100%; margin-left: 0; order: 10; }
-  .site-header nav > ul { overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none;
-    flex: 1 1 auto; min-width: 0; width: auto; }
+  .site-header nav > ul { flex-wrap: nowrap; justify-content: flex-start; overflow-x: auto; -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; flex: 1 1 auto; min-width: 0; width: auto; }
   .phase-pill { margin-right: auto; }
   .theme-toggle { order: 5; font-size: .78rem; padding: .2rem .55rem; }
 }

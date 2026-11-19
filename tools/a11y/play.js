@@ -65,6 +65,23 @@ function fail(msg) { console.error('FAIL ' + msg); process.exitCode = 1; }
   const bg = await home.evaluate(() => getComputedStyle(document.body).backgroundColor);
   if ((await home.evaluate(() => document.documentElement.getAttribute('data-theme'))) !== 'dark') fail('theme toggle did not set dark');
   else console.log('ok   theme toggle: auto -> light -> dark (' + bg + ')');
+  // A wider fallback font (no Inter on the visitor's system) must never put the nav on top of the toggle.
+  for (const w of [1200, 1280, 1366]) {
+    await home.setViewportSize({ width: w, height: 800 });
+    await home.addStyleTag({ content: '*{font-family:"DejaVu Sans",sans-serif!important}' });
+    const hit = await home.evaluate(() => {
+      const t = document.querySelector('.site-header .theme-toggle');
+      if (!t) return 'none';
+      const r = t.getBoundingClientRect();
+      const e = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
+      return e && (e === t || t.contains(e)) ? 'ok' : (e ? e.tagName : 'null');
+    });
+    const sw = await home.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+    if (hit !== 'ok') fail('theme toggle covered at ' + w + ' px with a wide fallback font by ' + hit);
+    else if (sw > 0) fail('page scrolls sideways at ' + w + ' px with a wide fallback font');
+    else console.log('ok   header at ' + w + ' px with a wide fallback font');
+  }
+  await home.setViewportSize({ width: 1200, height: 800 });
   const qs = await ctx.newPage();
   await qs.goto('file://' + path.join(root, 'questions', 'index.html'));
   const total = await qs.locator('.qlist li').count();

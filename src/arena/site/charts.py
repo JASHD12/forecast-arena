@@ -82,8 +82,12 @@ SERIES_SLOTS = {
     "agent_graph": 8,
     "llm_local": 6,  # shares the ensemble slot until T134 adds a validated ninth colour
 }
-RACE_W, RACE_H = 680, 300
-RACE_PAD = (16, 150, 30, 44)  # top, right, bottom, left
+RACE_MIN_DAYS = 7  # a line chart over fewer days is noise, not a race
+RACE_WIDE = (700, 300, (16, 220, 34, 44))  # viewBox width, height, pad (top, right, bottom, left)
+RACE_NARROW = (360, 300, (16, 12, 34, 40))  # phones: text in viewBox units stays readable
+AI_FORECASTERS = ("llm_plain", "llm_context", "agent", "agent_graph", "llm_local")
+RACE_LABEL_CHARS = 20  # longest name drawn next to a line (the legend has the full name)
+HIGHLIGHT = ("ml", "base_rate")
 
 
 def series_class(fid: str) -> str:
@@ -93,16 +97,27 @@ def series_class(fid: str) -> str:
     return f"s-{SERIES_SLOTS.get(fid, 8)}"
 
 
-def race_svg(
-    series: dict[str, list[tuple[str, float]]], names: dict[str, str], days: Sequence[str]
-) -> Markup:
-    """Line chart of cumulative mean Brier score per forecaster over batch days.
+def _day_ticks(days: Sequence[str], limit: int) -> list[str]:
+    """At most `limit` evenly spread days, always including the first and the last."""
+    if len(days) <= limit:
+        return list(days)
+    step = (len(days) - 1) / (limit - 1)
+    return [days[round(i * step)] for i in range(limit)]
 
-    One y-axis (Brier, lower is better), a hairline reference at 0.25 (always saying 50%),
-    2px lines, end dots with direct labels, and a native tooltip on every point."""
-    top, right, bottom, left = RACE_PAD
-    w, h = RACE_W - left - right, RACE_H - top - bottom
-    vals = [v for pts in series.values() for _, v in pts] + [0.25]  # keep the coin line
+
+def _race_one(
+    series: dict[str, list[tuple[str, float]]],
+    names: dict[str, str],
+    days: Sequence[str],
+    layout: tuple[int, int, tuple[int, int, int, int]],
+    highlight: set[str],
+    narrow: bool,
+) -> str:
+    """One layout of the race chart. Highlighted lines are coloured and (wide layout only) get
+    a direct end label with a leader line; the others are light grey and live in the legend."""
+    width, height, (top, right, bottom, left) = layout
+    w, h = width - left - right, height - top - bottom
+    vals = [v for pts in series.values() for _, v in pts] + [0.25]
     step = 0.05 if max(vals) - min(vals) > 0.12 else 0.02
     ymin = max(0.0, math.floor((min(vals) - step / 2) / step) * step)
     ymax = math.ceil((max(vals) + step / 2) / step) * step
@@ -115,13 +130,15 @@ def race_svg(
     def y(v: float) -> float:
         return top + h - ((v - ymin) / (ymax - ymin)) * h
 
+    suffix = "n" if narrow else "w"
+    cls = "race race-narrow" if narrow else "race race-wide"
     p = [
-        f'<svg class="race" viewBox="0 0 {RACE_W} {RACE_H}" role="img" '
-        'aria-labelledby="race-t race-d">',
-        '<title id="race-t">Cumulative Brier score by forecaster</title>',
-        '<desc id="race-d">Running average Brier score (lower is better) after each batch '
-        "day, on the questions every plotted forecaster answered. The data is also in the "
-        "table below the chart.</desc>",
+        f'<svg class="{cls}" viewBox="0 0 {width} {height}" role="img" '
+        f'aria-labelledby="race-t-{suffix} race-d-{suffix}">',
+        f'<title id="race-t-{suffix}">Cumulative Brier score by forecaster</title>',
+        f'<desc id="race-d-{suffix}">Running average Brier score (lower is better) after each '
+        "batch day, on the questions every plotted forecaster answered. The values are also in "
+        "the list and the table next to the chart.</desc>",
     ]
     t = ymin
     while t <= ymax + 1e-9:
@@ -129,48 +146,98 @@ def race_svg(
             f'<line class="grid" x1="{left}" x2="{left + w}" y1="{y(t):.1f}" y2="{y(t):.1f}"/>'
         )
         p.append(
-            f'<text class="tick" x="{left - 8}" y="{y(t) + 4:.1f}" text-anchor="end">{t:.2f}</text>'
+            f'<text class="tick" x="{left - 6}" y="{y(t) + 4:.1f}" text-anchor="end">{t:.2f}</text>'
         )
         t = round(t + step, 10)
+    yc = y(0.25)
+    p.append(f'<line class="coinline" x1="{left}" x2="{left + w}" y1="{yc:.1f}" y2="{yc:.1f}"/>')
     p.append(
-        f'<line class="coinline" x1="{left}" x2="{left + w}" '
-        f'y1="{y(0.25):.1f}" y2="{y(0.25):.1f}"/>'
+        f'<text class="tick coin" x="{left + w}" y="{yc - 6:.1f}" text-anchor="end">'
+        "always 50% = 0.25</text>"
     )
-    p.append(f'<text class="tick" x="{left + 4}" y="{y(0.25) - 5:.1f}">coin flip (0.25)</text>')
-    for d in (days[0], days[-1]) if days else ():
-        anchor = "start" if d == days[0] else "end"
+    ticks = _day_ticks(days, 4 if narrow else 6)
+    for d in ticks:
+        anchor = "start" if d == ticks[0] else "end" if d == ticks[-1] else "middle"
         p.append(
-            f'<text class="tick" x="{x(d):.1f}" y="{RACE_H - 8}" '
-            f'text-anchor="{anchor}">{escape(d)}</text>'
+            f'<text class="tick" x="{x(d):.1f}" y="{height - 10}" '
+            f'text-anchor="{anchor}">{escape(d[5:])}</text>'
         )
+    order = [f for f in series if f not in highlight] + [f for f in series if f in highlight]
     ends: list[list[Any]] = []
-    for fid, pts in series.items():
+    for fid in order:
+        pts = series[fid]
         if not pts:
             continue
-        cls = series_class(fid)
+        hot = fid in highlight
+        c = series_class(fid) if hot else "s-muted"
         path = " ".join(
             f"{'M' if i == 0 else 'L'}{x(d):.1f},{y(v):.1f}" for i, (d, v) in enumerate(pts)
         )
-        p.append(f'<path class="line {cls}" d="{path}"/>')
+        p.append(f'<path class="line {c}" d="{path}"/>')
         for d, v in pts:
             tip = escape(f"{names.get(fid, fid)}: {v:.3f} after {d}")
+            r = 3.5 if hot else 2.5
             p.append(
                 f'<g class="pt"><circle class="hit" cx="{x(d):.1f}" cy="{y(v):.1f}" r="10">'
                 f"<title>{tip}</title></circle>"
-                f'<circle class="dot {cls}" cx="{x(d):.1f}" cy="{y(v):.1f}" r="3.5"/></g>'
+                f'<circle class="dot {c}" cx="{x(d):.1f}" cy="{y(v):.1f}" r="{r}"/></g>'
             )
-        d_last, v_last = pts[-1]
-        ends.append([y(v_last), x(d_last), fid, v_last])
+        if hot and not narrow:
+            d_last, v_last = pts[-1]
+            ends.append([y(v_last), x(d_last), fid, v_last])
     ends.sort()
-    for i in range(1, len(ends)):  # keep end labels at least 15px apart
-        ends[i][0] = max(ends[i][0], ends[i - 1][0] + 15)
-    for ly, _lx, fid, v in ends:
+    for i in range(1, len(ends)):  # at least 16 units apart, labels stay near their dots
+        ends[i][0] = max(ends[i][0], ends[i - 1][0] + 16)
+    for ly, lx, fid, v in ends:
+        name = names.get(fid, fid)
+        name = name if len(name) <= RACE_LABEL_CHARS else name[: RACE_LABEL_CHARS - 1] + "…"
+        label = f"{name} {v:.3f}"
+        p.append(f'<line class="leader" x1="{lx + 5:.1f}" y1="{y(series[fid][-1][1]):.1f}" '
+                 f'x2="{left + w + 8}" y2="{ly:.1f}"/>')  # fmt: skip
         p.append(
-            f'<text class="endlabel" x="{left + w + 10}" y="{ly + 4:.1f}">'
-            f"{escape(names.get(fid, fid))} {v:.3f}</text>"
+            f'<text class="endlabel {series_class(fid)}" x="{left + w + 12}" y="{ly + 4:.1f}">'
+            f"{escape(label)}</text>"
         )
     p.append("</svg>")
-    return Markup("".join(p))
+    return "".join(p)
+
+
+def race_highlights(series: dict[str, list[tuple[str, float]]]) -> set[str]:
+    """The lines drawn in colour: the ML model, the base rate and the best AI forecaster."""
+    ai = [f for f in AI_FORECASTERS if series.get(f)]
+    best = min(ai, key=lambda f: series[f][-1][1]) if ai else None
+    return {f for f in HIGHLIGHT if f in series} | ({best} if best else set())
+
+
+def race_svg(
+    series: dict[str, list[tuple[str, float]]], names: dict[str, str], days: Sequence[str]
+) -> Markup:
+    """Line chart of cumulative mean Brier score per forecaster over batch days, in two
+    layouts (wide, and a phone layout the CSS switches to), plus a legend sorted by the latest
+    score. With fewer than `RACE_MIN_DAYS` days it shows a short note instead of a chart.
+
+    One y-axis (Brier, lower is better), a reference at 0.25 (always saying 50%), end labels
+    only for the highlighted lines, and a native tooltip on every point."""
+    if len(days) < RACE_MIN_DAYS:
+        return Markup(
+            f'<p class="empty race-wait">The race chart appears after {RACE_MIN_DAYS} days of '
+            f"results; so far there are {len(days)}. Until then the standings above and the "
+            "table below show the same numbers.</p>"
+        )
+    hot = race_highlights(series)
+    ranked = sorted((f for f in series if series[f]), key=lambda f: series[f][-1][1])
+    legend = "".join(
+        f'<li><span class="dot-key {series_class(f) if f in hot else "s-muted"}" '
+        f'aria-hidden="true"></span><span class="lg-name">{escape(names.get(f, f))}</span> '
+        f'<span class="lg-val">{series[f][-1][1]:.3f}</span></li>'
+        for f in ranked
+    )
+    return Markup(
+        '<div class="race-wrap">'
+        + _race_one(series, names, days, RACE_WIDE, hot, narrow=False)
+        + _race_one(series, names, days, RACE_NARROW, hot, narrow=True)
+        + f'<ol class="race-legend" aria-label="Latest score, best first">{legend}</ol></div>'
+    )
 
 
 FOREST_W, FOREST_ROW = 680, 34

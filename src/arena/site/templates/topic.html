@@ -21,7 +21,6 @@
 
 <h2>The race</h2>
 {% if race.days %}<figure class="race-card">
-<ul class="legend" aria-label="Legend">{% for fid in race.fids %}<li><span class="dot-key {{ series_class(fid) }}" aria-hidden="true"></span>{{ fname(fid) }}</li>{% endfor %}</ul>
 {{ race_svg(race.series, all_names, race.days) }}
 <figcaption class="note">Running average Brier score on the {{ race.n }} {{ dname(t.domain) }} questions every plotted forecaster answered ({{ scope }}).</figcaption>
 <details class="faq"><summary>Data table</summary>

@@ -89,7 +89,6 @@
 <div class="section-head"><h2>The race</h2><span class="note">{{ race_scope|capitalize }}; running average Brier score, lower is better.</span></div>
 {% if race.days %}
 <figure class="race-card">
-<ul class="legend" aria-label="Legend">{% for fid in race.fids %}<li><span class="dot-key {{ series_class(fid) }}" aria-hidden="true"></span>{{ fname(fid) }}</li>{% endfor %}</ul>
 {{ race_svg(race.series, all_names, race.days) }}
 <figcaption class="note">On the {{ race.n }} questions every plotted forecaster answered. Hover a point for its value. This is a picture, not a verdict: whether a gap is real is decided on the <a href="leaderboard.html">leaderboard</a> with 95% intervals.</figcaption>
 <details class="faq"><summary>Data table</summary>

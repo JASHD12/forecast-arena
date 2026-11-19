@@ -195,3 +195,25 @@ curl -X POST -H "Authorization: Bearer TOKEN" -H "Accept: application/vnd.github
     200,000 tokens).
   - Reply yes and the agent dispatches it, reads the result from the job log and commits it; or no.
   - Decided 2026-11-19 (yes): run 44611596780 dispatched from `main` (`agent=true`, 12 questions, 200,000-token cap); it cost about 1.8 US cents.
+- [ ] H24 · Start the official record (this also switches the ensemble on)
+  - You said yes on 2026-11-19 to a start on **2026-11-23**. The agent cannot do this: it is a repository
+    setting (CLAUDE.md, S4).
+  - Steps: on GitHub open the repository > Settings > Secrets and variables > Actions > tab "Variables".
+    Edit `ARENA_OFFICIAL_START_NOT_BEFORE` if it exists, otherwise "New repository variable". Name:
+    `ARENA_OFFICIAL_START_NOT_BEFORE`, value: `2026-11-23`. Save. Nothing else (no workflow edit).
+    Do it before the morning run of 2026-11-22 so the daily clean-day check sees it.
+  - What it does: the official record starts on the later of the day after five clean days in a row
+    and 2026-11-23. From then the headline scores, findings and the leaderboard count only official days
+    and nothing may be tuned on them (integrity rule I8). Rehearsal days stay visible but do not count.
+  - Expected timeline: 17 and 18 Nov are clean; if 19 to 22 Nov are clean too (a successful morning run,
+    the evening job done, health green, day sealed, no open incident), the record starts on 2026-11-23.
+    The evening job runs late on GitHub (see H20), so one late evening can make a day unclean and move the
+    start; the Status page ("Road to the official record") lists each day and its reason.
+  - Ensemble: it registers itself when 60 questions answered by all five members (about 12 a day) have
+    resolved in the official record, using the Monday cutoff, so its first forecasts are expected in the
+    batch of Monday 2026-11-30. If the start slips, so does this by the same days.
+  - How to check: Status page; `meta/official_start.json` on the `ledger` branch; then the "ensemble" row
+    on the Leaderboard and `ensemble` forecasts in the ledger.
+  - Undo: set the variable back to `2099-12-31` before the start is written. Once `meta/official_start.json`
+    exists it is never changed.
+

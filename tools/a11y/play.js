@@ -39,6 +39,7 @@ function fail(msg) { console.error('FAIL ' + msg); process.exitCode = 1; }
 
   const lb = await ctx.newPage();
   await lb.goto('file://' + path.join(root, 'leaderboard.html'));
+  await lb.evaluate(() => document.querySelectorAll('details.lb-more').forEach((d) => { d.open = true; }));  // the heatmap sits in a disclosure
   const sortBtn = lb.locator('table.sortable thead th button').nth(1);
   if (await sortBtn.count()) {
     await sortBtn.click();
@@ -71,6 +72,13 @@ function fail(msg) { console.error('FAIL ' + msg); process.exitCode = 1; }
   await qs.locator('#qsearch').fill('');
   if ((await qs.locator('.qlist li:visible').count()) !== total) fail('search did not reset');
   else console.log('ok   archive search filters ' + total + ' questions');
+  // the state filter narrows the list and opens the days it keeps
+  await qs.locator('.state-filter button[data-state="answered"]').click();
+  const answered = await qs.locator('.qlist li:visible').count();
+  if (answered > total || (await qs.locator('.qlist li:visible:not([data-state="answered"])').count()) !== 0) fail('state filter did not filter');
+  await qs.locator('.state-filter button[data-state="all"]').click();
+  if ((await qs.locator('.qlist li:visible').count()) !== total) fail('state filter did not reset');
+  else console.log('ok   archive state filter: ' + answered + ' answered of ' + total);
 
   const noJs = await browser.newContext({ javaScriptEnabled: false });
   const n1 = await noJs.newPage();

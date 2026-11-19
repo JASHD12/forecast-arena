@@ -8,16 +8,23 @@
 </nav>
 {% if archive %}
 <label class="qsearch" hidden>Search these questions <input type="search" id="qsearch" placeholder="e.g. Berlin, peak, 80" autocomplete="off"></label>
+<div class="state-filter" role="group" aria-label="Filter by state" hidden>
+<button type="button" class="filter active" data-state="all" aria-pressed="true">All</button>
+<button type="button" class="filter" data-state="answered" aria-pressed="false">Answered</button>
+<button type="button" class="filter" data-state="open" aria-pressed="false">Waiting for an answer</button>
+</div>
 <p class="note qsearch-count" aria-live="polite" hidden></p>
 {% for batch, qs in archive|groupby("batch_date")|reverse %}
-<h2 class="day-head">{{ batch.strftime("%A %d %B %Y") }} <span class="muted">· {{ qs|length }} questions</span></h2>
+<details class="day"{% if loop.index <= 7 %} open{% endif %}>
+<summary class="day-head">{{ batch.strftime("%A %d %B %Y") }} <span class="muted">· {{ qs|length }} questions</span></summary>
 <ul class="qlist">
-{% for q in qs %}{% set r = rec.resolutions.get(q.question_id) %}{% set v = rec.voids.get(q.question_id) %}<li>
+{% for q in qs %}{% set r = rec.resolutions.get(q.question_id) %}{% set v = rec.voids.get(q.question_id) %}<li data-state="{{ "answered" if r else ("void" if v else "open") }}">
 <span class="chip chip-{{ q.domain }}">{{ dname(q.domain) }}</span>
 <a href="{{ qhref(q.question_id, '') }}">{{ plain_title(q) }}</a>
-{% if r %}{% if r.outcome == 1 %}<span class="outcome yes-badge">✓ YES</span>{% else %}<span class="outcome no-badge">✗ NO</span>{% endif %}{% elif v %}<span class="label">void</span>{% else %}<span class="label">open</span>{% endif %}
+{% if r %}{% if r.outcome == 1 %}<span class="outcome yes-badge">✓ YES</span>{% else %}<span class="outcome no-badge">✗ NO</span>{% endif %}{% elif v %}<span class="label">void</span>{% else %}<span class="label">waiting</span>{% endif %}
 </li>{% endfor %}
 </ul>
+</details>
 {% endfor %}
 {% else %}<p class="empty">No questions yet.</p>{% endif %}
 {% endblock %}

@@ -36,6 +36,7 @@ function pages(dir) {
         const bad = v.impact === 'serious' || v.impact === 'critical';
         if (bad) serious += 1;
         console.log(`${bad ? 'FAIL' : 'warn'} [${v.impact}] ${path.relative(root, file)} (${w}px, ${scheme}): ${v.id} - ${v.help} (${v.nodes.length} nodes)`);
+        if (bad) v.nodes.forEach((n) => console.log('   node: ' + n.html.slice(0, 160) + ' | ' + (n.any[0] && n.any[0].message || '').slice(0, 200)));
       }
       await page.close();
     }

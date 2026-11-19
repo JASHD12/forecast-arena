@@ -204,27 +204,42 @@
     setInterval(tick, 30000);
   }
 
-  // Archive search (T137): filters the question list in place.
+  // Archive search (T137) and state filter: filters the question list in place; days are
+  // collapsed (older ones) and are opened while a search or filter is active.
   function initSearch(input) {
     var label = input.closest('.qsearch'), count = document.querySelector('.qsearch-count');
-    label.hidden = false; count.hidden = false;
+    var bar = document.querySelector('.state-filter');
+    label.hidden = false; count.hidden = false; if (bar) bar.hidden = false;
     var items = Array.prototype.slice.call(document.querySelectorAll('.qlist li'));
+    var days = Array.prototype.slice.call(document.querySelectorAll('details.day'));
+    days.forEach(function (d) { d.dataset.wasOpen = d.open ? '1' : '0'; });
+    var state = 'all';
     function run() {
       var words = input.value.toLowerCase().split(/\s+/).filter(Boolean), shown = 0;
+      var active = words.length > 0 || state !== 'all';
       items.forEach(function (li) {
         var t = li.textContent.toLowerCase();
-        var ok = words.every(function (w) { return t.indexOf(w) >= 0; });
+        var ok = words.every(function (w) { return t.indexOf(w) >= 0; }) &&
+          (state === 'all' || li.dataset.state === state);
         li.hidden = !ok; if (ok) shown += 1;
       });
-      document.querySelectorAll('.qlist').forEach(function (ul) {
+      days.forEach(function (d) {
+        var ul = d.querySelector('.qlist');
         var any = Array.prototype.some.call(ul.children, function (li) { return !li.hidden; });
-        ul.hidden = !any;
-        var head = ul.previousElementSibling;
-        if (head && head.classList.contains('day-head')) head.hidden = !any;
+        d.hidden = !any;
+        d.open = active ? any : d.dataset.wasOpen === '1';
       });
       count.textContent = shown + ' of ' + items.length + ' questions shown';
     }
     input.addEventListener('input', run);
+    if (bar) bar.addEventListener('click', function (e) {
+      var b = e.target.closest('button[data-state]'); if (!b) return;
+      state = b.dataset.state;
+      Array.prototype.forEach.call(bar.querySelectorAll('button'), function (x) {
+        var on = x === b; x.classList.toggle('active', on); x.setAttribute('aria-pressed', on ? 'true' : 'false');
+      });
+      run();
+    });
     run();
   }
 

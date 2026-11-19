@@ -74,7 +74,7 @@
 {{ bars_answered(row, forecasters) }}
 </li>
 {% endfor %}</ul>
-<p class="more-link"><a class="btn btn-ghost" href="questions/index.html">See all {{ latest|length }} questions for {{ latest_batch }} →</a> <span class="note">Shown here: the {{ cards|length }} that most forecasters answered. All locks are at 09:30 UTC.</span></p>
+<p class="more-link"><a class="btn btn-accent" href="questions/index.html">See all {{ latest|length }} questions for {{ latest_batch }} →</a> <span class="note">Shown here: the {{ cards|length }} that most forecasters answered. All locks are at 09:30 UTC.</span></p>
 {% else %}<p class="empty">No questions yet. Questions are published the evening before, answered the next morning and locked at 09:30 UTC.</p>{% endif %}
 
 {% if agent_card %}{% set a = agent_card %}<section class="card agent-card" aria-labelledby="agent-title">

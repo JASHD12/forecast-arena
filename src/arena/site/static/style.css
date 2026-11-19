@@ -697,3 +697,7 @@ pre code { overflow-wrap: normal; }
 .clean-days > li { margin: .5rem 0; }
 .reasons { margin: .3rem 0 0; }
 .reasons summary { font-size: .85rem; }
+details.day { margin: 0 0 .5rem; }
+details.day > summary.day-head { cursor: pointer; font-size: 1.05rem; font-weight: 700; margin: 1rem 0 .5rem; padding: .5rem 0; min-height: 2.75rem; }
+.state-filter { display: flex; flex-wrap: wrap; gap: .5rem; margin: .5rem 0 1rem; }
+.state-filter .filter { cursor: pointer; font: inherit; min-height: 2.5rem; }

@@ -28,7 +28,7 @@ def _run(led: Ledger, n: int, warnings: list[str], counts: dict[str, int] | None
 
 def test_never_ran(tmp_path) -> None:
     s = players_state(Ledger(tmp_path / "l"), TODAY)
-    assert s.state == "never_ran" and "H15" in s.text and s.last_run is None
+    assert s.state == "never_ran" and "not set up yet" in s.text and s.last_run is None
 
 
 def test_not_configured_then_late_then_wrote(tmp_path) -> None:
@@ -37,6 +37,6 @@ def test_not_configured_then_late_then_wrote(tmp_path) -> None:
     assert players_state(led, TODAY).state == "not_configured"
     _run(led, 2, ["late run: 2026-11-19T17:31 is at or after lock 2026-11-19T09:30"])
     late = players_state(led, TODAY)
-    assert late.state == "late" and "H20" in late.text
+    assert late.state == "late" and "external trigger" in late.text
     _run(led, 3, [], {"players": 2})
     assert players_state(led, TODAY).state == "wrote"

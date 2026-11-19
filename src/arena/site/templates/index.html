@@ -75,7 +75,7 @@
 </li>
 {% endfor %}</ul>
 <p class="more-link"><a class="btn btn-ghost" href="questions/index.html">See all {{ latest|length }} questions for {{ latest_batch }} →</a> <span class="note">Shown here: the {{ cards|length }} that most forecasters answered. All locks are at 09:30 UTC.</span></p>
-{% else %}<p class="empty">No questions yet. Questions are published the evening before (18:00 UTC), answered by the morning run (05:30 UTC) and locked at 09:30 UTC.</p>{% endif %}
+{% else %}<p class="empty">No questions yet. Questions are published the evening before, answered the next morning and locked at 09:30 UTC.</p>{% endif %}
 
 {% if agent_card %}{% set a = agent_card %}<section class="card agent-card" aria-labelledby="agent-title">
 <h2 id="agent-title">How the AI agent worked on {{ a.question.batch_date }}</h2>
@@ -119,8 +119,8 @@
 </ul>
 
 <ol class="how" aria-label="How it works">
-<li><strong>18:00 UTC, the evening before</strong> Questions are published from live public data.</li>
-<li><strong>05:30 UTC</strong> Every forecaster answers.</li>
+<li><strong>The evening before</strong> Questions are published from live public data.</li>
+<li><strong>The next morning</strong> Every forecaster answers.</li>
 <li><strong>09:30 UTC</strong> Every forecast is locked into the public ledger.</li>
 <li><strong>Next day</strong> Official data arrives, questions resolve, scores update. <a href="guide.html">Read the guide</a></li>
 </ol>

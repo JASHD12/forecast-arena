@@ -197,17 +197,17 @@ def players_state(ledger: Ledger, today: date, days: int = 14) -> PlayersState:
         return PlayersState(
             "never_ran",
             f"The players' intake has not run in the last {days} days. It needs the players' "
-            "form (owner item H15) and a start between 08:30 UTC and the 09:30 UTC lock.",
+            "form (not set up yet) and a start between 08:30 UTC and the 09:30 UTC lock.",
         )
     last = max(real, key=lambda m: m.started_at)
     warns = " ".join(last.warnings)
     if "no players CSV configured" in warns:
-        state, text = "not_configured", "The players' form is not configured yet (owner item H15)."
+        state, text = "not_configured", "The players' form is not set up yet."
     elif "late run" in warns or "lock passed" in warns:
         state, text = (
             "late",
             "The last intake run started after the lock, so it wrote nothing. GitHub starts "
-            "scheduled runs late; until an external scheduler calls it (owner item H20) the "
+            "scheduled runs late; until a reliable external trigger is in place the "
             "intake effectively runs only when started by hand.",
         )
     elif "refused" in warns:

@@ -694,3 +694,6 @@ pre code { overflow-wrap: normal; }
 .h2h th[scope="row"], .heatmap th[scope="row"] { position: sticky; left: 0; z-index: 1; background: var(--surface); }
 .scroll-hint { display: none; font-size: .82rem; color: var(--muted); margin: 0 0 .35rem; }
 @media (max-width: 760px) { .scroll-hint { display: block; } }
+.clean-days > li { margin: .5rem 0; }
+.reasons { margin: .3rem 0 0; }
+.reasons summary { font-size: .85rem; }

@@ -64,6 +64,7 @@ T171 honesty-audit details are in `docs/progress-archive.md`.
 
 ## Done log
 
+- 2026-11-19 T214, T221: the social preview image (1200x630) and og/twitter meta already existed; now tested, and H18 says where to upload it. Methods explains why a base rate can score above 0.25 early (audit F9)
 - 2026-11-19 T212-T213: README opens with the question, a generated "Result so far" block (backtest figures, ml-vs-persistence interval, the 365-independent-days caveat, live status), links and screenshot; stack in a details block. `scripts/screenshots.py LEDGER_DIR` rebuilds docs/img/home.png from a real ledger (dated caption). Also fixed my T210 hero: it cited the ml-vs-base-rate interval for a claim about persistence; it now uses the card's `ml - persistence` row
 - 2026-11-19 T210-T211: recruiter first screen (kicker, honest H1, result line copied from the model card, buttons; owner facts from optional `site_content/recruiter_facts.json`, omitted when absent) and three role cards with deep links, tested; verified above the fold at 1366x768 and 390x844 on a build from the real ledger
 - 2026-11-19 T204-T206: RUNBOOK schedule table now matches the gated hourly crons and documents GitHub's late starts; H20 has exact dispatch steps for morning, evening and players; Status and Play say whether the players' intake works (from run manifests); `api/v1/leaderboard.json` has a `common` block equal to the home board (rows of the all-questions board stay as before)

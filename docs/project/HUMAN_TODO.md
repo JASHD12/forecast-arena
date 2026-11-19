@@ -145,3 +145,13 @@ Keep the first line of each item in exactly this shape; the status script parses
     gate (`arena schedule due`) is not used for dispatches, but a run after the batch is
     sealed does nothing. Do not give the token to the agent; store it in the cron service.
 
+- [ ] H21 · `main` now rejects direct pushes (found 2026-11-19)
+  - What happened: `git push origin main` was refused: "Protected branch update failed ...
+    Changes must be made through a pull request. 2 of 2 required status checks are expected."
+    CLAUDE.md standing approval 1 allows pushing to `main`, so the branch rule was added
+    after it. The agent did not retry or look for another route (AGENTS.md 2.4, S4, S10).
+  - Refused command: `git push origin main` (commit "T200-T203 ...").
+  - The work is on branch `claude/relaxed-bardeen-rmhyal` (pushed there, as the session requires).
+  - You decide: (a) merge that branch yourself via a pull request (the agent does not merge), or
+    (b) change the branch rule or the standing approval so the agent may push to `main` again.
+    Until then Phase 12 tasks stay on the branch and CI/promote results for them are unconfirmed.

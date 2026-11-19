@@ -701,3 +701,28 @@ details.day { margin: 0 0 .5rem; }
 details.day > summary.day-head { cursor: pointer; font-size: 1.05rem; font-weight: 700; margin: 1rem 0 .5rem; padding: .5rem 0; min-height: 2.75rem; }
 .state-filter { display: flex; flex-wrap: wrap; gap: .5rem; margin: .5rem 0 1rem; }
 .state-filter .filter { cursor: pointer; font: inherit; min-height: 2.5rem; }
+
+/* Phone header: logo, notice pill, theme button and one "Menu" button; the full list opens below */
+.menu-m { display: none; }
+@media (max-width: 48rem) {
+  .site-header nav { display: none; }
+  .site-header .wrap > .theme-toggle { display: none; }
+  .menu-m { display: block; order: 6; }
+  .menu-theme { grid-column: 1 / -1; }
+  .menu-theme .theme-toggle:not([hidden]) { display: inline-block; margin-top: .4rem; min-height: 2.5rem; font-size: .9rem; }
+  .menu-m > summary { list-style: none; cursor: pointer; color: var(--ink-fg); font-weight: 700; font-size: .9rem;
+    padding: .4rem .9rem; border: 1px solid rgba(255, 255, 255, .35); border-radius: 999px; min-height: 2.5rem;
+    display: inline-flex; align-items: center; }
+  .menu-m > summary::-webkit-details-marker { display: none; }
+  .menu-m[open] > summary { background: var(--ink-fg); color: var(--ink); }
+  .menu-m > ul { position: absolute; left: 0; right: 0; top: 100%; z-index: 40; margin: 0; padding: .5rem 1rem 1rem;
+    list-style: none; background: var(--ink); border-top: 1px solid rgba(255, 255, 255, .15);
+    box-shadow: 0 14px 30px rgba(0, 0, 0, .35); display: grid; grid-template-columns: 1fr 1fr; gap: .25rem .75rem;
+    max-height: calc(100vh - 4rem); overflow-y: auto; }
+  .menu-m a { display: flex; align-items: center; min-height: 2.75rem; color: var(--ink-muted); text-decoration: none;
+    padding: .4rem .6rem; border-radius: 8px; font-size: 1rem; }
+  .menu-m a:hover { color: var(--ink-fg); background: rgba(255, 255, 255, .08); }
+  .menu-m a[aria-current="page"] { color: var(--ink); background: var(--ink-fg); font-weight: 700; }
+  .site-header .wrap { flex-wrap: nowrap; gap: .5rem; }
+  .phase-pill { margin-right: auto; }
+}

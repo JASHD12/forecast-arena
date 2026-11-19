@@ -56,7 +56,7 @@ function fail(msg) { console.error('FAIL ' + msg); process.exitCode = 1; }
   // the wording depends on the time of day: "lock in" before 09:30 UTC, "are locked ... lock is in" after
   if (!/lock[^]*\d+ h \d+ min/.test(cd)) fail('countdown not running: ' + cd);
   else console.log('ok   home: lock countdown');
-  const tg = home.locator('.theme-toggle');
+  const tg = home.locator('.theme-toggle').first();
   if (!(await tg.isVisible())) fail('theme toggle hidden with JavaScript');
   await tg.click();
   if ((await home.evaluate(() => document.documentElement.getAttribute('data-theme'))) !== 'light') fail('theme toggle did not set light');
@@ -83,7 +83,7 @@ function fail(msg) { console.error('FAIL ' + msg); process.exitCode = 1; }
   const noJs = await browser.newContext({ javaScriptEnabled: false });
   const n1 = await noJs.newPage();
   await n1.goto('file://' + path.join(root, 'index.html'));
-  if (await n1.locator('.theme-toggle').isVisible()) fail('toggle visible without JavaScript');
+  if (await (await n1.locator('.theme-toggle').count()) > 0 && (await n1.locator('.theme-toggle').first().isVisible())) fail('toggle visible without JavaScript');
   if (!/09:30 UTC/.test(await n1.locator('.lock-countdown').textContent())) fail('static lock text missing');
   await n1.goto('file://' + path.join(root, 'questions', 'index.html'));
   if (await n1.locator('#qsearch').isVisible()) fail('search visible without JavaScript');

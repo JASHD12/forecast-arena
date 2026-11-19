@@ -171,14 +171,17 @@
   }
 
   // Theme toggle (T137): auto -> light -> dark, in memory only (no storage).
-  function initTheme(btn) {
-    var modes = ['auto', 'light', 'dark'], i = 0;
-    btn.hidden = false;
-    btn.addEventListener('click', function () {
-      i = (i + 1) % modes.length;
-      if (modes[i] === 'auto') document.documentElement.removeAttribute('data-theme');
-      else document.documentElement.setAttribute('data-theme', modes[i]);
-      btn.textContent = 'Theme: ' + modes[i];
+  function initTheme(btns) {
+    var modes = ['auto', 'light', 'dark'];
+    btns.forEach(function (btn) {
+      btn.hidden = false;
+      btn.addEventListener('click', function () {
+        var cur = document.documentElement.getAttribute('data-theme') || 'auto';
+        var next = modes[(modes.indexOf(cur) + 1) % modes.length];
+        if (next === 'auto') document.documentElement.removeAttribute('data-theme');
+        else document.documentElement.setAttribute('data-theme', next);
+        btns.forEach(function (x) { x.textContent = 'Theme: ' + next; });
+      });
     });
   }
 
@@ -247,8 +250,8 @@
     var g = document.getElementById('game');
     if (g) initGame(g);
     document.querySelectorAll('table.sortable').forEach(initSortable);
-    var t = document.querySelector('.theme-toggle');
-    if (t) initTheme(t);
+    var t = document.querySelectorAll('.theme-toggle');
+    if (t.length) initTheme(Array.prototype.slice.call(t));
     var c = document.querySelector('.lock-countdown');
     if (c) initCountdown(c);
     var s = document.getElementById('qsearch');

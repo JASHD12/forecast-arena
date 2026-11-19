@@ -665,3 +665,6 @@ pre code { overflow-wrap: normal; }
   .site-header nav { align-items: flex-start; }
 }
 .standings .st-n { font-variant-numeric: tabular-nums; font-weight: 600; }
+.recruiter-hero .hero-result { font-size: 1.1rem; max-width: 46rem; }
+.roles { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 1rem; margin: 1.25rem 0; }
+.role-card h2 { margin-top: 0; font-size: 1.1rem; }

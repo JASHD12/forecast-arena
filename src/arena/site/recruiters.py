@@ -9,6 +9,11 @@ generated backtest and evaluation pages.
 
 from __future__ import annotations
 
+import json
+import re
+from pathlib import Path
+from typing import Any
+
 #: (skill, what it does in this project, site page or "", repository paths)
 PROOFS: tuple[tuple[str, str, str, tuple[str, ...]], ...] = (
     (
@@ -144,3 +149,87 @@ PROOFS: tuple[tuple[str, str, str, tuple[str, ...]], ...] = (
         ("apps/dashboard", "src/arena/site", "tools/a11y"),
     ),
 )
+
+
+#: Three reading paths for the three role families (P2). Each entry: (role, why, links) with
+#: links as (label, site page or repository path, is_repo_path). A test checks every one
+#: resolves; a repository path must exist and be run by CI.
+ROLE_PATHS: tuple[tuple[str, str, tuple[tuple[str, str, bool], ...]], ...] = (
+    (
+        "AI engineering",
+        "LLM and agent forecasters with budgets, tracing and an eval that caught a real bug.",
+        (
+            ("The eval that caught a bug", "evals.html", False),
+            ("How the LLM calls are traced", "llm.html", False),
+            ("The agent loop (code)", "src/arena/agent/forecaster.py", True),
+        ),
+    ),
+    (
+        "ML and MLOps",
+        "Weekly retraining, promotion by rule, hashed model artifacts, CI-gated releases.",
+        (
+            ("Champion and challenger timeline", "experiments.html", False),
+            ("Model registry (code)", "src/arena/forecasters/registry.py", True),
+            ("Pipeline status", "status.html", False),
+        ),
+    ),
+    (
+        "Data science",
+        "Proper scores, day-block intervals and honest comparison against a base rate.",
+        (
+            ("A year of backtests", "backtests.html", False),
+            ("Live leaderboard", "leaderboard.html", False),
+            ("The SQL behind the numbers", "data.html", False),
+        ),
+    ),
+)
+
+FACT_KEYS = ("city", "availability", "languages", "linkedin", "cv_url", "email")
+_DRAFT = "[FILL IN"
+
+
+def load_facts(content_dir: Path | None) -> dict[str, str]:
+    """The owner's optional facts from `recruiter_facts.json` (owner item H16).
+
+    Missing file, missing keys, empty values, draft markers and unsafe link schemes are
+    all dropped, so nothing unconfirmed is ever shown (I5). Links must be https, mailto
+    for `email`."""
+    if content_dir is None:
+        return {}
+    path = content_dir / "recruiter_facts.json"
+    if not path.is_file():
+        return {}
+    try:
+        raw = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}
+    out: dict[str, str] = {}
+    for key in FACT_KEYS:
+        val = raw.get(key) if isinstance(raw, dict) else None
+        if not isinstance(val, str) or not val.strip() or _DRAFT in val:
+            continue
+        val = val.strip()
+        if key in ("linkedin", "cv_url") and not val.startswith("https://"):
+            continue
+        if key == "email" and not re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", val):
+            continue
+        out[key] = val
+    return out
+
+
+def hero_result(backtest: dict[str, Any] | None) -> dict[str, str] | None:
+    """The one result line of the first screen, copied from the backtest card (I5).
+
+    Needs `ml` and `persistence` rows; returns None otherwise so the page shows no number
+    rather than a guessed one."""
+    if not backtest:
+        return None
+    vals = {fid: v for fid, v, _ in backtest["rows"]}
+    if "ml" not in vals or "persistence" not in vals:
+        return None
+    return {
+        "ml": vals["ml"],
+        "persistence": vals["persistence"],
+        "days": str(backtest["days"]),
+        "supported": "yes" if backtest["supported"] else "no",
+    }

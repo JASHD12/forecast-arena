@@ -68,7 +68,7 @@ from arena.site.ops_status import (
 )
 from arena.site.participation import participants, sample_links
 from arena.site.profiles import profile
-from arena.site.recruiters import PROOFS
+from arena.site.recruiters import PROOFS, ROLE_PATHS, hero_result, load_facts
 from arena.site.shaping import (
     _question_chart,
     _rows,
@@ -359,6 +359,9 @@ def build_site(
             {
                 "proofs": PROOFS,
                 "personal": read_content("recruiters.md"),
+                "facts": load_facts(content),
+                "roles": ROLE_PATHS,
+                "hero": hero_result(headline_backtest(models_dir)),
                 "backtest": headline_backtest(models_dir),
                 "json_change": json_validity_change(eval_runs(evals_dir)),
                 "k": {

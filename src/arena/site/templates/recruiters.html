@@ -1,11 +1,15 @@
 {% extends "base.html" %}
 {% from "macros.html" import page_head %}
 {% block content %}
-<section class="hero"><p class="kicker">Jashdeep Singh · Werkstudent AI / Machine Learning / Data Science</p>
-<h1>Python forecasting, evaluated in public.</h1><p>Forecast Arena compares classical models and LLM agents using forecasts published before outcomes are known.</p>
-{% if backtest %}<p><strong>Electricity backtest: {{ backtest.days }} days.</strong> {% for fid, value, numeric in backtest.rows %}{{ fname(fid) }} {{ value }}{% if not loop.last %} · {% endif %}{% endfor %} <a href="backtests.html#card-power">View model scores, paired comparisons and limitations</a>.</p>{% endif %}
-<p class="actions"><a class="btn" href="backtests.html{% if backtest %}#card-power{% endif %}">View the evidence</a> <a class="btn btn-ghost" href="{{ repo_url }}">Read the code</a></p>
-<p class="note">AI-assisted development: specified and directed by Jashdeep Singh, implemented with AI coding agents. Every figure on this site is computed from the public record.</p></section>
+<section class="hero recruiter-hero"><p class="kicker">Jashdeep Singh · Werkstudent AI / Machine Learning / Data Science{% for k in ("city", "availability") %}{% if facts[k] %} · {{ facts[k] }}{% endif %}{% endfor %}</p>
+<h1>I build forecasting systems and test them honestly.</h1>
+{% if hero %}<p class="hero-result"><strong>A gradient-boosted model beats "same as last time" on German day-ahead electricity:</strong> Brier {{ hero.ml }} vs {{ hero.persistence }} over {{ hero.days }} backtest days{% if hero.supported == "yes" %} (the interval excludes zero){% endif %}. The live comparison with LLM agents is still <em>too early to tell</em>. <a href="backtests.html#card-power">Scores, intervals and limits</a>.</p>
+{% else %}<p class="hero-result">Forecast Arena compares classical models and LLM agents on forecasts published before the outcome is known.</p>{% endif %}
+<p class="actions">{% if facts.cv_url %}<a class="btn" href="{{ facts.cv_url }}">Download CV (PDF)</a>{% elif facts.linkedin %}<a class="btn" href="{{ facts.linkedin }}">Contact on LinkedIn</a>{% elif facts.email %}<a class="btn" href="mailto:{{ facts.email }}">Contact by email</a>{% else %}<a class="btn" href="#r-five">60-second evidence tour</a>{% endif %} {% if facts.cv_url or facts.linkedin or facts.email %}<a class="btn btn-ghost" href="#r-five">60-second evidence tour</a> {% endif %}<a class="btn btn-ghost" href="{{ repo_url }}">Read the code</a></p>
+<p class="note">AI-assisted development: specified and directed by Jashdeep Singh, implemented with AI coding agents. Every figure on this site is computed from the public record.{% if facts.languages %} Languages: {{ facts.languages }}.{% endif %}{% if facts.linkedin and facts.cv_url %} <a href="{{ facts.linkedin }}">LinkedIn</a>.{% endif %}</p></section>
+<section class="roles" aria-label="Where to look, by role">
+{% for role, why, links in roles %}<article class="card role-card"><h2>{{ role }}</h2><p>{{ why }}</p><ul class="plain">{% for label, target, is_repo in links %}<li><a href="{{ (repo_url ~ "/blob/main/" ~ target) if is_repo else target }}">{{ label }}</a></li>{% endfor %}</ul></article>
+{% endfor %}</section>
 <div class="kpis">
 <div class="kpi"><span class="kpi-n">{{ k.questions }}</span><span class="kpi-l">questions asked</span></div>
 <div class="kpi"><span class="kpi-n">{{ k.forecasts }}</span><span class="kpi-l">forecasts published before the answer</span></div>

@@ -1051,3 +1051,11 @@ and evidence requirements. Do not backfill historical ML forecasts.
 - Proposal for the owner: if D+1 forecasts turn out to appear only after the lock, drop the
   "missing renewables" caveat from the pitch and say instead that the target-day renewable
   forecast is not available before the lock, which is why the model uses calendar and price lags.
+
+## 2026-11-19 T220: the slice-card reproduction test skips without the stored run
+
+- Context: CI failed on the first slice PR because the test re-reads `backtests/<run>/forecasts.jsonl`,
+  which is git-ignored and exists only on the machine that ran the backtest.
+- Decision: the byte-for-byte check of `docs/models/power-slices.md` against the stored run now skips
+  when the run is missing. CI still checks that the card names the same run as `power.md` and holds
+  all three tables. Backtest runs stay uncommitted (I4: they live in their own place).

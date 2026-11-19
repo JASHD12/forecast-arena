@@ -94,6 +94,8 @@ def test_first_screen_result_comes_from_the_model_card(tmp_path) -> None:
     page = (res.out_dir / "recruiters.html").read_text()
     assert "I build forecasting systems and test them honestly." in page
     assert f"Brier {ml['ml']} vs {ml['persistence']} over {bt['days']} backtest days" in page
+    vp = bt["vs_persistence"]
+    assert f"paired difference {vp['diff']} {vp['interval']}, excludes zero" in page
     assert "Werkstudent AI / Machine Learning / Data Science" in page
     assert "Download CV" not in page and "LinkedIn" not in page  # H16 facts absent: omitted
 

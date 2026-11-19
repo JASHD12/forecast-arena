@@ -641,9 +641,9 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
   - Done when: kicker, H1, generated result line, primary and secondary buttons visible at 1366x768 and 390x844; missing H16 fields are omitted, tested.
 - [x] T211 · Recruiter role-chooser cards with deep links (P2) (deps: T210)
   - Done when: three cards, two links each; a test checks every link resolves.
-- [ ] T212 · README opening (P3) (deps: T211)
+- [x] T212 · README opening (P3) (deps: T211)
   - Done when: `scripts/readme_sections.py --check` passes; first 15 lines hold result, caveat and live status; stack inside a details block.
-- [ ] T213 · README screenshot from a real-ledger build (P4) (deps: T212)
+- [x] T213 · README screenshot from a real-ledger build (P4) (deps: T212)
   - Done when: `scripts/screenshots.py LEDGER_DIR` regenerates docs/img/home.png with a dated caption.
 - [ ] T214 · Social preview image and og/twitter meta (P5) (deps: T213)
   - Done when: image 1280x640 is in the build; meta tags tested.

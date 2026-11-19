@@ -24,7 +24,7 @@ def test_readme_screenshots_exist_and_are_labelled() -> None:
     for name in ("home", "play", "leaderboard"):
         assert f"docs/img/{name}.png" in text
         assert (ROOT / "docs" / "img" / f"{name}.png").stat().st_size > 1000
-    assert "offline demo build (fixture data)" in text
+    assert "Screenshot of the site built from the public ledger on 20" in text  # T213
     assert "**backtests**" in text
     # T184: the first screen carries the pitch, links, one image and generated highlights
     top = text[: text.index("<details>")]
@@ -33,7 +33,28 @@ def test_readme_screenshots_exist_and_are_labelled() -> None:
         "60-second tour",
         "docs/img/home.png",
         "<!-- highlights:start -->",
-        "**Stack:**",
+        "<!-- headline:start -->",
+        "too early to tell",
     ):
         assert must in top, must
+    # T212: result, caveat and live status come before the stack, which sits in a details block
+    assert text.index("Result so far") < text.index("**Stack:**")
+    assert "<summary><strong>Tech stack</strong></summary>" in text
+    first15 = "\n".join(text.splitlines()[:25])
+    assert "Result so far" in first15 and "Caveat:" in first15
     assert "Status (20" not in text  # no hand-written, dated status paragraph
+
+
+def test_screenshot_caption_update() -> None:
+    """T213: the caption under the screenshot is rewritten with the date; no caption raises."""
+    import sys
+
+    sys.path.insert(0, str(ROOT / "scripts"))
+    import pytest
+    from screenshots import update_readme
+
+    text = "a\n*Screenshot of x. y*\nb\n"
+    out = update_readme(text, "2026-11-19")
+    assert "built from the public ledger on 2026-11-19" in out and out.startswith("a\n")
+    with pytest.raises(SystemExit):
+        update_readme("no caption here", "2026-11-19")

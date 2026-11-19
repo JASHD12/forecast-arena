@@ -225,11 +225,14 @@ def hero_result(backtest: dict[str, Any] | None) -> dict[str, str] | None:
     if not backtest:
         return None
     vals = {fid: v for fid, v, _ in backtest["rows"]}
-    if "ml" not in vals or "persistence" not in vals:
+    vp = backtest.get("vs_persistence")
+    if "ml" not in vals or "persistence" not in vals or not vp:
         return None
     return {
         "ml": vals["ml"],
         "persistence": vals["persistence"],
         "days": str(backtest["days"]),
-        "supported": "yes" if backtest["supported"] else "no",
+        "diff": vp["diff"],
+        "interval": vp["interval"],
+        "supported": "yes" if vp["supported"] else "no",
     }

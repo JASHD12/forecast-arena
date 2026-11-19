@@ -7,20 +7,25 @@
 [![Licence: MIT](https://img.shields.io/badge/licence-MIT-informational)](LICENSE)
 
 **Can an LLM agent beat a classical ML model at forecasting tomorrow?** Forecast Arena is a
-live, public benchmark that answers this honestly. Every day it turns public data (German
-electricity prices first) into yes/no questions; baselines, a gradient-boosted model and
-several LLM forecasters (Claude, a tool-using agent, a LangGraph agent, a local
-open-weights model) each publish a probability **before the answer exists**, into an
-append-only, hash-chained ledger. When the official data arrives, every forecast is scored.
+live, public benchmark: every day, baselines, a gradient-boosted model and several LLM
+forecasters publish a probability for yes/no questions about tomorrow (electricity prices,
+weather, Wikipedia attention, exchange rates) **before the answer exists**, into an
+append-only, hash-chained ledger. When the data arrives, every forecast is scored.
+
+<!-- headline:start -->
+**Result so far (backtest, not the live record):** over 365 days of German day-ahead electricity, the gradient-boosted model scores Brier 0.1930 against 0.2205 for "same as last time" and 0.2466 for the base rate (lower is better; always saying 50% scores 0.25). Paired difference to persistence: -0.0275 [-0.0378, -0.0162], supported. Caveat: the 2190 questions come from only 365 independent days (about 6 correlated questions per day), so intervals resample whole days.
+
+**Live record:** running in rehearsal since 2026-11-13. Whether LLM agents beat the classical model is **too early to tell**; the [Status page](https://jashd12.github.io/forecast-arena/status.html) shows the current counts.
+<!-- headline:end -->
 
 **[Live site](https://jashd12.github.io/forecast-arena/)** ·
-**[60-second tour](https://jashd12.github.io/forecast-arena/recruiters.html)** ·
+**[For recruiters: 60-second tour](https://jashd12.github.io/forecast-arena/recruiters.html)** ·
 **[Status](https://jashd12.github.io/forecast-arena/status.html)** ·
 [Code tour](docs/CODE_TOUR.md) · [Architecture](#how-it-works) · [Reproduce it](#reproduce-it)
 
 [![The home page](docs/img/home.png)](https://jashd12.github.io/forecast-arena/)
 
-*Screenshot of the offline demo build (fixture data). Research project, not advice.*
+*Screenshot of the site built from the public ledger on 2026-11-19. Research project, not advice.*
 
 ## What this shows
 
@@ -32,9 +37,16 @@ append-only, hash-chained ledger. When the official data arrives, every forecast
 - **Runs itself:** scheduled GitHub Actions jobs, CI-gated promotion to a stable branch, health checks with incident issues, Docker, Kubernetes (kind), dbt and Airflow validated in CI. Live record: "too early to tell" until the statistics can decide.
 <!-- highlights:end -->
 
+<details>
+<summary><strong>Tech stack</strong></summary>
+
 <!-- stack:start -->
 **Stack:** Python, typing, testing · SQL, DuckDB, Parquet, Polars · dbt · scikit-learn, calibration · LightGBM, Optuna, SHAP · PyTorch · Time-series models · MLOps: MLflow, Evidently, champion/challenger · Statistics · LLM APIs, prompts, structured output · Agents and tool use · RAG, embeddings · LangGraph · Open-weight models (llama.cpp) · LLM evals, tracing, OpenTelemetry · MCP · REST and JSON APIs · Docker, Kubernetes, Airflow · CI/CD on GitHub Actions · Data integrity · Dashboards and frontend
 <!-- stack:end -->
+
+Airflow, kind and dbt are validated in CI; production runs on GitHub Actions.
+
+</details>
 
 <details>
 <summary><strong>All backtest results</strong> (model cards)</summary>

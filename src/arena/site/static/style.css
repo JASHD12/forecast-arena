@@ -161,12 +161,12 @@ caption { text-align: left; caption-side: top; padding: .6rem .75rem; }
 .board td:last-child { min-width: 13rem; }
 
 /* Charts */
-.chart { width: 100%; max-width: 280px; height: auto; display: block; }
+.chart { width: 100%; min-width: 240px; max-width: 300px; height: auto; display: block; }
 .chart .grid { stroke: var(--line); stroke-width: 1; }
 .chart .ideal { stroke: var(--muted); stroke-width: 1.5; stroke-dasharray: 4 4; }
 .chart .series { fill: none; stroke: var(--accent); stroke-width: 2; stroke-linejoin: round; }
 .chart .mark { fill: var(--accent); stroke: var(--surface); stroke-width: 2; }
-.chart .tick, .chart .axis { fill: var(--muted); font-size: 10px; }
+.chart .tick, .chart .axis { fill: var(--muted); font-size: 13px; }
 .rationale { border-left: 3px solid var(--accent); padding: .1rem 0 .1rem .9rem;
   background: var(--surface); border-radius: 0 8px 8px 0; margin: .5rem 0; }
 
@@ -496,8 +496,8 @@ ul.plain { list-style: none; padding: 0; margin: 0; display: grid; gap: .45rem; 
 .forest { width: 100%; height: auto; display: block; }
 .forest .grid { stroke: var(--line); stroke-width: 1; }
 .forest .coinline { stroke: var(--muted); stroke-width: 1; opacity: .7; }
-.forest .tick { fill: var(--muted); font-size: 11px; }
-.forest .rowlabel { fill: var(--fg); font-size: 12.5px; font-weight: 600; }
+.forest .tick { fill: var(--muted); font-size: 12px; }
+.forest .rowlabel { fill: var(--fg); font-size: 13px; font-weight: 600; }
 .forest .whisker { stroke: var(--c); stroke-width: 2.5; stroke-linecap: round; }
 .forest .dot { fill: var(--c); stroke: var(--surface); stroke-width: 2; }
 .forest .hit { fill: transparent; }
@@ -726,3 +726,6 @@ details.day > summary.day-head { cursor: pointer; font-size: 1.05rem; font-weigh
   .site-header .wrap { flex-wrap: nowrap; gap: .5rem; }
   .phase-pill { margin-right: auto; }
 }
+
+.forest-narrow { display: none; }
+@media (max-width: 640px) { .forest-wide { display: none; } .forest-narrow { display: block; } }

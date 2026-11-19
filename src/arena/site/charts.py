@@ -242,17 +242,35 @@ def race_svg(
 
 FOREST_W, FOREST_ROW = 680, 34
 FOREST_PAD = (28, 24, 34, 170)  # top, right, bottom, left
+FOREST_NARROW = (360, 40, (30, 12, 36, 118))  # phone layout: width, row height, pad
+FOREST_LABEL_CHARS = 16  # longest row label on the phone layout (the tooltip has the full name)
 
 
 def forest_svg(rows: Sequence[Any], names: dict[str, str]) -> Markup:
     """Forest plot: each forecaster's Brier score (dot) with its 95% day-block bootstrap
     interval (whisker), sorted best first, with the coin-flip reference at 0.25.
 
+    Two layouts (wide, and a phone layout the CSS switches to) so the text stays readable.
     `rows` are BoardRow-like objects (forecaster_id, brier.estimate/low/high)."""
+    pad = FOREST_PAD
+    return Markup(
+        _forest_one(rows, names, FOREST_W, FOREST_ROW, pad, narrow=False)
+        + _forest_one(rows, names, *FOREST_NARROW, narrow=True)
+    )
+
+
+def _forest_one(
+    rows: Sequence[Any],
+    names: dict[str, str],
+    width: int,
+    row_h: int,
+    pad: tuple[int, int, int, int],
+    narrow: bool,
+) -> str:
     rows = sorted(rows, key=lambda r: r.brier.estimate)
-    top, right, bottom, left = FOREST_PAD
-    h = top + bottom + FOREST_ROW * max(1, len(rows))
-    w = FOREST_W - left - right
+    top, right, bottom, left = pad
+    h = top + bottom + row_h * max(1, len(rows))
+    w = width - left - right
     lo = min([r.brier.low for r in rows] + [0.25])
     hi = max([r.brier.high for r in rows] + [0.25])
     step = 0.05 if hi - lo > 0.12 else 0.02
@@ -262,11 +280,12 @@ def forest_svg(rows: Sequence[Any], names: dict[str, str]) -> Markup:
     def x(v: float) -> float:
         return left + (v - xmin) / (xmax - xmin) * w
 
+    sfx = "-n" if narrow else "-w"
     p = [
-        f'<svg class="forest" viewBox="0 0 {FOREST_W} {h}" role="img" '
-        'aria-labelledby="forest-t forest-d">',
-        '<title id="forest-t">Brier score with 95% interval per forecaster</title>',
-        '<desc id="forest-d">Dots are mean Brier scores (lower is better); lines are 95% '
+        f'<svg class="forest {"forest-narrow" if narrow else "forest-wide"}" '
+        f'viewBox="0 0 {width} {h}" role="img" aria-labelledby="forest-t{sfx} forest-d{sfx}">',
+        f'<title id="forest-t{sfx}">Brier score with 95% interval per forecaster</title>',
+        f'<desc id="forest-d{sfx}">Dots are mean Brier scores (lower is better); lines are 95% '
         "day-block bootstrap intervals. Overlapping intervals mean the difference is not "
         "established yet. The same numbers are in the table below.</desc>",
     ]
@@ -286,9 +305,15 @@ def forest_svg(rows: Sequence[Any], names: dict[str, str]) -> Markup:
     )
     p.append(f'<text class="tick" x="{x(0.25) + 4:.1f}" y="{top - 16}">coin flip 0.25</text>')
     for i, r in enumerate(rows):
-        cy = top + FOREST_ROW * i + FOREST_ROW / 2
+        cy = top + row_h * i + row_h / 2
         cls = series_class(r.forecaster_id)
-        name = escape(names.get(r.forecaster_id, r.forecaster_id))
+        full = names.get(r.forecaster_id, r.forecaster_id)
+        short = (
+            full
+            if not narrow or len(full) <= FOREST_LABEL_CHARS
+            else full[: FOREST_LABEL_CHARS - 1] + "…"
+        )
+        name = escape(short)
         b = r.brier
         tip = escape(
             f"{names.get(r.forecaster_id, r.forecaster_id)}: {b.estimate:.3f} "
@@ -300,11 +325,11 @@ def forest_svg(rows: Sequence[Any], names: dict[str, str]) -> Markup:
         )
         p.append(
             f'<g class="pt"><title>{tip}</title>'
-            f'<rect class="hit" x="{left}" y="{cy - FOREST_ROW / 2:.1f}" width="{w}" '
-            f'height="{FOREST_ROW}"/>'
+            f'<rect class="hit" x="{left}" y="{cy - row_h / 2:.1f}" width="{w}" '
+            f'height="{row_h}"/>'
             f'<line class="whisker {cls}" x1="{x(b.low):.1f}" x2="{x(b.high):.1f}" '
             f'y1="{cy:.1f}" y2="{cy:.1f}"/>'
             f'<circle class="dot {cls}" cx="{x(b.estimate):.1f}" cy="{cy:.1f}" r="5"/></g>'
         )
     p.append("</svg>")
-    return Markup("".join(p))
+    return "".join(p)

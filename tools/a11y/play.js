@@ -56,6 +56,7 @@ function fail(msg) { console.error('FAIL ' + msg); process.exitCode = 1; }
   // the wording depends on the time of day: "lock in" before 09:30 UTC, "are locked ... lock is in" after
   if (!/lock[^]*\d+ h \d+ min/.test(cd)) fail('countdown not running: ' + cd);
   else console.log('ok   home: lock countdown');
+  await home.setViewportSize({ width: 1200, height: 800 });  // on a phone the toggle lives inside the menu
   const tg = home.locator('.theme-toggle').first();
   if (!(await tg.isVisible())) fail('theme toggle hidden with JavaScript');
   await tg.click();
@@ -106,6 +107,31 @@ function fail(msg) { console.error('FAIL ' + msg); process.exitCode = 1; }
       const [sw, iw] = await wp.evaluate(() => [document.documentElement.scrollWidth, window.innerWidth]);
       if (sw > iw) wide.push(`${f} (${sw} > ${iw})`);
     }
+    // chart text: inside its own picture, and readable (at least 11 px as rendered)
+    const bad = [];
+    for (const f of tops) {
+      await wp.goto('file://' + path.join(root, f));
+      const issues = await wp.evaluate(() => {
+        const out = [];
+        document.querySelectorAll('svg').forEach((svg) => {
+          const box = svg.getBoundingClientRect();
+          if (box.width === 0) return; // the layout the CSS hides
+          const vb = svg.viewBox.baseVal;
+          if (!vb || !vb.width) return;
+          const scale = box.width / vb.width;
+          svg.querySelectorAll('text').forEach((t) => {
+            const px = parseFloat(getComputedStyle(t).fontSize) * scale;
+            const b = t.getBBox();
+            if (px < 10.5) out.push(`${t.textContent.slice(0, 18)} is ${px.toFixed(1)}px`);
+            if (!t.hasAttribute('transform') && (b.x < -1 || b.x + b.width > vb.width + 1)) out.push(`${t.textContent.slice(0, 18)} leaves the picture`);
+          });
+        });
+        return out;
+      });
+      if (issues.length) bad.push(`${f}: ${issues.slice(0, 3).join('; ')}`);
+    }
+    if (bad.length) fail(`chart text at ${width}px: ${bad.join(' | ')}`);
+    else console.log(`ok   chart text readable and inside its picture at ${width}px`);
     if (wide.length) fail(`page wider than the viewport at ${width}px: ${wide.join(', ')}`);
     else console.log(`ok   no horizontal page scroll at ${width}px (${tops.length} pages)`);
     await wctx.close();

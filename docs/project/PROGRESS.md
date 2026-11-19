@@ -64,6 +64,7 @@ T171 honesty-audit details are in `docs/progress-archive.md`.
 
 ## Done log
 
+- 2026-11-19 T047, T058, T069: explainers 03 (question design and baselines), 04 (ML models, leakage, calibration, promotion) and 05 (LLM forecasters and agent) written from the code, each with ten interview questions; T065 and T068 ticked from the ledger (plain, context, agent and agent_graph forecast daily within the caps). Next ready: T090 ensemble
 - 2026-11-19 T223b (plain vs context): llm-eval run 44592033036 (24 golden questions, cap 100,000 tokens, owner-approved H22) completed with no skips: Brier 0.3483 plain vs 0.1855 context, paired difference +0.1628 [+0.0603, +0.2679] (evaluation set, not live). Result committed; numbers.md regenerated. Agent variants in the harness remain open
 - 2026-11-19 T223a: dispatched llm-eval from main (24 questions, 60,000-token cap, run 44586958389): plain answered everything, context hit the cap (budget_exhausted skips), so the run is not committed. T223 split; T223b needs the owner's decision on a higher eval token cap (H22). All of PRs #5-#12 are merged
 - 2026-11-19 T224: 90-second EN/DE walkthrough (one batch from question to score) added to docs/interview/pitch.md, no figures; the owner has to rehearse it

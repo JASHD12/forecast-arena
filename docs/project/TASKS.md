@@ -220,7 +220,7 @@ Keep the first line of each task in exactly this shape; the status script parses
   - Do: extend the e2e test to all four domains, then enable them in the live config.
   - Done when: the next real morning run writes questions for all applicable domains and
     verify passes. If that run has not happened yet, mark `WAIT(until=<date>)`.
-- [ ] T047 · Explainer 03 (deps: T046)
+- [x] T047 · Explainer 03 (deps: T046)
   - Do: `docs/explainers/03-question-design-and-base-rates.md`.
   - Done when: the file exists in the required format.
 
@@ -260,7 +260,7 @@ Keep the first line of each task in exactly this shape; the status script parses
     `CryptoModel`).
   - Done when: a real morning run records `ml` forecasts for every question, or
     `WAIT(until=<date>)` until that run exists.
-- [ ] T058 · Explainer 04 (deps: T057)
+- [x] T058 · Explainer 04 (deps: T057)
   - Do: `docs/explainers/04-ml-models-leakage-calibration.md`.
   - Done when: the file exists in the required format.
 
@@ -282,7 +282,8 @@ Keep the first line of each task in exactly this shape; the status script parses
 - [x] T064 · Live LLM smoke workflow (deps: T063; needs: H04)
   - Do: `llm-smoke.yml` (manual, two calls, prints usage, writes nothing).
   - Done when: a dispatch succeeds and reports token usage.
-- [ ] T065 · Enable plain and context LLM forecasters (live) (deps: T064, T046)
+- [x] T065 · Enable plain and context LLM forecasters (live) (deps: T064, T046)
+  - Verified 2026-11-19 on the ledger: `llm_plain` and `llm_context` forecast on a seeded daily sample in every batch since 2026-11-13, with `not_sampled` skips elsewhere and 0 of 49 answers unparseable on 2026-11-19 (health report).
   - Do: enable both in the live config.
   - Done when: a real morning run records their forecasts within the caps, or
     `WAIT(until=<date>)`.
@@ -294,11 +295,12 @@ Keep the first line of each task in exactly this shape; the status script parses
     headline-only storage.
   - Done when: a test with a tool result containing instructions shows they are ignored
     by the harness (no extra tool calls, no changed output contract).
-- [ ] T068 · Enable the agent forecaster (live) (deps: T067, T065; needs: H04)
+- [x] T068 · Enable the agent forecaster (live) (deps: T067, T065; needs: H04)
+  - Verified 2026-11-19 on the ledger: `agent` forecasts (11 to 12 per day, the rest `not_sampled`) with traces in every batch since 2026-11-14; `agent_graph` 3 to 4 per day.
   - Do: enable `agent` in the live config.
   - Done when: a real morning run records agent forecasts and traces within the caps, or
     `WAIT(until=<date>)`.
-- [ ] T069 · Explainer 05 (deps: T068)
+- [x] T069 · Explainer 05 (deps: T068)
   - Do: `docs/explainers/05-llm-forecasters-and-agent.md`, including costs and failure modes.
   - Done when: the file exists in the required format.
 

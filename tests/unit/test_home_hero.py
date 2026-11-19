@@ -85,3 +85,29 @@ def test_agent_card_only_from_real_successful_traces() -> None:
     assert agent_trace_of_day({"q1": [bad]}, rec, date(2026, 11, 2)) is None
     assert agent_trace_of_day({"q1": [ok]}, rec, date(2026, 10, 31)) is None  # not after batch
     assert agent_trace_of_day({}, rec, None) is None
+
+
+def test_home_standings_state_questions_and_days() -> None:
+    """T201: the standings card says how many questions and days stand behind the ranks."""
+    from types import SimpleNamespace as NS
+
+    from arena.site.build import _env
+
+    src = (ROOT / "src" / "arena" / "site" / "templates" / "index.html").read_text()
+    m = re.search(r"(<p class=\"st-note\">.*?</p>)", src, re.S)
+    assert m
+    tpl = _env().from_string(m.group(1))
+    one = tpl.render(board=NS(questions=24, days=3, label="too early to tell"))
+    assert "24 questions · 3 days" in one and "too early to tell" in one
+    assert "1 day<" in tpl.render(board=NS(questions=8, days=1, label=None))
+
+
+def test_no_unfinished_placeholder_text_on_any_page(tmp_path) -> None:
+    """T202: no draft marker or 'owner confirmation' sentence reaches a built page."""
+    out = _site(tmp_path)
+    pages = list(out.rglob("*.html"))
+    assert pages
+    for page in pages:
+        text = page.read_text()
+        assert "owner confirmation" not in text, page.name
+        assert "[FILL IN" not in text, page.name

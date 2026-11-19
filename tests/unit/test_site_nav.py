@@ -28,3 +28,11 @@ def test_every_nav_target_is_built_and_nothing_is_listed_twice(tmp_path) -> None
     assert 'id="official-start"' in methods
     exp = (res.out_dir / "experiments.html").read_text()
     assert 'class="is-current"' in exp and 'href="experiments.html" aria-current="page"' in exp
+
+
+def test_official_start_rule_names_the_not_before_date() -> None:
+    """T200: the rehearsal text must not promise an automatic start."""
+    from arena.site.build import START_RULE
+
+    assert "not before a start date" in START_RULE
+    assert "automatically" not in START_RULE

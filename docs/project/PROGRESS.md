@@ -64,6 +64,7 @@ T171 honesty-audit details are in `docs/progress-archive.md`.
 
 ## Done log
 
+- 2026-11-19 T200-T203 (audit plan docs/project/AUDIT_2026-11-19.md): official-start wording names the not-before rule; home standings show questions and days; placeholder sentence removed from the recruiter page (test over all built pages); leaderboard overflow fixed (sr-only spans escaped the scroll container) with a page-width check in `make a11y`. T057 and T193e ticked from the ledger (ml 33/33 each batch 11-16 to 11-19)
 - 2026-11-15 T193a-d: implemented handoff F1-F9; 600 unit and 7 E2E tests pass, 89.39% coverage; isolated HGB/LightGBM/PyTorch inference CI job; real read-only GitHub audit finds 17 attempts and fails closed on old missing evidence; current ledger and champion loading verified
 
 - 2026-11-14 T182: scripts/smoke_site.py (pages, data files, referenced assets, CSP meta, build age under 26 h) runs after every Pages deploy in morning/evening/resolve; green on a real resolve deploy; `make smoke-site` for manual runs

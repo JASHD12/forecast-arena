@@ -102,6 +102,13 @@ class SiteResult:
     pages: list[str]
 
 
+START_RULE = (
+    "The official record starts after five clean days in a row, and not before a start date "
+    "the owner fixes in advance; until then results are shown but don't count "
+    "towards headline scores."
+)
+
+
 def _env() -> Environment:
     env = Environment(
         loader=PackageLoader("arena.site", "templates"),
@@ -179,6 +186,7 @@ def build_site(
         "attributions": ATTRIBUTIONS,
         "built_at": clock.now().strftime("%Y-%m-%d %H:%M UTC"),
         "official_start": start_s,
+        "start_rule": START_RULE,
         "qhref": question_href,
         "plain_title": plain_title,
         "fname": forecaster_name,

@@ -665,5 +665,5 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
     if before, design the vintage archive (new ledger family needs owner review) then.
 - [ ] T223 · LLM ablation on the frozen golden set (C3) (deps: T222a)
   - Done when: one llm-eval dispatch within caps; result committed; Evals page labels it "evaluation set, not live".
-- [ ] T224 · 90-second EN/DE walkthrough draft (P6) (deps: T223)
-  - Done when: docs/interview/pitch.md updated with live ML facts; the owner rehearses it (human).
+- [x] T224 · 90-second EN/DE walkthrough draft (P6) (deps: T223)
+  - Done when: docs/interview/pitch.md has a 90-second EN and DE walkthrough with no figures (the interview-kit test passes); the owner rehearses it (human).

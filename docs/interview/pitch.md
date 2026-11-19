@@ -54,3 +54,54 @@ leakage.
 > Ehrliches Zwischenergebnis: Im einjährigen Backtest schlägt das klassische Modell die
 > Basisrate beim Strom deutlich; der Live-Vergleich mit den Sprachmodellen ist noch „zu
 > früh für eine Aussage“, und genau das zeigt die Website auch.
+
+# The 90-second walkthrough: one day in the system
+
+Draft for you to rehearse and make your own (owner item: say it aloud twice, time it). It
+follows one batch from question to score and quotes no figures; if asked for numbers, open
+`numbers.md`.
+
+## English
+
+> Let me walk you through one day. **The evening before**, the system publishes tomorrow's
+> questions from live data, for example "will tomorrow's average German day-ahead
+> electricity price be above this threshold?". **In the morning**, every forecaster
+> publishes a probability: two baselines, a gradient-boosted model that has been live since
+> mid-November, and several Claude-based forecasters, including an agent with tools.
+> Each answer is written into an append-only, hash-chained ledger on a git branch.
+>
+> **At 09:30 UTC the questions lock.** That is before the day-ahead auction results are
+> published around 13:00 Berlin time, so nobody, including me, can know the answer. A
+> data gateway only lets a model see what was public at that moment, which is how I
+> prevent leakage. If a model fails, the ledger records a skip with a reason; it never
+> fills in a guess.
+>
+> **The next day**, the official price data arrives, each question is resolved with its
+> evidence, and every forecast gets a Brier score. The site shows the result against the
+> base rate with day-block confidence intervals, and says "too early to tell" until the
+> statistics can decide. In the backtest the classical model clearly beats the baselines;
+> whether an LLM agent can beat it live is the open question, and I would rather show that
+> honestly than claim it.
+
+## Deutsch
+
+> Ich zeige Ihnen einen Tag im System. **Am Vorabend** veröffentlicht es Fragen zum
+> nächsten Tag aus Live-Daten, zum Beispiel: „Liegt der durchschnittliche deutsche
+> Day-Ahead-Strompreis morgen über diesem Schwellenwert?“ **Am Morgen** gibt jedes
+> Prognosemodell eine Wahrscheinlichkeit ab: zwei Baselines, ein Gradient-Boosting-Modell,
+> das seit Mitte November live läuft, und mehrere Claude-basierte Modelle, darunter ein
+> Agent mit Werkzeugen. Jede Antwort wird in ein nur erweiterbares, per Hash verkettetes
+> Protokoll auf einem Git-Branch geschrieben.
+>
+> **Um 09:30 UTC werden die Fragen gesperrt.** Das ist vor der Veröffentlichung der
+> Day-Ahead-Ergebnisse gegen 13 Uhr deutscher Zeit, also kann niemand die Antwort kennen,
+> auch ich nicht. Ein Datenzugang zeigt jedem Modell nur, was zu diesem Zeitpunkt
+> öffentlich war; so verhindere ich Datenlecks. Fällt ein Modell aus, steht im Protokoll
+> ein Ausfall mit Grund, nie ein geschätzter Ersatzwert.
+>
+> **Am nächsten Tag** kommen die offiziellen Preisdaten, jede Frage wird mit Beleg
+> aufgelöst, und jede Prognose erhält einen Brier-Score. Die Website vergleicht mit der
+> Basisrate samt Konfidenzintervallen und schreibt „zu früh für eine Aussage“, solange die
+> Statistik nichts hergibt. Im Backtest schlägt das klassische Modell die Baselines klar;
+> ob ein LLM-Agent es live schlagen kann, ist die offene Frage, und die zeige ich lieber
+> ehrlich, als sie zu behaupten.

@@ -106,3 +106,11 @@ Filled in per source by T023, T040, T042, T044.
   https://docs.github.com/en/rest/actions/workflow-jobs#list-jobs-for-a-workflow-run-attempt .
 - GitHub CLI supports `gh api --paginate --slurp` to collect complete JSON pages:
   https://cli.github.com/manual/gh_api . Incomplete or inaccessible evidence blocks readiness.
+
+## 2026-11-19 SMARD licence and forecast series (T222a)
+
+| Fact | Source | Checked |
+|---|---|---|
+| SMARD data (market data section and download centre) is CC BY 4.0; attribution "Bundesnetzagentur \| SMARD.de". The page says legal questions on licensing wholesale prices are under review (HEDWIG procedure); no restriction is stated. The page has no last-updated date | https://www.smard.de/home/datennutzung | 2026-11-19 |
+| Forecast series ids: 3791 forecast generation offshore, 123 onshore, 125 photovoltaics, 715 other, 5097 wind and PV, 122 total. There is no forecast-load id in the spec | https://raw.githubusercontent.com/bundesAPI/smard-api/main/openapi.yaml | 2026-11-19 |
+| Series 125 (hour, DE): latest weekly chunk (week of 2026-11-16 Berlin) had values up to 2026-11-19 22:00 UTC, `meta_data.created` 2026-11-18 17:06 UTC, still unchanged at 16:06 UTC on 2026-11-19; the remaining hours of the chunk were null. So D+1 forecasts had not appeared by 16:06 UTC on D | live call, one observation | 2026-11-19 |

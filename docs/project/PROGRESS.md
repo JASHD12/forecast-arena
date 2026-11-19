@@ -64,6 +64,7 @@ T171 honesty-audit details are in `docs/progress-archive.md`.
 
 ## Done log
 
+- 2026-11-19 T222a: checked the audit's SMARD forecast-vintage premise before building it. Terms (CC BY 4.0, HEDWIG review) and forecast series ids recorded; one live observation shows D+1 forecasts not yet published at 16:06 UTC on D, so they probably cannot be used at the 09:30 UTC lock. Archive not built; T222b measures publication time over 7 days. T223 now depends on T222a
 - 2026-11-19 T220: backtest slice card (`docs/models/power-slices.md`, shown on the Backtests page): ml vs persistence by template, month and target-day type with paired day-block intervals and a generated statement of where persistence is not worse (evening_gt, holidays and several single months: no supported difference); negative-price days not covered (DECISIONS)
 - 2026-11-19 T214, T221: the social preview image (1200x630) and og/twitter meta already existed; now tested, and H18 says where to upload it. Methods explains why a base rate can score above 0.25 early (audit F9)
 - 2026-11-19 T212-T213: README opens with the question, a generated "Result so far" block (backtest figures, ml-vs-persistence interval, the 365-independent-days caveat, live status), links and screenshot; stack in a details block. `scripts/screenshots.py LEDGER_DIR` rebuilds docs/img/home.png from a real ledger (dated caption). Also fixed my T210 hero: it cited the ml-vs-base-rate interval for a claim about persistence; it now uses the card's `ml - persistence` row

@@ -651,9 +651,19 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
   - Done when: Brier by template, month, holiday and negative-price days with day-block intervals, unit-tested; generated statement of where persistence wins.
 - [x] T221 · Methods note on a base rate scoring above 0.25 early (C4) (deps: T220)
   - Done when: Methods has one sentence, and a test pins it.
-- [ ] T222 · SMARD forecast-vintage archive (C2) (deps: T221)
-  - Done when: wind/solar/load forecasts stored with fetch time through the as-of gateway; SMARD terms noted in SOURCES; no model change.
-- [ ] T223 · LLM ablation on the frozen golden set (C3) (deps: T222)
+- [x] T222a · Check whether SMARD forecasts exist before the lock (C2 premise) (deps: T221)
+  - Done when: SMARD terms and the forecast series ids are in SOURCES with today's date, and the
+    evidence on when day-ahead generation forecasts appear is in DECISIONS. Result 2026-11-19:
+    the forecasts for D+1 were not yet published at 16:06 UTC on D, so they cannot be a feature
+    at the 09:30 UTC lock; building the archive as first specified would store nothing useful.
+- [ ] T222b · Measure when SMARD forecasts for D+1 appear (C2, corrected) (deps: T222a)
+  - Do: a small read-only job step (morning, evening and resolve runs) records, per forecast series
+    (ids 123, 3791, 125), the chunk's `created` time and the last non-null hour, as a run-manifest
+    count or warning; no model change and no new ledger family.
+  - Done when: after 7 days the manifests show the publication time of D+1 forecasts relative to
+    the 09:30 UTC lock. If it is after the lock every day, close the renewables idea in DECISIONS;
+    if before, design the vintage archive (new ledger family needs owner review) then.
+- [ ] T223 · LLM ablation on the frozen golden set (C3) (deps: T222a)
   - Done when: one llm-eval dispatch within caps; result committed; Evals page labels it "evaluation set, not live".
 - [ ] T224 · 90-second EN/DE walkthrough draft (P6) (deps: T223)
   - Done when: docs/interview/pitch.md updated with live ML facts; the owner rehearses it (human).

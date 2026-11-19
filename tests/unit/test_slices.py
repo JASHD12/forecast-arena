@@ -68,15 +68,26 @@ def test_markdown_is_labelled_backtest_and_has_all_tables() -> None:
 
 
 def test_committed_slice_card_matches_the_stored_run() -> None:
-    """The card in docs/models is exactly what the stored backtest run produces."""
+    """The card in docs/models is exactly what the stored backtest run produces.
+
+    Backtest runs are not committed (`backtests/` is git-ignored), so the byte-for-byte
+    reproduction only runs where the run exists; the committed-file checks below always run."""
     import re
     from pathlib import Path
+
+    import pytest
 
     from arena.backtest.harness import BacktestStore
 
     root = Path(__file__).resolve().parents[2]
     card = (root / "docs" / "models" / "power-slices.md").read_text(encoding="utf-8")
     run_id = re.search(r"\(run `([^`]+)`\)", card).group(1)  # type: ignore[union-attr]
+    # always: same run as the power card, and all three tables are present
+    assert run_id in (root / "docs" / "models" / "power.md").read_text(encoding="utf-8")
+    for g in ("template", "month", "target day"):
+        assert f"**By {g}**" in card
+    run_file = root / "backtests" / run_id / "forecasts.jsonl"
+    if not run_file.is_file():
+        pytest.skip("stored backtest run not available (backtests/ is not committed)")
     records = BacktestStore(root / "backtests").read(run_id)
     assert markdown(records, run_id) == card
-    assert run_id in (root / "docs" / "models" / "power.md").read_text(encoding="utf-8")

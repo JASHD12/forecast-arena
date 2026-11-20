@@ -10,6 +10,7 @@ import re
 from html import escape
 
 MIN_SECTIONS = 4
+MAX_LABEL = 48
 _H2 = re.compile(r"<h2(?P<attrs>(?:\s[^>]*)?)>(?P<inner>.*?)</h2>", re.S)
 _ID = re.compile(r'\sid="([^"]+)"')
 _TAG = re.compile(r"<[^>]+>")
@@ -39,7 +40,10 @@ def short_label(label: str) -> str:
     """A contents-list label without a trailing "backtest" or a trailing parenthesised id."""
     short = _SUFFIX.sub("", label)
     trimmed = _PAREN.sub("", short)
-    return trimmed if len(trimmed) >= 3 else short
+    label = trimmed if len(trimmed) >= 3 else short
+    if len(label) > MAX_LABEL:  # a long heading (a hypothesis sentence) stays whole in the page
+        label = label[:MAX_LABEL].rsplit(" ", 1)[0].rstrip(",;:") + "\u2026"
+    return label
 
 
 def _slug(text: str, taken: set[str]) -> str:

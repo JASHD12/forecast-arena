@@ -65,6 +65,7 @@ Nothing. See the session summary above and `python scripts/status.py`.
   output, not acted on (S11).
 
 ## Done log
+- 2026-11-20 T233: site-wide layout system (flow spacing, cards, links, duo rows) and a layout audit in `make a11y`; no number or wording of a result changed
 - 2026-11-20 T232: visual polish of the plain pages (Backtests model cards with chips, contents chips, callout banner, evals table, card spacing); no number or wording of a result changed
 - 2026-11-20 T231 (PR after #19): glossary line in the home hero; "answer due Sat 21 Nov" instead of "open"; long reference pages (methods, backtests, experiments, stack) fold into sections on phones (script-driven, open without JavaScript), phone heights 2,004 to 3,165 px (were 14,000 to 20,000); browser check for the fold. H24 could not be set by the agent (variables API refused, recorded in HUMAN_TODO)
 

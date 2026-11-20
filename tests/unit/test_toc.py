@@ -1,6 +1,6 @@
 """Table of contents for long pages: ids, order, and nothing for short pages."""
 
-from arena.site.toc import MIN_SECTIONS, add_toc
+from arena.site.toc import MIN_SECTIONS, add_toc, mark_fold
 
 HEAD = '<main><header class="page-head"><h1>T</h1></header>'
 
@@ -38,3 +38,8 @@ def test_short_pages_and_pages_without_a_head_are_untouched() -> None:
     assert add_toc(short) == short
     no_head = "<main>" + "".join(f"<h2>H{i}</h2>" for i in range(6)) + "</main>"
     assert add_toc(no_head) == no_head
+
+
+def test_mark_fold_flags_main_for_the_phone_script() -> None:
+    assert "data-fold" in mark_fold('<main id="main"><div>x</div></main>')
+    assert mark_fold("<p>no main</p>") == "<p>no main</p>"

@@ -100,6 +100,20 @@ function fail(msg) { console.error('FAIL ' + msg); process.exitCode = 1; }
   if ((await shown()) !== total) fail('state filter did not reset');
   else console.log('ok   archive state filter: ' + answered + ' answered of ' + total);
 
+  // Long reference pages fold into sections on a phone; the contents link opens its section.
+  const fp = await ctx.newPage();
+  await fp.goto('file://' + path.join(root, 'methods.html'));
+  const btns = await fp.locator('.fold-btn').count();
+  const closed = await fp.locator('.fold-btn[aria-expanded="false"]').count();
+  if (btns < 4 || closed < 1) fail('methods.html did not fold into sections on a phone');
+  else {
+    await fp.locator('.toc summary').click();
+    await fp.locator('.toc a').last().click();
+    const opened = await fp.evaluate(() => { const h = document.getElementById(location.hash.slice(1)); const n = h && h.nextElementSibling; return !!n && !n.hidden; });
+    if (!opened) fail('contents link did not open its folded section');
+    else console.log('ok   methods: ' + btns + ' folded sections on a phone, contents link opens one');
+  }
+
   const noJs = await browser.newContext({ javaScriptEnabled: false });
   const n1 = await noJs.newPage();
   await n1.goto('file://' + path.join(root, 'index.html'));

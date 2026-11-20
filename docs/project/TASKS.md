@@ -695,9 +695,9 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
     Status without internal jargon or run-id walls and with the real schedule; questions archive with folded days
     and a state filter (26,012 to about 12,000 px on a phone); phone header with one Menu button; chart text at
     least 11 px as rendered, checked in the browser tests; table of contents on the long reference pages.
-- [ ] T231 · Usability pass, second part (deps: T230)
-  - Not started: a one-line glossary (Brier score, base rate, "too early to tell") linked from the hero; folding the
+- [x] T231 · Usability pass, second part (deps: T230)
+  - Done 2026-11-20: a one-line glossary (Brier score, base rate, "too early to tell") linked from the hero; folding the
     long reference pages (methods, backtests, experiments, tech stack) into sections on phones; "answer due" instead
-    of the "open" pill on question cards.
+    of the "open" pill on question cards ("answer due Sat 21 Nov"). Folding is script-driven (open without JavaScript).
   - Done when: the three items are in and page heights on a phone for those four pages are under 10,000 px.
 

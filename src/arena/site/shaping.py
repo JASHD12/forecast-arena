@@ -205,6 +205,7 @@ def _rows(questions: Sequence[Question], rec: Any) -> tuple[list[dict[str, Any]]
                 "outcome": None if r is None else r.outcome,
                 "observed": None if r is None else r.observed_value,
                 "state": state,
+                "due": q.resolve_after.strftime("%a %d %b"),
             }
         )
     order = [

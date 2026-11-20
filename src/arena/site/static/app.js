@@ -246,6 +246,32 @@
     run();
   }
 
+  // Long reference pages: on phones each section heading becomes a button that folds its section.
+  function initFold() {
+    var heads = Array.prototype.slice.call(document.querySelectorAll('main h2, main h3'));
+    heads.forEach(function (h, i) {
+      var body = [];
+      for (var n = h.nextElementSibling; n && n.tagName !== 'H2' && n.tagName !== h.tagName; n = n.nextElementSibling) body.push(n);
+      if (!body.length) return;
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'fold-btn';
+      var set = function (open) {
+        b.setAttribute('aria-expanded', open ? 'true' : 'false');
+        body.forEach(function (n) { n.hidden = !open; });
+      };
+      while (h.firstChild) b.appendChild(h.firstChild);
+      h.appendChild(b);
+      b.addEventListener('click', function () { set(b.getAttribute('aria-expanded') !== 'true'); });
+      h._open = function () { set(true); };
+      set(i === 0 && h.tagName === 'H2');
+    });
+    document.querySelectorAll('.toc a[href^="#"]').forEach(function (a) {
+      a.addEventListener('click', function () {
+        var t = document.getElementById(a.getAttribute('href').slice(1));
+        if (t && t._open) t._open();
+      });
+    });
+  }
   document.addEventListener('DOMContentLoaded', function () {
     var g = document.getElementById('game');
     if (g) initGame(g);
@@ -257,6 +283,7 @@
     // the contents list starts closed on phones, where it would push the page down
     var toc = document.querySelector('.toc details');
     if (toc && window.matchMedia('(max-width: 640px)').matches) toc.open = false;
+    if (document.querySelector('main[data-fold]') && window.matchMedia('(max-width: 640px)').matches) initFold();
     var s = document.getElementById('qsearch');
     if (s) initSearch(s);
   });

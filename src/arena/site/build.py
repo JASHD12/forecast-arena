@@ -94,7 +94,7 @@ from arena.site.shaping import (
     version_changelog,
 )
 from arena.site.titles import FORECASTER_NAMES, domain_name, forecaster_name, plain_title
-from arena.site.toc import TOC_PAGES, add_toc
+from arena.site.toc import FOLD_PAGES, TOC_PAGES, add_toc, mark_fold
 from arena.site.topics import topic
 
 
@@ -424,6 +424,8 @@ def build_site(
         )
         if name in TOC_PAGES:
             html_text = add_toc(html_text)
+        if name in FOLD_PAGES:
+            html_text = mark_fold(html_text)
         (tmp / name).write_text(html_text, encoding="utf-8")
     itpl = env.get_template("questions_index.html")
     for dom in domains:

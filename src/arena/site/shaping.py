@@ -92,6 +92,37 @@ def race_data(scored: Sequence[Scored]) -> dict[str, Any]:
     return {"days": [d.isoformat() for d in days], "series": series, "n": len(common), "fids": fids}
 
 
+def pick_cards(rows: Sequence[dict[str, Any]], k: int = 6) -> list[dict[str, Any]]:
+    """The `k` questions the home page shows in full: those most forecasters answered, then
+    those they disagree on most, spread over the topics (round robin). Display only."""
+
+    def spread(r: dict[str, Any]) -> float:
+        ps = list(r["pn"].values())
+        return max(ps) - min(ps) if len(ps) >= 2 else 0.0
+
+    ranked = sorted(rows, key=lambda r: (-len(r["pn"]), -spread(r), r["qid"]))
+    by_domain: dict[str, list[dict[str, Any]]] = {}
+    for r in ranked:
+        by_domain.setdefault(r["domain"], []).append(r)
+    out: list[dict[str, Any]] = []
+    while len(out) < k and any(by_domain.values()):
+        for dom in list(by_domain):
+            if by_domain[dom] and len(out) < k:
+                out.append(by_domain[dom].pop(0))
+    return out
+
+
+def split_outcomes(rows: Sequence[dict[str, Any]], limit: int = 8) -> dict[str, Any]:
+    """Resolved questions first (at most `limit`), plus how many are resolved and still open."""
+    done = [r for r in rows if r["outcome"] is not None]
+    return {
+        "shown": done[:limit],
+        "resolved": len(done),
+        "open": sum(1 for r in rows if r["outcome"] is None and r["state"] == "open"),
+        "total": len(rows),
+    }
+
+
 def featured_row(rows: Sequence[dict[str, Any]]) -> dict[str, Any] | None:
     """The latest question on which the forecasters disagree most (display only)."""
     best, spread = None, -1.0

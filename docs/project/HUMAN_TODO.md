@@ -216,4 +216,11 @@ curl -X POST -H "Authorization: Bearer TOKEN" -H "Accept: application/vnd.github
     on the Leaderboard and `ensemble` forecasts in the ledger.
   - Undo: set the variable back to `2099-12-31` before the start is written. Once `meta/official_start.json`
     exists it is never changed.
+- [ ] H25 · Decision: wording of "supported" on boards that still say "too early to tell"
+  - Today the leaderboard shows "supported: better than base_rate" in the Reading column even when the same board is
+    labelled "too early to tell" (3 days, 30 questions). A first-time reader finds that contradictory.
+  - Proposal: show "early sign: better than base_rate" while a board carries the "too early to tell" label, and
+    "supported" only after the 30-day and 300-forecast gates. Statistics and the label rule stay as they are; only the
+    word changes. SPEC section 10 (scoring and wording) is yours to change, so the agent has not touched it.
+  - Reply yes (and the agent changes the wording and its tests) or no.
 

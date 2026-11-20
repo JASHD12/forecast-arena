@@ -171,14 +171,17 @@
   }
 
   // Theme toggle (T137): auto -> light -> dark, in memory only (no storage).
-  function initTheme(btn) {
-    var modes = ['auto', 'light', 'dark'], i = 0;
-    btn.hidden = false;
-    btn.addEventListener('click', function () {
-      i = (i + 1) % modes.length;
-      if (modes[i] === 'auto') document.documentElement.removeAttribute('data-theme');
-      else document.documentElement.setAttribute('data-theme', modes[i]);
-      btn.textContent = 'Theme: ' + modes[i];
+  function initTheme(btns) {
+    var modes = ['auto', 'light', 'dark'];
+    btns.forEach(function (btn) {
+      btn.hidden = false;
+      btn.addEventListener('click', function () {
+        var cur = document.documentElement.getAttribute('data-theme') || 'auto';
+        var next = modes[(modes.indexOf(cur) + 1) % modes.length];
+        if (next === 'auto') document.documentElement.removeAttribute('data-theme');
+        else document.documentElement.setAttribute('data-theme', next);
+        btns.forEach(function (x) { x.textContent = 'Theme: ' + next; });
+      });
     });
   }
 
@@ -204,27 +207,42 @@
     setInterval(tick, 30000);
   }
 
-  // Archive search (T137): filters the question list in place.
+  // Archive search (T137) and state filter: filters the question list in place; days are
+  // collapsed (older ones) and are opened while a search or filter is active.
   function initSearch(input) {
     var label = input.closest('.qsearch'), count = document.querySelector('.qsearch-count');
-    label.hidden = false; count.hidden = false;
+    var bar = document.querySelector('.state-filter');
+    label.hidden = false; count.hidden = false; if (bar) bar.hidden = false;
     var items = Array.prototype.slice.call(document.querySelectorAll('.qlist li'));
+    var days = Array.prototype.slice.call(document.querySelectorAll('details.day'));
+    days.forEach(function (d) { d.dataset.wasOpen = d.open ? '1' : '0'; });
+    var state = 'all';
     function run() {
       var words = input.value.toLowerCase().split(/\s+/).filter(Boolean), shown = 0;
+      var active = words.length > 0 || state !== 'all';
       items.forEach(function (li) {
         var t = li.textContent.toLowerCase();
-        var ok = words.every(function (w) { return t.indexOf(w) >= 0; });
+        var ok = words.every(function (w) { return t.indexOf(w) >= 0; }) &&
+          (state === 'all' || li.dataset.state === state);
         li.hidden = !ok; if (ok) shown += 1;
       });
-      document.querySelectorAll('.qlist').forEach(function (ul) {
+      days.forEach(function (d) {
+        var ul = d.querySelector('.qlist');
         var any = Array.prototype.some.call(ul.children, function (li) { return !li.hidden; });
-        ul.hidden = !any;
-        var head = ul.previousElementSibling;
-        if (head && head.classList.contains('day-head')) head.hidden = !any;
+        d.hidden = !any;
+        d.open = active ? any : d.dataset.wasOpen === '1';
       });
       count.textContent = shown + ' of ' + items.length + ' questions shown';
     }
     input.addEventListener('input', run);
+    if (bar) bar.addEventListener('click', function (e) {
+      var b = e.target.closest('button[data-state]'); if (!b) return;
+      state = b.dataset.state;
+      Array.prototype.forEach.call(bar.querySelectorAll('button'), function (x) {
+        var on = x === b; x.classList.toggle('active', on); x.setAttribute('aria-pressed', on ? 'true' : 'false');
+      });
+      run();
+    });
     run();
   }
 
@@ -232,10 +250,13 @@
     var g = document.getElementById('game');
     if (g) initGame(g);
     document.querySelectorAll('table.sortable').forEach(initSortable);
-    var t = document.querySelector('.theme-toggle');
-    if (t) initTheme(t);
+    var t = document.querySelectorAll('.theme-toggle');
+    if (t.length) initTheme(Array.prototype.slice.call(t));
     var c = document.querySelector('.lock-countdown');
     if (c) initCountdown(c);
+    // the contents list starts closed on phones, where it would push the page down
+    var toc = document.querySelector('.toc details');
+    if (toc && window.matchMedia('(max-width: 640px)').matches) toc.open = false;
     var s = document.getElementById('qsearch');
     if (s) initSearch(s);
   });

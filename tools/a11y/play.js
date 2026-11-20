@@ -39,6 +39,7 @@ function fail(msg) { console.error('FAIL ' + msg); process.exitCode = 1; }
 
   const lb = await ctx.newPage();
   await lb.goto('file://' + path.join(root, 'leaderboard.html'));
+  await lb.evaluate(() => document.querySelectorAll('details.lb-more').forEach((d) => { d.open = true; }));  // the heatmap sits in a disclosure
   const sortBtn = lb.locator('table.sortable thead th button').nth(1);
   if (await sortBtn.count()) {
     await sortBtn.click();
@@ -55,7 +56,8 @@ function fail(msg) { console.error('FAIL ' + msg); process.exitCode = 1; }
   // the wording depends on the time of day: "lock in" before 09:30 UTC, "are locked ... lock is in" after
   if (!/lock[^]*\d+ h \d+ min/.test(cd)) fail('countdown not running: ' + cd);
   else console.log('ok   home: lock countdown');
-  const tg = home.locator('.theme-toggle');
+  await home.setViewportSize({ width: 1200, height: 800 });  // on a phone the toggle lives inside the menu
+  const tg = home.locator('.theme-toggle').first();
   if (!(await tg.isVisible())) fail('theme toggle hidden with JavaScript');
   await tg.click();
   if ((await home.evaluate(() => document.documentElement.getAttribute('data-theme'))) !== 'light') fail('theme toggle did not set light');
@@ -63,19 +65,45 @@ function fail(msg) { console.error('FAIL ' + msg); process.exitCode = 1; }
   const bg = await home.evaluate(() => getComputedStyle(document.body).backgroundColor);
   if ((await home.evaluate(() => document.documentElement.getAttribute('data-theme'))) !== 'dark') fail('theme toggle did not set dark');
   else console.log('ok   theme toggle: auto -> light -> dark (' + bg + ')');
+  // A wider fallback font (no Inter on the visitor's system) must never put the nav on top of the toggle.
+  for (const w of [1200, 1280, 1366]) {
+    await home.setViewportSize({ width: w, height: 800 });
+    await home.addStyleTag({ content: '*{font-family:"DejaVu Sans",sans-serif!important}' });
+    const hit = await home.evaluate(() => {
+      const t = document.querySelector('.site-header .theme-toggle');
+      if (!t) return 'none';
+      const r = t.getBoundingClientRect();
+      const e = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
+      return e && (e === t || t.contains(e)) ? 'ok' : (e ? e.tagName : 'null');
+    });
+    const sw = await home.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+    if (hit !== 'ok') fail('theme toggle covered at ' + w + ' px with a wide fallback font by ' + hit);
+    else if (sw > 0) fail('page scrolls sideways at ' + w + ' px with a wide fallback font');
+    else console.log('ok   header at ' + w + ' px with a wide fallback font');
+  }
+  await home.setViewportSize({ width: 1200, height: 800 });
   const qs = await ctx.newPage();
   await qs.goto('file://' + path.join(root, 'questions', 'index.html'));
   const total = await qs.locator('.qlist li').count();
+  // folded days are not 'visible' to the browser, so count the rows the filter has not hidden
+  const shown = () => qs.evaluate(() => document.querySelectorAll('.qlist li:not([hidden])').length);
   await qs.locator('#qsearch').fill('zzzz-no-match');
-  if ((await qs.locator('.qlist li:visible').count()) !== 0) fail('search did not filter');
+  if ((await shown()) !== 0) fail('search did not filter');
   await qs.locator('#qsearch').fill('');
-  if ((await qs.locator('.qlist li:visible').count()) !== total) fail('search did not reset');
+  if ((await shown()) !== total) fail('search did not reset');
   else console.log('ok   archive search filters ' + total + ' questions');
+  // the state filter narrows the list and opens the days it keeps
+  await qs.locator('.state-filter button[data-state="answered"]').click();
+  const answered = await shown();
+  if (answered > total || (await qs.evaluate(() => document.querySelectorAll('.qlist li:not([hidden]):not([data-state="answered"])').length)) !== 0) fail('state filter did not filter');
+  await qs.locator('.state-filter button[data-state="all"]').click();
+  if ((await shown()) !== total) fail('state filter did not reset');
+  else console.log('ok   archive state filter: ' + answered + ' answered of ' + total);
 
   const noJs = await browser.newContext({ javaScriptEnabled: false });
   const n1 = await noJs.newPage();
   await n1.goto('file://' + path.join(root, 'index.html'));
-  if (await n1.locator('.theme-toggle').isVisible()) fail('toggle visible without JavaScript');
+  if (await (await n1.locator('.theme-toggle').count()) > 0 && (await n1.locator('.theme-toggle').first().isVisible())) fail('toggle visible without JavaScript');
   if (!/09:30 UTC/.test(await n1.locator('.lock-countdown').textContent())) fail('static lock text missing');
   await n1.goto('file://' + path.join(root, 'questions', 'index.html'));
   if (await n1.locator('#qsearch').isVisible()) fail('search visible without JavaScript');
@@ -98,6 +126,31 @@ function fail(msg) { console.error('FAIL ' + msg); process.exitCode = 1; }
       const [sw, iw] = await wp.evaluate(() => [document.documentElement.scrollWidth, window.innerWidth]);
       if (sw > iw) wide.push(`${f} (${sw} > ${iw})`);
     }
+    // chart text: inside its own picture, and readable (at least 11 px as rendered)
+    const bad = [];
+    for (const f of tops) {
+      await wp.goto('file://' + path.join(root, f));
+      const issues = await wp.evaluate(() => {
+        const out = [];
+        document.querySelectorAll('svg').forEach((svg) => {
+          const box = svg.getBoundingClientRect();
+          if (box.width === 0) return; // the layout the CSS hides
+          const vb = svg.viewBox.baseVal;
+          if (!vb || !vb.width) return;
+          const scale = box.width / vb.width;
+          svg.querySelectorAll('text').forEach((t) => {
+            const px = parseFloat(getComputedStyle(t).fontSize) * scale;
+            const b = t.getBBox();
+            if (px < 10.5) out.push(`${t.textContent.slice(0, 18)} is ${px.toFixed(1)}px`);
+            if (!t.hasAttribute('transform') && (b.x < -1 || b.x + b.width > vb.width + 1)) out.push(`${t.textContent.slice(0, 18)} leaves the picture`);
+          });
+        });
+        return out;
+      });
+      if (issues.length) bad.push(`${f}: ${issues.slice(0, 3).join('; ')}`);
+    }
+    if (bad.length) fail(`chart text at ${width}px: ${bad.join(' | ')}`);
+    else console.log(`ok   chart text readable and inside its picture at ${width}px`);
     if (wide.length) fail(`page wider than the viewport at ${width}px: ${wide.join(', ')}`);
     else console.log(`ok   no horizontal page scroll at ${width}px (${tops.length} pages)`);
     await wctx.close();

@@ -84,14 +84,17 @@ from arena.site.shaping import (
     live_versions,
     model_timeline,
     official_start,
+    pick_cards,
     question_href,
     question_scores,
     race_data,
     simple_markdown,
+    split_outcomes,
     template_changelog,
     version_changelog,
 )
 from arena.site.titles import FORECASTER_NAMES, domain_name, forecaster_name, plain_title
+from arena.site.toc import TOC_PAGES, add_toc
 from arena.site.topics import topic
 
 
@@ -236,6 +239,8 @@ def build_site(
                 "verify_summary": rep.summary(),
                 "latest_batch": latest_b,
                 "latest": latest,
+                "cards": pick_cards(latest),
+                "outcomes": split_outcomes(previous),
                 "forecasters": fids,
                 "previous_batch": prev_b,
                 "previous": previous,
@@ -417,6 +422,8 @@ def build_site(
         html_text = env.get_template(name.replace("/", "_")).render(
             title=title, page=nav_page, **{**common, "root": root}, **ctx
         )
+        if name in TOC_PAGES:
+            html_text = add_toc(html_text)
         (tmp / name).write_text(html_text, encoding="utf-8")
     itpl = env.get_template("questions_index.html")
     for dom in domains:

@@ -195,7 +195,8 @@ curl -X POST -H "Authorization: Bearer TOKEN" -H "Accept: application/vnd.github
     200,000 tokens).
   - Reply yes and the agent dispatches it, reads the result from the job log and commits it; or no.
   - Decided 2026-11-19 (yes): run 44611596780 dispatched from `main` (`agent=true`, 12 questions, 200,000-token cap); it cost about 1.8 US cents.
-- [ ] H24 · Start the official record (this also switches the ensemble on)
+- [x] H24 · Start the official record (this also switches the ensemble on)
+  - Owner reported on 2026-11-20 that `ARENA_OFFICIAL_START_NOT_BEFORE=2026-11-23` is set (the agent cannot read repository variables to confirm; the Status page "Road to the official record" shows the effect).
   - You said yes on 2026-11-19 to a start on **2026-11-23** and asked the agent on 2026-11-20 to set it. The agent
     cannot: `gh variable set` / the Actions variables API is refused by the sandbox proxy (HTTP 403, command
     `gh variable list`), and repository settings are outside its approvals (CLAUDE.md, S4). No other route was tried.

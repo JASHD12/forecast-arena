@@ -1102,3 +1102,8 @@ and evidence requirements. Do not backfill historical ML forecasts.
 - Context: owner found the reference pages (Backtests first) "very basic": default-styled contents links, stuck-together paragraphs, a duplicated link list.
 - Decision: restyle shared components only (contents chips, callout `.banner`, `.prose-card`, `.chips`, card spacing) instead of a new layout per page; at-a-glance chips on model cards are copied from the card text (`cards_page.card_stats`), never computed or typed, and absent when the card lacks them (I5).
 - Alternatives: a dark hero on every page (rejected: competes with the home hero and adds height); hand-written summaries per card (rejected: numbers could drift from the card).
+
+## 2026-11-20 T233: spacing is a zero-specificity layer, not per-page margins
+- Context: boxes touched wherever a template forgot a margin (home, recruiters, findings, play).
+- Decision: `:where(main > .wrap, .game) > * + *` and the same inside cards give every block the same gap, and any component that sets its own margin still wins; a browser audit (`tools/a11y/layout.js`) keeps it that way.
+- Rejected: a sticky contents rail for long pages (narrows tables and the six-step diagram; the chip list is compact enough); rewriting each template's margins one by one.

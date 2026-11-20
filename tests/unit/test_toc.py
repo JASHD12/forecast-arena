@@ -56,3 +56,12 @@ def test_contents_labels_drop_a_trailing_backtest_and_id_but_headings_keep_them(
     assert (
         ">Model0</a>" in out and '<h2 id="model0-id-0-backtest">Model0 (id-0) backtest</h2>' in out
     )
+
+
+def test_long_headings_are_cut_in_the_contents_list_only() -> None:
+    long = (
+        "On purely numeric domains (electricity prices, weather), the classical ML forecaster wins"
+    )
+    out = short_label(long)
+    assert out.endswith("\u2026") and len(out) <= 49 and " " not in out[-2:]
+    assert short_label("Short heading") == "Short heading"

@@ -41,8 +41,9 @@ html { -webkit-text-size-adjust: 100%; }
 body { margin: 0; background: var(--bg); color: var(--fg);
   font: 16px/1.6 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
     Arial, sans-serif; }
-a { color: var(--accent); text-underline-offset: 2px; }
-a:hover { text-decoration-thickness: 2px; }
+a { color: var(--accent); text-underline-offset: .2em; text-decoration-thickness: 1px;
+  text-decoration-color: color-mix(in srgb, currentColor 45%, transparent); }
+a:hover { text-decoration-thickness: 2px; text-decoration-color: currentColor; }
 :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
 .wrap { max-width: 72rem; margin: 0 auto; padding: 0 1rem; }
 
@@ -193,7 +194,7 @@ footer strong { color: var(--fg); }
 .lead { font-size: 1.1rem; color: var(--muted); max-width: 46rem; }
 .prose { max-width: 46rem; }
 .card h3 { margin-bottom: .35rem; }
-.card p { margin: 0; color: var(--muted); font-size: .95rem; }
+.card p { color: var(--muted); font-size: .95rem; }
 .notice { background: var(--banner); color: var(--banner-fg); border-radius: 10px; padding: .75rem 1rem; }
 .checks { list-style: none; padding: 0; display: grid; gap: .5rem; }
 .checks li { background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
@@ -461,7 +462,7 @@ pre.sql { background: var(--ink); color: #e6edf3; border-radius: 10px; padding: 
 .progress { height: .7rem; background: var(--track); border-radius: 999px; overflow: hidden; }
 .progress span { display: block; height: 100%; background: linear-gradient(90deg, var(--bar), var(--bar-ai));
   border-radius: 999px; min-width: .7rem; }
-.hyps { list-style: none; padding: 0; margin: 0; display: grid; gap: .9rem; }
+.hyps { list-style: none; padding: 0; display: grid; gap: var(--s-4); }
 .hyp { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--muted);
   border-radius: var(--radius); padding: 1rem 1.2rem; box-shadow: var(--shadow); }
 .hyp-supported { border-left-color: var(--yes); }
@@ -606,7 +607,7 @@ ul.plain { list-style: none; padding: 0; margin: 0; display: grid; gap: .45rem; 
 .site-header { position: sticky; top: 0; z-index: 20; }
 .theme-toggle { font: inherit; font-size: .85rem; background: transparent; color: var(--ink-fg);
   border: 1px solid rgba(255, 255, 255, .35); border-radius: 999px; padding: .25rem .7rem; cursor: pointer; }
-.lock-line { margin: .25rem 0 1rem; color: var(--muted); }
+.lock-line { margin: var(--s-4) 0 var(--s-2); color: var(--muted); }
 .lock-countdown strong { color: var(--fg); }
 .qsearch { display: block; margin: 0 0 1rem; }
 .qsearch input { font: inherit; width: 100%; max-width: 28rem; padding: .5rem .75rem; border-radius: 10px;
@@ -765,11 +766,42 @@ html { scroll-padding-top: 4.5rem; }
 .prose-card h3 code { font-size: .8rem; background: var(--accent-soft); border-radius: 6px; padding: .1rem .4rem; }
 .model-card { margin-bottom: 1.25rem; padding: 1.25rem 1.4rem; }
 .model-card > h2 { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; margin: 0 0 .5rem; font-size: 1.15rem; }
-.card p + p { margin-top: .6rem; }
 .card > * + h2, .card > * + h3 { margin-top: 1.4rem; }
 
 .eval-table th[scope="row"] { min-width: 13rem; }
 .eval-table th[scope="row"] code { font-size: .72rem; font-weight: 400; overflow-wrap: anywhere; }
 .hero + .toc { margin-top: 1.25rem; }
-main > .wrap > section.card + section.card, .kpis + section.card, .kpis + .card { margin-top: 1rem; }
 .prose-card h3 code { overflow-wrap: anywhere; }
+
+/* T233: one vertical rhythm for the whole site.
+   :where() keeps these rules at zero specificity, so any component that sets its own margin still wins. */
+:root { --s-1: .25rem; --s-2: .5rem; --s-3: .75rem; --s-4: 1rem; --s-5: 1.5rem; --s-6: 2rem; --s-7: 3rem; }
+:where(main > .wrap, .game) > :where(* + *) { margin-top: var(--s-4); }
+:where(.card, .hyp, .spotlight, .progress-card, .race-card) > :where(* + *) { margin-top: var(--s-3); }
+:where(.card, .hyp, .spotlight) > :where(* + h2, * + h3) { margin-top: var(--s-5); }
+main > .wrap > h3 { margin: var(--s-5) 0 var(--s-3); }
+.table-scroll { margin-top: var(--s-3); }
+
+/* One callout and one accent-card look */
+.notice, .rehearsal-note { border-radius: var(--radius); padding: .8rem 1.1rem; border-left: 4px solid currentColor; }
+.agent-card, .play-teaser, .power-card { border-left: 4px solid var(--accent); }
+.duo { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-4); align-items: stretch; }
+.duo > * { margin: 0; }
+@media (max-width: 56rem) { .duo { grid-template-columns: minmax(0, 1fr); } }
+.more-link { margin-bottom: 0; }
+
+/* Link lists and card titles read as designed elements: no underline until hover */
+.plain a, .five a, .proof th a, .role-card a, .qcard h3 a, .agent-card h2 a, .footer-links a { text-decoration: none; }
+.plain a:hover, .five a:hover, .proof th a:hover, .role-card a:hover, .qcard h3 a:hover, .footer-links a:hover { text-decoration: underline; }
+.five { padding-left: 1.2rem; }
+.five li { margin: .5rem 0; }
+
+/* Wide eval tables keep the variant name in view while scrolling */
+.eval-table th[scope="row"] { position: sticky; left: 0; z-index: 1; background: var(--surface); box-shadow: 1px 0 0 var(--line); }
+.card > .table-scroll:last-child { margin-bottom: 0; }
+.cal-panel { display: grid; grid-template-columns: minmax(0, 24rem) minmax(0, 30rem); justify-content: start; gap: var(--s-5); align-items: center;
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: var(--s-4) var(--s-5);
+  box-shadow: var(--shadow); }
+.cal-panel svg { width: 100%; height: auto; max-width: 24rem; margin: 0 auto; display: block; }
+@media (max-width: 48rem) { .cal-panel { grid-template-columns: minmax(0, 1fr); padding: var(--s-4); } }
+.cal-panel .note { font-size: .95rem; }

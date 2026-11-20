@@ -707,3 +707,11 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
     cards with at-a-glance chips copied from the card, readable paragraph spacing; evals table no longer breaks the
     version string per character; spacing between stacked cards on Status and text pages.
   - Done when: `make check` and `make a11y` pass; before/after screenshots of the pages reviewed at 1366 and 390 px.
+- [x] T233 · Site-wide layout and spacing system (deps: T232)
+  - Done 2026-11-20 (owner: "formatting and layout is not there"): one vertical rhythm for every page (zero-specificity flow
+    layer with a spacing scale), one callout and accent-card look, thinner links with no underline in link lists, paired cards
+    in a `.duo` row (home agent card and play teaser, recruiters), calibration panel, sticky variant column on eval tables,
+    long contents labels cut in the list only; `tools/a11y/layout.js` (in `make a11y`) fails on glued boxes, boxed elements
+    outside the column and an off-centre column, on every page at 1366 and 390 px.
+  - Done when: layout audit and `make check a11y` pass; every page type reviewed by eye at both widths.
+

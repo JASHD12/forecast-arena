@@ -78,6 +78,7 @@
 <p class="more-link"><a class="btn btn-accent" href="questions/index.html">See all {{ latest|length }} questions for {{ latest_batch }} →</a> <span class="note">Shown here: the {{ cards|length }} that most forecasters answered. All locks are at 09:30 UTC.</span></p>
 {% else %}<p class="empty">No questions yet. Questions are published the evening before, answered the next morning and locked at 09:30 UTC.</p>{% endif %}
 
+<div class="duo">
 {% if agent_card %}{% set a = agent_card %}<section class="card agent-card" aria-labelledby="agent-title">
 <h2 id="agent-title">How the AI agent worked on {{ a.question.batch_date }}</h2>
 <p><a href="{{ a.href }}">{{ plain_title(a.question) }}</a></p>
@@ -90,6 +91,7 @@
 <p>Give your own probability for real questions, see the answer, and compare your score with the AI, the ML model and the base rate. Nothing is stored.</p>
 <p><a class="btn btn-accent" href="play.html">Play a round</a></p>
 </section>
+</div>
 
 <div class="section-head"><h2>The race</h2><span class="note">{{ race_scope|capitalize }}; running average Brier score, lower is better.</span></div>
 {% if race.days %}

@@ -13,6 +13,8 @@ MIN_SECTIONS = 4
 _H2 = re.compile(r"<h2(?P<attrs>(?:\s[^>]*)?)>(?P<inner>.*?)</h2>", re.S)
 _ID = re.compile(r'\sid="([^"]+)"')
 _TAG = re.compile(r"<[^>]+>")
+#: Long reference pages whose sections fold on phones (script-driven; open without it).
+FOLD_PAGES = ("methods.html", "backtests.html", "experiments.html", "stack.html")
 #: Pages that get a table of contents (the long ones).
 TOC_PAGES = (
     "methods.html",
@@ -40,10 +42,13 @@ def _slug(text: str, taken: set[str]) -> str:
 
 def add_toc(html: str) -> str:
     """Return `html` with ids on its h2 headings and a contents list after the page head."""
-    end_head = html.find("</header>", html.find('<header class="page-head">'))
+    end_head, close = html.find("</header>", html.find('<header class="page-head">')), "</header>"
+    if end_head < 0 or '<header class="page-head">' not in html:
+        start = html.find('<section class="hero')  # pages with a hero instead of a page head
+        end_head, close = (html.find("</section>", start), "</section>") if start >= 0 else (-1, "")
     if end_head < 0:
         return html
-    head, body = html[: end_head + len("</header>")], html[end_head + len("</header>") :]
+    head, body = html[: end_head + len(close)], html[end_head + len(close) :]
     taken = set(_ID.findall(html))
     items: list[tuple[str, str]] = []
 
@@ -66,7 +71,12 @@ def add_toc(html: str) -> str:
         return html
     links = "".join(f'<li><a href="#{escape(s)}">{escape(t)}</a></li>' for s, t in items)
     toc = (
-        '\n<nav class="toc" aria-label="On this page"><details open><summary>On this page '
+        f'\n<nav class="toc" aria-label="On this page"><details open><summary>On this page '
         f"({len(items)} sections)</summary><ol>{links}</ol></details></nav>\n"
     )
     return head + toc + new_body
+
+
+def mark_fold(html: str) -> str:
+    """Flag `<main>` so the phone script folds its sections (without it everything stays open)."""
+    return html.replace('<main id="main">', '<main id="main" data-fold>', 1)

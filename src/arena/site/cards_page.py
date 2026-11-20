@@ -68,6 +68,24 @@ def render_card(text: str, label: str) -> Markup:
     return Markup("\n".join(out))
 
 
+def card_stats(text: str) -> list[dict[str, str]]:
+    """At-a-glance figures copied from a card: days replayed and the Brier score of each row.
+
+    Values are copied as written (I5); a card without the usual table or period gives fewer
+    chips, never invented ones.
+    """
+    out: list[dict[str, str]] = []
+    if span := re.search(r"Batches (\S+) to (\S+) \((\d+) batch days\)", text):
+        out.append({"n": span.group(3), "l": "days replayed"})
+    rows = [
+        (m.group(1), m.group(2))
+        for m in re.finditer(r"^\| (\w+) \| \d+ \| ([0-9.]+) \| \[", text, re.M)
+    ]
+    for fid, brier in sorted(rows, key=lambda r: float(r[1]))[:3]:
+        out.append({"n": brier, "l": f"Brier, {fid}"})
+    return out
+
+
 def load_cards(models_dir: Path | None) -> list[dict[str, Any]]:
     """Every committed card, in a fixed order (known stems first, then the rest)."""
     if models_dir is None or not models_dir.is_dir():
@@ -81,7 +99,13 @@ def load_cards(models_dir: Path | None) -> list[dict[str, Any]]:
         title = re.sub(r"^#\s*(Model card:\s*)?", "", first).replace("`", "")
         body = "\n".join(text.splitlines()[1:])
         out.append(
-            {"id": f"card-{stem}", "stem": stem, "title": title, "html": render_card(body, title)}
+            {
+                "id": f"card-{stem}",
+                "stem": stem,
+                "title": title,
+                "html": render_card(body, title),
+                "stats": card_stats(text),
+            }
         )
     return out
 

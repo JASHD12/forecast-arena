@@ -1,6 +1,6 @@
 """Table of contents for long pages: ids, order, and nothing for short pages."""
 
-from arena.site.toc import MIN_SECTIONS, add_toc, mark_fold
+from arena.site.toc import MIN_SECTIONS, add_toc, mark_fold, short_label
 
 HEAD = '<main><header class="page-head"><h1>T</h1></header>'
 
@@ -43,3 +43,16 @@ def test_short_pages_and_pages_without_a_head_are_untouched() -> None:
 def test_mark_fold_flags_main_for_the_phone_script() -> None:
     assert "data-fold" in mark_fold('<main id="main"><div>x</div></main>')
     assert mark_fold("<p>no main</p>") == "<p>no main</p>"
+
+
+def test_contents_labels_drop_a_trailing_backtest_and_id_but_headings_keep_them() -> None:
+    assert short_label("ml for power (power-gbq, revision 1) backtest") == "ml for power"
+    assert short_label("Backtest slices: where ml beats persistence (power) backtest") == (
+        "Backtest slices: where ml beats persistence"
+    )
+    assert short_label("Scoring") == "Scoring"
+    assert short_label("(x)") == "(x)"
+    out = add_toc(_page(*[f"<h2>Model{i} (id-{i}) backtest</h2>" for i in range(MIN_SECTIONS)]))
+    assert (
+        ">Model0</a>" in out and '<h2 id="model0-id-0-backtest">Model0 (id-0) backtest</h2>' in out
+    )

@@ -1097,3 +1097,8 @@ and evidence requirements. Do not backfill historical ML forecasts.
 - Tests: browser checks for chart text (inside its picture, at least 10.5 px as rendered), the archive state filter and
   page width; the leaderboard heatmap test opens the disclosure first.
 
+
+## 2026-11-20 T232: page polish keeps one component set
+- Context: owner found the reference pages (Backtests first) "very basic": default-styled contents links, stuck-together paragraphs, a duplicated link list.
+- Decision: restyle shared components only (contents chips, callout `.banner`, `.prose-card`, `.chips`, card spacing) instead of a new layout per page; at-a-glance chips on model cards are copied from the card text (`cards_page.card_stats`), never computed or typed, and absent when the card lacks them (I5).
+- Alternatives: a dark hero on every page (rejected: competes with the home hero and adds height); hand-written summaries per card (rejected: numbers could drift from the card).

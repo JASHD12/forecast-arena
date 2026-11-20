@@ -27,5 +27,5 @@ def test_paired_cards_sit_in_a_duo_row(tmp_path) -> None:
 
 def test_stylesheet_has_the_flow_layer_at_zero_specificity() -> None:
     css = CSS.read_text()
-    assert ":where(main > .wrap) > :where(* + *)" in css
+    assert ":where(main > .wrap, .game) > :where(* + *)" in css
     assert "--s-4: 1rem" in css and ".duo {" in css

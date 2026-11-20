@@ -38,3 +38,17 @@ def test_committed_cards_are_all_on_the_page(tmp_path) -> None:
     page = (res.out_dir / "backtests.html").read_text()
     assert "BACKTEST" in page and 'id="card-power-ts"' in page and "0.1930" in page
     assert load_cards(None) == [] and load_cards(tmp_path / "missing") == []
+
+
+def test_card_stats_are_copied_from_the_card_and_absent_without_them() -> None:
+    from arena.site.cards_page import card_stats
+
+    text = (
+        "Batches 2025-11-01 to 2026-10-31 (365 batch days).\n\n"
+        "| base_rate | 2190 | 0.2466 | [0.24, 0.25] | 0.68 |\n"
+        "| ml | 2190 | 0.1930 | [0.18, 0.20] | 0.56 |\n"
+    )
+    stats = card_stats(text)
+    assert stats[0] == {"n": "365", "l": "days replayed"}
+    assert [s["n"] for s in stats[1:]] == ["0.1930", "0.2466"]
+    assert card_stats("no tables here") == []

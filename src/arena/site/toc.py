@@ -31,6 +31,17 @@ TOC_PAGES = (
 )
 
 
+_SUFFIX = re.compile(r"\s+backtest$", re.I)
+_PAREN = re.compile(r"\s*\([^()]*\)$")
+
+
+def short_label(label: str) -> str:
+    """A contents-list label without a trailing "backtest" or a trailing parenthesised id."""
+    short = _SUFFIX.sub("", label)
+    trimmed = _PAREN.sub("", short)
+    return trimmed if len(trimmed) >= 3 else short
+
+
 def _slug(text: str, taken: set[str]) -> str:
     base = re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-")[:40] or "section"
     slug, n = base, 2
@@ -69,7 +80,9 @@ def add_toc(html: str) -> str:
     new_body = _H2.sub(repl, body)
     if len(items) < MIN_SECTIONS:
         return html
-    links = "".join(f'<li><a href="#{escape(s)}">{escape(t)}</a></li>' for s, t in items)
+    links = "".join(
+        f'<li><a href="#{escape(s)}">{escape(short_label(t))}</a></li>' for s, t in items
+    )
     toc = (
         f'\n<nav class="toc" aria-label="On this page"><details open><summary>On this page '
         f"({len(items)} sections)</summary><ol>{links}</ol></details></nav>\n"

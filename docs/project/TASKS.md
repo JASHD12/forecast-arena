@@ -701,3 +701,9 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
     of the "open" pill on question cards ("answer due Sat 21 Nov"). Folding is script-driven (open without JavaScript).
   - Done when: the three items are in and page heights on a phone for those four pages are under 10,000 px.
 
+- [x] T232 · Visual polish of the plain-looking pages (deps: T231)
+  - Done 2026-11-20 (owner: "pages look very basic"): contents list as chips (no default blue underlines, equal
+    columns, shorter labels, headings unchanged); Backtests: duplicate link list removed, banner as a callout, model
+    cards with at-a-glance chips copied from the card, readable paragraph spacing; evals table no longer breaks the
+    version string per character; spacing between stacked cards on Status and text pages.
+  - Done when: `make check` and `make a11y` pass; before/after screenshots of the pages reviewed at 1366 and 390 px.

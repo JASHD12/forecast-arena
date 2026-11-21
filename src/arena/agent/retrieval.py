@@ -272,6 +272,36 @@ class PastQuestions:
             return [(self.items[ok[j]], float(sc)) for j, sc in ranked[:k]]
         return [(self.items[ok[j]], fused[j]) for j in order[:k]]
 
+    def tool_result_hybrid(
+        self,
+        text: str,
+        asof: datetime,
+        *,
+        k: int,
+        exclude: str,
+        domain: str | None,
+        rerank: Callable[[str, Sequence[str]], Sequence[float]] | None,
+        reranker_name: str = "",
+    ) -> dict[str, Any]:
+        """As `tool_result`, ranked by BM25 + dense + RRF and optionally a cross-encoder."""
+        hits = self.search_hybrid(text, asof, k=k, exclude=exclude, domain=domain, rerank=rerank)
+        yes = sum(p.outcome for p, _ in hits)
+        return {
+            "eligible_rule": "questions resolved before the forecast time only",
+            "matches": [
+                {
+                    "question": p.text,
+                    "target_date": p.target_date.isoformat(),
+                    "outcome": "YES" if p.outcome else "NO",
+                    "observed_value": p.observed_value,
+                    "score": round(s, 3) if math.isfinite(s) else None,
+                }
+                for p, s in hits
+            ],
+            "yes_rate_of_matches": round(yes / len(hits), 3) if hits else None,
+            "retriever": f"bm25+{self.embedder.name}+rrf" + (f"+{reranker_name}" if rerank else ""),
+        }
+
     def tool_result(
         self, text: str, asof: datetime, *, k: int, exclude: str, domain: str | None
     ) -> dict[str, Any]:

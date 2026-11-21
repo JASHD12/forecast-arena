@@ -65,6 +65,7 @@ def expected_forecasters(settings: Settings) -> frozenset[str]:
         | ({"llm_local"} if settings.llm_local else set())
         | ({"agent_graph"} if settings.agent_graph else set())
         | ({"llm_local_ft"} if settings.llm_local_ft else set())
+        | ({"agent_hybrid"} if settings.agent_hybrid else set())
     )
 
 

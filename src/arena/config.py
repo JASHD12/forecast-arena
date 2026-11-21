@@ -67,6 +67,8 @@ class Settings(BaseModel):
     #: T120: offer the agent the similar-past-questions tool (prompt v2); needs fastembed
     #: (requirements/rag.txt). Off by default; the workflows switch it on.
     agent_rag: bool = False
+    #: T274: run `agent_hybrid` (hybrid retrieval + guarded tool text); needs the RAG requirements.
+    agent_hybrid: bool = False
     #: T121: run the LangGraph agent `agent_graph` (needs requirements/graph.txt).
     agent_graph: bool = False
     #: T122: run `llm_local`, an open model on the local CPU (needs requirements/local.txt).

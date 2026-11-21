@@ -189,6 +189,39 @@ def _ft_forecaster(settings: Settings, n: int) -> Forecaster:
     return LLMLocalFT(scorer, art, n)
 
 
+def _hybrid_forecaster(
+    ledger: Ledger,
+    settings: Settings,
+    client: LLMClient | None,
+    agent: AgentForecaster,
+    retriever: Any,
+    peers: dict[str, Forecaster],
+) -> Forecaster:
+    """`agent_hybrid` next to `agent`. A missing reranker or retriever is a visible
+    `model_missing` skip, not a failure of the whole run (the lock-critical job must go on)."""
+    from arena.agent.hybrid import AgentHybrid
+    from arena.agent.retrieval import CrossEncoderReranker, FastEmbedder, PastQuestions
+
+    common: dict[str, Any] = {
+        "per_domain": settings.llm_questions_per_domain,
+        "max_tool_calls": settings.agent_max_tool_calls,
+        "peers": peers,
+        "news": agent.news,
+        "wiki": agent.wiki,
+    }
+    try:
+        cache = settings.cache_dir / "fastembed"
+        if retriever is None:
+            retriever = PastQuestions.from_ledger(ledger, FastEmbedder(cache_dir=cache))
+        rr = CrossEncoderReranker(cache_dir=cache)
+    except Exception as exc:  # ImportError, download or load failure
+        reason = f"hybrid retrieval unavailable: {type(exc).__name__}: {exc}"
+        return AgentHybrid(client, missing=reason, **common)
+    return AgentHybrid(
+        client, retriever=retriever, reranker=rr.score, reranker_name=rr.name, **common
+    )
+
+
 def live_ml(ledger: Ledger, domains: Sequence[Domain], asof: datetime) -> MLForecaster:
     """Load the visible champions once; one bad artifact only disables its own domain."""
     from arena.forecasters import registry
@@ -297,6 +330,12 @@ def build_forecasters(
         wiki=None if llm is not None else partial(wikipedia_summary, http),
     )
     out += [LLMPlain(client, n), LLMContext(client, n), agent]
+    if settings.agent_hybrid:
+        out.append(
+            _hybrid_forecaster(
+                ledger, settings, client, agent, retriever, {"base_rate": out[0], "ml": ml}
+            )
+        )
     if settings.llm_local:
         out.append(_local_forecaster(settings, n, tracer, clk))
     if settings.llm_local_ft:

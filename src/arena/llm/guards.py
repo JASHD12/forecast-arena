@@ -117,3 +117,28 @@ def check_answer(probability: float, rationale: str | None, max_words: int = 80)
     if rationale and scan(rationale):
         flags.append("rationale_contains_instruction")
     return flags
+
+
+def sanitize_tree(
+    obj: object, skip_keys: tuple[str, ...] = ("url", "published", "attribution")
+) -> tuple[object, list[str]]:
+    """Sanitize every string of a JSON-like tool result (keys in `skip_keys` are left as they are).
+
+    Returns the cleaned structure and the sorted flags found anywhere in it.
+    """
+    flags: set[str] = set()
+
+    def walk(x: object, key: str = "") -> object:
+        if isinstance(x, str):
+            if key in skip_keys:
+                return x
+            s = sanitize(x)
+            flags.update(s.flags)
+            return s.text
+        if isinstance(x, dict):
+            return {k: walk(v, str(k)) for k, v in x.items()}
+        if isinstance(x, list):
+            return [walk(v, key) for v in x]
+        return x
+
+    return walk(obj), sorted(flags)

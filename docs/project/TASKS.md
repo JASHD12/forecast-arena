@@ -797,7 +797,9 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
   - Done 2026-11-21: names "(experimental)", colour slots 9 to 11, Methods information-set rows, health roster, Lab page section that lists
     the ones that have published; they are in no common group and not in the ensemble (tests).
 - [ ] T273 · `llm_router`: cascade forecaster over the other forecasts (deps: T271; needs: H31)
-- [ ] T274 · `agent_hybrid`: the agent with hybrid retrieval and guards (deps: T270)
+- [x] T274 · `agent_hybrid`: the agent with hybrid retrieval and guards (deps: T270)
+  - Done 2026-11-21 (code, flag `ARENA_AGENT_HYBRID` default off): `agent/hybrid.py`, guard hook in the toolbox (flags in the trace), hybrid
+    similar-questions tool with the leakage rule, a missing reranker is a visible `model_missing` skip; launch in T279 after a dry-run measurement.
 - [ ] T275 · Weekly challengers: global LightGBM and Chronos-2 (deps: T270)
 - [ ] T276 · Live monitoring: grounding on Status, data contracts, experimental conformal interval (deps: T270)
 - [ ] T277 · ONNX export and `/predict/power` parity in the deployed container (deps: T270)

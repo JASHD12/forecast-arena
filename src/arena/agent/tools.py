@@ -259,6 +259,7 @@ class TraceEntry:
     result_chars: int
     sources: list[str] = field(default_factory=list)
     error: str | None = None
+    guard_flags: list[str] = field(default_factory=list)
 
 
 def _series_from_context(ctx: Mapping[str, Any], key: str, lookback: int) -> Any:
@@ -282,6 +283,7 @@ class ToolBox:
         news: NewsBackend | None = None,
         wiki: Callable[[str, str], dict[str, str]] | None = None,
         similar: Callable[[int, bool], dict[str, Any]] | None = None,
+        guard: Callable[[Any], tuple[Any, list[str]]] | None = None,
         max_calls: int = 4,
         time_limit: float = 90.0,
         monotonic: Callable[[], float] = _time.monotonic,
@@ -292,6 +294,7 @@ class ToolBox:
         self.news = news
         self.wiki = wiki
         self.similar = similar
+        self.guard = guard  # (result) -> (cleaned result, flags); None keeps results as they are
         self.max_calls = max_calls
         self.time_limit = time_limit
         self.monotonic = monotonic
@@ -316,8 +319,13 @@ class ToolBox:
         sources: list[str] = []
         try:
             result = self._dispatch(call, sources)
+            flags: list[str] = []
+            if self.guard is not None:
+                result, flags = self.guard(result)
             text = json.dumps({"tool": call.name, "data": result}, ensure_ascii=False, default=str)
-            self.trace.append(TraceEntry(call.name, dict(call.input), True, len(text), sources))
+            self.trace.append(
+                TraceEntry(call.name, dict(call.input), True, len(text), sources, None, flags)
+            )
             return text, False
         except (KeyError, ValueError, TypeError, HttpError, OSError) as exc:
             msg = f"{type(exc).__name__}: {exc}"[:300]
@@ -370,6 +378,7 @@ class ToolBox:
                 "result_chars": t.result_chars,
                 "sources": t.sources,
                 "error": t.error,
+                **({"guard_flags": t.guard_flags} if t.guard_flags else {}),
             }
             for t in self.trace
         ]

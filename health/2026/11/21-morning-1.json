@@ -1,0 +1,44 @@
+{
+ "job": "morning",
+ "at": "2026-11-21T07:18:04.352468+00:00",
+ "ok": true,
+ "checks": [
+  {
+   "name": "batch_sealed",
+   "ok": true,
+   "detail": "28 questions sealed at 07:17 UTC"
+  },
+  {
+   "name": "nothing_overdue",
+   "ok": true,
+   "detail": "none"
+  },
+  {
+   "name": "sources_fresh",
+   "ok": true,
+   "detail": "4 domain(s) fresh"
+  },
+  {
+   "name": "forecaster_coverage",
+   "ok": true,
+   "detail": "expected 224 forecast-or-skip pairs; complete"
+  },
+  {
+   "name": "ml_available",
+   "ok": true,
+   "detail": "0 ML model_missing/error skips"
+  },
+  {
+   "name": "parse_failures",
+   "ok": true,
+   "detail": "0 of 39 LLM answers unparseable (0%)"
+  },
+  {
+   "name": "ledger_verify",
+   "ok": true,
+   "detail": "ledger verify: PASS: 278 files, 9 batch seals, 9 day seals, 1008 forecasts checked"
+  }
+ ],
+ "workflow_run_id": "44878556345",
+ "workflow_attempt": "1"
+}

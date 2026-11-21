@@ -65,3 +65,19 @@ def test_long_headings_are_cut_in_the_contents_list_only() -> None:
     out = short_label(long)
     assert out.endswith("\u2026") and len(out) <= 49 and " " not in out[-2:]
     assert short_label("Short heading") == "Short heading"
+
+
+def test_dates_in_text_do_not_break_but_attributes_and_head_are_untouched() -> None:
+    from arena.site.typography import nowrap_dates
+
+    page = (
+        "<head><title>Run 2026-11-19</title></head><main>"
+        '<p aria-label="Run 2026-11-19">Run 2026-11-19 and 2026-11-20.</p>'
+        '<a href="q/x-2026-11-19-v2.html">link</a><script>var d = 2026-11-19;</script></main>'
+    )
+    out = nowrap_dates(page)
+    assert out.count('<span class="nw">2026-11-19</span>') == 1  # only the text node
+    assert '<span class="nw">2026-11-20</span>' in out
+    assert "<title>Run 2026-11-19</title>" in out and 'aria-label="Run 2026-11-19"' in out
+    assert 'href="q/x-2026-11-19-v2.html"' in out and "var d = 2026-11-19;" in out
+    assert nowrap_dates("<p>no main 2026-11-19</p>") == "<p>no main 2026-11-19</p>"

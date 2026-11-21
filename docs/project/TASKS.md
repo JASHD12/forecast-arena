@@ -714,4 +714,16 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
     long contents labels cut in the list only; `tools/a11y/layout.js` (in `make a11y`) fails on glued boxes, boxed elements
     outside the column and an off-centre column, on every page at 1366 and 390 px.
   - Done when: layout audit and `make check a11y` pass; every page type reviewed by eye at both widths.
+- [x] T234 · Full sweep of every page (deps: T233)
+  - Done 2026-11-21 (owner: "check all web pages again"): all 24 page types screenshotted at 1366, 1024 and 390 px from a fresh
+    ledger clone and reviewed by eye. Fixed: Status job-start table now a full-width card; mixed-height card grids top-aligned;
+    dates, counts and file names no longer break mid-token in tables (`typography.nowrap_dates`, `table code`); a scroll-edge
+    shadow on every wide table; forest-plot names wrap on two lines on phones instead of being cut; Topics and Forecasters
+    index as cards; "1 kind" plural; sort buttons, summaries and sliders at least 24 px tall; forecaster names in question
+    bars wrap instead of being clipped; equal-height paired cards with the button at the bottom.
+  - `tools/a11y/layout.js` now also fails on clipped text, tiny text, small tap targets, empty space in cards, heading order,
+    duplicate ids, missing lang/title/description, empty links, broken images and console errors, at 1366, 1024 and 390 px.
+  - Not changed (by design): the 404 page loads its CSS from the live site (`<base href>`), so it looks unstyled when opened from a
+    file; the German page keeps English navigation until H17 (proofreading).
+  - Done when: `make check` and `make a11y` pass and the audit is clean on the fixture and the real-ledger build.
 

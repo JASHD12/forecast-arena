@@ -751,7 +751,8 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
 - [ ] T246 · Evaluate the fine-tuned model in `lab-eval.yml` (deps: T245, T242)
 - [ ] T247 · Distillation from Claude (deps: T246; needs: H27)
 - [ ] T248 · Adapter registry and lineage (deps: T246)
-- [ ] T249 · Shadow run of the fine-tuned model (deps: T246; needs: H30)
+- [x] T249 · Shadow run of the fine-tuned model (deps: T246)
+  - SUPERSEDED 2026-11-21 by Phase 15: the fine-tuned model runs live as `llm_local_ft` (T271); no shadow tree is built.
 - [ ] T250 · Cost routing and cascades (deps: T246; needs: H31)
   - Needs a paid-tier probability on every test item: Claude `llm_context` on the two frozen test sets (276 questions, about US$0.15 at the
     recorded cost per call) through the existing `llm-eval.yml`; the stored eval rows cover only 24 of the 186 October items, too few.
@@ -778,8 +779,23 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
 - [ ] T260 · Per-forecast explanations in the backtest (deps: T242)
 - [ ] T261 · ONNX export and serving parity (deps: T242)
 - [ ] T262 · Data contracts and validation (deps: T241)
-- [ ] T263 · Shadow period for weekly challengers (deps: T249; needs: H30)
+- [x] T263 · Shadow period for weekly challengers (deps: T249)
+  - SUPERSEDED 2026-11-21 by Phase 15: challengers enter the weekly rule as candidate families (T275); no shadow tree is built.
 - [x] T264a · Explainer 06 and the recruiter role mapping (deps: T242)
   - Done 2026-11-21: `docs/explainers/06-experiments-lab.md` (ten interview questions); each role card links a lab page or code path.
 - [ ] T264b · Lab numbers in `docs/interview/numbers.md` and a generated README table (deps: T264a)
 - [ ] T265 · Final sweep and redeploy (deps: T264b)
+
+## Phase 15 - The lab goes live (owner decision 2026-11-21; design in docs/project/LAB_PLAN.md, Part 2)
+
+- [x] T270 · Governance for going live: SPEC 17 amended, information-set rows, DECISIONS, H32 (deps: T264a)
+  - Done 2026-11-21: owner decisions recorded (fine-tuned model live whatever its backtest result; token cap 300,000; all lab techniques live).
+- [ ] T271 · `llm_local_ft`: the fine-tuned model as a live forecaster (deps: T270; code now, go-live needs: H26, H28, H32)
+- [ ] T272 · Site and boards for the experimental forecasters (deps: T271)
+- [ ] T273 · `llm_router`: cascade forecaster over the other forecasts (deps: T271; needs: H31)
+- [ ] T274 · `agent_hybrid`: the agent with hybrid retrieval and guards (deps: T270)
+- [ ] T275 · Weekly challengers: global LightGBM and Chronos-2 (deps: T270)
+- [ ] T276 · Live monitoring: grounding on Status, data contracts, experimental conformal interval (deps: T270)
+- [ ] T277 · ONNX export and `/predict/power` parity in the deployed container (deps: T270)
+- [ ] T279 · Launch checks: dry-run measurement of runner time and tokens, then flags one at a time (deps: T271, T274)
+- [ ] T280 · Showcase and final sweep for the live lab (deps: T272, T274, T276)

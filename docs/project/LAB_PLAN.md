@@ -408,3 +408,125 @@ Each task is ticked only after its "Done when" checks and `make check` pass, plu
 - The semantic cache is likely useless here, because contexts change daily. Reported as a negative.
 - Hybrid RAG with rerank usually beats dense-only on keyword-heavy queries; the size of the gain is unknown until
   measured.
+
+
+---
+
+# Part 2: "Everything in the lab goes live": Phase 15, deploy the lab techniques as real forecasters and monitors
+
+> Tasks T270 onward are Phase 15 in `docs/project/TASKS.md`. All of AGENTS.md and CLAUDE.md apply.
+
+## 0. Owner decisions of 2026-11-21 (in chat, recorded in DECISIONS)
+
+1. **The fine-tuned model runs live as a forecaster**, whatever its backtest result is (a loser is also a result). It is frozen,
+   pre-registered, labelled "experimental", and never changes because of live results (I8).
+2. **Daily LLM token cap raised from 150,000 to 300,000** (live usage is about 130,000; SPEC 9.4's own default is 400,000).
+3. **All lab techniques also run live**: cascade router, agent with hybrid retrieval and guards, weekly challengers (global LightGBM,
+   Chronos-2), live monitoring on Status (grounding rate, data contracts, experimental conformal interval).
+4. The first draft's rule "never live" (SPEC 17 L1) and the shadow-forecasting tasks T249/T263 are **superseded**: a new forecaster
+   is simply a forecaster with its own id; no shadow tree is needed.
+
+Why it was separate before: integrity rules I4 (live and backtest never mix) and I8 (no tuning on the live record). Both are kept, by a
+different mechanism: **backtest first, then freeze the version and go live**, exactly as `ml` did. The model is trained only on replayed
+days up to 2026-06-30, so the live record has not shaped it.
+
+## 1. Integrity design for new live forecasters (applies to every item below)
+
+- **New `forecaster_id` and a `forecaster_version` that changes with the artefact** (SPEC 8.5): artefact SHA-256, Platt coefficients,
+  prompt fingerprint and retriever version are in the version string; history of other forecasters is untouched.
+- **Written before the lock, same sample, same contract** as the other LLM forecasters (SPEC 8.4 daily sample, `not_sampled`/
+  `model_missing`/`error` skips with reasons, never a default probability, I6).
+- **Boards:** `COMMON_GROUP` (base_rate, ml, llm_plain, llm_context, agent) and the ensemble members stay unchanged, so the headline
+  common-set board and the ensemble do not move. New forecasters appear on the "all questions" and per-topic boards with an
+  "experimental, since <first day>" chip and are compared only on questions they answered (existing coverage logic); the Methods
+  information-set table (SPEC 8) gets one row each.
+- **Official record:** the official start is 2026-11-23 (H24). A forecaster that goes live later is allowed; it simply has fewer days.
+- **No post-hoc edits:** a pre-registered expectation sits next to each (`lab/prereg/*.md`); any change after launch is a new id.
+- **Cost:** local model costs nothing; Claude-based additions fit the 300,000 cap (measured, see T279).
+
+## 2. Tasks (Phase 15; order matters; each ticked only after its checks and `make check`, plus `make a11y` for site work)
+
+- **T270 Governance for going live.** SPEC: amend section 17 L1 (lab results stay evaluations; a lab technique may also run live as an
+  experimental forecaster under section 1 above), add information-set rows for `llm_local_ft`, `llm_router`, `agent_hybrid` to the SPEC 8
+  table, note the 300,000 cap in 9.4. DECISIONS entry quoting the four owner decisions; TASKS Phase 15; mark T249 and T263 superseded;
+  HUMAN_TODO H32 (confirm the Colab outputs so the model can go live). Done when docs are in the PR and `status.py` lists Phase 15.
+- **T271 `llm_local_ft`, the fine-tuned model as a live forecaster** (needs the Colab artefacts: H26, H28; code and tests can be written now).
+  - `src/arena/forecasters/llm_ft.py`: `LLMLocalFT` (`forecaster_id = "llm_local_ft"`), same prompt as `llm_context`
+    (`LLMContext.user_prompt` + `system`), scores with llama.cpp: tokenise the chat-templated prompt, `eval`, read the last-position logits,
+    margin = logit(YES) - logit(NO) (ids checked to be single tokens), P = Platt(a, b) from the Colab validation fit, clipped to [0.01, 0.99].
+  - `src/arena/lab/artefacts.py` pins release URL, SHA-256 (refuse a mismatch: `model_missing` skip with the reason), Platt (a, b), base
+    revision, adapter hash. Version string: `qwen2.5-1.5b-qlora-r1|gguf-<sha8>|platt|prompt-v1-<fingerprint>`; meta carries margin and a, b.
+  - Wiring: `build_forecasters` appends it after `llm_local` when `settings.llm_local_ft` (`ARENA_LLM_LOCAL_FT=1`); shares the daily LLM
+    sample; run budget raised (about 2,300-token prompts; measure first, T279).
+  - Workflows: `morning.yml` downloads the release asset with `actions/cache` keyed by the SHA-256, verifies it, reuses the llama-cpp
+    install of `llm_local`. Look up the current `actions/cache` major version first (AGENTS section 7).
+  - Parity check (CI-free workflow or notebook cell): GGUF Q4 margins vs the fp16 merged model on 20 test rows within a stated tolerance.
+  - Tests: fake llama backend (margins to probabilities, hash mismatch skip, single-token check, time-limit skip); version string changes
+    with the artefact.
+- **T272 Site and boards for the new forecasters.** Names and colours (`site/titles.py`, `charts.SERIES_SLOTS`), forecaster pages,
+  "experimental, since <day>" chip, Methods information-set rows, Lab page section "Live experimental forecasters" linking to their
+  boards (live numbers come from the ledger, never typed). A test checks that none of them is in `COMMON_GROUP` or the ensemble.
+- **T273 `llm_router`, the cascade forecaster.**
+  - `src/arena/forecasters/router.py`, `needs_peers = True` like the ensemble: for each sampled question it chooses among forecasts the
+    peers already wrote: answer with the cheap pair (mean of `ml` and `llm_local_ft`) when both are decisive (`|p-0.5| >= delta`) and agree
+    (`|ml - ft| <= gamma`), otherwise take `llm_context`. It records `escalated` and `paid_calls_avoided` in meta, so the live saving is
+    measured on the shared sample without extra paid calls.
+  - `delta`, `gamma` are chosen on the validation window only and frozen in the version string. Needs Claude test rows (H31, one paid
+    `llm-eval` run, about US$0.15) and the T246 scores, so it is written after them; until then it is not registered.
+  - Listed after the forecasters it reads (like the ensemble). Tests with fixed peer forecasts.
+- **T274 `agent_hybrid`, the agent with hybrid retrieval and guards.**
+  - A retriever wrapper around `PastQuestions.search_hybrid` (BM25 + dense + RRF + cross-encoder rerank) with the same leakage rule;
+    `AgentForecaster(... retriever=hybrid)` under the id `agent_hybrid` next to `agent` (side-by-side comparison, same sample).
+  - Harness-level guards: `llm/guards.sanitize` on news headlines, Wikipedia summaries and every tool output before the model sees them,
+    flags written to the trace span attributes; the guard version is part of the forecaster version.
+  - Reranker weights (about 80 MB) cached by `actions/cache` like the fastembed model.
+  - Needs the 300,000 cap: change `ARENA_LLM_MAX_TOKENS_PER_DAY` (check the exact setting name in `config.py` and `morning.yml`) and record the
+    measured daily usage after one week in PROGRESS.
+  - Tests: leakage property test (never returns a question resolved after the forecast time), guard flags in spans, version string.
+- **T275 Weekly challengers (`glgbm`, `chronos2`).**
+  - `forecasters/ml_power_global.py`: one global LightGBM quantile model over all power statistics (statistic id feature, lags, calendar),
+    same walk-forward and Optuna budget as `ml_power_lgbm.py`; `ts_bench.py` wrapper for Chronos-2 turning predicted quantiles into
+    P(statistic > T) like `ml_power`.
+  - Registered as candidate families in `ops/weekly.py`, scored by the existing 28-day rule (promote only if not worse), so each can become
+    the live `ml` power champion by the written rule, never by hand. Weekly workflow installs the extra requirement files.
+  - Backtest cards `docs/models/power-global.md`, update `power-ts.md`. Tests on fixtures; no network in `make check`.
+- **T276 Live monitoring on Status and question pages.**
+  - Rationale grounding: `lab/grounding.py` over the last 7 days of stored rationales, a table on Status (not-in-prompt share per forecaster).
+  - Data contracts (T262): pydantic models plus a small expectations runner (freshness, ranges, completeness, uniqueness) as health checks in
+    `ops/health.py`; failures are recorded health warnings (existing incident flow), never silent drops. Read the earlier pandera rejection
+    first (`DECISIONS.md` about line 508).
+  - Experimental 80% conformal interval for the electricity mean-price questions: the weekly job stores the CQR margin in the registry
+    metadata (`ops/explain.cqr_margin`), `ml` writes the interval into the forecast meta (probability unchanged), the question page shows it
+    as "experimental" and Status tracks empirical coverage from resolved questions.
+- **T277 Serving parity (ONNX) in the deployed container.** Export the LightGBM power challenger (and the champion if `skl2onnx` supports
+  HistGradientBoosting quantile loss; check, otherwise say so) to ONNX, parity within 1e-6 on 500 backtest rows, `POST /predict/power` in
+  `api/app.py` using ONNX Runtime, exercised by the existing Docker and kind CI jobs; the hash goes into the registry metadata.
+- **T278 Colab results and evaluation (unchanged from Phase 14): T245/T246 and, after them, T247 (distillation, H27), T248, T252b (judge,
+  H27/H29), T254 (docs assistant), T255 (trace export), T250 (replaced by T273)**; distilled student, if it beats the QLoRA model on the
+  validation window, replaces the artefact in T271 as a new version, never silently.
+- **T279 Launch checks (before turning each flag on in the workflows).** Dispatch `morning.yml` once from `main` with `dry_run=true` and the
+  new flags to measure runner minutes per question and token use (the manifest reports usage); set the run budget and the cap from the
+  measurement; dry runs write nothing to the ledger (existing behaviour). Then enable the flags one at a time (`ARENA_LLM_LOCAL_FT`,
+  `ARENA_AGENT_HYBRID`, router) on separate days so the first-day problems are attributable; each launch is an owner-visible PROGRESS line.
+- **T280 Showcase and final sweep.** Update explainer 06 (live section: what runs live, version strings, expectations written before the
+  first live day), README table, recruiter roles (live forecasters named), interview numbers generated from the ledger, `make check`,
+  `make a11y`, redeploy with one `resolve.yml` dispatch.
+
+## 3. Owner actions (exact steps go to `docs/project/HUMAN_TODO.md`)
+
+- **H26, H28** (still the critical path): run the Colab notebook on a free T4 and upload `outputs.zip` as a GitHub release.
+- **H32** reply "go" after the agent shows the evaluation of the fine-tuned model (it goes live whatever the result, but you see it first).
+- **H27** (paid distillation and judge runs, within US$2.00) and **H31** (one paid test-set run, about US$0.15) as before; **H29** label
+  30 rationales; **H30** no longer needed.
+
+## 4. Order and parallelism
+
+T270 first. Then T274, T275, T276, T277 (independent, need no owner input). T271 code and T272 can be written now; T271 goes live after
+H26/H28. T273 after T271 and H31. T279 gates every flag. T280 last. While the Colab run is pending, never wait idle.
+
+## 5. Risks to watch
+
+- Runner CPU time for 2,300-token prompts (measure in T279); the morning job must still seal before the 09:30 UTC lock.
+- 1 GB model download per run: cache by hash; a cache miss must not break the lock-critical run (skip with `model_missing`, never block).
+- Daily token cap: measure after enabling `agent_hybrid`; if the cap is hit forecasts become `budget_exhausted` skips (visible, I6).
+- Adding forecasters changes board layouts: the layout audit and a11y checks run in T272 and T280.

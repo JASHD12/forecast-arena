@@ -168,3 +168,73 @@ def lab_card_cmd(result: Path) -> None:
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(card_markdown(r), encoding="utf-8")
     click.echo(f"card -> {out}")
+
+
+@lab.command("grounding")
+@click.option(
+    "--out", type=click.Path(path_type=Path), default=Path("evals/results/lab-grounding.json")
+)
+@click.pass_obj
+def lab_grounding(obj: Ctx, out: Path) -> None:
+    """Check every stored live rationale for numbers that are not in its prompt (T252a)."""
+    import gzip
+
+    from arena.lab import grounding as gr
+    from arena.lab.results import LabResult
+    from arena.ledger import layout
+    from arena.scoring.core import load
+
+    rec = load(obj.ledger)
+    snaps: dict[tuple[str, object], dict[str, object]] = {}
+    per: dict[str, list[dict[str, int]]] = {}
+    for f in rec.forecasts:
+        q = rec.questions.get(f.question_id)
+        if q is None or not f.rationale:
+            continue
+        key = (q.domain, q.batch_date)
+        if key not in snaps:
+            rel = f"{layout.snapshot_dir(q.domain, q.batch_date)}/morning_context.json.gz"
+            snaps[key] = (
+                json.loads(gzip.decompress(obj.ledger.read_bytes(rel)))
+                if obj.ledger.exists(rel)
+                else {}
+            )
+        ctx = snaps[key].get(q.question_id)
+        if ctx is None:  # no stored context for this question: nothing to compare with
+            continue
+        text = f.rationale + " " + " ".join(map(str, f.meta.get("key_factors") or []))
+        per.setdefault(f.forecaster_id, []).append(gr.check(text, [q.text, q.resolution_rule], ctx))
+    metrics = {fid: gr.summarize(items) for fid, items in sorted(per.items())}
+    result = LabResult(
+        experiment="grounding",
+        title="Numeric grounding of model rationales",
+        created_at=obj.clock.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+        why=(
+            "Checking generated answers against their source data is the cheapest first line of "
+            "LLM evaluation, before any LLM-as-judge (docs/SOURCES.md, lab sources)."
+        ),
+        metrics=metrics,  # type: ignore[arg-type]
+        notes=[
+            "Every stored live rationale and key factor with a stored morning context "
+            f"({sum(m['n'] for m in metrics.values())} rationales; "
+            f"{len(rec.forecasts)} forecasts in the ledger).",
+            "Trivial numbers (small integers, years, dates) are ignored. A number counts as in "
+            "the prompt if it equals one in the question, the rule or the context within its "
+            "rounding or 1%.",
+        ],
+        limits=[
+            "Not in the prompt is an upper bound on invented figures: a model can compute "
+            "things (a weekly mean of seven values, for example) that are legitimate but not "
+            "literally in the prompt.",
+            "The agents also read tool results (series, base rates, retrieval) that are not part "
+            "of the stored morning context, so their share is overstated here.",
+            "It does not judge whether the reasoning is good, only whether the figures it "
+            "quotes can be traced.",
+            "Small sample: the live record is a few days old; the numbers will move.",
+        ],
+        card="docs/lab/grounding.md",
+    )
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(result.model_dump_json(indent=1) + "\n", encoding="utf-8")
+    for fid, m in metrics.items():
+        click.echo(f"{fid}: {m}")

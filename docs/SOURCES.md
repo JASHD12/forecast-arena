@@ -155,4 +155,4 @@ Used for the one-line "why companies use it" on the Lab page. Confidence: V = pr
   cross-encoder `Xenova/ms-marco-MiniLM-L-6-v2` (apache-2.0, 0.08 GB).
 
 ## ONNX export and runtime (T277), checked 2026-11-21
-- `skl2onnx` 1.20.0: conversion of `HistGradientBoostingRegressor(loss="quantile")` fails when building the `TreeEnsembleRegressor` node (tested locally); `onnxmltools` 1.16.0 `convert_lightgbm` works for LightGBM quantile regressors (max difference 1.1e-6 against LightGBM). Licences: onnxmltools Apache-2.0, onnx Apache-2.0, onnxruntime 1.32.0 MIT (package metadata).
+- `skl2onnx` 1.20.0: conversion of `HistGradientBoostingRegressor(loss="quantile")` fails when building the `TreeEnsembleRegressor` node (tested locally); `onnxmltools` 1.16.0 `convert_lightgbm` works for LightGBM quantile regressors (max difference 1.1e-6 against LightGBM). Licences: onnxmltools Apache-2.0, onnx Apache-2.0, onnxruntime 1.31.1 MIT (package metadata).

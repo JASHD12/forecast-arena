@@ -1,4 +1,4 @@
 # ONNX export (T277): the LightGBM power models as ONNX files, served with ONNX Runtime.
 # Keep lightgbm aligned with ml.txt. Licences: onnxruntime MIT, onnxmltools Apache-2.0.
 onnxmltools==1.16.0
-onnxruntime==1.32.0
+onnxruntime==1.31.1

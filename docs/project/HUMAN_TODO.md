@@ -226,3 +226,25 @@ curl -X POST -H "Authorization: Bearer TOKEN" -H "Accept: application/vnd.github
     word changes. SPEC section 10 (scoring and wording) is yours to change, so the agent has not touched it.
   - Reply yes (and the agent changes the wording and its tests) or no.
 
+## Experiments lab (Phase 14, owner request 2026-11-21)
+
+- [ ] H26 · Run the QLoRA notebook on Colab (needed for T245)
+  - Open `notebooks/lab/qlora_qwen_forecast.ipynb` from the repository in Google Colab (File > Open notebook > GitHub, or the
+    badge at the top of the notebook), Runtime > Change runtime type > T4 GPU, then Runtime > Run all. It takes about 30 to 60
+    minutes. At the end it prints the SHA-256 of every output file and writes `outputs.zip`; download it.
+  - You need a Google account. The agent cannot do this (AGENTS.md S2: no accounts, no signing up).
+- [ ] H27 · Approve the use of the Claude API key for non-forecast lab runs (needed for T247 and T252b)
+  - CLAUDE.md standing approval 2 covers workflows that use `ARENA_LLM_API_KEY` to generate forecasts. The lab also wants two
+    small paid runs: distillation labels (about US$0.35) and an LLM-as-judge run (about US$0.10), together at most US$2.00
+    (`docs/project/LAB_BUDGET.md`). Reply yes to allow the agent to commit those two workflows; each is still a manual dispatch.
+- [ ] H28 · Upload the lab files as GitHub release assets (needed for T245)
+  - After H26: GitHub > repository > Releases > Draft a new release, tag `lab-qlora-r1`, attach the files from `outputs.zip`
+    (adapter, GGUF, logs; the training data is already in the repository, nothing to upload for it), publish.
+    Paste the printed SHA-256 values and the release URL into the chat. The agent then pins them in code.
+- [ ] H29 · Label 30 model rationales for the judge calibration (needed for T252b)
+  - The agent will write `lab/judge/label-sheet.csv` (30 stored rationales, no names of forecasters). Fill the three columns
+    `uses_data`, `direction_ok`, `hedged` with 0 or 1, commit nothing, and send the file back in the chat.
+- [ ] H30 · Decision: allow shadow forecasting (needed for T249 and T263)
+  - A shadow forecaster writes real forecasts before the lock into a separate `shadow/` tree on the ledger that no board reads.
+    It needs a small ledger-schema change. Reply yes to allow it, or no to keep both tasks as written proposals.
+

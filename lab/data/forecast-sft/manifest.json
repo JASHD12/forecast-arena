@@ -1,0 +1,90 @@
+{
+  "domain": "power",
+  "seed": 0,
+  "splits": {
+    "test_nov": {
+      "chars_user_p50": 3760,
+      "days": 15,
+      "first_day": "2026-11-01",
+      "last_day": "2026-11-15",
+      "rows": 90,
+      "sha256": "b45e6a5440f9a1857e01abd82c6a6520054f994bfa261c2b2e8a2fb3a75d5eae",
+      "templates": {
+        "evening_gt": 15,
+        "max_gt": 15,
+        "mean_gt": 15,
+        "min_lt": 15,
+        "spread_gt": 15,
+        "up_vs_today": 15
+      },
+      "window": [
+        "2026-11-01",
+        "2026-11-15"
+      ],
+      "yes_rate": 0.4889
+    },
+    "test_oct": {
+      "chars_user_p50": 3735,
+      "days": 31,
+      "first_day": "2026-10-01",
+      "last_day": "2026-10-31",
+      "rows": 186,
+      "sha256": "f120884a109778ea0be0674f8649a50548f2668417fadd7a6ce61401ed03c4f8",
+      "templates": {
+        "evening_gt": 31,
+        "max_gt": 31,
+        "mean_gt": 31,
+        "min_lt": 31,
+        "spread_gt": 31,
+        "up_vs_today": 31
+      },
+      "window": [
+        "2026-10-01",
+        "2026-10-31"
+      ],
+      "yes_rate": 0.4194
+    },
+    "train": {
+      "chars_user_p50": 3678,
+      "days": 2591,
+      "first_day": "2018-12-01",
+      "last_day": "2026-06-30",
+      "rows": 6000,
+      "sha256": "63d387c583ecdaaf61d1df1a9158e576ab0341f274638411e2fd857923266f7f",
+      "templates": {
+        "evening_gt": 1000,
+        "max_gt": 1000,
+        "mean_gt": 1000,
+        "min_lt": 1000,
+        "spread_gt": 1000,
+        "up_vs_today": 1000
+      },
+      "window": [
+        "2018-12-01",
+        "2026-06-30"
+      ],
+      "yes_rate": 0.4433
+    },
+    "val": {
+      "chars_user_p50": 3717,
+      "days": 92,
+      "first_day": "2026-07-01",
+      "last_day": "2026-09-30",
+      "rows": 552,
+      "sha256": "ffb1d23a2240f4e0de6209775406062d79c6022ebf669eb20a7229aa0a880ee5",
+      "templates": {
+        "evening_gt": 92,
+        "max_gt": 92,
+        "mean_gt": 92,
+        "min_lt": 92,
+        "spread_gt": 92,
+        "up_vs_today": 92
+      },
+      "window": [
+        "2026-07-01",
+        "2026-09-30"
+      ],
+      "yes_rate": 0.5018
+    }
+  }
+}

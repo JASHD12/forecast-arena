@@ -733,3 +733,39 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
     audit tools now open percent-encoded file names (real ledgers have them) and skip the file-opened 404; the chart-text check also
     covers a question page.
 
+## Phase 14 - Experiments lab (owner request 2026-11-21; design in docs/project/LAB_PLAN.md)
+
+- [x] T240 · Lab charter: SPEC section 17, DECISIONS, LAB_BUDGET, owner items H26 to H30 (deps: T235)
+  - Done 2026-11-21: docs in the experiments-lab PR; `status.py` lists Phase 14.
+- [x] T241 · Lab dataset builder `arena lab dataset build` and data card (deps: T240)
+  - Done 2026-11-21: power splits train 6,000 (seeded subsample of the replay), val 552, test_oct 186, test_nov 90, gzipped in
+    `lab/data/forecast-sft/` (0.8 MB, so the Colab notebook needs no upload); hashes in `manifest.json`; unit tests incl. leakage.
+- [ ] T242 · Lab result schema and `lab.html` skeleton with the EVALUATION banner (deps: T240)
+  - Done when: schema round trip, page renders with an empty state, a11y and layout audit pass.
+- [ ] T243 · Pre-registration `lab/prereg/qlora-forecast.md` and frozen test sets (deps: T241)
+  - Done when: both test sets are built and their hashes committed before any training.
+- [ ] T244 · QLoRA training code and the Colab notebook (deps: T243)
+  - Done when: format, train and score code is unit-tested on a tiny random model on CPU; the notebook is complete.
+- [ ] T245 · Owner runs the Colab notebook and uploads the release assets (deps: T244; needs: H26, H28)
+- [ ] T246 · Evaluate the fine-tuned model in `lab-eval.yml` (deps: T245, T242)
+- [ ] T247 · Distillation from Claude (deps: T246; needs: H27)
+- [ ] T248 · Adapter registry and lineage (deps: T246)
+- [ ] T249 · Shadow run of the fine-tuned model (deps: T246; needs: H30)
+- [ ] T250 · Cost routing and cascades, offline (deps: T242)
+  - Done when: Pareto curve from stored rows, delta chosen on validation, card generated.
+- [ ] T251 · Hybrid retrieval: BM25, RRF, optional cross-encoder rerank, retrieval eval (deps: T242)
+- [ ] T252a · Numeric grounding metric over stored rationales (deps: T242)
+- [ ] T252b · LLM-as-judge with calibration (deps: T252a; needs: H27, H29)
+- [ ] T253 · Guardrails and red-team suite (deps: T252a)
+- [ ] T254 · Docs RAG assistant with citations (deps: T251)
+- [ ] T255 · GenAI-convention trace export and a Phoenix smoke target (deps: T242)
+- [ ] T256 · Calibration methods compared in the power backtest (deps: T242)
+- [ ] T257 · Conformal prediction coverage study (deps: T242)
+- [ ] T258 · Global LightGBM power model against the per-statistic champion (deps: T242)
+- [ ] T259 · Time-series foundation models, zero-shot, in the power benchmark (deps: T242)
+- [ ] T260 · Per-forecast explanations in the backtest (deps: T242)
+- [ ] T261 · ONNX export and serving parity (deps: T242)
+- [ ] T262 · Data contracts and validation (deps: T241)
+- [ ] T263 · Shadow period for weekly challengers (deps: T249; needs: H30)
+- [ ] T264 · Explainer 06, interview numbers, README and recruiter mapping (deps: T242)
+- [ ] T265 · Final sweep and redeploy (deps: T264)

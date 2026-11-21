@@ -624,3 +624,21 @@ Makefile  pyproject.toml  Dockerfile
 
 Real-time streaming, databases, Kubernetes, user accounts, trading or portfolio features,
 investment or purchasing advice, scraping of sites that forbid it, mobile apps.
+
+## 17. Experiments lab (added 2026-11-21 with the owner's approval)
+
+The lab holds pre-registered experiments (fine-tuning, distillation, retrieval, judging, routing, calibration and others)
+that compare techniques against the existing baselines. Design: `docs/project/LAB_PLAN.md`. Rules:
+
+- **L1** Every lab result is `kind="evaluation"` or `label="backtest"`, carries that banner, and never enters a leaderboard,
+  finding or headline. No live forecaster, prompt or threshold changes because of a lab result. Promotion is a separate owner
+  decision and goes through a new `forecaster_id` or version and the weekly rule.
+- **L2** Before any training or paid run, `lab/prereg/<experiment>.md` states the hypothesis, the train, validation and test
+  windows, the metric and the decision rule; its SHA-256 is stored in the result.
+- **L3** Splits are by batch day: train before validation before test. Test sets are frozen and hashed before training.
+- **L4** Every dataset, adapter and quantized file has a SHA-256, the base-model revision, the code SHA, seeds and package
+  versions. Large files are release assets, never in git. A hash mismatch is an error, never a fallback.
+- **L5** Paid calls happen only inside GitHub Actions through the budget guard; the total spent by the lab is at most US$2.00
+  (`docs/project/LAB_BUDGET.md`).
+- **L6** Lab-only packages live in separate pinned requirements files; `make check` stays network-free.
+- **L7** Each experiment has a card generated from its result file, including what the result does not show.

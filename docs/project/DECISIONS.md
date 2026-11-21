@@ -1112,3 +1112,8 @@ and evidence requirements. Do not backfill historical ML forecasts.
 - Context: tables broke dates and model versions at their hyphens ("2026-" / "11-21").
 - Decision: one post-processing pass (`site/typography.nowrap_dates`) wraps ISO dates in the page body text in a no-break span; attributes, the head and scripts are never touched, and tests that compare page text strip the span.
 - Rejected: non-breaking hyphens in the text (changes what is copied and searched), per-template spans (easy to miss).
+
+## 2026-11-21 Experiments lab approved by the owner (Phase 14)
+- Context: the owner asked to add fine-tuning (QLoRA) and other techniques used in industry, so a hiring manager sees broad experimentation; the repo rules ask for owner approval for features outside the SPEC (AGENTS.md section 3).
+- Decision: the owner approved the plan in chat on 2026-11-21: GPU work on a free Colab T4 that the owner starts; up to about US$2 in total for paid Claude calls (distillation labels, LLM-as-judge), each as a capped manual run; the full program; a new Lab page plus model cards. SPEC section 17 adds the lab rules L1 to L7. Standing approval 2 in CLAUDE.md does not cover non-forecast API use, so H27 must be ticked before those two workflows are committed.
+- Alternatives: a smaller top-5 program (rejected by the owner); results in docs only (rejected: the owner wants a Lab page).

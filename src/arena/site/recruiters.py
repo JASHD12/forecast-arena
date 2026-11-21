@@ -163,6 +163,7 @@ ROLE_PATHS: tuple[tuple[str, str, tuple[tuple[str, str, bool], ...]], ...] = (
             ("How the LLM calls are traced", "llm.html", False),
             ("The agent loop (code)", "src/arena/agent/forecaster.py", True),
             ("Experiments lab: fine-tuning, retrieval, guardrails", "lab.html", False),
+            ("Ask the project: cited docs assistant (code)", "src/arena/lab/docs_assistant.py", True),
         ),
     ),
     (
@@ -173,6 +174,7 @@ ROLE_PATHS: tuple[tuple[str, str, tuple[tuple[str, str, bool], ...]], ...] = (
             ("Model registry (code)", "src/arena/forecasters/registry.py", True),
             ("Pipeline status", "status.html", False),
             ("Calibration study (code)", "src/arena/lab/calibration_study.py", True),
+            ("ONNX export and serving (code)", "src/arena/forecasters/onnx_power.py", True),
         ),
     ),
     (
@@ -183,6 +185,7 @@ ROLE_PATHS: tuple[tuple[str, str, tuple[tuple[str, str, bool], ...]], ...] = (
             ("Live leaderboard", "leaderboard.html", False),
             ("The SQL behind the numbers", "data.html", False),
             ("Retrieval and grounding experiments", "lab.html", False),
+            ("Conformal coverage study (code)", "src/arena/lab/conformal_study.py", True),
         ),
     ),
 )

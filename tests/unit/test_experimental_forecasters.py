@@ -51,6 +51,6 @@ def test_experimental_live_lists_only_forecasters_that_have_published() -> None:
             "name": "Fine-tuned open model (experimental)",
             "n": 2,
             "first_day": "2026-11-23",
-        }  # fmt: skip
+        }
     ]
     assert experimental_live(NS(forecasts=[]), {}) == []

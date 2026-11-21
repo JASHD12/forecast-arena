@@ -1163,3 +1163,9 @@ and evidence requirements. Do not backfill historical ML forecasts.
 ## 2026-11-21 T275b: Chronos-2 is not made a weekly challenger
 - Result (T259 backtest, 365 days): Chronos-2 zero-shot Brier 0.2073, Chronos-Bolt 0.2142, persistence 0.2205, champion 0.1930; Chronos-2 minus champion +0.0143 [+0.0045, +0.0235].
 - Decision: it stays a backtest benchmark. A 120M-parameter model per question in the lock-critical morning run, plus a registry artefact, buys nothing while it is significantly worse. Reopen if a later backtest changes the picture.
+
+## 2026-11-21 T284: CI `check` job timeout 15 -> 25 minutes
+- Context: the push CI on the merge of PR #27 was cancelled by the job's own 15-minute limit (install about 2 min, `make check` about 13 min), so `promote` was skipped and `stable` did not advance. The same code passed on the PR run (check 13 min).
+- Evidence (local, 763 tests, 8 min): the slowest tests are the weekly-job tests in `tests/unit/test_weekly.py` (9 tests, about 3.5 min together), then the ONNX, global-LightGBM and SHAP model tests (8-12 s each); the new lab tests are not the cause.
+- Decision: raise only the `check` job limit to 25 minutes. No tests removed or weakened. Splitting or slimming `test_weekly.py` is a possible later proposal.
+- Alternatives: delete slow tests (rejected: loses coverage); run tests in parallel (needs `pytest-xdist`, a new dependency).

@@ -65,6 +65,7 @@ Nothing. See the session summary above and `python scripts/status.py`.
   output, not acted on (S11).
 
 ## Done log
+- 2026-11-21 T284: CI check job timeout raised to 25 min after the post-merge run hit the 15 min limit (promote was skipped).
 - 2026-11-21 T259/T275b: Chronos-2 backtest: Brier 0.2073, better than Chronos-Bolt and persistence but worse than the champion (+0.0143); not made a live challenger.
 - 2026-11-21 T258: global LightGBM backtest card: Brier 0.2079 vs 0.1930 champion (worse, interval excludes zero); stays a weekly challenger only.
 - 2026-11-21 T257: conformal coverage study over 7 months (80% band: 71.0% raw to 79.4% with CQR; 90%: 80.4% to 92.5%).

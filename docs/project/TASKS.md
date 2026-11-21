@@ -828,4 +828,5 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
 - [ ] T281c · Status shows the live model's training cut and months since retrain; HUMAN_TODO launchd steps (deps: T281b)
 - [x] T282 · Rehearsal banner computed from the ledger: clean days so far and the owner's not-before date (deps: T270)
 - [x] T283 · README for hiring managers: by-role guide, generated Experiments lab table, non-stale live status (deps: T270)
+- [x] T284 · CI `check` job timeout 15 -> 25 minutes after a post-merge timeout (deps: T270)
 - [ ] T280 · Showcase and final sweep for the live lab (deps: T272, T274, T276a, T276b)

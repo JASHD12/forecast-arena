@@ -1112,3 +1112,35 @@ and evidence requirements. Do not backfill historical ML forecasts.
 - Context: tables broke dates and model versions at their hyphens ("2026-" / "11-21").
 - Decision: one post-processing pass (`site/typography.nowrap_dates`) wraps ISO dates in the page body text in a no-break span; attributes, the head and scripts are never touched, and tests that compare page text strip the span.
 - Rejected: non-breaking hyphens in the text (changes what is copied and searched), per-template spans (easy to miss).
+
+## 2026-11-21 Experiments lab approved by the owner (Phase 14)
+- Context: the owner asked to add fine-tuning (QLoRA) and other techniques used in industry, so a hiring manager sees broad experimentation; the repo rules ask for owner approval for features outside the SPEC (AGENTS.md section 3).
+- Decision: the owner approved the plan in chat on 2026-11-21: GPU work on a free Colab T4 that the owner starts; up to about US$2 in total for paid Claude calls (distillation labels, LLM-as-judge), each as a capped manual run; the full program; a new Lab page plus model cards. SPEC section 17 adds the lab rules L1 to L7. Standing approval 2 in CLAUDE.md does not cover non-forecast API use, so H27 must be ticked before those two workflows are committed.
+- Alternatives: a smaller top-5 program (rejected by the owner); results in docs only (rejected: the owner wants a Lab page).
+
+## 2026-11-21 T244: fine-tuning with a small in-house loop, not TRL
+- Context: the plan named TRL's SFTTrainer. The target here is a single answer token (YES or NO), so supervised fine-tuning is a binary cross-entropy on the logit difference of two tokens.
+- Decision: a 100-line loop in `arena.lab.finetune.train` (PyTorch plus PEFT); no TRL. It is unit-tested on CPU with a tiny random Qwen2 model, avoids TRL's frequently changing API, and keeps the memory low by asking the model for logits at the last position only (`logits_to_keep=1`). New dependency: `peft==0.22.0` (Apache-2.0) in `requirements/lab.txt`; `bitsandbytes` is installed only in the Colab notebook.
+- Alternatives: TRL SFTTrainer (more moving parts for a one-token target), Unsloth (not needed, adds a dependency), full fine-tuning (does not fit a 16 GB T4 for 1.5B: about 18 GB for weights, gradients and Adam states).
+- Note found while building: the live prompts are about 2,300 Qwen tokens (numbers tokenize into many tokens), twice the first estimate, so the pre-registered run trains on 2,000 rows and uses a 2,560-token limit.
+
+## 2026-11-21 The lab goes live (Phase 15): owner decisions
+- Context: the owner asked that the fine-tuned model and the other lab techniques run as real forecasters, not only as separate experiments ("all these things can be deployed in this project").
+- Decision (owner, in chat): (1) the fine-tuned model runs live as `llm_local_ft` whatever its backtest result is, frozen and pre-registered, labelled experimental; (2) the daily LLM token cap goes from 150,000 to 300,000; (3) all lab techniques also run live: cascade router, agent with hybrid retrieval and guards, weekly challengers (global LightGBM, Chronos-2), live monitoring on Status. SPEC 17 L1 is amended and the shadow-forecasting tasks T249 and T263 are superseded.
+- Integrity: integrity rules I4 and I8 stay. Backtest first, then freeze the version and go live, as `ml` did; the model is trained on replayed days up to 2026-06-30 only. New forecasters have their own ids and versions, stay out of `COMMON_GROUP` and the ensemble, and follow the same sample, skip and budget rules (I6).
+- Alternatives: keep everything offline (rejected by the owner); go live only if the backtest is not worse than `llm_local` (rejected by the owner: a loser is also a result).
+
+## 2026-11-21 T272: three more series colours
+- Context: the chart palette had eight validated slots; the three experimental forecasters need their own.
+- Decision: slots 9 to 11 (teal, brown, olive; light and dark values) added to the stylesheet. They have not been checked for colour-blind separation like slots 1 to 8, so the forecaster name is always written next to the line (legends and labels), never colour alone.
+
+## 2026-11-21 Monthly retrain of `llm_local_ft` on the owner's Mac
+- Context: the owner asked why the fine-tuned model is not retrained automatically and chose their own machine (MacBook Air M5, 16 GB) with a monthly schedule over paid GPUs. Colab cannot be scheduled.
+- Decision: retrain rule pre-registered in `lab/prereg/qlora-retrain.md`: replayed data only, promote only if not worse on a held-out window, promotion is a PR the owner merges. The Mac recipe is MLX LoRA (bitsandbytes is CUDA-only), accepted only after a smoke run.
+- Alternatives: paid GitHub GPU runner or rented GPU (needs spending and an account, not pre-approved); daily Colab (manual); retrain weekly (versions too short-lived to evaluate).
+
+## 2026-11-21 T277: ONNX export of the LightGBM power models
+- Context: serving parity for the deployed container, no joblib or LightGBM needed at inference.
+- Decision: `forecasters/onnx_power.py` exports `power-lgbq` and `power-glgbq` with onnxmltools 1.16.0 (Apache-2.0) and serves with onnxruntime 1.31.1 (the version rag.txt already pins) (MIT); `POST /predict/power` in the API (503 without `ARENA_ONNX_DIR`). New files `requirements/onnx.txt` (export, CI) and `requirements/serve.txt` (runtime, Docker). Parity tolerance 1e-4 (float32 trees give about 1e-6 on quantiles), not 1e-6 as first planned.
+- Not done: the live champion `power-gbq` (scikit-learn HistGradientBoosting, quantile loss) does not convert with skl2onnx 1.20.0 (checked 2026-11-21, `TreeEnsembleRegressor` node cannot be built), so it stays on joblib. The ONNX hash is in the exported manifest, not yet in the weekly registry metadata; Docker CI proves the route and the runtime import, the numeric parity is proven by the unit tests in the `check` job.
+- Alternatives: convert the champion by hand (risk of silent mismatch); export only to a file without an endpoint.

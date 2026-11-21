@@ -23,6 +23,9 @@ FORECASTER_NAMES = {
     "agent": "AI agent with tools",
     "agent_graph": "AI agent (LangGraph)",
     "llm_local": "Open model (CPU)",
+    "llm_local_ft": "Fine-tuned open model (experimental)",
+    "llm_router": "Cascade router (experimental)",
+    "agent_hybrid": "AI agent, hybrid retrieval (experimental)",
     "ensemble": "Ensemble",
     "human_panel": "Human panel",
 }

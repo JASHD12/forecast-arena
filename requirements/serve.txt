@@ -1,0 +1,4 @@
+# Runtime for POST /predict/power (T277), installed in the Docker image. Export tools are in onnx.txt.
+flatbuffers==25.12.19
+onnxruntime==1.31.1
+protobuf==7.36.2

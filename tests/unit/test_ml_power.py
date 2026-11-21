@@ -61,3 +61,29 @@ def test_features_use_only_context_rows() -> None:
     ]
     x = features(rows, date(2026, 10, 29))
     assert len(x) == 12 + 5 * 5 and x[12] == 28.0
+
+
+def test_conformal_interval_is_meta_only_and_leaves_the_probability_alone(trained) -> None:
+    """T276b: with a CQR margin the forecast meta carries an ordered 80% band."""
+    dom, model = trained
+    b = date(2026, 10, 20)
+    asof = datetime.combine(b, time(5, 30), tzinfo=UTC)
+    q = next(q for q in dom.generate_questions(b, asof) if q.params.get("stat") == "mean")
+    ctx = dom.context(q, asof)
+    plain = MLForecaster({"power": model}).forecast(q, ctx, asof)
+    wide = MLForecaster({"power": model}, conformal={"power": {"mean": 7.5}}).forecast(q, ctx, asof)
+    assert isinstance(plain, Forecast) and isinstance(wide, Forecast)
+    assert "interval80" not in plain.meta  # no margin yet: nothing shown
+    assert (
+        wide.probability == plain.probability
+        and wide.forecaster_version == plain.forecaster_version
+    )
+    iv = wide.meta["interval80"]
+    assert iv["stat"] == "mean" and iv["margin"] == 7.5 and iv["lo"] < iv["hi"]
+    narrow = MLForecaster({"power": model}, conformal={"power": {"mean": 0.0}}).forecast(
+        q, ctx, asof
+    )
+    assert isinstance(narrow, Forecast)
+    assert wide.meta["interval80"]["lo"] == pytest.approx(
+        narrow.meta["interval80"]["lo"] - 7.5, abs=0.02
+    )

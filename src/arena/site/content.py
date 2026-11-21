@@ -31,6 +31,7 @@ NAV_MORE: tuple[tuple[str, str], ...] = (
     ("backtests.html", "Backtests"),
     ("experiments.html", "Experiments"),
     ("evals.html", "LLM evals"),
+    ("lab.html", "Experiments lab"),
     ("llm.html", "LLM observability"),
     ("data.html", "Open data and SQL"),
     ("api.html", "JSON API"),
@@ -128,10 +129,38 @@ INFORMATION_SETS = (
         "As agent, run as a LangGraph graph: plan, retrieved evidence, tools, self-check",
         "1 question per topic per day",
     ),
+    (
+        "llm_local_ft",
+        "As llm_context, answered by Qwen2.5-1.5B fine-tuned with QLoRA (experimental)",
+        "daily sample",
+    ),
+    (
+        "llm_router",
+        "The forecasts of ml, llm_local_ft and llm_context for one question (experimental)",
+        "daily sample",
+    ),
+    (
+        "agent_hybrid",
+        "As agent, with hybrid retrieval of past questions and guarded tool text (experimental)",
+        "daily sample",
+    ),
 )
 
 
-AI_FORECASTERS = frozenset({"llm_plain", "llm_context", "agent", "agent_graph", "llm_local"})
+AI_FORECASTERS = frozenset(
+    {
+        "llm_plain",
+        "llm_context",
+        "agent",
+        "agent_graph",
+        "llm_local",
+        "llm_local_ft",
+        "llm_router",
+        "agent_hybrid",
+    }
+)
+#: Experimental forecasters (SPEC 17): named "(experimental)", outside the common-set board.
+EXPERIMENTAL_FORECASTERS = frozenset({"llm_local_ft", "llm_router", "agent_hybrid"})
 
 
 TEMPLATE_VERSION_NOTES = {

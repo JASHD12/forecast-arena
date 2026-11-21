@@ -25,6 +25,7 @@ from arena.analytics.sql import (
 from arena.analytics.sql import connect as sql_connect
 from arena.clock import Clock
 from arena.config import DEFAULT_REPO_URL, DEFAULT_SITE_URL
+from arena.lab.results import COLUMNS, PLANNED, lab_cards, load_lab_results, total_cost
 from arena.ledger import Ledger
 from arena.ledger.verify import verify
 from arena.llm.otlp import otlp_names, write_otlp
@@ -75,10 +76,14 @@ from arena.site.shaping import (
     _runs,
     agent_trace_of_day,
     calibration_panels,
+    contract_status,
     domain_stats,
     drift_badge,
     eval_runs,
+    experimental_live,
     featured_row,
+    grounding_rows,
+    interval_coverage,
     json_validity_change,
     library_versions,
     live_versions,
@@ -222,6 +227,7 @@ def build_site(
     game_payload = json.dumps({**game, "names": FORECASTER_NAMES}, sort_keys=True)
     # A JSON data block is never executed; "</" is escaped so it cannot end the element.
     game_json = Markup(game_payload.replace("</", "<\\/"))
+    lab_all = load_lab_results(evals_dir)
     pages: dict[str, tuple[str, dict[str, Any]]] = {
         "index.html": (
             "Home",
@@ -329,6 +335,9 @@ def build_site(
                 "usage": llm_usage(ledger, clock.now().date()),
                 "token_cap": llm_token_cap,
                 "parse": parse_failures(rec),
+                "contracts": contract_status(ledger, rec),
+                "interval": interval_coverage(rec),
+                "grounding": grounding_rows(ledger, rec, clock.now().date(), FORECASTER_NAMES),
                 "fresh": source_freshness(rec, clock.now()),
                 "starts": run_start_times(ledger, clock.now().date()),
                 "players": players_state(ledger, clock.now().date()),
@@ -347,6 +356,16 @@ def build_site(
             },
         ),
         "evals.html": ("LLM evals", {"runs": eval_runs(evals_dir)}),
+        "lab.html": (
+            "Experiments lab",
+            {
+                "results": lab_cards(lab_all),
+                "planned": PLANNED,
+                "spent": total_cost(lab_all),
+                "colnames": COLUMNS,
+                "live": experimental_live(rec, FORECASTER_NAMES),
+            },
+        ),
         "backtests.html": ("Backtests", {"cards": cards}),
         "api.html": ("JSON API", {"endpoints": ENDPOINTS}),
         "de.html": (

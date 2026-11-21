@@ -57,8 +57,10 @@ class AgentForecaster:
         monotonic: Callable[[], float] = _time.monotonic,
         prompt_version: str = prompts.PROMPT_VERSION,
         retriever: PastQuestions | None = None,
+        guard: Callable[[Any], tuple[Any, list[str]]] | None = None,
     ) -> None:
         self.client = client
+        self.guard = guard
         self.per_domain = per_domain
         self.max_tool_calls = max_tool_calls
         self.time_limit = time_limit
@@ -136,6 +138,7 @@ class AgentForecaster:
             news=self.news,
             wiki=self.wiki,
             similar=self._similar(q, asof),
+            guard=self.guard,
             max_calls=self.max_tool_calls,
             time_limit=self.time_limit,
             monotonic=self.monotonic,

@@ -733,3 +733,88 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
     audit tools now open percent-encoded file names (real ledgers have them) and skip the file-opened 404; the chart-text check also
     covers a question page.
 
+## Phase 14 - Experiments lab (owner request 2026-11-21; design in docs/project/LAB_PLAN.md)
+
+- [x] T240 · Lab charter: SPEC section 17, DECISIONS, LAB_BUDGET, owner items H26 to H30 (deps: T235)
+  - Done 2026-11-21: docs in the experiments-lab PR; `status.py` lists Phase 14.
+- [x] T241 · Lab dataset builder `arena lab dataset build` and data card (deps: T240)
+  - Done 2026-11-21: power splits train 6,000 (seeded subsample of the replay), val 552, test_oct 186, test_nov 90, gzipped in
+    `lab/data/forecast-sft/` (0.8 MB, so the Colab notebook needs no upload); hashes in `manifest.json`; unit tests incl. leakage.
+- [x] T242 · Lab result schema and `lab.html` skeleton with the EVALUATION banner (deps: T240)
+  - Done 2026-11-21: `LabResult`, `lab.html` (EVALUATION banner, planned list, empty state), nav entry, budget rule in `make check`.
+- [x] T243 · Pre-registration `lab/prereg/qlora-forecast.md` and frozen test sets (deps: T241)
+  - Done 2026-11-21: prereg committed with split hashes; test sets frozen in `lab/data/` and as golden files `evals/golden/power-2026-10.jsonl`, `power-2026-11a.jsonl`.
+- [x] T244 · QLoRA training code and the Colab notebook (deps: T243)
+  - Done 2026-11-21: `arena.lab.finetune` (format, train, score, run) unit-tested on CPU with a tiny random Qwen2 model; notebook
+    `notebooks/lab/qlora_qwen_forecast.ipynb` runs QLoRA 1.5B and the LoRA 0.5B ablation and scores val and both test sets on the GPU.
+- [ ] T245 · Owner runs the Colab notebook and uploads the release assets (deps: T244; needs: H26, H28)
+- [ ] T246 · Evaluate the fine-tuned model in `lab-eval.yml` (deps: T245, T242)
+- [ ] T247 · Distillation from Claude (deps: T246; needs: H27)
+- [ ] T248 · Adapter registry and lineage (deps: T246)
+- [x] T249 · Shadow run of the fine-tuned model (deps: T246)
+  - SUPERSEDED 2026-11-21 by Phase 15: the fine-tuned model runs live as `llm_local_ft` (T271); no shadow tree is built.
+- [ ] T250 · Cost routing and cascades (deps: T246; needs: H31)
+  - Needs a paid-tier probability on every test item: Claude `llm_context` on the two frozen test sets (276 questions, about US$0.15 at the
+    recorded cost per call) through the existing `llm-eval.yml`; the stored eval rows cover only 24 of the 186 October items, too few.
+  - Done when: Pareto curve (paid calls saved vs Brier), delta chosen on validation, card generated.
+- [x] T251 · Hybrid retrieval: BM25, RRF, optional cross-encoder rerank, retrieval eval (deps: T242)
+  - Done 2026-11-21: `PastQuestions.search_hybrid` (live agent unchanged), frozen set `evals/golden/retrieval-v1.jsonl` (2,004 documents, 186
+    graded queries), result `evals/results/lab-retrieval-hybrid.json`: nDCG@5 dense 0.373, BM25 0.339, hybrid 0.346, hybrid+rerank 0.556;
+    BM25 has the best MRR (0.80). Card `docs/lab/retrieval-hybrid.md`.
+- [x] T252a · Numeric grounding metric over stored rationales (deps: T242)
+  - Done 2026-11-21: `lab/grounding.py`, result `lab-grounding.json` (share of quoted numbers not literally in the prompt per forecaster; the
+    "derived arithmetic" class was dropped because it produced false matches by chance, noted in the module).
+- [ ] T252b · LLM-as-judge with calibration (deps: T252a; needs: H27, H29)
+- [x] T253 · Guardrails and red-team suite (deps: T252a)
+  - Done 2026-11-21: `llm/guards.py` (injection patterns EN/DE, markup, links, PII, length), 61 cases in `lab/redteam/cases.json`; 35 of 41
+    attacks flagged, 6 expected evasions missed, 0 of 20 benign texts flagged; report-only (live agent unchanged).
+- [ ] T254 · Docs RAG assistant with citations (deps: T251)
+- [ ] T255 · GenAI-convention trace export and a Phoenix smoke target (deps: T242)
+- [x] T256 · Calibration methods compared in the power backtest (deps: T242)
+  - Done 2026-11-21: `lab/calibration_study.py`; walk-forward re-calibration of the `ml` backtest probabilities (1,470 scored questions): ECE 0.070
+    (identity) to 0.055 (Platt, beta), Brier differences vs identity -0.0015 [-0.0034, +0.0005] (Platt), all intervals include zero: no live change.
+- [ ] T257 · Conformal prediction coverage study (deps: T242)
+- [ ] T258 · Global LightGBM power model against the per-statistic champion (deps: T242)
+- [ ] T259 · Time-series foundation models, zero-shot, in the power benchmark (deps: T242)
+- [ ] T260 · Per-forecast explanations in the backtest (deps: T242)
+- [ ] T261 · ONNX export and serving parity (deps: T242)
+- [ ] T262 · Data contracts and validation (deps: T241)
+- [x] T263 · Shadow period for weekly challengers (deps: T249)
+  - SUPERSEDED 2026-11-21 by Phase 15: challengers enter the weekly rule as candidate families (T275); no shadow tree is built.
+- [x] T264a · Explainer 06 and the recruiter role mapping (deps: T242)
+  - Done 2026-11-21: `docs/explainers/06-experiments-lab.md` (ten interview questions); each role card links a lab page or code path.
+- [ ] T264b · Lab numbers in `docs/interview/numbers.md` and a generated README table (deps: T264a)
+- [ ] T265 · Final sweep and redeploy (deps: T264b)
+
+## Phase 15 - The lab goes live (owner decision 2026-11-21; design in docs/project/LAB_PLAN.md, Part 2)
+
+- [x] T270 · Governance for going live: SPEC 17 amended, information-set rows, DECISIONS, H32 (deps: T264a)
+  - Done 2026-11-21: owner decisions recorded (fine-tuned model live whatever its backtest result; token cap 300,000; all lab techniques live).
+- [ ] T271 · `llm_local_ft`: the fine-tuned model as a live forecaster (deps: T270; needs: H26, H28, H32)
+  - Code done 2026-11-21 (forecaster, pin file loader with hash-verified download, llama.cpp scorer, flag `ARENA_LLM_LOCAL_FT` default off,
+    workflow cache step); goes live after the Colab artefacts, the parity check and H32.
+- [x] T272 · Site and boards for the experimental forecasters (deps: T271)
+  - Done 2026-11-21: names "(experimental)", colour slots 9 to 11, Methods information-set rows, health roster, Lab page section that lists
+    the ones that have published; they are in no common group and not in the ensemble (tests).
+- [ ] T273 · `llm_router`: cascade forecaster over the other forecasts (deps: T271; needs: H31)
+  - Code done 2026-11-21 (`forecasters/router.py`, registered only when `lab/artefacts/llm_router.json` exists, tests); the thresholds delta and gamma are
+    chosen on the validation days from the QLoRA scores and the paid test-set run (H31), then frozen.
+- [x] T274 · `agent_hybrid`: the agent with hybrid retrieval and guards (deps: T270)
+  - Done 2026-11-21 (code, flag `ARENA_AGENT_HYBRID` default off): `agent/hybrid.py`, guard hook in the toolbox (flags in the trace), hybrid
+    similar-questions tool with the leakage rule, a missing reranker is a visible `model_missing` skip; launch in T279 after a dry-run measurement.
+- [x] T275a · Weekly challenger: global LightGBM (family `power-glgbq`) (deps: T270)
+  - Done 2026-11-21: `ml_power_global.py` (one LightGBM per level over all five statistics, statistic one-hot, standardised targets), `multi_fitter` hook in
+    `ml_power.train`, weekly family `glgbm`, backtest challenger `ml_glgbm`; promotion only by the existing weekly rule.
+- [ ] T275b · Chronos-2 as a challenger (needs a lazily loaded pretrained artefact in the registry; the model weights are about 0.5 GB) (deps: T275a)
+- [x] T276a · Live monitoring: grounding table and data contracts on Status (deps: T270)
+  - Done 2026-11-21: `lab/grounding.rationale_checks` feeds a 7-day table on Status; `ops/contracts.py` checks stored contexts (freshness, completeness,
+    ranges), shown on Status and as an informational morning health check (never fails a run or a clean day). First real finding: a brand-new
+    Wikipedia article had 5 days of views.
+- [x] T276b · Experimental 80% conformal interval for electricity mean-price questions (deps: T270)
+- [x] T277 · ONNX export and `/predict/power` parity in the deployed container (deps: T270)
+  - Done 2026-11-21: LightGBM families only (the live HGB champion does not convert, see DECISIONS); parity 1e-4; Docker CI checks the route and runtime import.
+- [ ] T279 · Launch checks: dry-run measurement of runner time and tokens, then flags one at a time (deps: T271, T274)
+- [ ] T281a · Mac smoke run: MLX LoRA on 200 rows, measure memory, minutes and Brier; go/no-go against `lab/prereg/qlora-retrain.md` (deps: T246; needs H33)
+- [ ] T281b · `src/arena/lab/retrain.py` and `scripts/retrain_mac.sh`: monthly retrain, held-out comparison, promote-or-keep, asset upload, PR (deps: T281a)
+- [ ] T281c · Status shows the live model's training cut and months since retrain; HUMAN_TODO launchd steps (deps: T281b)
+- [ ] T280 · Showcase and final sweep for the live lab (deps: T272, T274, T276a, T276b)

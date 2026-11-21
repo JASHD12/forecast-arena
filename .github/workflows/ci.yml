@@ -27,7 +27,7 @@ jobs:
           make setup
           .venv/bin/pip install -r requirements/tracking.txt -r requirements/ml.txt
           .venv/bin/pip install -r requirements/torch.txt
-          .venv/bin/pip install -r requirements/ts.txt -r requirements/rag.txt -r requirements/graph.txt -r requirements/mcp.txt -r requirements/dashboard.txt -r requirements/api.txt
+          .venv/bin/pip install -r requirements/ts.txt -r requirements/rag.txt -r requirements/graph.txt -r requirements/mcp.txt -r requirements/dashboard.txt -r requirements/api.txt -r requirements/lab.txt -r requirements/onnx.txt
       - name: make check (with test coverage)
         run: |
           set -o pipefail
@@ -105,6 +105,9 @@ jobs:
           curl -fsS "http://127.0.0.1:8000/questions?limit=2" | python3 -c "import json,sys; d=json.load(sys.stdin); assert len(d)==2, d"
           curl -fsS "http://127.0.0.1:8000/leaderboard" | python3 -c "import json,sys; d=json.load(sys.stdin); assert d['rows'], d"
           test "$(curl -s -o /dev/null -w '%{http_code}' 'http://127.0.0.1:8000/sql?q=DROP%20TABLE%20skips')" = 400
+          # T277: the route exists and answers 503 (no model mounted) with onnxruntime importable in the image
+          test "$(curl -s -o /dev/null -w '%{http_code}' -X POST -H 'content-type: application/json' -d '{"stat":"mean","target_date":"2026-11-02","daily":[],"threshold":50}' http://127.0.0.1:8000/predict/power)" = 503
+          docker exec arena-api .venv/bin/python -c "import onnxruntime"
           docker logs arena-api | tail -5
 
   dbt:

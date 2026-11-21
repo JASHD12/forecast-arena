@@ -86,13 +86,15 @@ jobs:
       ARENA_LLM_MODEL: ${{ vars.ARENA_LLM_MODEL }}
       ARENA_LLM_EFFORT: ${{ vars.ARENA_LLM_EFFORT || 'low' }}  # thinking must not eat the 400-token answer budget
       ARENA_LLM_MAX_OUTPUT_TOKENS: ${{ vars.ARENA_LLM_MAX_OUTPUT_TOKENS || '1024' }}  # T124 eval: 400 cut off thinking answers
-      ARENA_LLM_MAX_TOKENS_PER_DAY: ${{ vars.ARENA_LLM_MAX_TOKENS_PER_DAY || '150000' }}  # owner: keep cost under ~$1/month on Haiku 5.5
+      ARENA_LLM_MAX_TOKENS_PER_DAY: ${{ vars.ARENA_LLM_MAX_TOKENS_PER_DAY || '300000' }}  # owner 2026-11-21: room for the experimental forecasters (SPEC 9.4 default is 400000)
       ARENA_LLM_BASE_URL: ${{ vars.ARENA_LLM_BASE_URL }}
       ARENA_LLM_API_KEY: ${{ secrets.ARENA_LLM_API_KEY }}
       ARENA_LLM_CACHE: ${{ vars.ARENA_LLM_CACHE || '0' }}  # T190: off; measured, it raised the cost of one-shot calls
       ARENA_LLM_STRUCTURED: ${{ vars.ARENA_LLM_STRUCTURED || '0' }}  # T190: off live until the eval compares both contracts
       ARENA_LLM_LOCAL: ${{ vars.ARENA_LLM_LOCAL || '1' }}  # T122: open model on the runner CPU, no API cost
+      ARENA_LLM_LOCAL_FT: ${{ vars.ARENA_LLM_LOCAL_FT || '0' }}  # T271: fine-tuned model; switched on after H32 (needs lab/artefacts/llm_local_ft.json)
       ARENA_AGENT_GRAPH: ${{ vars.ARENA_AGENT_GRAPH || '1' }}  # T121: LangGraph agent, 1 question per topic per day
+      ARENA_AGENT_HYBRID: ${{ vars.ARENA_AGENT_HYBRID || '0' }}  # T274: agent_hybrid (hybrid retrieval + guards); switched on at launch (T279)
       ARENA_AGENT_RAG: ${{ vars.ARENA_AGENT_RAG || '1' }}  # T120: similar-past-questions tool (local embeddings, no API cost)
       OMP_NUM_THREADS: "2"
     steps:
@@ -119,6 +121,11 @@ jobs:
         with:
           path: models_cache
           key: models-qwen2.5-1.5b-instruct-q4km-91cad51
+      - name: Restore cached fine-tuned model (llm_local_ft; keyed by the pin file)
+        uses: actions/cache@v6
+        with:
+          path: models_cache/ft
+          key: models-ft-${{ hashFiles('lab/artefacts/llm_local_ft.json') }}
       - name: Restore cached source data
         uses: actions/cache@v6
         with:

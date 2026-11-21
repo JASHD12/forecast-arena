@@ -11,8 +11,8 @@ import html
 import json
 import re
 import urllib.parse
-from collections.abc import Sequence
-from datetime import date
+from collections.abc import Mapping, Sequence
+from datetime import date, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -217,6 +217,9 @@ def _rows(questions: Sequence[Question], rec: Any) -> tuple[list[dict[str, Any]]
         "llm_local",
         "agent",
         "agent_graph",
+        "llm_local_ft",
+        "llm_router",
+        "agent_hybrid",
     ]
     ordered = [f for f in order if f in fids] + sorted(fids - set(order))
     return rows, ordered
@@ -286,8 +289,8 @@ def eval_runs(evals_dir: Path | None) -> list[dict[str, Any]]:
         return []
     runs = []
     for p in sorted(evals_dir.glob("*.json")):
-        if p.name.startswith("fake-"):
-            continue
+        if p.name.startswith(("fake-", "lab-")):
+            continue  # lab results have their own page
         r = json.loads(p.read_text(encoding="utf-8"))
         if r.get("kind") == "evaluation":
             runs.append(r)
@@ -426,3 +429,60 @@ def agent_trace_of_day(
         "probability": None if fc is None else fc.probability,
         "outcome": None if qid not in rec.resolutions else rec.resolutions[qid].outcome,
     }
+
+
+def experimental_live(rec: Any, names: Mapping[str, str]) -> list[dict[str, Any]]:
+    """The experimental forecasters that have written to the ledger: forecasts and first day."""
+    from arena.site.content import EXPERIMENTAL_FORECASTERS
+
+    out = []
+    for fid in sorted(EXPERIMENTAL_FORECASTERS):
+        fs = [f for f in rec.forecasts if f.forecaster_id == fid]
+        if not fs:
+            continue
+        days = sorted(f.created_at.date().isoformat() for f in fs)
+        out.append({"fid": fid, "name": names.get(fid, fid), "n": len(fs), "first_day": days[0]})
+    return out
+
+
+def grounding_rows(
+    ledger: Any, rec: Any, today: date, names: Mapping[str, str], days: int = 7
+) -> list[dict[str, Any]]:
+    """Share of quoted numbers not in the prompt, per forecaster, over the last `days` days."""
+    from arena.lab import grounding
+
+    per = grounding.rationale_checks(ledger, rec, first_day=today - timedelta(days=days - 1))
+    rows = []
+    for fid, items in sorted(per.items()):
+        s = grounding.summarize(items)
+        rows.append({"fid": fid, "name": names.get(fid, fid), **s})
+    return rows
+
+
+def interval_coverage(rec: Any) -> dict[str, Any] | None:
+    """Empirical coverage of the experimental 80% band on resolved questions (None: none yet).
+
+    One count per statistic and target day, because several thresholds share one band."""
+    seen: dict[tuple[str, Any], bool] = {}
+    for f in rec.forecasts:
+        iv = f.meta.get("interval80") if f.forecaster_id == "ml" else None
+        r = rec.resolutions.get(f.question_id)
+        q = rec.questions.get(f.question_id)
+        if not iv or r is None or r.observed_value is None or q is None:
+            continue
+        seen[(iv["stat"], q.target_date)] = iv["lo"] <= r.observed_value <= iv["hi"]
+    if not seen:
+        return None
+    hit = sum(seen.values())
+    return {"n": len(seen), "hits": hit, "share": hit / len(seen)}
+
+
+def contract_status(ledger: Any, rec: Any) -> dict[str, Any] | None:
+    """Data-contract result of the latest batch day for the Status page (None: no questions)."""
+    from arena.ops.contracts import check_batch
+
+    if not rec.questions:
+        return None
+    day = max(q.batch_date for q in rec.questions.values())
+    checked, bad = check_batch(ledger, rec, day)
+    return {"day": day.isoformat(), "checked": checked, "violations": bad}

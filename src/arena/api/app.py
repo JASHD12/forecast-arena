@@ -8,7 +8,9 @@ served at /docs. The snapshot is loaded at start-up; nothing can write to the le
 
 from __future__ import annotations
 
+import os
 from datetime import date
+from pathlib import Path
 from typing import Any, Literal
 
 from fastapi import FastAPI, HTTPException, Query
@@ -36,6 +38,25 @@ class SqlResult(BaseModel):
     columns: list[str]
     rows: list[list[Any]]
     truncated: bool
+
+
+class PowerRequest(BaseModel):
+    """One electricity question: the as-of daily rows plus the threshold to test."""
+
+    stat: Literal["mean", "max", "min", "spread", "evening"]
+    target_date: date
+    daily: list[dict[str, Any]]
+    threshold: float
+    comparator: Literal["gt", "lt"] = "gt"
+
+
+class PowerPrediction(BaseModel):
+    """Calibrated probability and the quantiles behind it."""
+
+    probability: float
+    raw: float
+    quantiles: dict[str, float]
+    version: str
 
 
 def create_app(ledger: Ledger) -> FastAPI:
@@ -124,5 +145,33 @@ def create_app(ledger: Ledger) -> FastAPI:
             raise HTTPException(status_code=400, detail=str(exc)) from exc
         except Exception as exc:  # DuckDB errors: bad SQL, blocked file access
             raise HTTPException(status_code=400, detail=f"query failed: {exc}"[:300]) from exc
+
+    power_model: Any = None
+    onnx_dir = os.environ.get("ARENA_ONNX_DIR")
+
+    @app.post("/predict/power", response_model=PowerPrediction)
+    def predict_power(req: PowerRequest) -> PowerPrediction:
+        """Probability from the exported LightGBM power model (ONNX Runtime). Research only."""
+        if not onnx_dir:
+            raise HTTPException(status_code=503, detail="no ONNX model configured (ARENA_ONNX_DIR)")
+        try:
+            from arena.forecasters.onnx_power import OnnxPowerModel
+        except ImportError as exc:  # pragma: no cover - runtime missing
+            raise HTTPException(status_code=503, detail="onnxruntime is not installed") from exc
+        nonlocal power_model
+        if power_model is None:
+            try:
+                power_model = OnnxPowerModel(Path(onnx_dir))
+            except (OSError, ValueError) as exc:
+                raise HTTPException(
+                    status_code=503, detail=f"model not loadable: {exc}"[:300]
+                ) from exc
+        try:
+            out = power_model.probability(
+                req.stat, req.daily, req.target_date, req.threshold, req.comparator
+            )
+        except (ValueError, KeyError) as exc:
+            raise HTTPException(status_code=422, detail=str(exc)[:300]) from exc
+        return PowerPrediction(**out)
 
     return app

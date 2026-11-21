@@ -226,3 +226,38 @@ curl -X POST -H "Authorization: Bearer TOKEN" -H "Accept: application/vnd.github
     word changes. SPEC section 10 (scoring and wording) is yours to change, so the agent has not touched it.
   - Reply yes (and the agent changes the wording and its tests) or no.
 
+## Experiments lab (Phase 14, owner request 2026-11-21)
+
+- [ ] H26 · Run the QLoRA notebook on Colab (needed for T245)
+  - Open `notebooks/lab/qlora_qwen_forecast.ipynb` from the repository in Google Colab (File > Open notebook > GitHub, or the
+    badge at the top of the notebook), Runtime > Change runtime type > T4 GPU, then Runtime > Run all. It takes about 30 to 60
+    minutes. At the end it prints the SHA-256 of every output file and writes `outputs.zip`; download it.
+  - You need a Google account. The agent cannot do this (AGENTS.md S2: no accounts, no signing up).
+- [ ] H27 · Approve the use of the Claude API key for non-forecast lab runs (needed for T247 and T252b)
+  - CLAUDE.md standing approval 2 covers workflows that use `ARENA_LLM_API_KEY` to generate forecasts. The lab also wants two
+    small paid runs: distillation labels (about US$0.35) and an LLM-as-judge run (about US$0.10), together at most US$2.00
+    (`docs/project/LAB_BUDGET.md`). Reply yes to allow the agent to commit those two workflows; each is still a manual dispatch.
+- [ ] H28 · Upload the lab files as GitHub release assets (needed for T245)
+  - After H26: GitHub > repository > Releases > Draft a new release, tag `lab-qlora-r1`, attach the files from `outputs.zip`
+    (adapter, GGUF, logs; the training data is already in the repository, nothing to upload for it), publish.
+    Paste the printed SHA-256 values and the release URL into the chat. The agent then pins them in code.
+- [ ] H29 · Label 30 model rationales for the judge calibration (needed for T252b)
+  - The agent will write `lab/judge/label-sheet.csv` (30 stored rationales, no names of forecasters). Fill the three columns
+    `uses_data`, `direction_ok`, `hedged` with 0 or 1, commit nothing, and send the file back in the chat.
+- [x] H30 · Decision: allow shadow forecasting (no longer needed: the lab techniques run live as normal forecasters, Phase 15)
+  - A shadow forecaster writes real forecasts before the lock into a separate `shadow/` tree on the ledger that no board reads.
+    It needs a small ledger-schema change. Reply yes to allow it, or no to keep both tasks as written proposals.
+
+- [ ] H31 · Approve one paid `llm-eval` run on the two frozen lab test sets (needed for T250)
+  - The routing study needs Claude's `llm_context` probabilities on all 276 test questions (`evals/golden/power-2026-10.jsonl` and
+    `power-2026-11a.jsonl`). The existing workflow `llm-eval.yml` does it in one dispatch for about US$0.15 (recorded cost per call
+    about US$0.0004, total lab budget limit US$2.00). Reply yes and the agent dispatches it once, with a token cap.
+- [ ] H32 · Confirm that the fine-tuned model goes live (needed for T271's go-live)
+  - After your Colab run (H26, H28) the agent shows you the evaluation of the fine-tuned model on the frozen test days. You decided that it
+    goes live whatever the result; reply "go" after looking at it, and the agent turns on `ARENA_LLM_LOCAL_FT` in the workflows (one PR).
+  - Also, if you ever set the repository variable `ARENA_LLM_MAX_TOKENS_PER_DAY` (Settings > Secrets and variables > Actions > Variables), change it to
+    `300000`; the workflow default is now 300,000 and a variable would override it.
+- [ ] H33 · Mac smoke run for the monthly retrain (needed for T281a), and later the launchd schedule
+  - Needs your MacBook Air (M5, 16 GB). The agent cannot reach it from the cloud, so it will give you one script to run; send back the printed
+    summary (memory, minutes, Brier). Run it on mains power, lid open. Do not schedule anything yet: the monthly schedule steps come after the smoke
+    result in T281c.

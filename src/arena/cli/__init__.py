@@ -89,6 +89,11 @@ def questions() -> None:
 
 # ----- data ----------------------------------------------------------------------------
 @main.group()
+def lab() -> None:
+    """The experiments lab (SPEC 17): datasets and evaluation-only experiments."""
+
+
+@main.group()
 def data() -> None:
     """Fetch and cache source data (git-ignored cache, ARENA_CACHE_DIR)."""
 
@@ -193,4 +198,4 @@ def mcp_command(obj: Ctx) -> None:
 
 
 # Command modules register themselves on the groups above (T187: split by purpose).
-from arena.cli import jobs, llm_cmds, record, reports  # noqa: E402,F401
+from arena.cli import jobs, lab_cmds, llm_cmds, record, reports  # noqa: E402,F401

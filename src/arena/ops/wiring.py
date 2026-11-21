@@ -169,6 +169,75 @@ def _local_forecaster(settings: Settings, n: int, tracer: Tracer, clock: Clock) 
     return LLMLocal(TracingLLM(local.LlamaCppLLM(backend), tracer, clock), n)
 
 
+def _ft_forecaster(settings: Settings, n: int) -> Forecaster:
+    """`llm_local_ft`: no API cost, so it also runs in dry runs. A missing pin, a failed or
+    mismatching download or a load failure give `model_missing` skips with the reason (I6)."""
+    from arena.forecasters.llm_ft import LLMLocalFT
+    from arena.lab import artefacts
+    from arena.lab.ft_runtime import LlamaScorer
+
+    art = artefacts.load_artefact()
+    if art is None:
+        return LLMLocalFT(None, None, n)
+    try:
+        path = artefacts.fetch(art, settings.models_dir / "ft", settings.user_agent())
+        scorer = LlamaScorer(path, model=art.name, yes_id=art.yes_id, no_id=art.no_id)
+    except Exception as exc:  # ImportError, download, hash or load failure
+        return LLMLocalFT(
+            None, art, n, missing=f"fine-tuned model unavailable: {type(exc).__name__}: {exc}"
+        )
+    return LLMLocalFT(scorer, art, n)
+
+
+def _hybrid_forecaster(
+    ledger: Ledger,
+    settings: Settings,
+    client: LLMClient | None,
+    agent: AgentForecaster,
+    retriever: Any,
+    peers: dict[str, Forecaster],
+) -> Forecaster:
+    """`agent_hybrid` next to `agent`. A missing reranker or retriever is a visible
+    `model_missing` skip, not a failure of the whole run (the lock-critical job must go on)."""
+    from arena.agent.hybrid import AgentHybrid
+    from arena.agent.retrieval import CrossEncoderReranker, FastEmbedder, PastQuestions
+
+    common: dict[str, Any] = {
+        "per_domain": settings.llm_questions_per_domain,
+        "max_tool_calls": settings.agent_max_tool_calls,
+        "peers": peers,
+        "news": agent.news,
+        "wiki": agent.wiki,
+    }
+    try:
+        cache = settings.cache_dir / "fastembed"
+        if retriever is None:
+            retriever = PastQuestions.from_ledger(ledger, FastEmbedder(cache_dir=cache))
+        rr = CrossEncoderReranker(cache_dir=cache)
+    except Exception as exc:  # ImportError, download or load failure
+        reason = f"hybrid retrieval unavailable: {type(exc).__name__}: {exc}"
+        return AgentHybrid(client, missing=reason, **common)
+    return AgentHybrid(
+        client, retriever=retriever, reranker=rr.score, reranker_name=rr.name, **common
+    )
+
+
+def _conformal_margins(ledger: Ledger) -> dict[str, dict[str, float]]:
+    """CQR margins of the central 80% band per power statistic, from the newest weekly summary
+    that has them (T276b). Missing or unreadable summaries simply mean no interval is shown."""
+    from arena.ops import weekly
+
+    try:
+        for s in weekly.summaries(ledger):
+            rows = (s.get("conformal") or {}).get("power") or []
+            margins = {r["stat"]: float(r["margin80"]) for r in rows if "margin80" in r}
+            if margins:
+                return {"power": margins}
+    except (OSError, ValueError, KeyError, TypeError):
+        pass
+    return {}
+
+
 def live_ml(ledger: Ledger, domains: Sequence[Domain], asof: datetime) -> MLForecaster:
     """Load the visible champions once; one bad artifact only disables its own domain."""
     from arena.forecasters import registry
@@ -207,7 +276,9 @@ def live_ml(ledger: Ledger, domains: Sequence[Domain], asof: datetime) -> MLFore
             errors[name] = ModelLoadFailure(
                 version, f"{name} model load failed: {type(exc).__name__}: {exc}"[:300]
             )
-    return MLForecaster(models, load_errors=errors, artifact_hashes=hashes)
+    return MLForecaster(
+        models, load_errors=errors, artifact_hashes=hashes, conformal=_conformal_margins(ledger)
+    )
 
 
 def live_ensemble(ledger: Ledger, asof: datetime) -> Forecaster | None:
@@ -277,8 +348,16 @@ def build_forecasters(
         wiki=None if llm is not None else partial(wikipedia_summary, http),
     )
     out += [LLMPlain(client, n), LLMContext(client, n), agent]
+    if settings.agent_hybrid:
+        out.append(
+            _hybrid_forecaster(
+                ledger, settings, client, agent, retriever, {"base_rate": out[0], "ml": ml}
+            )
+        )
     if settings.llm_local:
         out.append(_local_forecaster(settings, n, tracer, clk))
+    if settings.llm_local_ft:
+        out.append(_ft_forecaster(settings, n))
     if settings.agent_graph:
         # No silent fallback: if langgraph is missing this raises and the run fails.
         from arena.agent.graph import GraphAgentForecaster
@@ -293,6 +372,11 @@ def build_forecasters(
                 retriever=retriever,
             )
         )
+    from arena.forecasters import router as router_mod
+
+    rp = router_mod.load_params()
+    if rp is not None:  # listed after the forecasters it reads; not registered until frozen
+        out.append(router_mod.RouterForecaster(rp))
     ens = live_ensemble(ledger, clk.now())
     if ens is not None:  # listed last: it combines the forecasts the others just wrote
         out.append(ens)
@@ -327,6 +411,9 @@ def weekly_setup(
             from arena.forecasters import ml_power_lgbm
 
             fams["lgbm"] = lambda cut: ml_power_lgbm.train_lgbm(pdom, cut, n_trials=20, folds=2)
+            from arena.forecasters import ml_power_global
+
+            fams["glgbm"] = lambda cut: ml_power_global.train_global(pdom, cut, folds=2)
         if importlib.util.find_spec("torch"):
             from arena.forecasters import ml_power_torch
 

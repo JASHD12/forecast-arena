@@ -624,3 +624,33 @@ Makefile  pyproject.toml  Dockerfile
 
 Real-time streaming, databases, Kubernetes, user accounts, trading or portfolio features,
 investment or purchasing advice, scraping of sites that forbid it, mobile apps.
+
+## 17. Experiments lab (added 2026-11-21 with the owner's approval)
+
+The lab holds pre-registered experiments (fine-tuning, distillation, retrieval, judging, routing, calibration and others)
+that compare techniques against the existing baselines. Design: `docs/project/LAB_PLAN.md`. Rules:
+
+- **L1** Every lab result is `kind="evaluation"` or `label="backtest"`, carries that banner, and never enters a leaderboard,
+  finding or headline. No live forecaster, prompt or threshold changes because of a lab result. A technique may also run live, as
+  an *experimental forecaster* with its own `forecaster_id` and a version that changes with its artefact (owner decision
+  2026-11-21): frozen and pre-registered before its first live day, labelled "experimental", outside the common-set board and the
+  ensemble, never changed because of live results (I8).
+- **L2** Before any training or paid run, `lab/prereg/<experiment>.md` states the hypothesis, the train, validation and test
+  windows, the metric and the decision rule; its SHA-256 is stored in the result.
+- **L3** Splits are by batch day: train before validation before test. Test sets are frozen and hashed before training.
+- **L4** Every dataset, adapter and quantized file has a SHA-256, the base-model revision, the code SHA, seeds and package
+  versions. Large files are release assets, never in git. A hash mismatch is an error, never a fallback.
+- **L5** Paid calls happen only inside GitHub Actions through the budget guard; the total spent by the lab is at most US$2.00
+  (`docs/project/LAB_BUDGET.md`).
+- **L6** Lab-only packages live in separate pinned requirements files; `make check` stays network-free.
+- **L7** Each experiment has a card generated from its result file, including what the result does not show.
+
+### Experimental forecasters (added 2026-11-21, SPEC 8 information sets)
+
+| Forecaster | Sees | Notes |
+|---|---|---|
+| `llm_local_ft` | the `llm_context` prompt (question, rule, as-of context) | Qwen2.5-1.5B fine-tuned with QLoRA on replayed days up to 2026-06-30; answers with one token (YES/NO logits), Platt-calibrated on validation days; runs on the runner CPU; version string carries the artefact hash |
+| `llm_router` | the forecasts of `ml`, `llm_local_ft` and `llm_context` for the same question | picks the cheap pair when both are decisive and agree, otherwise `llm_context`; thresholds frozen from validation days; records the paid calls it would avoid |
+| `agent_hybrid` | as `agent`, with BM25 + dense + rerank retrieval of past questions and guarded tool and news text | same tools, limits and sample as `agent` |
+
+The daily LLM token cap in the live workflows is 300,000 (SPEC 9.4 default 400,000; owner decision 2026-11-21).

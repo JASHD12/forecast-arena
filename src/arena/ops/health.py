@@ -39,7 +39,18 @@ FRESH_WITHIN = timedelta(hours=36)
 FRESH_OVERRIDES = {"markets": timedelta(hours=96)}
 MAX_PARSE_FAILURE_RATE = 0.20
 MIN_LLM_ANSWERS = 5
-LLM_FORECASTERS = frozenset({"llm_plain", "llm_context", "llm_local", "agent", "agent_graph"})
+LLM_FORECASTERS = frozenset(
+    {
+        "llm_plain",
+        "llm_context",
+        "llm_local",
+        "agent",
+        "agent_graph",
+        "llm_local_ft",
+        "llm_router",
+        "agent_hybrid",
+    }
+)
 INCIDENT_LABEL = "incident"
 INCIDENT_TITLE = "Forecast Arena incident: a job or health check failed"
 CORE_FORECASTERS = frozenset(
@@ -53,6 +64,8 @@ def expected_forecasters(settings: Settings) -> frozenset[str]:
         CORE_FORECASTERS
         | ({"llm_local"} if settings.llm_local else set())
         | ({"agent_graph"} if settings.agent_graph else set())
+        | ({"llm_local_ft"} if settings.llm_local_ft else set())
+        | ({"agent_hybrid"} if settings.agent_hybrid else set())
     )
 
 
@@ -135,6 +148,20 @@ def run_checks(
                 "batch_sealed",
                 True,
                 f"{len(todays)} questions sealed at {seal.sealed_at:%H:%M} UTC",
+            )
+        )
+
+    if job == "morning" and todays:  # T276: informational data contracts on the stored contexts
+        from arena.ops.contracts import check_batch
+
+        checked, bad = check_batch(ledger, rec, today)
+        shown = "; ".join(bad[:3]) + (f"; and {len(bad) - 3} more" if len(bad) > 3 else "")
+        rep.checks.append(
+            Check(
+                "data_contracts",
+                True,  # informational: never fails a run or a clean day (SPEC 2.9)
+                f"{checked} contexts checked, {len(bad)} violations"
+                + (f": {shown}" if bad else ""),
             )
         )
 

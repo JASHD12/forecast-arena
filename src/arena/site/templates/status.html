@@ -71,6 +71,19 @@
 <p class="note">A parse failure is recorded as a skip after one repair attempt; it is never replaced by a guess.</p>{% else %}<p class="note">No LLM forecasts yet.</p>{% endif %}</section>
 </div>
 
+{% if interval %}<section class="card" aria-labelledby="interval-title"><h2 id="interval-title">Experimental 80% price range</h2>
+<p>The ML model's conformal range for electricity prices held the observed value on <strong>{{ interval.hits }} of {{ interval.n }}</strong> resolved days ({{ '%.0f'|format(interval.share * 100) }}%; the target is 80%). Experimental: with so few days this says little yet.</p></section>{% endif %}
+{% if contracts %}<section class="card" aria-labelledby="contracts-title"><h2 id="contracts-title">Data contracts (latest batch, {{ contracts.day }})</h2>
+<p>{{ contracts.checked }} stored contexts checked for freshness, completeness and plausible ranges: <strong>{{ contracts.violations|length }} violation{{ "" if contracts.violations|length == 1 else "s" }}</strong>.</p>
+{% if contracts.violations %}<ul class="plain">{% for v in contracts.violations[:10] %}<li><code>{{ v }}</code></li>{% endfor %}</ul>{% endif %}
+<p class="note">Informational: the source parsers already reject malformed data; these checks catch stale, thin or implausible data. A violation never fails a run or a clean day. A new Wikipedia article can have fewer than 7 days of views.</p></section>{% endif %}
+{% if grounding %}<section class="card" aria-labelledby="ground-title"><h2 id="ground-title">Rationale grounding (last 7 days)</h2>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Numbers in rationales that are not in the prompt"><table>
+<thead><tr><th scope="col">Forecaster</th><th scope="col" class="num">Rationales</th><th scope="col" class="num">Numbers checked</th><th scope="col" class="num">Not in the prompt %</th><th scope="col" class="num">Rationales with such a number %</th></tr></thead>
+<tbody>{% for g in grounding %}<tr><th scope="row">{{ g.name }}</th><td class="num">{{ g.n }}</td><td class="num">{{ g.numbers }}</td><td class="num">{{ g.not_in_prompt_pct }}</td><td class="num">{{ g.rationales_with_not_in_prompt_pct }}</td></tr>
+{% endfor %}</tbody></table></div>
+<p class="note">A number quoted in a rationale counts as "in the prompt" if it equals one in the question, the rule or the stored morning context (within rounding). Not in the prompt is an upper bound on invented figures: models also calculate, and the agents read tool results that are not stored here. Method and limits: <a href="lab.html">Experiments lab</a>.</p></section>{% endif %}
+
 <h2>Latest runs</h2>
 {% if runs %}
 <div class="table-scroll" tabindex="0" role="region" aria-label="Latest runs"><table>

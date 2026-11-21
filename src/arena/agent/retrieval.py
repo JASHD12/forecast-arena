@@ -15,7 +15,8 @@ from __future__ import annotations
 import hashlib
 import math
 import re
-from collections.abc import Sequence
+from collections import Counter
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from datetime import date, datetime
 from pathlib import Path
@@ -77,6 +78,65 @@ def _unit(m: np.ndarray) -> np.ndarray:
     return np.divide(m, norms, out=np.zeros_like(m), where=norms > 0)
 
 
+def tokens(text: str) -> list[str]:
+    """Lowercase alphanumeric tokens (numbers stay whole: "246" is one token)."""
+    return re.findall(r"[a-z0-9]+", text.lower())
+
+
+class BM25Index:
+    """Okapi BM25 over short texts (k1=1.5, b=0.75); numpy only, no extra package (T251)."""
+
+    def __init__(self, docs: Sequence[str], k1: float = 1.5, b: float = 0.75) -> None:
+        self.k1, self.b = k1, b
+        self._tf = [Counter(tokens(d)) for d in docs]
+        self._len = np.array([sum(c.values()) for c in self._tf], float)
+        self._avg = float(self._len.mean()) if len(docs) else 0.0
+        df: Counter[str] = Counter()
+        for c in self._tf:
+            df.update(c.keys())
+        n = len(docs)
+        self._idf = {t: math.log(1 + (n - d + 0.5) / (d + 0.5)) for t, d in df.items()}
+
+    def scores(self, query: str) -> np.ndarray:
+        """BM25 score of every document for `query` (0 where no query token occurs)."""
+        out = np.zeros(len(self._tf))
+        if not len(self._tf):
+            return out
+        norm = self.k1 * (1 - self.b + self.b * self._len / max(self._avg, 1e-9))
+        for t in set(tokens(query)):
+            idf = self._idf.get(t)
+            if idf is None:
+                continue
+            f = np.array([c.get(t, 0) for c in self._tf], float)
+            out += idf * f * (self.k1 + 1) / (f + norm)
+        return out
+
+
+def rrf(rankings: Sequence[Sequence[int]], k: int = 60) -> dict[int, float]:
+    """Reciprocal Rank Fusion: sum of 1 / (k + rank) over the rankings (rank starts at 1)."""
+    fused: dict[int, float] = {}
+    for ranking in rankings:
+        for rank, i in enumerate(ranking, start=1):
+            fused[i] = fused.get(i, 0.0) + 1.0 / (k + rank)
+    return fused
+
+
+class CrossEncoderReranker:
+    """Cross-encoder re-scoring of (query, document) pairs via fastembed's ONNX models."""
+
+    def __init__(self, model: str = "Xenova/ms-marco-MiniLM-L-6-v2", cache_dir: Path | None = None):
+        from fastembed.rerank.cross_encoder import TextCrossEncoder
+
+        self.name = model
+        self._model = TextCrossEncoder(
+            model_name=model, cache_dir=str(cache_dir) if cache_dir else None
+        )
+
+    def score(self, query: str, docs: Sequence[str]) -> list[float]:
+        """One relevance score per document (higher is better)."""
+        return [float(x) for x in self._model.rerank(query, list(docs))]
+
+
 @dataclass(frozen=True)
 class PastQuestion:
     """A resolved question as the retriever sees it."""
@@ -97,6 +157,7 @@ class PastQuestions:
     def __init__(self, items: Sequence[PastQuestion], embedder: Embedder) -> None:
         self.items = list(items)
         self.embedder = embedder
+        self._bm25: BM25Index | None = None
         self._vecs = (
             _unit(embedder.embed([p.text for p in self.items])) if self.items else np.zeros((0, 1))
         )
@@ -151,6 +212,95 @@ class PastQuestions:
             range(len(ok)), key=lambda j: (-float(sims[j]), self.items[ok[j]].question_id)
         )
         return [(self.items[ok[j]], float(sims[j])) for j in order[:k]]
+
+    def _eligible(self, asof: datetime, exclude: str | None, domain: str | None) -> list[int]:
+        return [
+            i
+            for i, p in enumerate(self.items)
+            if p.resolved_at < asof
+            and p.question_id != exclude
+            and (domain is None or p.domain == domain)
+        ]
+
+    def search_hybrid(
+        self,
+        text: str,
+        asof: datetime,
+        *,
+        k: int = 5,
+        exclude: str | None = None,
+        domain: str | None = None,
+        dense: bool = True,
+        bm25: bool = True,
+        rerank: Callable[[str, Sequence[str]], Sequence[float]] | None = None,
+        pool: int = 30,
+    ) -> list[tuple[PastQuestion, float]]:
+        """Dense and/or BM25 ranking fused with RRF, optionally re-scored by a cross-encoder.
+
+        Only questions eligible by the leakage rule are ranked (same rule as `search`). The
+        live agent keeps `search`; this is the lab's comparison (T251).
+        """
+        k = max(1, min(MAX_K, k))
+        ok = self._eligible(asof, exclude, domain)
+        if not ok or not (dense or bm25):
+            return []
+        rankings: list[list[int]] = []
+        if dense:
+            qv = _unit(self.embedder.embed([text]))[0]
+            sims = self._vecs[ok] @ qv
+            rankings.append(
+                sorted(
+                    range(len(ok)), key=lambda j: (-float(sims[j]), self.items[ok[j]].question_id)
+                )
+            )
+        if bm25:
+            if self._bm25 is None:
+                self._bm25 = BM25Index([p.text for p in self.items])
+            sc = self._bm25.scores(text)[ok]
+            rankings.append(
+                sorted(range(len(ok)), key=lambda j: (-float(sc[j]), self.items[ok[j]].question_id))
+            )
+        fused = rrf(rankings)
+        order = sorted(fused, key=lambda j: (-fused[j], self.items[ok[j]].question_id))
+        if rerank is not None:
+            head = order[: max(k, pool)]
+            scores = list(rerank(text, [self.items[ok[j]].text for j in head]))
+            ranked = sorted(
+                zip(head, scores, strict=True),
+                key=lambda t: (-t[1], self.items[ok[t[0]]].question_id),
+            )
+            return [(self.items[ok[j]], float(sc)) for j, sc in ranked[:k]]
+        return [(self.items[ok[j]], fused[j]) for j in order[:k]]
+
+    def tool_result_hybrid(
+        self,
+        text: str,
+        asof: datetime,
+        *,
+        k: int,
+        exclude: str,
+        domain: str | None,
+        rerank: Callable[[str, Sequence[str]], Sequence[float]] | None,
+        reranker_name: str = "",
+    ) -> dict[str, Any]:
+        """As `tool_result`, ranked by BM25 + dense + RRF and optionally a cross-encoder."""
+        hits = self.search_hybrid(text, asof, k=k, exclude=exclude, domain=domain, rerank=rerank)
+        yes = sum(p.outcome for p, _ in hits)
+        return {
+            "eligible_rule": "questions resolved before the forecast time only",
+            "matches": [
+                {
+                    "question": p.text,
+                    "target_date": p.target_date.isoformat(),
+                    "outcome": "YES" if p.outcome else "NO",
+                    "observed_value": p.observed_value,
+                    "score": round(s, 3) if math.isfinite(s) else None,
+                }
+                for p, s in hits
+            ],
+            "yes_rate_of_matches": round(yes / len(hits), 3) if hits else None,
+            "retriever": f"bm25+{self.embedder.name}+rrf" + (f"+{reranker_name}" if rerank else ""),
+        }
 
     def tool_result(
         self, text: str, asof: datetime, *, k: int, exclude: str, domain: str | None

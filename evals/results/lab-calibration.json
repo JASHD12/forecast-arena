@@ -1,0 +1,71 @@
+{
+ "kind": "evaluation",
+ "experiment": "calibration",
+ "title": "Calibration methods compared: identity, Platt, isotonic, beta",
+ "created_at": "2026-11-21T14:56:09Z",
+ "why": "Probabilistic forecasts are only useful if they are calibrated; production teams monitor and re-calibrate them (docs/SOURCES.md, lab sources).",
+ "prereg_sha256": null,
+ "dataset_sha256": {},
+ "artefacts": {},
+ "metrics": {
+  "identity": {
+   "n": 1470,
+   "brier": 0.1935,
+   "ece": 0.0699
+  },
+  "platt": {
+   "n": 1470,
+   "brier": 0.1921,
+   "ece": 0.0546
+  },
+  "isotonic": {
+   "n": 1470,
+   "brier": 0.193,
+   "ece": 0.0562
+  },
+  "beta": {
+   "n": 1470,
+   "brier": 0.1922,
+   "ece": 0.0545
+  }
+ },
+ "paired": [
+  {
+   "a": "platt",
+   "b": "identity",
+   "diff": -0.0014584148423695158,
+   "lo": -0.003350177189809201,
+   "hi": 0.00048042308346649343,
+   "n": 1470,
+   "days": 245
+  },
+  {
+   "a": "isotonic",
+   "b": "identity",
+   "diff": -0.0005595048928001046,
+   "lo": -0.003482744987300618,
+   "hi": 0.0024895594620065473,
+   "n": 1470,
+   "days": 245
+  },
+  {
+   "a": "beta",
+   "b": "identity",
+   "diff": -0.0012632784571500566,
+   "lo": -0.003184469254973624,
+   "hi": 0.0007393733363119199,
+   "n": 1470,
+   "days": 245
+  }
+ ],
+ "cost_usd": 0.0,
+ "notes": [
+  "The `ml` backtest probabilities of run power-2025-11-01-2026-10-31-20261113T0954, re-calibrated day by day on earlier days only (batch days 2026-03-01 to 2026-10-31, 120 warm-up days, weekly refit).",
+  "Identity is the power champion as it is (it is already Platt-calibrated inside its own training)."
+ ],
+ "limits": [
+  "A backtest, not live: one market, one year, six strongly correlated questions a day.",
+  "Re-calibrating already calibrated probabilities can only add noise unless the model drifted; no live change follows from this study (rule I8)."
+ ],
+ "card": "docs/lab/calibration.md"
+}

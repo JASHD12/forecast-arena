@@ -1,0 +1,55 @@
+{
+ "kind": "evaluation",
+ "experiment": "grounding",
+ "title": "Numeric grounding of model rationales",
+ "created_at": "2026-11-21T14:53:16Z",
+ "why": "Checking generated answers against their source data is the cheapest first line of LLM evaluation, before any LLM-as-judge (docs/SOURCES.md, lab sources).",
+ "prereg_sha256": null,
+ "dataset_sha256": {},
+ "artefacts": {},
+ "metrics": {
+  "agent": {
+   "n": 80,
+   "numbers": 859,
+   "not_in_prompt_pct": 44.1,
+   "rationales_with_not_in_prompt_pct": 88.8
+  },
+  "agent_graph": {
+   "n": 25,
+   "numbers": 299,
+   "not_in_prompt_pct": 56.5,
+   "rationales_with_not_in_prompt_pct": 100.0
+  },
+  "llm_context": {
+   "n": 83,
+   "numbers": 788,
+   "not_in_prompt_pct": 41.8,
+   "rationales_with_not_in_prompt_pct": 75.9
+  },
+  "llm_local": {
+   "n": 78,
+   "numbers": 337,
+   "not_in_prompt_pct": 20.5,
+   "rationales_with_not_in_prompt_pct": 52.6
+  },
+  "llm_plain": {
+   "n": 84,
+   "numbers": 301,
+   "not_in_prompt_pct": 40.5,
+   "rationales_with_not_in_prompt_pct": 52.4
+  }
+ },
+ "paired": [],
+ "cost_usd": 0.0,
+ "notes": [
+  "Every stored live rationale and key factor with a stored morning context (350 rationales; 1008 forecasts in the ledger).",
+  "Trivial numbers (small integers, years, dates) are ignored. A number counts as in the prompt if it equals one in the question, the rule or the context within its rounding or 1%."
+ ],
+ "limits": [
+  "Not in the prompt is an upper bound on invented figures: a model can compute things (a weekly mean of seven values, for example) that are legitimate but not literally in the prompt.",
+  "The agents also read tool results (series, base rates, retrieval) that are not part of the stored morning context, so their share is overstated here.",
+  "It does not judge whether the reasoning is good, only whether the figures it quotes can be traced.",
+  "Small sample: the live record is a few days old; the numbers will move."
+ ],
+ "card": "docs/lab/grounding.md"
+}

@@ -116,3 +116,43 @@ Filled in per source by T023, T040, T042, T044.
 | Series 125 (hour, DE): latest weekly chunk (week of 2026-11-16 Berlin) had values up to 2026-11-19 22:00 UTC, `meta_data.created` 2026-11-18 17:06 UTC, still unchanged at 16:06 UTC on 2026-11-19; the remaining hours of the chunk were null. So D+1 forecasts had not appeared by 16:06 UTC on D | live call, one observation | 2026-11-19 |
 
 | Series 125 again: on 2026-11-19 at about 19:26 UTC the latest chunk had values up to 2026-11-20 22:00 UTC and `meta_data.created` 2026-11-19 17:16:53 UTC, i.e. the forecasts for 2026-11-20 were published at about 17:16 UTC on the 19th (2026-11-18: 17:06 UTC). Both after the 09:30 UTC lock | live call, second observation | 2026-11-19 |
+
+## Experiments lab: fine-tuning stack (checked 2026-11-21)
+
+- Qwen2.5-1.5B-Instruct and Qwen2.5-0.5B-Instruct: licence `apache-2.0` (model card metadata via the Hugging Face API); revisions
+  pinned in the notebook: 1.5B `989aa7980e4cf806f80c7fef2b1adb7bc71aa306`, 0.5B `7ae557604adf67be50417f59c2c2f167def9a775`
+  (both last modified 2024-09-25, so their data predates every lab window). `YES` and `NO` are single tokens in the Qwen tokenizer
+  (ids 14004 and 8996, checked 2026-11-21).
+- peft 0.22.0 (Apache-2.0): `LoraConfig`, `get_peft_model`, `prepare_model_for_kbit_training` signatures read from the installed package.
+- transformers 5.22.2: `BitsAndBytesConfig` arguments `load_in_4bit`, `bnb_4bit_quant_type`, `bnb_4bit_use_double_quant`,
+  `bnb_4bit_compute_dtype`; `Qwen2ForCausalLM.forward(..., logits_to_keep=...)`; `get_cosine_schedule_with_warmup`.
+- bitsandbytes 0.50.2 (MIT): installed only inside the Colab notebook (needs a CUDA GPU).
+- llama.cpp `convert_hf_to_gguf.py` and `llama-quantize`: the notebook clones the current default branch and records the commit in
+  `run_summary.json` (not pinned, because a verified tag could not be looked up from the build sandbox).
+
+## Experiments lab: what companies use (lab sources, seen 2026-11-21 through web search; most pages not read in full)
+
+Used for the one-line "why companies use it" on the Lab page. Confidence: V = primary source seen, S = secondary write-up.
+
+- RAG with hybrid retrieval and reranking: SAP, Siemens and Bosch Werkstudent postings ask for RAG (V, e.g.
+  https://jobs.sap.com/job/Walldorf-Working-Student-%28fmd%29-Generative-AI-Engineer-69190/1281420901); hybrid search with
+  Reciprocal Rank Fusion and a cross-encoder is the usual described pattern (S,
+  https://towardsdatascience.com/hybrid-search-and-re-ranking-in-production-rag).
+- Fine-tuning (LoRA/QLoRA, distillation): Uber Michelangelo supports full fine-tuning and LoRA/QLoRA (S,
+  https://www.uber.com/blog/open-source-and-in-house-how-uber-optimizes-llm-training/); Netflix post-training with SFT, DPO and
+  distillation (S, https://noise.getoto.net/2026/02/13/scaling-llm-post-training-at-netflix/); Amplify 2025 AI engineering survey:
+  41% fine-tune, about 40% of those with LoRA/QLoRA (S, https://www.notion.com/lp/ai-engineering-survey).
+- LLM evaluation and LLM-as-judge: Airbnb on evaluation noise (V,
+  https://airbnb.tech/ai-ml/from-weeks-to-a-day-how-we-made-llm-evaluation-fast-enough-to-iterate-on/); Zalando LLM-judge for search
+  quality (S, https://engineering.zalando.com/posts/2026/03/search-quality-assurance-with-llm-judge.html); Anthropic guidance on
+  rubrics (V, https://platform.claude.com/docs/en/build-with-claude/define-success).
+- Shadow deployment and safe rollout: Uber (V, https://www.uber.com/blog/raising-the-bar-on-ml-model-deployment-safety/).
+- Gateways, routing and MCP: Uber GenAI Gateway and MCP Gateway (V, https://www.uber.com/blog/genai-gateway/,
+  https://www.uber.com/blog/designing-mcp-gateway/).
+- Probabilistic and global forecasting: Zalando inventory optimisation with LightGBM global models (S,
+  https://engineering.zalando.com/posts/2025/06/inventory-optimisation-system.html).
+- Retrieval models used by the lab (checked with the installed fastembed 0.9.1): `BAAI/bge-small-en-v1.5` (dense, MIT) and the
+  cross-encoder `Xenova/ms-marco-MiniLM-L-6-v2` (apache-2.0, 0.08 GB).
+
+## ONNX export and runtime (T277), checked 2026-11-21
+- `skl2onnx` 1.20.0: conversion of `HistGradientBoostingRegressor(loss="quantile")` fails when building the `TreeEnsembleRegressor` node (tested locally); `onnxmltools` 1.16.0 `convert_lightgbm` works for LightGBM quantile regressors (max difference 1.1e-6 against LightGBM). Licences: onnxmltools Apache-2.0, onnx Apache-2.0, onnxruntime 1.31.1 MIT (package metadata).

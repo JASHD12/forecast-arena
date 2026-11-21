@@ -1138,3 +1138,9 @@ and evidence requirements. Do not backfill historical ML forecasts.
 - Context: the owner asked why the fine-tuned model is not retrained automatically and chose their own machine (MacBook Air M5, 16 GB) with a monthly schedule over paid GPUs. Colab cannot be scheduled.
 - Decision: retrain rule pre-registered in `lab/prereg/qlora-retrain.md`: replayed data only, promote only if not worse on a held-out window, promotion is a PR the owner merges. The Mac recipe is MLX LoRA (bitsandbytes is CUDA-only), accepted only after a smoke run.
 - Alternatives: paid GitHub GPU runner or rented GPU (needs spending and an account, not pre-approved); daily Colab (manual); retrain weekly (versions too short-lived to evaluate).
+
+## 2026-11-21 T277: ONNX export of the LightGBM power models
+- Context: serving parity for the deployed container, no joblib or LightGBM needed at inference.
+- Decision: `forecasters/onnx_power.py` exports `power-lgbq` and `power-glgbq` with onnxmltools 1.16.0 (Apache-2.0) and serves with onnxruntime 1.32.0 (MIT); `POST /predict/power` in the API (503 without `ARENA_ONNX_DIR`). New files `requirements/onnx.txt` (export, CI) and `requirements/serve.txt` (runtime, Docker). Parity tolerance 1e-4 (float32 trees give about 1e-6 on quantiles), not 1e-6 as first planned.
+- Not done: the live champion `power-gbq` (scikit-learn HistGradientBoosting, quantile loss) does not convert with skl2onnx 1.20.0 (checked 2026-11-21, `TreeEnsembleRegressor` node cannot be built), so it stays on joblib. The ONNX hash is in the exported manifest, not yet in the weekly registry metadata; Docker CI proves the route and the runtime import, the numeric parity is proven by the unit tests in the `check` job.
+- Alternatives: convert the champion by hand (risk of silent mismatch); export only to a file without an endpoint.

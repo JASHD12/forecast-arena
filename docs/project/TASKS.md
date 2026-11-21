@@ -811,7 +811,8 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
     ranges), shown on Status and as an informational morning health check (never fails a run or a clean day). First real finding: a brand-new
     Wikipedia article had 5 days of views.
 - [x] T276b · Experimental 80% conformal interval for electricity mean-price questions (deps: T270)
-- [ ] T277 · ONNX export and `/predict/power` parity in the deployed container (deps: T270)
+- [x] T277 · ONNX export and `/predict/power` parity in the deployed container (deps: T270)
+  - Done 2026-11-21: LightGBM families only (the live HGB champion does not convert, see DECISIONS); parity 1e-4; Docker CI checks the route and runtime import.
 - [ ] T279 · Launch checks: dry-run measurement of runner time and tokens, then flags one at a time (deps: T271, T274)
 - [ ] T281a · Mac smoke run: MLX LoRA on 200 rows, measure memory, minutes and Brier; go/no-go against `lab/prereg/qlora-retrain.md` (deps: T246; needs H33)
 - [ ] T281b · `src/arena/lab/retrain.py` and `scripts/retrain_mac.sh`: monthly retrain, held-out comparison, promote-or-keep, asset upload, PR (deps: T281a)

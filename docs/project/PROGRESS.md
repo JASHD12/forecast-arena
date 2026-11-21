@@ -65,6 +65,7 @@ Nothing. See the session summary above and `python scripts/status.py`.
   output, not acted on (S11).
 
 ## Done log
+- 2026-11-21 T277: ONNX export/serve of the LightGBM power models (`onnx_power.py`, `POST /predict/power`); HGB champion does not convert; parity 1e-4.
 - T276b: experimental 80% conformal band (CQR margin from the weekly summary) in `ml` meta for power questions, shown on the question page and its coverage on Status; probability and version unchanged.
 - 2026-11-21 T235: recheck of the live build; question-page chart phone layout, bars row on phones, audit tools robust to real file names
 - 2026-11-21 T234: sweep of all page types at three widths; Status, tables, forest labels, index pages, tap targets fixed; layout audit extended (clipping, headings, ids, document basics)

@@ -1129,3 +1129,7 @@ and evidence requirements. Do not backfill historical ML forecasts.
 - Decision (owner, in chat): (1) the fine-tuned model runs live as `llm_local_ft` whatever its backtest result is, frozen and pre-registered, labelled experimental; (2) the daily LLM token cap goes from 150,000 to 300,000; (3) all lab techniques also run live: cascade router, agent with hybrid retrieval and guards, weekly challengers (global LightGBM, Chronos-2), live monitoring on Status. SPEC 17 L1 is amended and the shadow-forecasting tasks T249 and T263 are superseded.
 - Integrity: integrity rules I4 and I8 stay. Backtest first, then freeze the version and go live, as `ml` did; the model is trained on replayed days up to 2026-06-30 only. New forecasters have their own ids and versions, stay out of `COMMON_GROUP` and the ensemble, and follow the same sample, skip and budget rules (I6).
 - Alternatives: keep everything offline (rejected by the owner); go live only if the backtest is not worse than `llm_local` (rejected by the owner: a loser is also a result).
+
+## 2026-11-21 T272: three more series colours
+- Context: the chart palette had eight validated slots; the three experimental forecasters need their own.
+- Decision: slots 9 to 11 (teal, brown, olive; light and dark values) added to the stylesheet. They have not been checked for colour-blind separation like slots 1 to 8, so the forecaster name is always written next to the line (legends and labels), never colour alone.

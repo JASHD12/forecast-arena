@@ -82,11 +82,23 @@ SERIES_SLOTS = {
     "human_panel": 7,
     "agent_graph": 8,
     "llm_local": 6,  # shares the ensemble slot until T134 adds a validated ninth colour
+    "llm_local_ft": 9,  # experimental forecasters (Phase 15): own colours, see DECISIONS
+    "llm_router": 10,
+    "agent_hybrid": 11,
 }
 RACE_MIN_DAYS = 7  # a line chart over fewer days is noise, not a race
 RACE_WIDE = (700, 300, (16, 220, 34, 44))  # viewBox width, height, pad (top, right, bottom, left)
 RACE_NARROW = (360, 300, (16, 12, 34, 40))  # phones: text in viewBox units stays readable
-AI_FORECASTERS = ("llm_plain", "llm_context", "agent", "agent_graph", "llm_local")
+AI_FORECASTERS = (
+    "llm_plain",
+    "llm_context",
+    "agent",
+    "agent_graph",
+    "llm_local",
+    "llm_local_ft",
+    "llm_router",
+    "agent_hybrid",
+)
 RACE_LABEL_CHARS = 20  # longest name drawn next to a line (the legend has the full name)
 HIGHLIGHT = ("ml", "base_rate")
 

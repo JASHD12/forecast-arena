@@ -790,8 +790,12 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
 
 - [x] T270 · Governance for going live: SPEC 17 amended, information-set rows, DECISIONS, H32 (deps: T264a)
   - Done 2026-11-21: owner decisions recorded (fine-tuned model live whatever its backtest result; token cap 300,000; all lab techniques live).
-- [ ] T271 · `llm_local_ft`: the fine-tuned model as a live forecaster (deps: T270; code now, go-live needs: H26, H28, H32)
-- [ ] T272 · Site and boards for the experimental forecasters (deps: T271)
+- [ ] T271 · `llm_local_ft`: the fine-tuned model as a live forecaster (deps: T270; needs: H26, H28, H32)
+  - Code done 2026-11-21 (forecaster, pin file loader with hash-verified download, llama.cpp scorer, flag `ARENA_LLM_LOCAL_FT` default off,
+    workflow cache step); goes live after the Colab artefacts, the parity check and H32.
+- [x] T272 · Site and boards for the experimental forecasters (deps: T271)
+  - Done 2026-11-21: names "(experimental)", colour slots 9 to 11, Methods information-set rows, health roster, Lab page section that lists
+    the ones that have published; they are in no common group and not in the ensemble (tests).
 - [ ] T273 · `llm_router`: cascade forecaster over the other forecasts (deps: T271; needs: H31)
 - [ ] T274 · `agent_hybrid`: the agent with hybrid retrieval and guards (deps: T270)
 - [ ] T275 · Weekly challengers: global LightGBM and Chronos-2 (deps: T270)

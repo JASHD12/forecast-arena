@@ -26,6 +26,9 @@
 {% else %}
 <p class="empty">No experiment has finished yet. The first is a QLoRA fine-tune of the small open model; its result will appear here with the interval, whichever way it falls.</p>
 {% endfor %}
+{% if live %}<section class="card" aria-labelledby="lab-live"><h2 id="lab-live">Running live as experimental forecasters</h2>
+<p class="note">These also publish forecasts before every lock, like the other forecasters. Their scores are on the <a href="leaderboard.html">leaderboard</a> (outside the headline board) and their pages below; nothing about them changes because of live results.</p>
+<ul class="plain">{% for x in live %}<li><a href="forecasters/{{ x.fid }}.html">{{ x.name }}</a> <span class="muted">({{ x.n }} forecasts since {{ x.first_day }})</span></li>{% endfor %}</ul></section>{% endif %}
 <h2>Planned</h2>
 <ul class="plain">{% for name, status in planned %}<li><strong>{{ name }}</strong> <span class="muted">({{ status }})</span></li>{% endfor %}</ul>
 <p class="note">Design and rules: <a href="{{ repo_url }}/blob/main/docs/project/LAB_PLAN.md"><code>docs/project/LAB_PLAN.md</code></a>.</p>

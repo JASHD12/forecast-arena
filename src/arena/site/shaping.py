@@ -11,7 +11,7 @@ import html
 import json
 import re
 import urllib.parse
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from datetime import date
 from pathlib import Path
 from typing import Any
@@ -217,6 +217,9 @@ def _rows(questions: Sequence[Question], rec: Any) -> tuple[list[dict[str, Any]]
         "llm_local",
         "agent",
         "agent_graph",
+        "llm_local_ft",
+        "llm_router",
+        "agent_hybrid",
     ]
     ordered = [f for f in order if f in fids] + sorted(fids - set(order))
     return rows, ordered
@@ -426,3 +429,17 @@ def agent_trace_of_day(
         "probability": None if fc is None else fc.probability,
         "outcome": None if qid not in rec.resolutions else rec.resolutions[qid].outcome,
     }
+
+
+def experimental_live(rec: Any, names: Mapping[str, str]) -> list[dict[str, Any]]:
+    """The experimental forecasters that have written to the ledger: forecasts and first day."""
+    from arena.site.content import EXPERIMENTAL_FORECASTERS
+
+    out = []
+    for fid in sorted(EXPERIMENTAL_FORECASTERS):
+        fs = [f for f in rec.forecasts if f.forecaster_id == fid]
+        if not fs:
+            continue
+        days = sorted(f.created_at.date().isoformat() for f in fs)
+        out.append({"fid": fid, "name": names.get(fid, fid), "n": len(fs), "first_day": days[0]})
+    return out

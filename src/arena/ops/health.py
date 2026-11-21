@@ -39,7 +39,18 @@ FRESH_WITHIN = timedelta(hours=36)
 FRESH_OVERRIDES = {"markets": timedelta(hours=96)}
 MAX_PARSE_FAILURE_RATE = 0.20
 MIN_LLM_ANSWERS = 5
-LLM_FORECASTERS = frozenset({"llm_plain", "llm_context", "llm_local", "agent", "agent_graph"})
+LLM_FORECASTERS = frozenset(
+    {
+        "llm_plain",
+        "llm_context",
+        "llm_local",
+        "agent",
+        "agent_graph",
+        "llm_local_ft",
+        "llm_router",
+        "agent_hybrid",
+    }
+)
 INCIDENT_LABEL = "incident"
 INCIDENT_TITLE = "Forecast Arena incident: a job or health check failed"
 CORE_FORECASTERS = frozenset(
@@ -53,6 +64,7 @@ def expected_forecasters(settings: Settings) -> frozenset[str]:
         CORE_FORECASTERS
         | ({"llm_local"} if settings.llm_local else set())
         | ({"agent_graph"} if settings.agent_graph else set())
+        | ({"llm_local_ft"} if settings.llm_local_ft else set())
     )
 
 

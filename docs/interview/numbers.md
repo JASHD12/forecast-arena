@@ -213,6 +213,18 @@ Source: `evals/results/lab-calibration.json`; card `docs/lab/calibration.md`
 | isotonic | 1470 | 0.193 | 0.0562 |
 | platt | 1470 | 0.1921 | 0.0546 |
 
+### Conformal price bands: coverage by month
+
+Source: `evals/results/lab-conformal.json`; card `docs/lab/conformal.md`
+
+| Arm | Questions | Months | 80% band, raw | 80% band, conformal | 90% band, raw | 90% band, conformal |
+|---|---|---|---|---|---|---|
+| evening | 214 | 7 | 0.696 | 0.822 | 0.869 | 0.911 |
+| max | 214 | 7 | 0.766 | 0.799 | 0.893 | 0.907 |
+| mean | 214 | 7 | 0.71 | 0.794 | 0.804 | 0.925 |
+| min | 214 | 7 | 0.64 | 0.761 | 0.762 | 0.907 |
+| spread | 214 | 7 | 0.715 | 0.832 | 0.822 | 0.911 |
+
 ### Guardrails and red-team suite for untrusted tool and news text
 
 Source: `evals/results/lab-guardrails.json`; card `docs/lab/guardrails.md`

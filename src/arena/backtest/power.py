@@ -15,6 +15,7 @@ from arena.forecasters.ml_power import PowerModel, train
 #: Challenger name -> forecaster id in the backtest report.
 CHALLENGER_IDS = {
     "lgbm": "ml_lgbm",
+    "glgbm": "ml_glgbm",
     "mlp": "ml_mlp",
     "ets": "ts_ets",
     "sarimax": "ts_sarimax",
@@ -86,6 +87,14 @@ def run(
             )
             f.forecaster_id = "ml_lgbm"
             out.append(f)
+        if "glgbm" in challengers:
+            from arena.forecasters.ml_power_global import train_global
+
+            gl = MLForecaster(
+                {}, refresher("glgbm", lambda c: train_global(domain, c, folds=folds))
+            )
+            gl.forecaster_id = "ml_glgbm"
+            out.append(gl)
         if "mlp" in challengers:
             from arena.forecasters.ml_power_torch import train_torch
 

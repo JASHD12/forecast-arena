@@ -192,13 +192,16 @@ def train(
     fitter: Callable[[np.ndarray, np.ndarray], list[Any]] | None = None,
     family: str = MODEL_FAMILY,
     params: dict[str, Any] | None = None,
+    multi_fitter: Callable[[np.ndarray, dict[str, np.ndarray]], dict[str, list[Any]]] | None = None,
 ) -> PowerModel:
     """Fit on targets up to `train_end`; calibrate on out-of-fold predictions of the real
     questions in the last `folds` x `fold_days` days (expanding window, `gap_days` gap).
 
     `fitter(x, y)` returns one fitted regressor per level in QUANTILES (default: the
     histogram gradient boosting of `fit_quantiles`); `family` names the model in its
-    version, so a challenger family never collides with the champion's artefacts."""
+    version, so a challenger family never collides with the champion's artefacts.
+    `multi_fitter(x, {stat: y})` fits all statistics at once (a global model, T275) and returns
+    {stat: one regressor per level}; it replaces `fitter`."""
     if fitter is None:
 
         def fitter(x: np.ndarray, y: np.ndarray) -> list[Any]:
@@ -217,7 +220,9 @@ def train(
         if len(x) < 200:
             continue
         fold_model = PowerModel(
-            train_end=f_start, models={s: fitter(x, y[s]) for s in STATS}, family=family
+            train_end=f_start,
+            models=multi_fitter(x, y) if multi_fitter else {s: fitter(x, y[s]) for s in STATS},
+            family=family,
         )
         b = f_start - timedelta(days=1)
         while b < f_end:
@@ -232,7 +237,7 @@ def train(
     model = PowerModel(
         train_end=train_end,
         n_train=len(targets),
-        models={s: fitter(x, y[s]) for s in STATS},
+        models=multi_fitter(x, y) if multi_fitter else {s: fitter(x, y[s]) for s in STATS},
         family=family,
         params=dict(params or {}),
     )

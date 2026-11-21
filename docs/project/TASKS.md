@@ -800,7 +800,10 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
 - [x] T274 · `agent_hybrid`: the agent with hybrid retrieval and guards (deps: T270)
   - Done 2026-11-21 (code, flag `ARENA_AGENT_HYBRID` default off): `agent/hybrid.py`, guard hook in the toolbox (flags in the trace), hybrid
     similar-questions tool with the leakage rule, a missing reranker is a visible `model_missing` skip; launch in T279 after a dry-run measurement.
-- [ ] T275 · Weekly challengers: global LightGBM and Chronos-2 (deps: T270)
+- [x] T275a · Weekly challenger: global LightGBM (family `power-glgbq`) (deps: T270)
+  - Done 2026-11-21: `ml_power_global.py` (one LightGBM per level over all five statistics, statistic one-hot, standardised targets), `multi_fitter` hook in
+    `ml_power.train`, weekly family `glgbm`, backtest challenger `ml_glgbm`; promotion only by the existing weekly rule.
+- [ ] T275b · Chronos-2 as a challenger (needs a lazily loaded pretrained artefact in the registry; the model weights are about 0.5 GB) (deps: T275a)
 - [x] T276a · Live monitoring: grounding table and data contracts on Status (deps: T270)
   - Done 2026-11-21: `lab/grounding.rationale_checks` feeds a 7-day table on Status; `ops/contracts.py` checks stored contexts (freshness, completeness,
     ranges), shown on Status and as an informational morning health check (never fails a run or a clean day). First real finding: a brand-new

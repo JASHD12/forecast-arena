@@ -388,6 +388,9 @@ def weekly_setup(
             from arena.forecasters import ml_power_lgbm
 
             fams["lgbm"] = lambda cut: ml_power_lgbm.train_lgbm(pdom, cut, n_trials=20, folds=2)
+            from arena.forecasters import ml_power_global
+
+            fams["glgbm"] = lambda cut: ml_power_global.train_global(pdom, cut, folds=2)
         if importlib.util.find_spec("torch"):
             from arena.forecasters import ml_power_torch
 

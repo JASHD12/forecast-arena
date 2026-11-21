@@ -1107,3 +1107,8 @@ and evidence requirements. Do not backfill historical ML forecasts.
 - Context: boxes touched wherever a template forgot a margin (home, recruiters, findings, play).
 - Decision: `:where(main > .wrap, .game) > * + *` and the same inside cards give every block the same gap, and any component that sets its own margin still wins; a browser audit (`tools/a11y/layout.js`) keeps it that way.
 - Rejected: a sticky contents rail for long pages (narrows tables and the six-step diagram; the chip list is compact enough); rewriting each template's margins one by one.
+
+## 2026-11-21 T234: dates are wrapped in the built HTML, not in the templates
+- Context: tables broke dates and model versions at their hyphens ("2026-" / "11-21").
+- Decision: one post-processing pass (`site/typography.nowrap_dates`) wraps ISO dates in the page body text in a no-break span; attributes, the head and scripts are never touched, and tests that compare page text strip the span.
+- Rejected: non-breaking hyphens in the text (changes what is copied and searched), per-template spans (easy to miss).

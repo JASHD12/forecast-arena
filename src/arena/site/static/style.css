@@ -126,7 +126,7 @@ h3 { font-size: 1.05rem; margin: 0; line-height: 1.35; }
 .bars { list-style: none; margin: 0; padding: 0; display: grid; gap: .35rem; }
 .bars li { display: grid; grid-template-columns: 11rem 1fr 3rem; gap: .5rem; align-items: center;
   font-size: .85rem; }
-.bars .who { color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bars .who { color: var(--muted); overflow-wrap: anywhere; line-height: 1.25; }
 .bars .track { height: .55rem; background: var(--track); border-radius: 999px; overflow: hidden; }
 .bars .fill { display: block; height: 100%; background: var(--bar); border-radius: 999px; }
 .bars .ai .fill { background: var(--bar-ai); }
@@ -805,3 +805,28 @@ main > .wrap > h3 { margin: var(--s-5) 0 var(--s-3); }
 .cal-panel svg { width: 100%; height: auto; max-width: 24rem; margin: 0 auto; display: block; }
 @media (max-width: 48rem) { .cal-panel { grid-template-columns: minmax(0, 1fr); padding: var(--s-4); } }
 .cal-panel .note { font-size: .95rem; }
+
+/* T234: sweep fixes */
+.nw { white-space: nowrap; }
+table code, .table-scroll code { overflow-wrap: break-word; }
+.grid-cards { align-items: start; }
+.index-cards { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: var(--s-4); }
+.index-cards > li { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: var(--s-4) var(--s-5); box-shadow: var(--shadow); display: grid; gap: var(--s-2); align-content: start; }
+.index-cards > li > a { font-size: 1.05rem; text-decoration: none; }
+.index-cards > li > a:hover { text-decoration: underline; }
+.card > .timeline:last-child { margin-bottom: 0; }
+/* a visible cue (edge shadow) only while a table can still scroll sideways */
+.table-scroll { background:
+    linear-gradient(to right, var(--surface) 30%, rgba(255, 255, 255, 0)) 0 0 / 2.5rem 100% no-repeat local,
+    linear-gradient(to left, var(--surface) 30%, rgba(255, 255, 255, 0)) 100% 0 / 2.5rem 100% no-repeat local,
+    radial-gradient(farthest-side at 0 50%, rgba(0, 0, 0, .22), rgba(0, 0, 0, 0)) 0 0 / .9rem 100% no-repeat scroll,
+    radial-gradient(farthest-side at 100% 50%, rgba(0, 0, 0, .22), rgba(0, 0, 0, 0)) 100% 0 / .9rem 100% no-repeat scroll,
+    var(--surface); }
+.duo > .card { display: flex; flex-direction: column; }
+.duo > .play-teaser > p:last-child { margin-top: auto; padding-top: var(--s-3); }
+.about-grid { align-items: start; }
+main summary { min-height: 1.5rem; }
+.sortable th button { min-height: 1.5rem; padding: .15rem 0; }
+.game input[type="range"] { height: 1.5rem; }

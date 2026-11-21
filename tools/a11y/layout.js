@@ -75,6 +75,55 @@ function audit() {
     const r = e.getBoundingClientRect();
     if (r.right > right + 1 || r.left < left - 1) out.push(`sticks out of the column: ${name(e)} (${Math.round(r.left)}..${Math.round(r.right)} vs ${Math.round(left)}..${Math.round(right)})`);
   }
+  // ---- T234: clipping, empty boxes, tiny controls, heading order, document basics ----
+  const seenX = new Set();
+  const note = (msg) => { if (!seenX.has(msg)) { seenX.add(msg); out.push(msg); } };
+  for (const e of wrap.querySelectorAll('*')) {
+    if (!shown(e) || e.closest('svg, .sr-only, pre, .table-scroll, .hero')) continue;
+    const c = getComputedStyle(e);
+    if ((c.overflow === 'hidden' || c.textOverflow === 'ellipsis') && e.scrollWidth > e.clientWidth + 1 && e.clientWidth > 0) {
+      note(`text clipped: ${name(e)} (${e.scrollWidth} > ${e.clientWidth})`);
+    }
+    if (e.children.length === 0 && e.textContent.trim() && parseFloat(c.fontSize) < 10.5) {
+      note(`tiny text (${c.fontSize}): ${name(e)}`);
+    }
+  }
+  for (const e of document.querySelectorAll('main button, main input, main summary, main select')) {
+    if (!shown(e) || e.closest('.sr-only')) continue;
+    const r = e.getBoundingClientRect();
+    if (r.height < 24 || r.width < 24) note(`small tap target ${Math.round(r.width)}x${Math.round(r.height)}: ${name(e)}`);
+  }
+  for (const card of document.querySelectorAll('main .card')) {
+    if (!shown(card)) continue;
+    const kids = Array.from(card.children).filter(shown);
+    if (!kids.length) continue;
+    const cr = card.getBoundingClientRect();
+    const slack = cr.bottom - parseFloat(getComputedStyle(card).paddingBottom) - kids[kids.length - 1].getBoundingClientRect().bottom;
+    if (slack > 90) note(`empty space (${Math.round(slack)} px) at the bottom of ${name(card)}`);
+  }
+  const heads = Array.from(document.querySelectorAll('h1, h2, h3, h4')).filter(shown);
+  if (document.querySelectorAll('h1').length !== 1) note(`${document.querySelectorAll('h1').length} h1 elements`);
+  let prev = 0;
+  for (const h of heads) {
+    const lvl = +h.tagName[1];
+    if (!h.textContent.trim()) note(`empty heading ${name(h)}`);
+    if (prev && lvl > prev + 1) note(`heading level jumps h${prev} -> h${lvl}: ${h.textContent.trim().slice(0, 40)}`);
+    prev = lvl;
+  }
+  const ids = {};
+  for (const e of document.querySelectorAll('[id]')) ids[e.id] = (ids[e.id] || 0) + 1;
+  for (const [id, n] of Object.entries(ids)) if (n > 1) note(`duplicate id ${id} (${n})`);
+  if (!document.documentElement.lang) note('html has no lang');
+  if (!document.title.trim()) note('empty title');
+  if (!document.querySelector('meta[name="description"]')) note('no meta description');
+  for (const a of document.querySelectorAll('a')) {
+    const h = a.getAttribute('href');
+    if (h === null || h === '' || h === '#') note(`link without target: ${a.textContent.trim().slice(0, 30)}`);
+  }
+  for (const img of document.querySelectorAll('img')) {
+    if (!img.hasAttribute('alt')) note(`image without alt: ${img.getAttribute('src')}`);
+    if (img.complete && img.naturalWidth === 0) note(`broken image: ${img.getAttribute('src')}`);
+  }
   return out;
 }
 
@@ -88,10 +137,14 @@ function audit() {
     .concat(qs.slice(0, 3), fc.slice(0, 3), tp.slice(0, 3));
   const browser = await chromium.launch();
   let problems = 0;
-  for (const width of [1366, 390]) {
+  for (const width of [1366, 1024, 390]) {
     const ctx = await browser.newContext({ viewport: { width, height: 900 } });
     const page = await ctx.newPage();
+    let current = '';
+    page.on('pageerror', (e) => { problems += 1; console.log(`LAYOUT ${current} (${width}px): script error: ${String(e).slice(0, 120)}`); });
+    page.on('console', (m) => { if (m.type() === 'error') { problems += 1; console.log(`LAYOUT ${current} (${width}px): console error: ${m.text().slice(0, 120)}`); } });
     for (const file of list) {
+      current = path.relative(root, file);
       await page.goto(require('url').pathToFileURL(file).href);
       await page.waitForTimeout(40);
       const found = await page.evaluate(audit);
@@ -103,6 +156,6 @@ function audit() {
     await ctx.close();
   }
   await browser.close();
-  console.log(problems ? `layout: ${problems} problem(s) on ${list.length} pages` : `layout: PASS (${list.length} pages x 2 widths)`);
+  console.log(problems ? `layout: ${problems} problem(s) on ${list.length} pages` : `layout: PASS (${list.length} pages x 3 widths)`);
   process.exit(problems ? 1 : 0);
 })();

@@ -96,6 +96,7 @@ from arena.site.shaping import (
 from arena.site.titles import FORECASTER_NAMES, domain_name, forecaster_name, plain_title
 from arena.site.toc import FOLD_PAGES, TOC_PAGES, add_toc, mark_fold
 from arena.site.topics import topic
+from arena.site.typography import nowrap_dates
 
 
 @dataclass(frozen=True)
@@ -523,6 +524,8 @@ def build_site(
             race=race_data([s for s in (off if off else rehearsal) if s.domain == dom]),
         )
         (tmp / "topics" / f"{dom}.html").write_text(html_text, encoding="utf-8")
+    for page_file in tmp.rglob("*.html"):
+        page_file.write_text(nowrap_dates(page_file.read_text(encoding="utf-8")), encoding="utf-8")
     static = Path(__file__).parent / "static"
     for f in static.iterdir():
         shutil.copy(f, tmp / "static" / f.name)

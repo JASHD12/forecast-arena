@@ -4,6 +4,7 @@ every chart has a <title>/<desc>, native tooltips on marks, and a data table nex
 from __future__ import annotations
 
 import math
+import textwrap
 from collections.abc import Sequence
 from html import escape
 from typing import Any
@@ -243,7 +244,7 @@ def race_svg(
 FOREST_W, FOREST_ROW = 680, 34
 FOREST_PAD = (28, 24, 34, 170)  # top, right, bottom, left
 FOREST_NARROW = (360, 40, (30, 22, 36, 118))  # phone layout: width, row height, pad
-FOREST_LABEL_CHARS = 16  # longest row label on the phone layout (the tooltip has the full name)
+FOREST_LABEL_CHARS = 17  # characters per label line on the phone layout (two lines at most)
 
 
 def forest_svg(rows: Sequence[Any], names: dict[str, str]) -> Markup:
@@ -257,6 +258,16 @@ def forest_svg(rows: Sequence[Any], names: dict[str, str]) -> Markup:
         _forest_one(rows, names, FOREST_W, FOREST_ROW, pad, narrow=False)
         + _forest_one(rows, names, *FOREST_NARROW, narrow=True)
     )
+
+
+def _label_lines(name: str, width: int = FOREST_LABEL_CHARS) -> list[str]:
+    """A row label on at most two lines of `width` characters (the second ends in "…" if cut)."""
+    lines = textwrap.wrap(name, width=width, break_long_words=True) or [name]
+    if len(lines) > 2:
+        lines = [lines[0], " ".join(lines[1:])]
+    if len(lines[-1]) > width and len(lines) == 2:
+        lines[1] = lines[1][: width - 1] + "…"
+    return lines
 
 
 def _forest_one(
@@ -308,21 +319,24 @@ def _forest_one(
         cy = top + row_h * i + row_h / 2
         cls = series_class(r.forecaster_id)
         full = names.get(r.forecaster_id, r.forecaster_id)
-        short = (
-            full
-            if not narrow or len(full) <= FOREST_LABEL_CHARS
-            else full[: FOREST_LABEL_CHARS - 1] + "…"
-        )
-        name = escape(short)
+        lines = _label_lines(full) if narrow else [full]
         b = r.brier
         tip = escape(
             f"{names.get(r.forecaster_id, r.forecaster_id)}: {b.estimate:.3f} "
             f"(95% interval {b.low:.3f} to {b.high:.3f}, n = {r.n})"
         )
-        p.append(
-            f'<text class="rowlabel" x="{left - 12}" y="{cy + 4:.1f}" text-anchor="end">'
-            f"{name}</text>"
-        )
+        lx = left - 12
+        if len(lines) == 1:
+            p.append(
+                f'<text class="rowlabel" x="{lx}" y="{cy + 4:.1f}" text-anchor="end">'
+                f"{escape(lines[0])}</text>"
+            )
+        else:  # a long name wraps onto two lines instead of being cut off
+            p.append(
+                f'<text class="rowlabel" x="{lx}" y="{cy - 2:.1f}" text-anchor="end">'
+                f'<tspan x="{lx}">{escape(lines[0])}</tspan>'
+                f'<tspan x="{lx}" dy="1.2em">{escape(lines[1])}</tspan></text>'
+            )
         p.append(
             f'<g class="pt"><title>{tip}</title>'
             f'<rect class="hit" x="{left}" y="{cy - row_h / 2:.1f}" width="{w}" '

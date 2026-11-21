@@ -60,12 +60,14 @@ def test_home_shows_questions_and_forecasts(tmp_path) -> None:
     res = build_site(led, tmp_path / "site", CLOCK, tmp_path / "none")
     home = (res.out_dir / "index.html").read_text()
     import html as _html
+    import re as _re
 
     from arena.site.titles import plain_title
 
     assert "61%" in home and "width: 61.0%" in home and "Base rate" in home
     assert _html.escape(plain_title(q)) in home
     text = (res.out_dir / "questions" / f"{q.question_id}.html").read_text()
+    text = _re.sub(r'<span class="nw">(.*?)</span>', r"\1", text)  # dates are wrapped to not break
     assert "Exact question:" in text
     assert _html.escape(q.text) in text and _html.escape(q.resolution_rule) in text
 

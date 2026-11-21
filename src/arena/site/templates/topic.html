@@ -5,7 +5,7 @@
 <div class="kpis">
 <div class="kpi"><span class="kpi-n">{{ t.n_questions }}</span><span class="kpi-l">questions</span></div>
 <div class="kpi"><span class="kpi-n">{{ t.n_resolved }}</span><span class="kpi-l">answered</span></div>
-<div class="kpi"><span class="kpi-n">{{ t.kinds|length }}</span><span class="kpi-l">kinds of question</span></div>
+<div class="kpi"><span class="kpi-n">{{ t.kinds|length }}</span><span class="kpi-l">kind{{ "" if t.kinds|length == 1 else "s" }} of question</span></div>
 </div>
 <section class="card" aria-labelledby="tp-src"><h2 id="tp-src">Where the answers come from</h2>
 <p><strong>{{ t.source }}</strong>{% if t.url %} (<a href="{{ t.url }}">source</a>){% endif %}. Terms: {{ t.terms }}.</p>

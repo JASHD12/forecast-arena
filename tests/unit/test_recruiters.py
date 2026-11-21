@@ -25,6 +25,11 @@ CI_COVERED = (
 )
 
 
+def _plain(html: str) -> str:
+    """Page text without the no-break wrappers around dates."""
+    return html.replace('<span class="nw">', "").replace("</span>", "")
+
+
 def test_every_named_path_exists_and_is_run_by_ci() -> None:
     for skill, _, _, paths in PROOFS:
         assert paths, skill
@@ -38,7 +43,7 @@ def test_every_named_path_exists_and_is_run_by_ci() -> None:
 def test_page_links_resolve_and_placeholder_stays_private(tmp_path) -> None:
     clock = FixedClock(datetime(2026, 11, 13, tzinfo=UTC))
     res = build_site(Ledger(tmp_path / "l"), tmp_path / "site", clock, ROOT / "site_content")
-    page = (res.out_dir / "recruiters.html").read_text()
+    page = _plain((res.out_dir / "recruiters.html").read_text())
     for _, _, link, _ in PROOFS:
         if link:
             assert (res.out_dir / link.split("#")[0]).exists(), link
@@ -63,7 +68,12 @@ def test_role_cards_link_to_real_pages_and_code(tmp_path) -> None:
 
     clock = FixedClock(datetime(2026, 11, 13, tzinfo=UTC))
     res = build_site(Ledger(tmp_path / "l"), tmp_path / "site", clock, ROOT / "site_content")
-    page = (res.out_dir / "recruiters.html").read_text()
+    page = (
+        (res.out_dir / "recruiters.html")
+        .read_text()
+        .replace('<span class="nw">', "")
+        .replace("</span>", "")
+    )
     assert len(ROLE_PATHS) == 3
     for role, _, links in ROLE_PATHS:
         assert role in page and len(links) >= 2
@@ -91,7 +101,7 @@ def test_first_screen_result_comes_from_the_model_card(tmp_path) -> None:
         ROOT / "site_content",
         models_dir=ROOT / "docs" / "models",
     )
-    page = (res.out_dir / "recruiters.html").read_text()
+    page = _plain((res.out_dir / "recruiters.html").read_text())
     assert "I build forecasting systems and test them honestly." in page
     assert f"Brier {ml['ml']} vs {ml['persistence']} over {bt['days']} backtest days" in page
     vp = bt["vs_persistence"]
@@ -130,7 +140,7 @@ def test_owner_facts_are_shown_only_when_valid(tmp_path) -> None:
     (content / "recruiter_facts.json").write_text((tmp_path / "recruiter_facts.json").read_text())
     clock = FixedClock(datetime(2026, 11, 13, tzinfo=UTC))
     res = build_site(Ledger(tmp_path / "l"), tmp_path / "site", clock, content)
-    page = (res.out_dir / "recruiters.html").read_text()
+    page = _plain((res.out_dir / "recruiters.html").read_text())
     assert "· Berlin · 20 h/week from 2027-01-04" in page
     assert 'href="https://example.org/cv.pdf">Download CV (PDF)' in page
     assert "javascript:" not in page

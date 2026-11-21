@@ -163,7 +163,11 @@ ROLE_PATHS: tuple[tuple[str, str, tuple[tuple[str, str, bool], ...]], ...] = (
             ("How the LLM calls are traced", "llm.html", False),
             ("The agent loop (code)", "src/arena/agent/forecaster.py", True),
             ("Experiments lab: fine-tuning, retrieval, guardrails", "lab.html", False),
-            ("Ask the project: cited docs assistant (code)", "src/arena/lab/docs_assistant.py", True),
+            (
+                "Ask the project: cited docs assistant (code)",
+                "src/arena/lab/docs_assistant.py",
+                True,
+            ),
         ),
     ),
     (

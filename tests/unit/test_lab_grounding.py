@@ -59,3 +59,47 @@ def test_committed_result_matches_the_schema() -> None:
 
     r = LabResult.model_validate(json.loads(path.read_text()))
     assert r.experiment == "grounding" and "llm_plain" in r.metrics and r.cost_usd == 0
+
+
+def test_status_rows_use_only_the_last_days_and_skip_questions_without_a_context(tmp_path) -> None:
+    import gzip
+    from datetime import date
+    from types import SimpleNamespace as NS
+
+    from arena.ledger import Ledger, layout
+    from arena.site.shaping import grounding_rows
+
+    led = Ledger(tmp_path)
+    old, new = date(2026, 11, 1), date(2026, 11, 20)
+
+    def q(qid: str, day: date) -> NS:
+        return NS(
+            question_id=qid,
+            domain="power",
+            batch_date=day,
+            text="threshold 246",
+            resolution_rule="",
+        )
+
+    def f(qid: str, text: str) -> NS:
+        return NS(question_id=qid, forecaster_id="llm_context", rationale=text, meta={})
+
+    rec = NS(
+        questions={"a": q("a", old), "b": q("b", new), "c": q("c", new)},
+        forecasts=[f("a", "peak 314"), f("b", "mean 197 and 523"), f("c", "peak 100")],
+    )
+    for day, ctx in ((old, {"a": {"x": 314}}), (new, {"b": {"x": 197}})):  # no context for "c"
+        path = led.abspath(f"{layout.snapshot_dir('power', day)}/morning_context.json.gz")
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(gzip.compress(json.dumps(ctx).encode()))
+    rows = grounding_rows(led, rec, date(2026, 11, 21), {"llm_context": "AI with data"})
+    assert rows == [
+        {
+            "fid": "llm_context",
+            "name": "AI with data",
+            "n": 1,
+            "numbers": 2,
+            "not_in_prompt_pct": 50.0,
+            "rationales_with_not_in_prompt_pct": 100.0,
+        }
+    ]

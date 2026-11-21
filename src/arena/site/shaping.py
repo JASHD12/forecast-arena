@@ -12,7 +12,7 @@ import json
 import re
 import urllib.parse
 from collections.abc import Mapping, Sequence
-from datetime import date
+from datetime import date, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -443,3 +443,28 @@ def experimental_live(rec: Any, names: Mapping[str, str]) -> list[dict[str, Any]
         days = sorted(f.created_at.date().isoformat() for f in fs)
         out.append({"fid": fid, "name": names.get(fid, fid), "n": len(fs), "first_day": days[0]})
     return out
+
+
+def grounding_rows(
+    ledger: Any, rec: Any, today: date, names: Mapping[str, str], days: int = 7
+) -> list[dict[str, Any]]:
+    """Share of quoted numbers not in the prompt, per forecaster, over the last `days` days."""
+    from arena.lab import grounding
+
+    per = grounding.rationale_checks(ledger, rec, first_day=today - timedelta(days=days - 1))
+    rows = []
+    for fid, items in sorted(per.items()):
+        s = grounding.summarize(items)
+        rows.append({"fid": fid, "name": names.get(fid, fid), **s})
+    return rows
+
+
+def contract_status(ledger: Any, rec: Any) -> dict[str, Any] | None:
+    """Data-contract result of the latest batch day for the Status page (None: no questions)."""
+    from arena.ops.contracts import check_batch
+
+    if not rec.questions:
+        return None
+    day = max(q.batch_date for q in rec.questions.values())
+    checked, bad = check_batch(ledger, rec, day)
+    return {"day": day.isoformat(), "checked": checked, "violations": bad}

@@ -151,6 +151,20 @@ def run_checks(
             )
         )
 
+    if job == "morning" and todays:  # T276: informational data contracts on the stored contexts
+        from arena.ops.contracts import check_batch
+
+        checked, bad = check_batch(ledger, rec, today)
+        shown = "; ".join(bad[:3]) + (f"; and {len(bad) - 3} more" if len(bad) > 3 else "")
+        rep.checks.append(
+            Check(
+                "data_contracts",
+                True,  # informational: never fails a run or a clean day (SPEC 2.9)
+                f"{checked} contexts checked, {len(bad)} violations"
+                + (f": {shown}" if bad else ""),
+            )
+        )
+
     if job == "evening":  # T160: tomorrow's questions are published tonight
         nxt = today + timedelta(days=1)
         n = sum(q.batch_date == nxt for q in rec.questions.values())

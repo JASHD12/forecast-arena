@@ -177,33 +177,12 @@ def lab_card_cmd(result: Path) -> None:
 @click.pass_obj
 def lab_grounding(obj: Ctx, out: Path) -> None:
     """Check every stored live rationale for numbers that are not in its prompt (T252a)."""
-    import gzip
-
     from arena.lab import grounding as gr
     from arena.lab.results import LabResult
-    from arena.ledger import layout
     from arena.scoring.core import load
 
     rec = load(obj.ledger)
-    snaps: dict[tuple[str, object], dict[str, object]] = {}
-    per: dict[str, list[dict[str, int]]] = {}
-    for f in rec.forecasts:
-        q = rec.questions.get(f.question_id)
-        if q is None or not f.rationale:
-            continue
-        key = (q.domain, q.batch_date)
-        if key not in snaps:
-            rel = f"{layout.snapshot_dir(q.domain, q.batch_date)}/morning_context.json.gz"
-            snaps[key] = (
-                json.loads(gzip.decompress(obj.ledger.read_bytes(rel)))
-                if obj.ledger.exists(rel)
-                else {}
-            )
-        ctx = snaps[key].get(q.question_id)
-        if ctx is None:  # no stored context for this question: nothing to compare with
-            continue
-        text = f.rationale + " " + " ".join(map(str, f.meta.get("key_factors") or []))
-        per.setdefault(f.forecaster_id, []).append(gr.check(text, [q.text, q.resolution_rule], ctx))
+    per = gr.rationale_checks(obj.ledger, rec)
     metrics = {fid: gr.summarize(items) for fid, items in sorted(per.items())}
     result = LabResult(
         experiment="grounding",

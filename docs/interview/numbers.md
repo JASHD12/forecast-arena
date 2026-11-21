@@ -75,6 +75,7 @@ Source: `docs/models/power-ts.md`
 | ts_ets | 2190 | 0.2441 | [0.2263, 0.2616] | 0.7466 |
 | ts_sarimax | 2190 | 0.2279 | [0.2181, 0.2377] | 0.6607 |
 | ts_chronos | 2190 | 0.2142 | [0.2040, 0.2243] | 0.6227 |
+| ts_chronos2 | 2190 | 0.2073 | [0.1970, 0.2181] | 0.6062 |
 
 | Comparison | Difference | 95% interval | Supported? | Diebold-Mariano |
 |---|---|---|---|---|
@@ -84,9 +85,11 @@ Source: `docs/models/power-ts.md`
 | ts_ets - ml | +0.0511 | [+0.0355, +0.0671] | yes | DM = +5.96, p = 0.000 |
 | ts_sarimax - ml | +0.0349 | [+0.0240, +0.0458] | yes | DM = +6.39, p = 0.000 |
 | ts_chronos - ml | +0.0212 | [+0.0109, +0.0318] | yes | DM = +4.37, p = 0.000 |
+| ts_chronos2 - ml | +0.0143 | [+0.0045, +0.0235] | yes | DM = +3.02, p = 0.003 |
 | ts_ets - base_rate | -0.0025 | [-0.0208, +0.0154] | no (interval includes zero) | DM = -0.23, p = 0.819 |
 | ts_sarimax - base_rate | -0.0187 | [-0.0287, -0.0086] | yes | DM = -2.79, p = 0.006 |
 | ts_chronos - base_rate | -0.0324 | [-0.0431, -0.0215] | yes | DM = -4.66, p = 0.000 |
+| ts_chronos2 - base_rate | -0.0393 | [-0.0498, -0.0278] | yes | DM = -5.94, p = 0.000 |
 
 ### Wikipedia attention - 2026-10-15 to 2026-11-07, 24 batch days
 
@@ -212,6 +215,18 @@ Source: `evals/results/lab-calibration.json`; card `docs/lab/calibration.md`
 | identity | 1470 | 0.1935 | 0.0699 |
 | isotonic | 1470 | 0.193 | 0.0562 |
 | platt | 1470 | 0.1921 | 0.0546 |
+
+### Conformal price bands: coverage by month
+
+Source: `evals/results/lab-conformal.json`; card `docs/lab/conformal.md`
+
+| Arm | Questions | Months | 80% band, raw | 80% band, conformal | 90% band, raw | 90% band, conformal |
+|---|---|---|---|---|---|---|
+| evening | 214 | 7 | 0.696 | 0.822 | 0.869 | 0.911 |
+| max | 214 | 7 | 0.766 | 0.799 | 0.893 | 0.907 |
+| mean | 214 | 7 | 0.71 | 0.794 | 0.804 | 0.925 |
+| min | 214 | 7 | 0.64 | 0.761 | 0.762 | 0.907 |
+| spread | 214 | 7 | 0.715 | 0.832 | 0.822 | 0.911 |
 
 ### Guardrails and red-team suite for untrusted tool and news text
 

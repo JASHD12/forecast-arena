@@ -54,6 +54,7 @@ Each technique is tried against the project's baselines on questions it never sa
 |---|---|---|
 | Ask the project: cited answers over the project documents | evaluated (not a live score) | [docs/lab/docs-assistant.md](docs/lab/docs-assistant.md) |
 | Calibration methods compared: identity, Platt, isotonic, beta | evaluated (not a live score) | [docs/lab/calibration.md](docs/lab/calibration.md) |
+| Conformal price bands: coverage by month | evaluated (not a live score) | [docs/lab/conformal.md](docs/lab/conformal.md) |
 | Guardrails and red-team suite for untrusted tool and news text | evaluated (not a live score) | [docs/lab/guardrails.md](docs/lab/guardrails.md) |
 | Numeric grounding of model rationales | evaluated (not a live score) | [docs/lab/grounding.md](docs/lab/grounding.md) |
 | Retrieval: dense vs BM25 vs hybrid with reranking | evaluated (not a live score) | [docs/lab/retrieval-hybrid.md](docs/lab/retrieval-hybrid.md) |
@@ -111,6 +112,7 @@ All numbers below are **backtests**: past days replayed through the production c
 | ts_ets | 2190 | 0.2441 | [0.2263, 0.2616] | 0.7466 |
 | ts_sarimax | 2190 | 0.2279 | [0.2181, 0.2377] | 0.6607 |
 | ts_chronos | 2190 | 0.2142 | [0.2040, 0.2243] | 0.6227 |
+| ts_chronos2 | 2190 | 0.2073 | [0.1970, 0.2181] | 0.6062 |
 <!-- results:end -->
 
 </details>

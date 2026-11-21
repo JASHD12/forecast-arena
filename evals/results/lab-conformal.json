@@ -1,0 +1,64 @@
+{
+ "kind": "evaluation",
+ "experiment": "conformal",
+ "title": "Conformal price bands: coverage by month",
+ "created_at": "2026-11-21T20:11:19Z",
+ "why": "Calibrated uncertainty intervals are what planning teams ask of a forecasting model.",
+ "prereg_sha256": null,
+ "dataset_sha256": {},
+ "artefacts": {},
+ "metrics": {
+  "mean": {
+   "n": 214,
+   "months": 7,
+   "raw80": 0.71,
+   "conformal80": 0.794,
+   "raw90": 0.804,
+   "conformal90": 0.925
+  },
+  "max": {
+   "n": 214,
+   "months": 7,
+   "raw80": 0.766,
+   "conformal80": 0.799,
+   "raw90": 0.893,
+   "conformal90": 0.907
+  },
+  "min": {
+   "n": 214,
+   "months": 7,
+   "raw80": 0.64,
+   "conformal80": 0.761,
+   "raw90": 0.762,
+   "conformal90": 0.907
+  },
+  "spread": {
+   "n": 214,
+   "months": 7,
+   "raw80": 0.715,
+   "conformal80": 0.832,
+   "raw90": 0.822,
+   "conformal90": 0.911
+  },
+  "evening": {
+   "n": 214,
+   "months": 7,
+   "raw80": 0.696,
+   "conformal80": 0.822,
+   "raw90": 0.869,
+   "conformal90": 0.911
+  }
+ },
+ "paired": [],
+ "cost_usd": 0.0,
+ "notes": [
+  "35 month-statistic rows from 2026-04-01 to 2026-10-31; targets 80% and 90%.",
+  "Each month: model trained before a 30-day calibration window, CQR margin fitted on that window, bands scored on the month."
+ ],
+ "limits": [
+  "Seven months only; coverage in one month moves with the market regime.",
+  "Conformal guarantees assume exchangeable days, which price series are not.",
+  "Backtest of the production recipe on replayed days; not a live score."
+ ],
+ "card": "docs/lab/conformal.md"
+}

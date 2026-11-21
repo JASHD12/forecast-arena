@@ -440,13 +440,14 @@ def lab_explain(obj: Ctx, cut: str, day: str, out: Path) -> None:
     client = SmardClient(HttpClient(obj.settings.user_agent()), cache_dir=obj.settings.cache_dir)
     store = PowerHistory(client).store([PRICE_KEY], HISTORY_START, b + timedelta(days=3))
     dom = PowerDomain(store)
-    model = train(dom, c)
+    model = train(dom, c, folds=2, max_iter=60)  # lighter than live: this is an illustration
     asof = datetime.combine(b, time(5, 30), tzinfo=UTC)
     rows = example_rows(model, dom, b, asof)
     lines = [
         "# Per-forecast explanations (backtest, not the live record)",
         "",
-        f"Model `{model.version}` replayed on {day}. For each question the input features are "
+        f"Model `{model.version}` (reduced training settings, for illustration) replayed on "
+        f"{day}. For each question the input features are "
         "replaced one group at a time by their typical value (median of the last week of "
         "inputs); the change in the probability, in percentage points, is the effect. The three "
         "largest are shown. This describes what the model reacts to, not why the market moves.",

@@ -784,7 +784,7 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
   - SUPERSEDED 2026-11-21 by Phase 15: challengers enter the weekly rule as candidate families (T275); no shadow tree is built.
 - [x] T264a · Explainer 06 and the recruiter role mapping (deps: T242)
   - Done 2026-11-21: `docs/explainers/06-experiments-lab.md` (ten interview questions); each role card links a lab page or code path.
-- [ ] T264b · Lab numbers in `docs/interview/numbers.md` and a generated README table (deps: T264a)
+- [x] T264b · Lab numbers in `docs/interview/numbers.md` and a generated README table (deps: T264a)
 - [ ] T265 · Final sweep and redeploy (deps: T264b)
 
 ## Phase 15 - The lab goes live (owner decision 2026-11-21; design in docs/project/LAB_PLAN.md, Part 2)

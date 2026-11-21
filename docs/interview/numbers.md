@@ -191,6 +191,74 @@ Source: `evals/results/eval-20261119T204603.json`
 Paired Brier difference: llm_plain - llm_context: +0.0332 [-0.0997, +0.1732] on 12 items; llm_plain - agent: +0.0199 [-0.1056, +0.1619] on 12 items; llm_context - agent: -0.0133 [-0.0443, +0.0180] on 12 items
 <!-- evals:end -->
 
+<!-- lab:start -->
+## Experiments lab (evaluations; not the live record)
+
+### Ask the project: cited answers over the project documents
+
+Source: `evals/results/lab-docs-assistant.json`; card `docs/lab/docs-assistant.md`
+
+| Arm | Answerable questions | Hit % | False refusals % | Out of scope | Correct refusals % |
+|---|---|---|---|---|---|
+| docs_assistant | 20 | 60.0 | 5.0 | 6 | 83.3 |
+
+### Calibration methods compared: identity, Platt, isotonic, beta
+
+Source: `evals/results/lab-calibration.json`; card `docs/lab/calibration.md`
+
+| Arm | Questions | Brier | ECE |
+|---|---|---|---|
+| beta | 1470 | 0.1922 | 0.0545 |
+| identity | 1470 | 0.1935 | 0.0699 |
+| isotonic | 1470 | 0.193 | 0.0562 |
+| platt | 1470 | 0.1921 | 0.0546 |
+
+### Guardrails and red-team suite for untrusted tool and news text
+
+Source: `evals/results/lab-guardrails.json`; card `docs/lab/guardrails.md`
+
+| Arm | Questions | Flagged | Detected % | False positives % |
+|---|---|---|---|---|
+| all_attacks | 41 | 35 | 85.4 | - |
+| benign | 20 | 0 | - | 0.0 |
+| code_fence | 1 | 1 | 100.0 | - |
+| evasion | 6 | 0 | 0.0 | - |
+| force_output | 4 | 4 | 100.0 | - |
+| markup | 2 | 2 | 100.0 | - |
+| new_instructions | 3 | 3 | 100.0 | - |
+| override | 7 | 7 | 100.0 | - |
+| reveal_prompt | 3 | 3 | 100.0 | - |
+| role_change | 4 | 4 | 100.0 | - |
+| role_marker | 2 | 2 | 100.0 | - |
+| template_token | 3 | 3 | 100.0 | - |
+| too_long | 1 | 1 | 100.0 | - |
+| tool_spoof | 3 | 3 | 100.0 | - |
+| url | 2 | 2 | 100.0 | - |
+
+### Numeric grounding of model rationales
+
+Source: `evals/results/lab-grounding.json`; card `docs/lab/grounding.md`
+
+| Arm | Questions | Numbers checked | Numbers not in the prompt % | Rationales with such a number % |
+|---|---|---|---|---|
+| agent | 80 | 859 | 44.1 | 88.8 |
+| agent_graph | 25 | 299 | 56.5 | 100.0 |
+| llm_context | 83 | 788 | 41.8 | 75.9 |
+| llm_local | 78 | 337 | 20.5 | 52.6 |
+| llm_plain | 84 | 301 | 40.5 | 52.4 |
+
+### Retrieval: dense vs BM25 vs hybrid with reranking
+
+Source: `evals/results/lab-retrieval-hybrid.json`; card `docs/lab/retrieval-hybrid.md`
+
+| Arm | Questions | nDCG@5 | MRR | Precision@5 | Latency p50 (ms) |
+|---|---|---|---|---|---|
+| bm25 | 143 | 0.3386 | 0.8012 | 0.186 | 10.56 |
+| dense | 143 | 0.3731 | 0.5065 | 0.2126 | 51.92 |
+| hybrid_rerank | 143 | 0.5557 | 0.7425 | 0.3762 | 382.68 |
+| hybrid_rrf | 143 | 0.3464 | 0.6656 | 0.2196 | 59.86 |
+<!-- lab:end -->
+
 <!-- live:start -->
 ## Live record (ledger commit fa353ef 2026-11-13T16:40:44+00:00)
 

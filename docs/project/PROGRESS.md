@@ -65,6 +65,7 @@ Nothing. See the session summary above and `python scripts/status.py`.
   output, not acted on (S11).
 
 ## Done log
+- 2026-11-21 T264b: lab results in the interview numbers (generated); README lab table already generated.
 - 2026-11-21 T254: docs assistant (extractive, cited, offline): 60% hits, 83% correct refusals on 26 hand-written questions; one method change after the first score is disclosed.
 - 2026-11-21 T282/T283: computed rehearsal banner (streak and not-before date); README by-role guide and generated lab table.
 - 2026-11-21 T277: ONNX export/serve of the LightGBM power models (`onnx_power.py`, `POST /predict/power`); HGB champion does not convert; parity 1e-4.

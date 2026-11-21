@@ -102,6 +102,25 @@ def evals() -> str:
     return "\n\n".join(parts)
 
 
+def lab() -> str:
+    """Lab results (evaluations, never live scores); every figure is copied from the result file."""
+    sys.path.insert(0, str(ROOT / "src"))
+    from arena.lab.results import COLUMNS, load_lab_results
+
+    parts = ["## Experiments lab (evaluations; not the live record)"]
+    for r in sorted(load_lab_results(ROOT / "evals" / "results"), key=lambda r: r.title):
+        cols = [c for c in COLUMNS if any(c in m for m in r.metrics.values())]
+        rows = ["| Arm | " + " | ".join(COLUMNS[c] for c in cols) + " |"]
+        rows.append("|---|" + "---|" * len(cols))
+        for arm, m in sorted(r.metrics.items()):
+            rows.append(f"| {arm} | " + " | ".join(str(m.get(c, "-")) for c in cols) + " |")
+        parts.append(
+            f"### {r.title}\n\nSource: `evals/results/lab-{r.experiment}.json`; card `{r.card}`\n\n"
+            + "\n".join(rows)
+        )
+    return "\n\n".join(parts)
+
+
 def live(ledger: Path) -> str:
     def arena(*args: str) -> str:
         cmd = [str(ROOT / ".venv" / "bin" / "arena"), "--ledger-dir", str(ledger), *args]
@@ -140,6 +159,7 @@ def render(old: str, ledger: Path | None) -> str:
                 HEAD.rstrip(),
                 block("backtests", backtests()),
                 block("evals", evals()),
+                block("lab", lab()),
                 block("live", live_body),
             ]
         )

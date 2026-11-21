@@ -477,6 +477,31 @@ def interval_coverage(rec: Any) -> dict[str, Any] | None:
     return {"n": len(seen), "hits": hit, "share": hit / len(seen)}
 
 
+def phase_line(dec: Any, needed: int, not_before: Any, fallback: str) -> str:
+    """One sentence on where the official record stands, computed from the ledger and the
+    owner's not-before date (a far-future date counts as "not set")."""
+    from datetime import date as _date
+
+    nb = not_before if isinstance(not_before, _date) and not_before.year < 2090 else None
+    gate = (
+        f"not before {nb.isoformat()}, the date the owner fixed in advance"
+        if nb
+        else "not before a start date the owner fixes in advance (not set yet)"
+    )
+    tail = "until then results are shown but don't count towards headline scores."
+    if dec is None:
+        return fallback
+    if dec.rule:
+        return (
+            f"Rehearsal: the {needed} clean days are complete. The official record starts "
+            f"{gate}; {tail}"
+        )
+    return (
+        f"Rehearsal: {dec.streak} of {needed} clean days in a row so far. The official record "
+        f"starts the day after the {needed}th, {gate}; {tail}"
+    )
+
+
 def contract_status(ledger: Any, rec: Any) -> dict[str, Any] | None:
     """Data-contract result of the latest batch day for the Status page (None: no questions)."""
     from arena.ops.contracts import check_batch

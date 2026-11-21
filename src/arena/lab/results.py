@@ -42,7 +42,11 @@ PLANNED: tuple[tuple[str, str], ...] = (
     ("Distillation from Claude", "waiting for the QLoRA result and approval of paid runs"),
     ("Cost routing between cheap and paid forecasters", "waiting for the QLoRA scores"),
     ("LLM-as-judge with human calibration", "waiting for approval of the paid run"),
-    ("Conformal intervals, global LightGBM, foundation models, ONNX", "planned"),
+    (
+        "Global LightGBM challenger, experimental conformal interval, ONNX serving",
+        "built and running as live challengers or checks; no separate evaluation card yet",
+    ),
+    ("Chronos-2 foundation-model challenger", "planned"),
 )
 
 
@@ -83,6 +87,16 @@ COLUMNS: dict[str, str] = {
     "detected_pct": "Detected %",
     "false_positive_pct": "False positives %",
     "numbers": "Numbers checked",
+    "months": "Months",
+    "raw80": "80% band, raw",
+    "conformal80": "80% band, conformal",
+    "raw90": "90% band, raw",
+    "conformal90": "90% band, conformal",
+    "answerable": "Answerable questions",
+    "hit_pct": "Hit %",
+    "false_refusal_pct": "False refusals %",
+    "out_of_scope": "Out of scope",
+    "correct_refusal_pct": "Correct refusals %",
     "not_in_prompt_pct": "Numbers not in the prompt %",
     "rationales_with_not_in_prompt_pct": "Rationales with such a number %",
     "latency_ms_p50": "Latency p50 (ms)",

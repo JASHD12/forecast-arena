@@ -9,6 +9,7 @@ from pathlib import Path
 import click
 
 from arena.cli import Ctx, lab
+from arena.lab.docs_assistant import DOC_PATHS, DocsIndex, ask, evaluate, load_chunks
 
 
 @lab.group("dataset")
@@ -321,3 +322,140 @@ def lab_calibration(obj: Ctx, run_dir: Path, out: Path) -> None:
         click.echo(f"{name}: {m}")
     for p in paired:
         click.echo(f"{p['a']} - {p['b']}: {p['diff']:+.4f} [{p['lo']:+.4f}, {p['hi']:+.4f}]")
+
+
+def _docs_index() -> DocsIndex:
+    return DocsIndex(load_chunks(Path("."), DOC_PATHS))
+
+
+@lab.command("ask")
+@click.argument("question")
+def lab_ask(question: str) -> None:
+    """Ask the project documents a question (extractive, cited, offline; T254)."""
+    click.echo(ask(_docs_index(), question).text)
+
+
+@lab.command("docs-eval")
+@click.option(
+    "--out", type=click.Path(path_type=Path), default=Path("evals/results/lab-docs-assistant.json")
+)
+@click.pass_obj
+def lab_docs_eval(obj: Ctx, out: Path) -> None:
+    """Score the docs assistant on the hand-written question set (T254)."""
+    from arena.lab.dataset import plain_sha256
+    from arena.lab.results import LabResult
+
+    golden = Path("evals/golden/docs-qa-v1.jsonl")
+    pairs = [json.loads(line) for line in golden.read_text(encoding="utf-8").splitlines() if line]
+    metrics = {"docs_assistant": evaluate(_docs_index(), pairs)}
+    result = LabResult(
+        experiment="docs-assistant",
+        title="Ask the project: cited answers over the project documents",
+        created_at=obj.clock.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+        why=(
+            "Retrieval-grounded assistants with citations and refusals are the standard "
+            "internal-knowledge pattern."
+        ),
+        dataset_sha256={golden.name: plain_sha256(golden)},
+        metrics=metrics,  # type: ignore[arg-type]
+        notes=[f"{len(pairs)} hand-written questions; answers are extractive sentences."],
+        limits=[
+            "The method was changed once after seeing the first score (stop words removed from "
+            "the query; a hit no longer needs the expected file; the first run scored 25.0% "
+            "hits), so the final figure is optimistic.",
+            "Small, hand-written question set whose expected phrases come from the same documents.",
+            "A hit means a cited chunk contains the expected phrase, not that the answer reads "
+            "well.",
+            "Refusal uses a fixed word-coverage threshold chosen once, not tuned per question.",
+        ],
+        card="docs/lab/docs-assistant.md",
+    )
+    out.write_text(result.model_dump_json(indent=1) + "\n", encoding="utf-8")
+    click.echo(metrics)
+
+
+@lab.command("conformal")
+@click.option("--first", default="2026-04-01", show_default=True)
+@click.option("--last", default="2026-10-31", show_default=True)
+@click.option(
+    "--out", type=click.Path(path_type=Path), default=Path("evals/results/lab-conformal.json")
+)
+@click.pass_obj
+def lab_conformal(obj: Ctx, first: str, last: str, out: Path) -> None:
+    """Walk-forward coverage of the central 80% and 90% price bands, raw and conformal (T257)."""
+    from datetime import date
+
+    from arena.domains.power import PowerDomain
+    from arena.domains.power_history import HISTORY_START, PRICE_KEY, PowerHistory
+    from arena.lab import conformal_study as cs
+    from arena.lab.results import LabResult
+    from arena.sources.http import HttpClient
+    from arena.sources.smard import SmardClient
+
+    f, la = date.fromisoformat(first), date.fromisoformat(last)
+    client = SmardClient(HttpClient(obj.settings.user_agent()), cache_dir=obj.settings.cache_dir)
+    store = PowerHistory(client).store([PRICE_KEY], HISTORY_START, la + timedelta(days=3))
+    rows = cs.coverage_rows(PowerDomain(store), cs.month_windows(f, la))
+    metrics = cs.summarise(rows)
+    result = LabResult(
+        experiment="conformal",
+        title="Conformal price bands: coverage by month",
+        created_at=obj.clock.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+        why="Calibrated uncertainty intervals are what planning teams ask of a forecasting model.",
+        metrics=metrics,
+        notes=[
+            f"{len(rows)} month-statistic rows from {first} to {last}; targets 80% and 90%.",
+            "Each month: model trained before a 30-day calibration window, CQR margin fitted on "
+            "that window, bands scored on the month.",
+        ],
+        limits=[
+            "Seven months only; coverage in one month moves with the market regime.",
+            "Conformal guarantees assume exchangeable days, which price series are not.",
+            "Backtest of the production recipe on replayed days; not a live score.",
+        ],
+        card="docs/lab/conformal.md",
+    )
+    out.write_text(result.model_dump_json(indent=1) + "\n", encoding="utf-8")
+    for stat, m in metrics.items():
+        click.echo(f"{stat}: {m}")
+
+
+@lab.command("explain")
+@click.option("--cut", default="2026-11-01", show_default=True, help="Train on days before this.")
+@click.option("--day", default="2026-11-10", show_default=True, help="Batch day to explain.")
+@click.option("--out", type=click.Path(path_type=Path), default=Path("docs/lab/explanations.md"))
+@click.pass_obj
+def lab_explain(obj: Ctx, cut: str, day: str, out: Path) -> None:
+    """Top-3 feature effects for three replayed questions (backtest; T260)."""
+    from datetime import UTC, date, datetime, time
+
+    from arena.domains.power import PowerDomain
+    from arena.domains.power_history import HISTORY_START, PRICE_KEY, PowerHistory
+    from arena.forecasters.ml_power import train
+    from arena.lab.explanations import example_rows
+    from arena.sources.http import HttpClient
+    from arena.sources.smard import SmardClient
+
+    c, b = date.fromisoformat(cut), date.fromisoformat(day)
+    client = SmardClient(HttpClient(obj.settings.user_agent()), cache_dir=obj.settings.cache_dir)
+    store = PowerHistory(client).store([PRICE_KEY], HISTORY_START, b + timedelta(days=3))
+    dom = PowerDomain(store)
+    model = train(dom, c)
+    asof = datetime.combine(b, time(5, 30), tzinfo=UTC)
+    rows = example_rows(model, dom, b, asof)
+    lines = [
+        "# Per-forecast explanations (backtest, not the live record)",
+        "",
+        f"Model `{model.version}` replayed on {day}. For each question the input features are "
+        "replaced one group at a time by their typical value (median of the last week of "
+        "inputs); the change in the probability, in percentage points, is the effect. The three "
+        "largest are shown. This describes what the model reacts to, not why the market moves.",
+        "",
+    ]
+    for r in rows:
+        lines.append(f"**{r['question']}**  P(YES) = {100 * r['probability']:.1f}%")
+        lines.append("")
+        lines += [f"- {t['feature']}: {t['effect_points']:+.1f} points" for t in r["top"]]
+        lines.append("")
+    out.write_text("\n".join(lines), encoding="utf-8")
+    click.echo(f"explanations -> {out}")

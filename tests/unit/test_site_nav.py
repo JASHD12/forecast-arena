@@ -62,3 +62,20 @@ def test_social_preview_and_base_rate_note(tmp_path) -> None:
     assert struct.unpack(">II", png[16:24]) == (1200, 630)
     methods = (res.out_dir / "methods.html").read_text()
     assert "Why a base rate can score worse than 0.25" in methods
+
+
+def test_phase_line_is_computed_from_the_streak_and_the_not_before_date() -> None:
+    from datetime import date
+    from types import SimpleNamespace as NS
+
+    from arena.site.shaping import phase_line
+
+    fb = "static text"
+    four = NS(streak=4, rule=None)
+    line = phase_line(four, 5, date(2026, 11, 23), fb)
+    assert "4 of 5 clean days" in line and "not before 2026-11-23" in line
+    assert "not set yet" in phase_line(four, 5, date(2099, 12, 31), fb)  # the workflow default
+    assert "not set yet" in phase_line(four, 5, None, fb)
+    done = phase_line(NS(streak=5, rule=date(2026, 11, 22)), 5, date(2026, 11, 23), fb)
+    assert "5 clean days are complete" in done and "2026-11-23" in done
+    assert phase_line(None, 5, None, fb) == fb

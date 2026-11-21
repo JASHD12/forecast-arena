@@ -155,6 +155,7 @@ CHALLENGER_NAMES = {
     "ts_ets": "ETS (statsmodels)",
     "ts_sarimax": "SARIMAX (statsmodels)",
     "ts_chronos": "Chronos-Bolt (pretrained)",
+    "ts_chronos2": "Chronos-2 (pretrained)",
 }
 
 #: The power cards whose comparison tables hold challenger-versus-champion rows.

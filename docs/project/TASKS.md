@@ -768,8 +768,11 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
 - [x] T253 · Guardrails and red-team suite (deps: T252a)
   - Done 2026-11-21: `llm/guards.py` (injection patterns EN/DE, markup, links, PII, length), 61 cases in `lab/redteam/cases.json`; 35 of 41
     attacks flagged, 6 expected evasions missed, 0 of 20 benign texts flagged; report-only (live agent unchanged).
-- [ ] T254 · Docs RAG assistant with citations (deps: T251)
-- [ ] T255 · GenAI-convention trace export and a Phoenix smoke target (deps: T242)
+- [x] T254 · Docs RAG assistant with citations (deps: T251)
+  - Done 2026-11-21: extractive cited answers (`lab/docs_assistant.py`, `arena lab ask`), 26 hand-written questions, result and card; MCP tool not added.
+- [x] T255a · GenAI-convention trace export (deps: T242)
+  - Done: `llm/otlp.py` already writes `gen_ai.*` attributes (operation, provider, model, token usage, finish reasons, prompt version); nothing to add without a Phoenix check.
+- [!] T255b · Phoenix smoke target and screenshot (deps: T255a) BLOCKED(permission: fetching https://arize.com/docs/phoenix/self-hosting/deployment-options/docker - the host does not resolve from this environment; image, ports and licence could not be verified)
 - [x] T256 · Calibration methods compared in the power backtest (deps: T242)
   - Done 2026-11-21: `lab/calibration_study.py`; walk-forward re-calibration of the `ml` backtest probabilities (1,470 scored questions): ECE 0.070
     (identity) to 0.055 (Platt, beta), Brier differences vs identity -0.0015 [-0.0034, +0.0005] (Platt), all intervals include zero: no live change.
@@ -777,13 +780,15 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
 - [ ] T258 · Global LightGBM power model against the per-statistic champion (deps: T242)
 - [ ] T259 · Time-series foundation models, zero-shot, in the power benchmark (deps: T242)
 - [ ] T260 · Per-forecast explanations in the backtest (deps: T242)
-- [ ] T261 · ONNX export and serving parity (deps: T242)
-- [ ] T262 · Data contracts and validation (deps: T241)
+- [x] T261 · ONNX export and serving parity (deps: T242)
+  - Done as T277 (2026-11-21): LightGBM families export to ONNX with parity 1e-4 and `POST /predict/power`; the HistGradientBoosting champion does not convert.
+- [x] T262 · Data contracts and validation (deps: T241)
+  - Done as T276a (2026-11-21): `ops/contracts.py`, informational health check and Status section.
 - [x] T263 · Shadow period for weekly challengers (deps: T249)
   - SUPERSEDED 2026-11-21 by Phase 15: challengers enter the weekly rule as candidate families (T275); no shadow tree is built.
 - [x] T264a · Explainer 06 and the recruiter role mapping (deps: T242)
   - Done 2026-11-21: `docs/explainers/06-experiments-lab.md` (ten interview questions); each role card links a lab page or code path.
-- [ ] T264b · Lab numbers in `docs/interview/numbers.md` and a generated README table (deps: T264a)
+- [x] T264b · Lab numbers in `docs/interview/numbers.md` and a generated README table (deps: T264a)
 - [ ] T265 · Final sweep and redeploy (deps: T264b)
 
 ## Phase 15 - The lab goes live (owner decision 2026-11-21; design in docs/project/LAB_PLAN.md, Part 2)
@@ -817,4 +822,6 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
 - [ ] T281a · Mac smoke run: MLX LoRA on 200 rows, measure memory, minutes and Brier; go/no-go against `lab/prereg/qlora-retrain.md` (deps: T246; needs H33)
 - [ ] T281b · `src/arena/lab/retrain.py` and `scripts/retrain_mac.sh`: monthly retrain, held-out comparison, promote-or-keep, asset upload, PR (deps: T281a)
 - [ ] T281c · Status shows the live model's training cut and months since retrain; HUMAN_TODO launchd steps (deps: T281b)
+- [x] T282 · Rehearsal banner computed from the ledger: clean days so far and the owner's not-before date (deps: T270)
+- [x] T283 · README for hiring managers: by-role guide, generated Experiments lab table, non-stale live status (deps: T270)
 - [ ] T280 · Showcase and final sweep for the live lab (deps: T272, T274, T276a, T276b)

@@ -20,6 +20,7 @@ CHALLENGER_IDS = {
     "ets": "ts_ets",
     "sarimax": "ts_sarimax",
     "chronos": "ts_chronos",
+    "chronos2": "ts_chronos2",
 }
 
 NOTES = (
@@ -101,7 +102,7 @@ def run(
             g = MLForecaster({}, refresher("mlp", lambda c: train_torch(domain, c, folds=folds)))
             g.forecaster_id = "ml_mlp"
             out.append(g)
-        for method in ("ets", "sarimax", "chronos"):
+        for method in ("ets", "sarimax", "chronos", "chronos2"):
             if method in challengers:
                 from arena.forecasters.ts_bench import SeriesBenchmark
 

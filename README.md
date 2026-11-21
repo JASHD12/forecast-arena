@@ -15,7 +15,7 @@ append-only, hash-chained ledger. When the data arrives, every forecast is score
 <!-- headline:start -->
 **Result so far (backtest, not the live record):** over 365 days of German day-ahead electricity, the gradient-boosted model scores Brier 0.1930 against 0.2205 for "same as last time" and 0.2466 for the base rate (lower is better; always saying 50% scores 0.25). Paired difference to persistence: -0.0275 [-0.0378, -0.0162], supported. Caveat: the 2190 questions come from only 365 independent days (about 6 correlated questions per day), so intervals resample whole days.
 
-**Live record:** running in rehearsal since 2026-11-13. Whether LLM agents beat the classical model is **too early to tell**; the [Status page](https://jashd12.github.io/forecast-arena/status.html) shows the current counts.
+**Live record:** in a rehearsal phase since the first batch (2026-11-13); the official record starts after five clean days in a row and not before a date fixed in advance. Whether LLM agents beat the classical model is **too early to tell**; the [Status page](https://jashd12.github.io/forecast-arena/status.html) shows the current counts.
 <!-- headline:end -->
 
 **[Live site](https://jashd12.github.io/forecast-arena/)** ·
@@ -36,6 +36,36 @@ append-only, hash-chained ledger. When the data arrives, every forecast is score
 - **Forecasts locked before the truth:** an append-only, hash-chained ledger on a git branch; `arena ledger verify --git` lets anyone check that no forecast was written after its question locked. Failures are recorded as skips, never filled in.
 - **Runs itself:** scheduled GitHub Actions jobs, CI-gated promotion to a stable branch, health checks with incident issues, Docker, Kubernetes (kind), dbt and Airflow validated in CI. Live record: "too early to tell" until the statistics can decide.
 <!-- highlights:end -->
+
+## Where to look, by role
+
+| If you hire for | Start here | What it shows |
+|---|---|---|
+| **AI / LLM engineering** | [Evals](https://jashd12.github.io/forecast-arena/evals.html), [LLM page](https://jashd12.github.io/forecast-arena/llm.html), [Lab](https://jashd12.github.io/forecast-arena/lab.html) | frozen golden-set evals that caught a truncation bug, tool-using and LangGraph agents, hybrid retrieval with reranking, prompt-injection guards, a QLoRA fine-tune (notebook and pre-registration ready) |
+| **ML / MLOps** | [Backtests](https://jashd12.github.io/forecast-arena/backtests.html), [`registry.py`](src/arena/forecasters/registry.py), [`onnx_power.py`](src/arena/forecasters/onnx_power.py) | champion/challenger promotion by a written rule, artefact hashes, ONNX serving with parity tests, CI with Docker, Kubernetes (kind), dbt and Airflow |
+| **Data science** | [Leaderboard](https://jashd12.github.io/forecast-arena/leaderboard.html), [Findings](https://jashd12.github.io/forecast-arena/findings.html), [Methods](https://jashd12.github.io/forecast-arena/methods.html) | proper scoring rules, day-block bootstrap intervals, calibration and conformal studies, honest negative results |
+
+## Experiments lab
+
+Each technique is tried against the project's baselines on questions it never saw, pre-registered, with negative results published.
+
+<!-- lab:start -->
+| Technique | Status | Card |
+|---|---|---|
+| Ask the project: cited answers over the project documents | evaluated (not a live score) | [docs/lab/docs-assistant.md](docs/lab/docs-assistant.md) |
+| Calibration methods compared: identity, Platt, isotonic, beta | evaluated (not a live score) | [docs/lab/calibration.md](docs/lab/calibration.md) |
+| Guardrails and red-team suite for untrusted tool and news text | evaluated (not a live score) | [docs/lab/guardrails.md](docs/lab/guardrails.md) |
+| Numeric grounding of model rationales | evaluated (not a live score) | [docs/lab/grounding.md](docs/lab/grounding.md) |
+| Retrieval: dense vs BM25 vs hybrid with reranking | evaluated (not a live score) | [docs/lab/retrieval-hybrid.md](docs/lab/retrieval-hybrid.md) |
+| QLoRA fine-tune of the open model | notebook ready; waiting for the Colab run | - |
+| Distillation from Claude | waiting for the QLoRA result and approval of paid runs | - |
+| Cost routing between cheap and paid forecasters | waiting for the QLoRA scores | - |
+| LLM-as-judge with human calibration | waiting for approval of the paid run | - |
+| Global LightGBM challenger, experimental conformal interval, ONNX serving | built and running as live challengers or checks; no separate evaluation card yet | - |
+| Chronos-2 foundation-model challenger | planned | - |
+
+Live experimental forecasters (flagged off until their pre-registered checks): the QLoRA-tuned model, an agent with hybrid retrieval and guards, and a cascade router. They never enter the headline board. Details: [Lab page](https://jashd12.github.io/forecast-arena/lab.html), [explainer](docs/explainers/06-experiments-lab.md).
+<!-- lab:end -->
 
 <details>
 <summary><strong>Tech stack</strong></summary>

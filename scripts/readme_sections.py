@@ -126,11 +126,31 @@ def headline() -> str:
         f"Caveat: the {n.group(1) if n else '?'} questions come from only {days} independent "
         f"days (about {per_day} correlated questions per day), so intervals resample "
         "whole days.\n\n"
-        "**Live record:** running in rehearsal since 2026-11-13. Whether LLM agents beat the "
-        "classical model is **too early to tell**; the "
+        "**Live record:** in a rehearsal phase since the first batch (2026-11-13); the official "
+        "record starts after five clean days in a row and not before a date fixed in advance. "
+        "Whether LLM agents beat the classical model is **too early to tell**; the "
         "[Status page](https://jashd12.github.io/forecast-arena/status.html) shows the "
         "current counts."
     )
+
+
+def lab() -> str:
+    """The Experiments lab table: committed results with their cards, then what is pending."""
+    from arena.lab.results import PLANNED, load_lab_results
+
+    rows = ["| Technique | Status | Card |", "|---|---|---|"]
+    for r in sorted(load_lab_results(ROOT / "evals" / "results"), key=lambda r: r.title):
+        rows.append(f"| {r.title} | evaluated (not a live score) | [{r.card}]({r.card}) |")
+    for title, state in PLANNED:
+        rows.append(f"| {title} | {state} | - |")
+    rows.append("")
+    rows.append(
+        "Live experimental forecasters (flagged off until their pre-registered checks): the "
+        "QLoRA-tuned model, an agent with hybrid retrieval and guards, and a cascade router. "
+        "They never enter the headline board. Details: [Lab page](https://jashd12.github.io/"
+        "forecast-arena/lab.html), [explainer](docs/explainers/06-experiments-lab.md)."
+    )
+    return "\n".join(rows)
 
 
 def stack() -> str:
@@ -149,6 +169,7 @@ def render(readme: str) -> str:
     blocks = (
         ("headline", headline()),
         ("highlights", highlights()),
+        ("lab", lab()),
         ("stack", stack()),
         ("results", results()),
         ("skills", skills()),

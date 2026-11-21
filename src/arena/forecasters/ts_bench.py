@@ -38,6 +38,8 @@ LEVELS = (0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9)
 MIN_POINTS = 14
 CHRONOS_MODEL = "amazon/chronos-bolt-tiny"
 CHRONOS_REVISION = "a0e552de83495b5c28c14c71c374f3e33280b340"
+CHRONOS2_MODEL = "amazon/chronos-2"  # Apache-2.0, 120M parameters, checked 2026-11-21
+CHRONOS2_REVISION = "29ec3766d36d6f73f0696f85560a422f50e8498c"
 REVISION = 1
 
 
@@ -121,8 +123,42 @@ def _chronos(series: tuple[float, ...], h: int) -> Callable[[float], float]:
     return lambda t: cdf_from_quantiles(LEVELS, values, t)
 
 
-PREDICTORS: dict[str, Predictor] = {"ets": _ets, "sarimax": _sarimax, "chronos": _chronos}
-FAMILIES = {"ets": "power-ets", "sarimax": "power-sarimax", "chronos": "power-chronos-bolt-tiny"}
+@lru_cache(maxsize=1)
+def chronos2_pipeline() -> Any:
+    """Load Chronos-2 on CPU (downloaded once into the Hugging Face cache)."""
+    os.environ.setdefault("HF_HUB_DISABLE_XET", "1")
+    import torch
+    from chronos import Chronos2Pipeline
+
+    torch.manual_seed(0)
+    return Chronos2Pipeline.from_pretrained(
+        CHRONOS2_MODEL, revision=CHRONOS2_REVISION, device_map="cpu", dtype=torch.float32
+    )
+
+
+def _chronos2(series: tuple[float, ...], h: int) -> Callable[[float], float]:
+    import torch
+
+    pipe = chronos2_pipeline()
+    x = torch.tensor(series, dtype=torch.float32)[None, None, :]  # (series, variates, history)
+    with torch.no_grad():
+        q, _ = pipe.predict_quantiles(x, prediction_length=h, quantile_levels=list(LEVELS))
+    values = [float(v) for v in q[0][0, h - 1, :]]
+    return lambda t: cdf_from_quantiles(LEVELS, values, t)
+
+
+PREDICTORS: dict[str, Predictor] = {
+    "ets": _ets,
+    "sarimax": _sarimax,
+    "chronos": _chronos,
+    "chronos2": _chronos2,
+}
+FAMILIES = {
+    "ets": "power-ets",
+    "sarimax": "power-sarimax",
+    "chronos": "power-chronos-bolt-tiny",
+    "chronos2": "power-chronos-2",
+}
 
 
 @dataclass
@@ -146,7 +182,8 @@ class SeriesBenchmark:
 
     def model_hash(self) -> str:
         """Short hash of the version (and, for Chronos, the pinned weights revision)."""
-        blob = f"{self.version}|{CHRONOS_REVISION if self.method == 'chronos' else ''}"
+        pinned = {"chronos": CHRONOS_REVISION, "chronos2": CHRONOS2_REVISION}.get(self.method, "")
+        blob = f"{self.version}|{pinned}"
         return hashlib.sha256(blob.encode()).hexdigest()[:12]
 
     def cdf(self, stat: str, ctx: dict[str, Any], target: date) -> Callable[[float], float]:

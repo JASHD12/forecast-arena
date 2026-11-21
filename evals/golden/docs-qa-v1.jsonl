@@ -1,0 +1,26 @@
+{"q": "What is the daily LLM token cap?", "source": "docs/SPEC.md", "must_contain": "300,000"}
+{"q": "At what time is the daily lock for forecasts?", "source": "docs/SPEC.md", "must_contain": "09:30"}
+{"q": "How many clean days must pass before the official record starts?", "source": "docs/RUNBOOK.md", "must_contain": "five clean days"}
+{"q": "Which timezone defines an electricity day?", "source": "docs/SPEC.md", "must_contain": "Europe/Berlin"}
+{"q": "Which smoothing does the base rate forecaster use?", "source": "docs/METHODS.md", "must_contain": "Laplace"}
+{"q": "How are model probabilities calibrated for the power forecaster?", "source": "docs/explainers/04-ml-models-leakage-calibration.md", "must_contain": "Platt"}
+{"q": "Where does the weather data come from?", "source": "docs/SPEC.md", "must_contain": "Open-Meteo"}
+{"q": "Which source provides exchange rates?", "source": "docs/SPEC.md", "must_contain": "ECB"}
+{"q": "What does the ledger guarantee about forecasts written after the lock?", "source": "docs/METHODS.md", "must_contain": "lock_time"}
+{"q": "Which source supplies German electricity prices?", "source": "docs/SPEC.md", "must_contain": "SMARD"}
+{"q": "Is a human panel part of the benchmark?", "source": "docs/METHODS.md", "must_contain": "human panel"}
+{"q": "How is the ensemble forecaster built?", "source": "docs/METHODS.md", "must_contain": "ensemble"}
+{"q": "Why can a base rate score worse than a coin flip early on?", "source": "docs/METHODS.md", "must_contain": "base rate"}
+{"q": "What is the reason code stored with a skipped forecast?", "source": "docs/SPEC.md", "must_contain": "reason_code"}
+{"q": "How does the champion challenger promotion decide?", "source": "docs/explainers/04-ml-models-leakage-calibration.md", "must_contain": "champion"}
+{"q": "Which conformal interval is shown on electricity questions?", "source": "docs/explainers/06-experiments-lab.md", "must_contain": "conformal"}
+{"q": "Which models are exported to ONNX?", "source": "docs/explainers/06-experiments-lab.md", "must_contain": "ONNX"}
+{"q": "Which Brier score does the power model reach against persistence?", "source": "docs/METHODS.md", "must_contain": "Brier"}
+{"q": "What is the append-only rule for the ledger?", "source": "docs/SPEC.md", "must_contain": "append-only"}
+{"q": "Which data does Wikipedia attention use?", "source": "docs/SPEC.md", "must_contain": "Wikipedia"}
+{"q": "What is the price of a Berlin apartment?", "source": null, "must_contain": null}
+{"q": "Who won the football World Cup?", "source": null, "must_contain": null}
+{"q": "How do I bake sourdough bread?", "source": null, "must_contain": null}
+{"q": "What is the capital of Australia?", "source": null, "must_contain": null}
+{"q": "Which stock should I buy tomorrow?", "source": null, "must_contain": null}
+{"q": "How tall is Mount Everest?", "source": null, "must_contain": null}

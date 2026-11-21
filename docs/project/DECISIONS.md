@@ -1144,3 +1144,13 @@ and evidence requirements. Do not backfill historical ML forecasts.
 - Decision: `forecasters/onnx_power.py` exports `power-lgbq` and `power-glgbq` with onnxmltools 1.16.0 (Apache-2.0) and serves with onnxruntime 1.31.1 (the version rag.txt already pins) (MIT); `POST /predict/power` in the API (503 without `ARENA_ONNX_DIR`). New files `requirements/onnx.txt` (export, CI) and `requirements/serve.txt` (runtime, Docker). Parity tolerance 1e-4 (float32 trees give about 1e-6 on quantiles), not 1e-6 as first planned.
 - Not done: the live champion `power-gbq` (scikit-learn HistGradientBoosting, quantile loss) does not convert with skl2onnx 1.20.0 (checked 2026-11-21, `TreeEnsembleRegressor` node cannot be built), so it stays on joblib. The ONNX hash is in the exported manifest, not yet in the weekly registry metadata; Docker CI proves the route and the runtime import, the numeric parity is proven by the unit tests in the `check` job.
 - Alternatives: convert the champion by hand (risk of silent mismatch); export only to a file without an endpoint.
+
+## 2026-11-21 T279: `experimental` input on the morning dry run
+- Context: the experimental forecasters are switched by repository variables, which the agent cannot set or read; the launch plan needs a measurement of runner time and tokens before any variable is turned on.
+- Decision: `morning.yml` gets a boolean `experimental` input that sets `ARENA_AGENT_HYBRID=1` only when `dry_run` is also true. A live run can never be switched on by it; scheduled runs ignore it. `llm_local_ft` is not measurable until its artefact is pinned (H26/H28).
+- Alternatives: dispatching from a branch (not allowed); asking the owner to set the variable first (turns it on for live runs before measuring).
+
+## 2026-11-21 T259: Chronos-2 as a backtest benchmark
+- Context: the owner asked for the remaining lab tasks in one PR; Chronos-2 is the newer foundation model next to Chronos-Bolt.
+- Decision: `ts_chronos2` joins the power time-series benchmarks (backtest only, zero-shot, revision pinned). It is not a live forecaster or a weekly challenger: the 120M-parameter weights would need a registry artefact and a per-question model call inside the lock-critical morning run, which T275b leaves open until the backtest says it is worth it.
+- Alternatives: weekly challenger now (cost and risk without evidence); TimesFM (licence and CPU feasibility not checked).

@@ -776,7 +776,8 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
 - [x] T256 · Calibration methods compared in the power backtest (deps: T242)
   - Done 2026-11-21: `lab/calibration_study.py`; walk-forward re-calibration of the `ml` backtest probabilities (1,470 scored questions): ECE 0.070
     (identity) to 0.055 (Platt, beta), Brier differences vs identity -0.0015 [-0.0034, +0.0005] (Platt), all intervals include zero: no live change.
-- [ ] T257 · Conformal prediction coverage study (deps: T242)
+- [x] T257 · Conformal prediction coverage study (deps: T242)
+  - Done 2026-11-21: `lab/conformal_study.py`; 7 months (Apr-Oct 2026), 214 days: the 80% band covers 71.0% raw and 79.4% after the CQR margin for the daily mean (target 80%); the 90% band 80.4% raw and 92.5% after. Not a live change.
 - [ ] T258 · Global LightGBM power model against the per-statistic champion (deps: T242)
 - [ ] T259 · Time-series foundation models, zero-shot, in the power benchmark (deps: T242)
 - [ ] T260 · Per-forecast explanations in the backtest (deps: T242)

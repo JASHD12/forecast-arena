@@ -459,6 +459,24 @@ def grounding_rows(
     return rows
 
 
+def interval_coverage(rec: Any) -> dict[str, Any] | None:
+    """Empirical coverage of the experimental 80% band on resolved questions (None: none yet).
+
+    One count per statistic and target day, because several thresholds share one band."""
+    seen: dict[tuple[str, Any], bool] = {}
+    for f in rec.forecasts:
+        iv = f.meta.get("interval80") if f.forecaster_id == "ml" else None
+        r = rec.resolutions.get(f.question_id)
+        q = rec.questions.get(f.question_id)
+        if not iv or r is None or r.observed_value is None or q is None:
+            continue
+        seen[(iv["stat"], q.target_date)] = iv["lo"] <= r.observed_value <= iv["hi"]
+    if not seen:
+        return None
+    hit = sum(seen.values())
+    return {"n": len(seen), "hits": hit, "share": hit / len(seen)}
+
+
 def contract_status(ledger: Any, rec: Any) -> dict[str, Any] | None:
     """Data-contract result of the latest batch day for the Status page (None: no questions)."""
     from arena.ops.contracts import check_batch

@@ -810,7 +810,7 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
   - Done 2026-11-21: `lab/grounding.rationale_checks` feeds a 7-day table on Status; `ops/contracts.py` checks stored contexts (freshness, completeness,
     ranges), shown on Status and as an informational morning health check (never fails a run or a clean day). First real finding: a brand-new
     Wikipedia article had 5 days of views.
-- [ ] T276b · Experimental 80% conformal interval for electricity mean-price questions (deps: T270)
+- [x] T276b · Experimental 80% conformal interval for electricity mean-price questions (deps: T270)
 - [ ] T277 · ONNX export and `/predict/power` parity in the deployed container (deps: T270)
 - [ ] T279 · Launch checks: dry-run measurement of runner time and tokens, then flags one at a time (deps: T271, T274)
 - [ ] T280 · Showcase and final sweep for the live lab (deps: T272, T274, T276)

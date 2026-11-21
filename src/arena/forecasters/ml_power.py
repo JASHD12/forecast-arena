@@ -129,6 +129,13 @@ class PowerModel:
             return raw
         return float(self.calib.predict_proba([[_logit(raw)]])[0, 1])
 
+    def interval80(
+        self, stat: str, ctx: dict[str, Any], target: date, margin: float
+    ) -> tuple[float, float]:
+        """Central 80% band of a statistic (quantiles 0.1 and 0.9) widened by a CQR margin."""
+        qs = sorted(self.quantiles(stat, features(ctx["daily"], target)))
+        return qs[QUANTILES.index(0.1)] - margin, qs[QUANTILES.index(0.9)] + margin
+
     def model_hash(self) -> str:
         """Short hash of the version and training sizes (for forecast meta)."""
         blob = f"{self.version}|{self.n_train}|{self.n_calib}".encode()

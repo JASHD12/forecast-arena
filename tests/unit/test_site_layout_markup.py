@@ -29,3 +29,42 @@ def test_stylesheet_has_the_flow_layer_at_zero_specificity() -> None:
     css = CSS.read_text()
     assert ":where(main > .wrap, .game) > :where(* + *)" in css
     assert "--s-4: 1rem" in css and ".duo {" in css
+
+
+def test_interval_coverage_counts_each_statistic_and_day_once() -> None:
+    """T276b: coverage of the experimental band, deduplicated across thresholds."""
+    from datetime import date
+    from types import SimpleNamespace as NS
+
+    from arena.site.shaping import interval_coverage
+
+    def fc(qid, lo, hi):
+        return NS(
+            forecaster_id="ml",
+            question_id=qid,
+            meta={"interval80": {"stat": "mean", "lo": lo, "hi": hi}},
+        )
+
+    rec = NS(
+        forecasts=[
+            fc("a", 40, 60),
+            fc("b", 40, 60),
+            fc("c", 40, 60),
+            NS(forecaster_id="base_rate", question_id="a", meta={}),
+        ],
+        questions={
+            k: NS(target_date=d)
+            for k, d in {
+                "a": date(2026, 11, 1),
+                "b": date(2026, 11, 1),
+                "c": date(2026, 11, 2),
+            }.items()
+        },
+        resolutions={
+            "a": NS(observed_value=50.0),
+            "b": NS(observed_value=50.0),
+            "c": NS(observed_value=90.0),
+        },
+    )
+    assert interval_coverage(rec) == {"n": 2, "hits": 1, "share": 0.5}
+    assert interval_coverage(NS(forecasts=[], questions={}, resolutions={})) is None

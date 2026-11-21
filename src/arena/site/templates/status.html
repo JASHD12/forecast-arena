@@ -71,6 +71,8 @@
 <p class="note">A parse failure is recorded as a skip after one repair attempt; it is never replaced by a guess.</p>{% else %}<p class="note">No LLM forecasts yet.</p>{% endif %}</section>
 </div>
 
+{% if interval %}<section class="card" aria-labelledby="interval-title"><h2 id="interval-title">Experimental 80% price range</h2>
+<p>The ML model's conformal range for electricity prices held the observed value on <strong>{{ interval.hits }} of {{ interval.n }}</strong> resolved days ({{ '%.0f'|format(interval.share * 100) }}%; the target is 80%). Experimental: with so few days this says little yet.</p></section>{% endif %}
 {% if contracts %}<section class="card" aria-labelledby="contracts-title"><h2 id="contracts-title">Data contracts (latest batch, {{ contracts.day }})</h2>
 <p>{{ contracts.checked }} stored contexts checked for freshness, completeness and plausible ranges: <strong>{{ contracts.violations|length }} violation{{ "" if contracts.violations|length == 1 else "s" }}</strong>.</p>
 {% if contracts.violations %}<ul class="plain">{% for v in contracts.violations[:10] %}<li><code>{{ v }}</code></li>{% endfor %}</ul>{% endif %}

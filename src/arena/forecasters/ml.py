@@ -41,11 +41,14 @@ class MLForecaster:
         *,
         load_errors: Mapping[str, ModelLoadFailure] | None = None,
         artifact_hashes: Mapping[str, str] | None = None,
+        conformal: Mapping[str, Mapping[str, float]] | None = None,
     ) -> None:
         self.models = dict(models)
         self.refresh = refresh
         self.load_errors = dict(load_errors or {})
         self.artifact_hashes = dict(artifact_hashes or {})
+        #: domain -> statistic -> CQR margin of the central 80% band (weekly job), T276b.
+        self.conformal = {d: dict(v) for d, v in (conformal or {}).items()}
 
     def version(self) -> str:
         """All model versions in use, sorted (changes whenever any artefact changes)."""
@@ -95,9 +98,11 @@ class MLForecaster:
                 detail=f"model returned {p!r}",
                 created_at=asof,
             )
-        meta = {"model_hash": model.model_hash()}
+        meta: dict[str, Any] = {"model_hash": model.model_hash()}
         if artifact_hash := self.artifact_hashes.get(q.domain):
             meta["artifact_sha256"] = artifact_hash
+        if interval := self._interval(model, q, ctx):
+            meta["interval80"] = interval  # experimental; the probability is unchanged
         return Forecast(
             forecast_id=f"{q.question_id}::{self.forecaster_id}",
             question_id=q.question_id,
@@ -107,3 +112,22 @@ class MLForecaster:
             created_at=asof,
             meta=meta,
         )
+
+    def _interval(self, model: Any, q: Question, ctx: dict[str, Any]) -> dict[str, Any] | None:
+        """Experimental conformal 80% band of the question's statistic, when a margin exists."""
+        stat = q.params.get("stat") if q.params else None
+        margin = self.conformal.get(q.domain, {}).get(str(stat)) if stat else None
+        band = getattr(model, "interval80", None)
+        if margin is None or band is None:
+            return None
+        try:
+            lo, hi = band(str(stat), ctx, q.target_date, margin)
+        except (ValueError, KeyError):
+            return None
+        return {
+            "stat": str(stat),
+            "lo": round(lo, 2),
+            "hi": round(hi, 2),
+            "margin": round(margin, 2),
+            "unit": q.unit,
+        }

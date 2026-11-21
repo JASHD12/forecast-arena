@@ -42,7 +42,11 @@ PLANNED: tuple[tuple[str, str], ...] = (
     ("Distillation from Claude", "waiting for the QLoRA result and approval of paid runs"),
     ("Cost routing between cheap and paid forecasters", "waiting for the QLoRA scores"),
     ("LLM-as-judge with human calibration", "waiting for approval of the paid run"),
-    ("Conformal intervals, global LightGBM, foundation models, ONNX", "planned"),
+    (
+        "Global LightGBM challenger, experimental conformal interval, ONNX serving",
+        "built and running as live challengers or checks; no separate evaluation card yet",
+    ),
+    ("Chronos-2 foundation-model challenger", "planned"),
 )
 
 

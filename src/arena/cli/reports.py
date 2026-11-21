@@ -42,6 +42,7 @@ def site_build(obj: Ctx, out_dir: Path, check_links: bool) -> None:
         models_dir=Path("docs/models"),
         dashboard_url=obj.settings.dashboard_url,
         marts_dir=Path("analytics/dbt/models/marts"),
+        official_not_before=obj.settings.official_start_not_before,
     )
     click.echo(f"site built: {len(res.pages)} pages in {res.out_dir}")
     if check_links:

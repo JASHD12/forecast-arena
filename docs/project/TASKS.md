@@ -817,4 +817,6 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
 - [ ] T281a · Mac smoke run: MLX LoRA on 200 rows, measure memory, minutes and Brier; go/no-go against `lab/prereg/qlora-retrain.md` (deps: T246; needs H33)
 - [ ] T281b · `src/arena/lab/retrain.py` and `scripts/retrain_mac.sh`: monthly retrain, held-out comparison, promote-or-keep, asset upload, PR (deps: T281a)
 - [ ] T281c · Status shows the live model's training cut and months since retrain; HUMAN_TODO launchd steps (deps: T281b)
+- [x] T282 · Rehearsal banner computed from the ledger: clean days so far and the owner's not-before date (deps: T270)
+- [x] T283 · README for hiring managers: by-role guide, generated Experiments lab table, non-stale live status (deps: T270)
 - [ ] T280 · Showcase and final sweep for the live lab (deps: T272, T274, T276a, T276b)

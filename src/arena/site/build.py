@@ -89,6 +89,7 @@ from arena.site.shaping import (
     live_versions,
     model_timeline,
     official_start,
+    phase_line,
     pick_cards,
     question_href,
     question_scores,
@@ -152,6 +153,7 @@ def build_site(
     models_dir: Path | None = None,
     dashboard_url: str | None = None,
     marts_dir: Path | None = None,
+    official_not_before: date | None = None,
 ) -> SiteResult:
     """Render every page into `out_dir` (built aside, then moved into place)."""
     rec = load(ledger)
@@ -182,6 +184,7 @@ def build_site(
         return simple_markdown(text)
 
     start_s = official_start(ledger)
+    decision = update_official_start(ledger, clock.now(), official_not_before, write=False)
     start = date.fromisoformat(start_s) if start_s else None
     off = official(rec.scored, start)
     rehearsal = [s for s in rec.scored if start is None or s.batch_date < start]
@@ -196,7 +199,7 @@ def build_site(
         "attributions": ATTRIBUTIONS,
         "built_at": clock.now().strftime("%Y-%m-%d %H:%M UTC"),
         "official_start": start_s,
-        "start_rule": START_RULE,
+        "start_rule": phase_line(decision, STREAK, official_not_before, START_RULE),
         "qhref": question_href,
         "plain_title": plain_title,
         "fname": forecaster_name,
@@ -329,7 +332,7 @@ def build_site(
                 "counts": counts(rec),
                 "runs": _runs(ledger),
                 "skip_help": SKIP_HELP,
-                "streak": update_official_start(ledger, clock.now(), write=False),
+                "streak": decision,
                 "streak_needed": STREAK,
                 "missed": missed_days(ledger, clock.now().date()),
                 "usage": llm_usage(ledger, clock.now().date()),

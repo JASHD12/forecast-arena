@@ -778,7 +778,8 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
     (identity) to 0.055 (Platt, beta), Brier differences vs identity -0.0015 [-0.0034, +0.0005] (Platt), all intervals include zero: no live change.
 - [x] T257 · Conformal prediction coverage study (deps: T242)
   - Done 2026-11-21: `lab/conformal_study.py`; 7 months (Apr-Oct 2026), 214 days: the 80% band covers 71.0% raw and 79.4% after the CQR margin for the daily mean (target 80%); the 90% band 80.4% raw and 92.5% after. Not a live change.
-- [ ] T258 · Global LightGBM power model against the per-statistic champion (deps: T242)
+- [x] T258 · Global LightGBM power model against the per-statistic champion (deps: T242)
+  - Done 2026-11-21: `docs/models/power-global.md`; over 365 days the global model scores Brier 0.2079 against 0.1930 for the champion (difference +0.0149 [+0.0097, +0.0198]): worse, so it stays a weekly challenger and is not expected to be promoted. Honest negative result.
 - [ ] T259 · Time-series foundation models, zero-shot, in the power benchmark (deps: T242)
 - [ ] T260 · Per-forecast explanations in the backtest (deps: T242)
 - [x] T261 · ONNX export and serving parity (deps: T242)

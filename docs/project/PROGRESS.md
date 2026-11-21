@@ -65,6 +65,7 @@ Nothing. See the session summary above and `python scripts/status.py`.
   output, not acted on (S11).
 
 ## Done log
+- 2026-11-21 T258: global LightGBM backtest card: Brier 0.2079 vs 0.1930 champion (worse, interval excludes zero); stays a weekly challenger only.
 - 2026-11-21 T257: conformal coverage study over 7 months (80% band: 71.0% raw to 79.4% with CQR; 90%: 80.4% to 92.5%).
 - 2026-11-21 T264b: lab results in the interview numbers (generated); README lab table already generated.
 - 2026-11-21 T254: docs assistant (extractive, cited, offline): 60% hits, 83% correct refusals on 26 hand-written questions; one method change after the first score is disclosed.

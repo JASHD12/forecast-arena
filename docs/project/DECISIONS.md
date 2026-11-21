@@ -1154,3 +1154,8 @@ and evidence requirements. Do not backfill historical ML forecasts.
 - Context: the owner asked for the remaining lab tasks in one PR; Chronos-2 is the newer foundation model next to Chronos-Bolt.
 - Decision: `ts_chronos2` joins the power time-series benchmarks (backtest only, zero-shot, revision pinned). It is not a live forecaster or a weekly challenger: the 120M-parameter weights would need a registry artefact and a per-question model call inside the lock-critical morning run, which T275b leaves open until the backtest says it is worth it.
 - Alternatives: weekly challenger now (cost and risk without evidence); TimesFM (licence and CPU feasibility not checked).
+
+## 2026-11-21 T258: the global LightGBM does not beat the champion
+- Context: one LightGBM per quantile level over all five statistics (`power-glgbq`) was backtested over 365 days (run recorded in `docs/models/power-global.md`).
+- Result: Brier 0.2079 against 0.1930 for the champion, difference +0.0149 [+0.0097, +0.0198], so worse with an interval that excludes zero. Not tuned (defaults, no Optuna), which is part of why it is weaker than the tuned per-statistic LightGBM.
+- Decision: no live change (I8). It stays a weekly challenger; the weekly rule promotes it only if it ever scores no worse than the champion on the recent window.

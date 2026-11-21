@@ -67,4 +67,4 @@ def test_readme_has_role_guide_and_generated_lab_table() -> None:
     assert text.index("## Where to look, by role") < text.index("**Stack:**")
     block = text[text.index("<!-- lab:start -->") : text.index("<!-- lab:end -->")]
     assert "docs/lab/retrieval-hybrid.md" in block and "waiting for the Colab run" in block
-    assert "rehearsal phase" in text and "since 2026-11-13" in text
+    assert "rehearsal phase since the first batch (2026-11-13)" in text

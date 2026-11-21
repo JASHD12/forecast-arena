@@ -779,5 +779,7 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
 - [ ] T261 · ONNX export and serving parity (deps: T242)
 - [ ] T262 · Data contracts and validation (deps: T241)
 - [ ] T263 · Shadow period for weekly challengers (deps: T249; needs: H30)
-- [ ] T264 · Explainer 06, interview numbers, README and recruiter mapping (deps: T242)
-- [ ] T265 · Final sweep and redeploy (deps: T264)
+- [x] T264a · Explainer 06 and the recruiter role mapping (deps: T242)
+  - Done 2026-11-21: `docs/explainers/06-experiments-lab.md` (ten interview questions); each role card links a lab page or code path.
+- [ ] T264b · Lab numbers in `docs/interview/numbers.md` and a generated README table (deps: T264a)
+- [ ] T265 · Final sweep and redeploy (deps: T264b)

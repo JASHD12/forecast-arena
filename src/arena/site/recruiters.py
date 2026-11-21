@@ -162,6 +162,7 @@ ROLE_PATHS: tuple[tuple[str, str, tuple[tuple[str, str, bool], ...]], ...] = (
             ("The eval that caught a bug", "evals.html", False),
             ("How the LLM calls are traced", "llm.html", False),
             ("The agent loop (code)", "src/arena/agent/forecaster.py", True),
+            ("Experiments lab: fine-tuning, retrieval, guardrails", "lab.html", False),
         ),
     ),
     (
@@ -171,6 +172,7 @@ ROLE_PATHS: tuple[tuple[str, str, tuple[tuple[str, str, bool], ...]], ...] = (
             ("Champion and challenger timeline", "experiments.html", False),
             ("Model registry (code)", "src/arena/forecasters/registry.py", True),
             ("Pipeline status", "status.html", False),
+            ("Calibration study (code)", "src/arena/lab/calibration_study.py", True),
         ),
     ),
     (
@@ -180,6 +182,7 @@ ROLE_PATHS: tuple[tuple[str, str, tuple[tuple[str, str, bool], ...]], ...] = (
             ("A year of backtests", "backtests.html", False),
             ("Live leaderboard", "leaderboard.html", False),
             ("The SQL behind the numbers", "data.html", False),
+            ("Retrieval and grounding experiments", "lab.html", False),
         ),
     ),
 )

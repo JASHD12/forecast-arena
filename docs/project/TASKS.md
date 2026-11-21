@@ -726,4 +726,10 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
   - Not changed (by design): the 404 page loads its CSS from the live site (`<base href>`), so it looks unstyled when opened from a
     file; the German page keeps English navigation until H17 (proofreading).
   - Done when: `make check` and `make a11y` pass and the audit is clean on the fixture and the real-ledger build.
+- [x] T235 · Recheck of the live build (deps: T234)
+  - Done 2026-11-21: the live site cannot be opened from the sandbox (proxy 403), so the live commit was rebuilt from a fresh ledger
+    clone and audited at three widths (layout audit PASS, axe 0 serious) and by eye. Real defects found and fixed: the question-page
+    line chart had a 5 px text size on phones (now a phone layout), and the Brier numbers dropped under the bars on phones. The
+    audit tools now open percent-encoded file names (real ledgers have them) and skip the file-opened 404; the chart-text check also
+    covers a question page.
 

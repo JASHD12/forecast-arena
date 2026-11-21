@@ -282,8 +282,8 @@ details.faq[open] summary { margin-bottom: .5rem; }
 .attrib { font-size: .85rem; }
 @media (max-width: 40rem) {
   .footer-grid { grid-template-columns: 1fr; }
-  .bars-wide li, .bars-wide li:not(:has(.score)) { grid-template-columns: 7.5rem 1fr 2.6rem; }
-  .bars-wide .score { grid-column: 3; }
+  .bars-wide li { grid-template-columns: 6.5rem 1fr 2.4rem 2.8rem; gap: .4rem; font-size: .9rem; }
+  .bars-wide li:not(:has(.score)) { grid-template-columns: 6.5rem 1fr 2.6rem; }
 }
 @media print {
   .site-header nav, .banner, footer nav, .filters { display: none; }
@@ -830,3 +830,5 @@ table code, .table-scroll code { overflow-wrap: break-word; }
 main summary { min-height: 1.5rem; }
 .sortable th button { min-height: 1.5rem; padding: .15rem 0; }
 .game input[type="range"] { height: 1.5rem; }
+.qchart-narrow { display: none; }
+@media (max-width: 640px) { .qchart-wide { display: none; } .qchart-narrow { display: block; } }

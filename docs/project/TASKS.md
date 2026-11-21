@@ -813,4 +813,7 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
 - [x] T276b · Experimental 80% conformal interval for electricity mean-price questions (deps: T270)
 - [ ] T277 · ONNX export and `/predict/power` parity in the deployed container (deps: T270)
 - [ ] T279 · Launch checks: dry-run measurement of runner time and tokens, then flags one at a time (deps: T271, T274)
-- [ ] T280 · Showcase and final sweep for the live lab (deps: T272, T274, T276)
+- [ ] T281a · Mac smoke run: MLX LoRA on 200 rows, measure memory, minutes and Brier; go/no-go against `lab/prereg/qlora-retrain.md` (deps: T246; needs H33)
+- [ ] T281b · `src/arena/lab/retrain.py` and `scripts/retrain_mac.sh`: monthly retrain, held-out comparison, promote-or-keep, asset upload, PR (deps: T281a)
+- [ ] T281c · Status shows the live model's training cut and months since retrain; HUMAN_TODO launchd steps (deps: T281b)
+- [ ] T280 · Showcase and final sweep for the live lab (deps: T272, T274, T276a, T276b)

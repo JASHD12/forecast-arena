@@ -257,3 +257,7 @@ curl -X POST -H "Authorization: Bearer TOKEN" -H "Accept: application/vnd.github
     goes live whatever the result; reply "go" after looking at it, and the agent turns on `ARENA_LLM_LOCAL_FT` in the workflows (one PR).
   - Also, if you ever set the repository variable `ARENA_LLM_MAX_TOKENS_PER_DAY` (Settings > Secrets and variables > Actions > Variables), change it to
     `300000`; the workflow default is now 300,000 and a variable would override it.
+- [ ] H33 · Mac smoke run for the monthly retrain (needed for T281a), and later the launchd schedule
+  - Needs your MacBook Air (M5, 16 GB). The agent cannot reach it from the cloud, so it will give you one script to run; send back the printed
+    summary (memory, minutes, Brier). Run it on mains power, lid open. Do not schedule anything yet: the monthly schedule steps come after the smoke
+    result in T281c.

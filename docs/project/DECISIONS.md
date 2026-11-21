@@ -1133,3 +1133,8 @@ and evidence requirements. Do not backfill historical ML forecasts.
 ## 2026-11-21 T272: three more series colours
 - Context: the chart palette had eight validated slots; the three experimental forecasters need their own.
 - Decision: slots 9 to 11 (teal, brown, olive; light and dark values) added to the stylesheet. They have not been checked for colour-blind separation like slots 1 to 8, so the forecaster name is always written next to the line (legends and labels), never colour alone.
+
+## 2026-11-21 Monthly retrain of `llm_local_ft` on the owner's Mac
+- Context: the owner asked why the fine-tuned model is not retrained automatically and chose their own machine (MacBook Air M5, 16 GB) with a monthly schedule over paid GPUs. Colab cannot be scheduled.
+- Decision: retrain rule pre-registered in `lab/prereg/qlora-retrain.md`: replayed data only, promote only if not worse on a held-out window, promotion is a PR the owner merges. The Mac recipe is MLX LoRA (bitsandbytes is CUDA-only), accepted only after a smoke run.
+- Alternatives: paid GitHub GPU runner or rented GPU (needs spending and an account, not pre-approved); daily Colab (manual); retrain weekly (versions too short-lived to evaluate).

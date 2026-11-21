@@ -9,6 +9,7 @@ from pathlib import Path
 import click
 
 from arena.cli import Ctx, lab
+from arena.lab.docs_assistant import DOC_PATHS, DocsIndex, ask, evaluate, load_chunks
 
 
 @lab.group("dataset")
@@ -321,3 +322,53 @@ def lab_calibration(obj: Ctx, run_dir: Path, out: Path) -> None:
         click.echo(f"{name}: {m}")
     for p in paired:
         click.echo(f"{p['a']} - {p['b']}: {p['diff']:+.4f} [{p['lo']:+.4f}, {p['hi']:+.4f}]")
+
+
+def _docs_index() -> DocsIndex:
+    return DocsIndex(load_chunks(Path("."), DOC_PATHS))
+
+
+@lab.command("ask")
+@click.argument("question")
+def lab_ask(question: str) -> None:
+    """Ask the project documents a question (extractive, cited, offline; T254)."""
+    click.echo(ask(_docs_index(), question).text)
+
+
+@lab.command("docs-eval")
+@click.option(
+    "--out", type=click.Path(path_type=Path), default=Path("evals/results/lab-docs-assistant.json")
+)
+@click.pass_obj
+def lab_docs_eval(obj: Ctx, out: Path) -> None:
+    """Score the docs assistant on the hand-written question set (T254)."""
+    from arena.lab.dataset import plain_sha256
+    from arena.lab.results import LabResult
+
+    golden = Path("evals/golden/docs-qa-v1.jsonl")
+    pairs = [json.loads(line) for line in golden.read_text(encoding="utf-8").splitlines() if line]
+    metrics = {"docs_assistant": evaluate(_docs_index(), pairs)}
+    result = LabResult(
+        experiment="docs-assistant",
+        title="Ask the project: cited answers over the project documents",
+        created_at=obj.clock.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+        why=(
+            "Retrieval-grounded assistants with citations and refusals are the standard "
+            "internal-knowledge pattern."
+        ),
+        dataset_sha256={golden.name: plain_sha256(golden)},
+        metrics=metrics,  # type: ignore[arg-type]
+        notes=[f"{len(pairs)} hand-written questions; answers are extractive sentences."],
+        limits=[
+            "The method was changed once after seeing the first score (stop words removed from "
+            "the query; a hit no longer needs the expected file; the first run scored 25.0% "
+            "hits), so the final figure is optimistic.",
+            "Small, hand-written question set whose expected phrases come from the same documents.",
+            "A hit means a cited chunk contains the expected phrase, not that the answer reads "
+            "well.",
+            "Refusal uses a fixed word-coverage threshold chosen once, not tuned per question.",
+        ],
+        card="docs/lab/docs-assistant.md",
+    )
+    out.write_text(result.model_dump_json(indent=1) + "\n", encoding="utf-8")
+    click.echo(metrics)

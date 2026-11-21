@@ -52,6 +52,7 @@ Each technique is tried against the project's baselines on questions it never sa
 <!-- lab:start -->
 | Technique | Status | Card |
 |---|---|---|
+| Ask the project: cited answers over the project documents | evaluated (not a live score) | [docs/lab/docs-assistant.md](docs/lab/docs-assistant.md) |
 | Calibration methods compared: identity, Platt, isotonic, beta | evaluated (not a live score) | [docs/lab/calibration.md](docs/lab/calibration.md) |
 | Guardrails and red-team suite for untrusted tool and news text | evaluated (not a live score) | [docs/lab/guardrails.md](docs/lab/guardrails.md) |
 | Numeric grounding of model rationales | evaluated (not a live score) | [docs/lab/grounding.md](docs/lab/grounding.md) |

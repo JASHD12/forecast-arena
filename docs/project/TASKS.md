@@ -768,7 +768,8 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
 - [x] T253 · Guardrails and red-team suite (deps: T252a)
   - Done 2026-11-21: `llm/guards.py` (injection patterns EN/DE, markup, links, PII, length), 61 cases in `lab/redteam/cases.json`; 35 of 41
     attacks flagged, 6 expected evasions missed, 0 of 20 benign texts flagged; report-only (live agent unchanged).
-- [ ] T254 · Docs RAG assistant with citations (deps: T251)
+- [x] T254 · Docs RAG assistant with citations (deps: T251)
+  - Done 2026-11-21: extractive cited answers (`lab/docs_assistant.py`, `arena lab ask`), 26 hand-written questions, result and card; MCP tool not added.
 - [ ] T255 · GenAI-convention trace export and a Phoenix smoke target (deps: T242)
 - [x] T256 · Calibration methods compared in the power backtest (deps: T242)
   - Done 2026-11-21: `lab/calibration_study.py`; walk-forward re-calibration of the `ml` backtest probabilities (1,470 scored questions): ECE 0.070

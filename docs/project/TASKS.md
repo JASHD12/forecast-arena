@@ -754,7 +754,10 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
 - [ ] T249 · Shadow run of the fine-tuned model (deps: T246; needs: H30)
 - [ ] T250 · Cost routing and cascades, offline (deps: T242)
   - Done when: Pareto curve from stored rows, delta chosen on validation, card generated.
-- [ ] T251 · Hybrid retrieval: BM25, RRF, optional cross-encoder rerank, retrieval eval (deps: T242)
+- [x] T251 · Hybrid retrieval: BM25, RRF, optional cross-encoder rerank, retrieval eval (deps: T242)
+  - Done 2026-11-21: `PastQuestions.search_hybrid` (live agent unchanged), frozen set `evals/golden/retrieval-v1.jsonl` (2,004 documents, 186
+    graded queries), result `evals/results/lab-retrieval-hybrid.json`: nDCG@5 dense 0.373, BM25 0.339, hybrid 0.346, hybrid+rerank 0.556;
+    BM25 has the best MRR (0.80). Card `docs/lab/retrieval-hybrid.md`.
 - [ ] T252a · Numeric grounding metric over stored rationales (deps: T242)
 - [ ] T252b · LLM-as-judge with calibration (deps: T252a; needs: H27, H29)
 - [ ] T253 · Guardrails and red-team suite (deps: T252a)

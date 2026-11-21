@@ -129,3 +129,27 @@ Filled in per source by T023, T040, T042, T044.
 - bitsandbytes 0.50.2 (MIT): installed only inside the Colab notebook (needs a CUDA GPU).
 - llama.cpp `convert_hf_to_gguf.py` and `llama-quantize`: the notebook clones the current default branch and records the commit in
   `run_summary.json` (not pinned, because a verified tag could not be looked up from the build sandbox).
+
+## Experiments lab: what companies use (lab sources, seen 2026-11-21 through web search; most pages not read in full)
+
+Used for the one-line "why companies use it" on the Lab page. Confidence: V = primary source seen, S = secondary write-up.
+
+- RAG with hybrid retrieval and reranking: SAP, Siemens and Bosch Werkstudent postings ask for RAG (V, e.g.
+  https://jobs.sap.com/job/Walldorf-Working-Student-%28fmd%29-Generative-AI-Engineer-69190/1281420901); hybrid search with
+  Reciprocal Rank Fusion and a cross-encoder is the usual described pattern (S,
+  https://towardsdatascience.com/hybrid-search-and-re-ranking-in-production-rag).
+- Fine-tuning (LoRA/QLoRA, distillation): Uber Michelangelo supports full fine-tuning and LoRA/QLoRA (S,
+  https://www.uber.com/blog/open-source-and-in-house-how-uber-optimizes-llm-training/); Netflix post-training with SFT, DPO and
+  distillation (S, https://noise.getoto.net/2026/02/13/scaling-llm-post-training-at-netflix/); Amplify 2025 AI engineering survey:
+  41% fine-tune, about 40% of those with LoRA/QLoRA (S, https://www.notion.com/lp/ai-engineering-survey).
+- LLM evaluation and LLM-as-judge: Airbnb on evaluation noise (V,
+  https://airbnb.tech/ai-ml/from-weeks-to-a-day-how-we-made-llm-evaluation-fast-enough-to-iterate-on/); Zalando LLM-judge for search
+  quality (S, https://engineering.zalando.com/posts/2026/03/search-quality-assurance-with-llm-judge.html); Anthropic guidance on
+  rubrics (V, https://platform.claude.com/docs/en/build-with-claude/define-success).
+- Shadow deployment and safe rollout: Uber (V, https://www.uber.com/blog/raising-the-bar-on-ml-model-deployment-safety/).
+- Gateways, routing and MCP: Uber GenAI Gateway and MCP Gateway (V, https://www.uber.com/blog/genai-gateway/,
+  https://www.uber.com/blog/designing-mcp-gateway/).
+- Probabilistic and global forecasting: Zalando inventory optimisation with LightGBM global models (S,
+  https://engineering.zalando.com/posts/2025/06/inventory-optimisation-system.html).
+- Retrieval models used by the lab (checked with the installed fastembed 0.9.1): `BAAI/bge-small-en-v1.5` (dense, MIT) and the
+  cross-encoder `Xenova/ms-marco-MiniLM-L-6-v2` (apache-2.0, 0.08 GB).

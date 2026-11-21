@@ -32,6 +32,7 @@ class LabResult(BaseModel):
     paired: list[dict[str, Any]] = Field(default_factory=list)
     cost_usd: float = 0.0
     notes: list[str] = Field(default_factory=list)
+    limits: list[str] = Field(default_factory=list, description="What the result does not show.")
     card: str | None = None
 
 
@@ -74,6 +75,9 @@ def check_budget(results: list[LabResult], limit: float = BUDGET_LIMIT_USD) -> f
 #: Metric columns the Lab page can show, in order, with their headings.
 COLUMNS: dict[str, str] = {
     "n": "Questions",
+    "ndcg5": "nDCG@5",
+    "mrr": "MRR",
+    "p_at_5": "Precision@5",
     "brier": "Brier",
     "log_score": "Log score",
     "ece": "ECE",
@@ -91,3 +95,35 @@ def lab_cards(results: list[LabResult]) -> list[dict[str, Any]]:
         d["cols"] = [c for c in COLUMNS if any(c in m for m in r.metrics.values())]
         out.append(d)
     return out
+
+
+def card_markdown(r: LabResult) -> str:
+    """The experiment card, generated from the result file (rule L7); every figure is copied."""
+    cols = [c for c in COLUMNS if any(c in m for m in r.metrics.values())]
+    lines = [
+        f"# {r.title}",
+        "",
+        "**EVALUATION: an experiment of the lab, not the live record (SPEC 17).**",
+        "",
+        f"Result file: `evals/results/lab-{r.experiment}.json`, created {r.created_at}.",
+        "",
+        f"Why companies use it: {r.why}",
+        "",
+    ]
+    if r.metrics:
+        lines += ["| Variant | " + " | ".join(COLUMNS[c] for c in cols) + " |"]
+        lines += ["|---|" + "---|" * len(cols)]
+        for name, m in r.metrics.items():
+            lines.append(f"| {name} | " + " | ".join(str(m.get(c, "-")) for c in cols) + " |")
+        lines.append("")
+    for p in r.paired:
+        sig = "interval excludes zero" if p["lo"] > 0 or p["hi"] < 0 else "interval includes zero"
+        lines.append(
+            f"- {p['a']} minus {p['b']}: Brier difference {p['diff']:+.4f}, 95% interval "
+            f"[{p['lo']:+.4f}, {p['hi']:+.4f}] over {p['n']} questions ({sig})."
+        )
+    lines += [""] + [f"- {n}" for n in r.notes]
+    if r.limits:
+        lines += ["", "## What this does and does not show", ""] + [f"- {x}" for x in r.limits]
+    lines += ["", f"Paid-call cost: US${r.cost_usd:.2f}.", ""]
+    return "\n".join(lines)

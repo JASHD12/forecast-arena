@@ -20,6 +20,7 @@
 {% endfor %}</tbody></table></div>{% endif %}
 {% if r.paired %}<ul class="plain">{% for p in r.paired %}<li>{{ p.a }} minus {{ p.b }}: Brier difference {{ "%+.4f"|format(p.diff) }}, 95% interval [{{ "%+.4f"|format(p.lo) }}, {{ "%+.4f"|format(p.hi) }}] over {{ p.n }} questions ({% if p.lo > 0 or p.hi < 0 %}interval excludes zero{% else %}interval includes zero: no difference shown{% endif %}).</li>{% endfor %}</ul>{% endif %}
 {% for n in r.notes %}<p class="note">{{ n }}</p>{% endfor %}
+{% if r.limits %}<details class="faq"><summary>What this does and does not show</summary><ul>{% for x in r.limits %}<li>{{ x }}</li>{% endfor %}</ul></details>{% endif %}
 <p class="note">Paid-call cost of this experiment: US${{ "%.2f"|format(r.cost_usd) }}.{% if r.card %} Card: <a href="{{ repo_url }}/blob/main/{{ r.card }}"><code>{{ r.card }}</code></a>.{% endif %}</p>
 </section>
 {% else %}

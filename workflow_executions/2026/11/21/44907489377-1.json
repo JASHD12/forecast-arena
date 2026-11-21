@@ -1,0 +1,1 @@
+{"code_sha": "e23584fcc6d9bd39af707d1d930eecabdc41b28c", "event_sha": "e23584fcc6d9bd39af707d1d930eecabdc41b28c", "intended_date": "2026-11-21", "job": "resolve", "roster": ["agent", "base_rate", "llm_context", "llm_plain", "ml", "persistence"], "started_at": "2026-11-21T13:10:39.377797+00:00", "workflow_attempt": "1", "workflow_run_id": "44907489377"}

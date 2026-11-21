@@ -248,3 +248,7 @@ curl -X POST -H "Authorization: Bearer TOKEN" -H "Accept: application/vnd.github
   - A shadow forecaster writes real forecasts before the lock into a separate `shadow/` tree on the ledger that no board reads.
     It needs a small ledger-schema change. Reply yes to allow it, or no to keep both tasks as written proposals.
 
+- [ ] H31 · Approve one paid `llm-eval` run on the two frozen lab test sets (needed for T250)
+  - The routing study needs Claude's `llm_context` probabilities on all 276 test questions (`evals/golden/power-2026-10.jsonl` and
+    `power-2026-11a.jsonl`). The existing workflow `llm-eval.yml` does it in one dispatch for about US$0.15 (recorded cost per call
+    about US$0.0004, total lab budget limit US$2.00). Reply yes and the agent dispatches it once, with a token cap.

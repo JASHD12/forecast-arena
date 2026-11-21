@@ -39,12 +39,10 @@ class LabResult(BaseModel):
 #: Experiments that are planned and not yet run (shown as such, never with numbers).
 PLANNED: tuple[tuple[str, str], ...] = (
     ("QLoRA fine-tune of the open model", "notebook ready; waiting for the Colab run"),
-    ("Distillation from Claude", "waiting for the QLoRA result and owner approval of paid runs"),
-    ("Hybrid retrieval with reranking", "planned"),
-    ("Cost routing between cheap and paid forecasters", "planned"),
-    ("LLM-as-judge and numeric grounding", "planned"),
-    ("Guardrails and red-team suite", "planned"),
-    ("Calibration methods, conformal intervals, global model, ONNX", "planned"),
+    ("Distillation from Claude", "waiting for the QLoRA result and approval of paid runs"),
+    ("Cost routing between cheap and paid forecasters", "waiting for the QLoRA scores"),
+    ("LLM-as-judge with human calibration", "waiting for approval of the paid run"),
+    ("Conformal intervals, global LightGBM, foundation models, ONNX", "planned"),
 )
 
 

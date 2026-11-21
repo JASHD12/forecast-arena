@@ -290,3 +290,55 @@ def lab_redteam(obj: Ctx, cases: Path, out: Path) -> None:
     out.write_text(result.model_dump_json(indent=1) + "\n", encoding="utf-8")
     for name, m in metrics.items():
         click.echo(f"{name}: {m}")
+
+
+@lab.command("calibration")
+@click.option(
+    "--run",
+    "run_dir",
+    type=click.Path(exists=True, file_okay=False, path_type=Path),
+    required=True,
+    help="A stored power backtest run (backtests/power-...).",
+)
+@click.option(
+    "--out", type=click.Path(path_type=Path), default=Path("evals/results/lab-calibration.json")
+)
+@click.pass_obj
+def lab_calibration(obj: Ctx, run_dir: Path, out: Path) -> None:
+    """Compare re-calibration methods on the `ml` probabilities of a stored backtest."""
+    from arena.lab import calibration_study as cs
+    from arena.lab.results import LabResult
+
+    rows = cs.load_rows(run_dir)
+    preds = cs.walk_forward(rows, cs.default_methods())
+    metrics, paired = cs.summarize(preds)
+    first, last = min(preds["identity"]["day"]), max(preds["identity"]["day"])
+    result = LabResult(
+        experiment="calibration",
+        title="Calibration methods compared: identity, Platt, isotonic, beta",
+        created_at=obj.clock.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+        why=(
+            "Probabilistic forecasts are only useful if they are calibrated; production teams "
+            "monitor and re-calibrate them (docs/SOURCES.md, lab sources)."
+        ),
+        metrics=metrics,  # type: ignore[arg-type]
+        paired=paired,
+        notes=[
+            f"The `ml` backtest probabilities of run {run_dir.name}, re-calibrated day by day on "
+            f"earlier days only (batch days {first} to {last}, 120 warm-up days, weekly refit).",
+            "Identity is the power champion as it is (it is already Platt-calibrated "
+            "inside its own training).",
+        ],
+        limits=[
+            "A backtest, not live: one market, one year, six strongly correlated questions a day.",
+            "Re-calibrating already calibrated probabilities can only add noise unless the "
+            "model drifted; no live change follows from this study (rule I8).",
+        ],
+        card="docs/lab/calibration.md",
+    )
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(result.model_dump_json(indent=1) + "\n", encoding="utf-8")
+    for name, m in metrics.items():
+        click.echo(f"{name}: {m}")
+    for p in paired:
+        click.echo(f"{p['a']} - {p['b']}: {p['diff']:+.4f} [{p['lo']:+.4f}, {p['hi']:+.4f}]")

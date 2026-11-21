@@ -752,8 +752,10 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
 - [ ] T247 · Distillation from Claude (deps: T246; needs: H27)
 - [ ] T248 · Adapter registry and lineage (deps: T246)
 - [ ] T249 · Shadow run of the fine-tuned model (deps: T246; needs: H30)
-- [ ] T250 · Cost routing and cascades, offline (deps: T242)
-  - Done when: Pareto curve from stored rows, delta chosen on validation, card generated.
+- [ ] T250 · Cost routing and cascades (deps: T246; needs: H31)
+  - Needs a paid-tier probability on every test item: Claude `llm_context` on the two frozen test sets (276 questions, about US$0.15 at the
+    recorded cost per call) through the existing `llm-eval.yml`; the stored eval rows cover only 24 of the 186 October items, too few.
+  - Done when: Pareto curve (paid calls saved vs Brier), delta chosen on validation, card generated.
 - [x] T251 · Hybrid retrieval: BM25, RRF, optional cross-encoder rerank, retrieval eval (deps: T242)
   - Done 2026-11-21: `PastQuestions.search_hybrid` (live agent unchanged), frozen set `evals/golden/retrieval-v1.jsonl` (2,004 documents, 186
     graded queries), result `evals/results/lab-retrieval-hybrid.json`: nDCG@5 dense 0.373, BM25 0.339, hybrid 0.346, hybrid+rerank 0.556;
@@ -767,7 +769,9 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
     attacks flagged, 6 expected evasions missed, 0 of 20 benign texts flagged; report-only (live agent unchanged).
 - [ ] T254 · Docs RAG assistant with citations (deps: T251)
 - [ ] T255 · GenAI-convention trace export and a Phoenix smoke target (deps: T242)
-- [ ] T256 · Calibration methods compared in the power backtest (deps: T242)
+- [x] T256 · Calibration methods compared in the power backtest (deps: T242)
+  - Done 2026-11-21: `lab/calibration_study.py`; walk-forward re-calibration of the `ml` backtest probabilities (1,470 scored questions): ECE 0.070
+    (identity) to 0.055 (Platt, beta), Brier differences vs identity -0.0015 [-0.0034, +0.0005] (Platt), all intervals include zero: no live change.
 - [ ] T257 · Conformal prediction coverage study (deps: T242)
 - [ ] T258 · Global LightGBM power model against the per-statistic champion (deps: T242)
 - [ ] T259 · Time-series foundation models, zero-shot, in the power benchmark (deps: T242)

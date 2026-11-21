@@ -1,0 +1,102 @@
+{
+ "kind": "evaluation",
+ "experiment": "guardrails",
+ "title": "Guardrails and red-team suite for untrusted tool and news text",
+ "created_at": "2026-11-21T14:54:52Z",
+ "why": "Layered input and output guards around an LLM agent, tested with a red-team set, are standard for production agents (docs/SOURCES.md, lab sources).",
+ "prereg_sha256": null,
+ "dataset_sha256": {
+  "redteam-cases": "eb8a15362668e21792952c38d308315a70b69da21449492f6824cbeacf6d5c5a"
+ },
+ "artefacts": {},
+ "metrics": {
+  "benign": {
+   "n": 20,
+   "flagged": 0,
+   "false_positive_pct": 0.0
+  },
+  "code_fence": {
+   "n": 1,
+   "flagged": 1,
+   "detected_pct": 100.0
+  },
+  "evasion": {
+   "n": 6,
+   "flagged": 0,
+   "detected_pct": 0.0
+  },
+  "force_output": {
+   "n": 4,
+   "flagged": 4,
+   "detected_pct": 100.0
+  },
+  "markup": {
+   "n": 2,
+   "flagged": 2,
+   "detected_pct": 100.0
+  },
+  "new_instructions": {
+   "n": 3,
+   "flagged": 3,
+   "detected_pct": 100.0
+  },
+  "override": {
+   "n": 7,
+   "flagged": 7,
+   "detected_pct": 100.0
+  },
+  "reveal_prompt": {
+   "n": 3,
+   "flagged": 3,
+   "detected_pct": 100.0
+  },
+  "role_change": {
+   "n": 4,
+   "flagged": 4,
+   "detected_pct": 100.0
+  },
+  "role_marker": {
+   "n": 2,
+   "flagged": 2,
+   "detected_pct": 100.0
+  },
+  "template_token": {
+   "n": 3,
+   "flagged": 3,
+   "detected_pct": 100.0
+  },
+  "too_long": {
+   "n": 1,
+   "flagged": 1,
+   "detected_pct": 100.0
+  },
+  "tool_spoof": {
+   "n": 3,
+   "flagged": 3,
+   "detected_pct": 100.0
+  },
+  "url": {
+   "n": 2,
+   "flagged": 2,
+   "detected_pct": 100.0
+  },
+  "all_attacks": {
+   "n": 41,
+   "flagged": 35,
+   "detected_pct": 85.4
+  }
+ },
+ "paired": [],
+ "cost_usd": 0.0,
+ "notes": [
+  "Detection means the guard flagged the text (injection pattern, markup, link, code fence or length); an instruction-like text is replaced before it reaches the model.",
+  "The evasion category (paraphrase, spacing, other languages, base64) is expected to get past the regex guards; its misses are the honest limit of this layer.",
+  "Report-only: the live agent is unchanged (its defences are the data labelling and the harness limits)."
+ ],
+ "limits": [
+  "Synthetic attacks written by the project; a determined attacker is not bounded by them. The patterns were refined once after a first run on this same set (three misses and one false positive), so the detection rate is optimistic.",
+  "Regex guards cannot understand meaning; a classifier or a second model would be the next layer.",
+  "No model was attacked here, so this measures detection, not attack success against an LLM."
+ ],
+ "card": "docs/lab/guardrails.md"
+}

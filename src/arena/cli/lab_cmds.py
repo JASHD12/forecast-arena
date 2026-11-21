@@ -238,3 +238,55 @@ def lab_grounding(obj: Ctx, out: Path) -> None:
     out.write_text(result.model_dump_json(indent=1) + "\n", encoding="utf-8")
     for fid, m in metrics.items():
         click.echo(f"{fid}: {m}")
+
+
+@lab.command("redteam")
+@click.option(
+    "--cases", type=click.Path(exists=True, path_type=Path), default=Path("lab/redteam/cases.json")
+)
+@click.option(
+    "--out", type=click.Path(path_type=Path), default=Path("evals/results/lab-guardrails.json")
+)
+@click.pass_obj
+def lab_redteam(obj: Ctx, cases: Path, out: Path) -> None:
+    """Run the guards over the red-team set and write the lab result (no model, no cost)."""
+    import hashlib
+
+    from arena.lab import redteam
+    from arena.lab.results import LabResult
+
+    metrics = redteam.run(redteam.load_cases(cases))
+    result = LabResult(
+        experiment="guardrails",
+        title="Guardrails and red-team suite for untrusted tool and news text",
+        created_at=obj.clock.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+        why=(
+            "Layered input and output guards around an LLM agent, tested with a red-team "
+            "set, are standard for production agents (docs/SOURCES.md, lab sources)."
+        ),
+        dataset_sha256={"redteam-cases": hashlib.sha256(cases.read_bytes()).hexdigest()},
+        metrics=metrics,  # type: ignore[arg-type]
+        notes=[
+            "Detection means the guard flagged the text (injection pattern, markup, link, "
+            "code fence or length); an instruction-like text is replaced before it reaches "
+            "the model.",
+            "The evasion category (paraphrase, spacing, other languages, base64) is expected "
+            "to get past the regex guards; its misses are the honest limit of this layer.",
+            "Report-only: the live agent is unchanged (its defences are the data labelling "
+            "and the harness limits).",
+        ],
+        limits=[
+            "Synthetic attacks written by the project; a determined attacker is not bounded "
+            "by them. The patterns were refined once after a first run on this same set "
+            "(three misses and one false positive), so the detection rate is optimistic.",
+            "Regex guards cannot understand meaning; a classifier or a second model would "
+            "be the next layer.",
+            "No model was attacked here, so this measures detection, not attack success "
+            "against an LLM.",
+        ],
+        card="docs/lab/guardrails.md",
+    )
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(result.model_dump_json(indent=1) + "\n", encoding="utf-8")
+    for name, m in metrics.items():
+        click.echo(f"{name}: {m}")

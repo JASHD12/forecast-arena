@@ -758,9 +758,13 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
   - Done 2026-11-21: `PastQuestions.search_hybrid` (live agent unchanged), frozen set `evals/golden/retrieval-v1.jsonl` (2,004 documents, 186
     graded queries), result `evals/results/lab-retrieval-hybrid.json`: nDCG@5 dense 0.373, BM25 0.339, hybrid 0.346, hybrid+rerank 0.556;
     BM25 has the best MRR (0.80). Card `docs/lab/retrieval-hybrid.md`.
-- [ ] T252a · Numeric grounding metric over stored rationales (deps: T242)
+- [x] T252a · Numeric grounding metric over stored rationales (deps: T242)
+  - Done 2026-11-21: `lab/grounding.py`, result `lab-grounding.json` (share of quoted numbers not literally in the prompt per forecaster; the
+    "derived arithmetic" class was dropped because it produced false matches by chance, noted in the module).
 - [ ] T252b · LLM-as-judge with calibration (deps: T252a; needs: H27, H29)
-- [ ] T253 · Guardrails and red-team suite (deps: T252a)
+- [x] T253 · Guardrails and red-team suite (deps: T252a)
+  - Done 2026-11-21: `llm/guards.py` (injection patterns EN/DE, markup, links, PII, length), 61 cases in `lab/redteam/cases.json`; 35 of 41
+    attacks flagged, 6 expected evasions missed, 0 of 20 benign texts flagged; report-only (live agent unchanged).
 - [ ] T254 · Docs RAG assistant with citations (deps: T251)
 - [ ] T255 · GenAI-convention trace export and a Phoenix smoke target (deps: T242)
 - [ ] T256 · Calibration methods compared in the power backtest (deps: T242)

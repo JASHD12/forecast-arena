@@ -169,6 +169,26 @@ def _local_forecaster(settings: Settings, n: int, tracer: Tracer, clock: Clock) 
     return LLMLocal(TracingLLM(local.LlamaCppLLM(backend), tracer, clock), n)
 
 
+def _ft_forecaster(settings: Settings, n: int) -> Forecaster:
+    """`llm_local_ft`: no API cost, so it also runs in dry runs. A missing pin, a failed or
+    mismatching download or a load failure give `model_missing` skips with the reason (I6)."""
+    from arena.forecasters.llm_ft import LLMLocalFT
+    from arena.lab import artefacts
+    from arena.lab.ft_runtime import LlamaScorer
+
+    art = artefacts.load_artefact()
+    if art is None:
+        return LLMLocalFT(None, None, n)
+    try:
+        path = artefacts.fetch(art, settings.models_dir / "ft", settings.user_agent())
+        scorer = LlamaScorer(path, model=art.name, yes_id=art.yes_id, no_id=art.no_id)
+    except Exception as exc:  # ImportError, download, hash or load failure
+        return LLMLocalFT(
+            None, art, n, missing=f"fine-tuned model unavailable: {type(exc).__name__}: {exc}"
+        )
+    return LLMLocalFT(scorer, art, n)
+
+
 def live_ml(ledger: Ledger, domains: Sequence[Domain], asof: datetime) -> MLForecaster:
     """Load the visible champions once; one bad artifact only disables its own domain."""
     from arena.forecasters import registry
@@ -279,6 +299,8 @@ def build_forecasters(
     out += [LLMPlain(client, n), LLMContext(client, n), agent]
     if settings.llm_local:
         out.append(_local_forecaster(settings, n, tracer, clk))
+    if settings.llm_local_ft:
+        out.append(_ft_forecaster(settings, n))
     if settings.agent_graph:
         # No silent fallback: if langgraph is missing this raises and the run fails.
         from arena.agent.graph import GraphAgentForecaster

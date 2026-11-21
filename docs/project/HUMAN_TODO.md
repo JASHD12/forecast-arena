@@ -255,3 +255,5 @@ curl -X POST -H "Authorization: Bearer TOKEN" -H "Accept: application/vnd.github
 - [ ] H32 · Confirm that the fine-tuned model goes live (needed for T271's go-live)
   - After your Colab run (H26, H28) the agent shows you the evaluation of the fine-tuned model on the frozen test days. You decided that it
     goes live whatever the result; reply "go" after looking at it, and the agent turns on `ARENA_LLM_LOCAL_FT` in the workflows (one PR).
+  - Also, if you ever set the repository variable `ARENA_LLM_MAX_TOKENS_PER_DAY` (Settings > Secrets and variables > Actions > Variables), change it to
+    `300000`; the workflow default is now 300,000 and a variable would override it.

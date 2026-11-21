@@ -27,7 +27,7 @@ jobs:
           make setup
           .venv/bin/pip install -r requirements/tracking.txt -r requirements/ml.txt
           .venv/bin/pip install -r requirements/torch.txt
-          .venv/bin/pip install -r requirements/ts.txt -r requirements/rag.txt -r requirements/graph.txt -r requirements/mcp.txt -r requirements/dashboard.txt -r requirements/api.txt
+          .venv/bin/pip install -r requirements/ts.txt -r requirements/rag.txt -r requirements/graph.txt -r requirements/mcp.txt -r requirements/dashboard.txt -r requirements/api.txt -r requirements/lab.txt
       - name: make check (with test coverage)
         run: |
           set -o pipefail

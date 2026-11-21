@@ -116,3 +116,16 @@ Filled in per source by T023, T040, T042, T044.
 | Series 125 (hour, DE): latest weekly chunk (week of 2026-11-16 Berlin) had values up to 2026-11-19 22:00 UTC, `meta_data.created` 2026-11-18 17:06 UTC, still unchanged at 16:06 UTC on 2026-11-19; the remaining hours of the chunk were null. So D+1 forecasts had not appeared by 16:06 UTC on D | live call, one observation | 2026-11-19 |
 
 | Series 125 again: on 2026-11-19 at about 19:26 UTC the latest chunk had values up to 2026-11-20 22:00 UTC and `meta_data.created` 2026-11-19 17:16:53 UTC, i.e. the forecasts for 2026-11-20 were published at about 17:16 UTC on the 19th (2026-11-18: 17:06 UTC). Both after the 09:30 UTC lock | live call, second observation | 2026-11-19 |
+
+## Experiments lab: fine-tuning stack (checked 2026-11-21)
+
+- Qwen2.5-1.5B-Instruct and Qwen2.5-0.5B-Instruct: licence `apache-2.0` (model card metadata via the Hugging Face API); revisions
+  pinned in the notebook: 1.5B `989aa7980e4cf806f80c7fef2b1adb7bc71aa306`, 0.5B `7ae557604adf67be50417f59c2c2f167def9a775`
+  (both last modified 2024-09-25, so their data predates every lab window). `YES` and `NO` are single tokens in the Qwen tokenizer
+  (ids 14004 and 8996, checked 2026-11-21).
+- peft 0.22.0 (Apache-2.0): `LoraConfig`, `get_peft_model`, `prepare_model_for_kbit_training` signatures read from the installed package.
+- transformers 5.22.2: `BitsAndBytesConfig` arguments `load_in_4bit`, `bnb_4bit_quant_type`, `bnb_4bit_use_double_quant`,
+  `bnb_4bit_compute_dtype`; `Qwen2ForCausalLM.forward(..., logits_to_keep=...)`; `get_cosine_schedule_with_warmup`.
+- bitsandbytes 0.50.2 (MIT): installed only inside the Colab notebook (needs a CUDA GPU).
+- llama.cpp `convert_hf_to_gguf.py` and `llama-quantize`: the notebook clones the current default branch and records the commit in
+  `run_summary.json` (not pinned, because a verified tag could not be looked up from the build sandbox).

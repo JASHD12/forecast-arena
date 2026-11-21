@@ -33,12 +33,14 @@ The test days are never used for training, early stopping, calibration or any ch
 | `lora_0_5b` | Qwen2.5-0.5B-Instruct | LoRA r=16 on fp16 base (precision ablation) |
 | `base_1_5b`, `base_0_5b` | same bases | no training; same scoring |
 
-Training: 1 epoch, learning rate 2e-4 with cosine schedule and 3% warm-up, effective batch 16, sequence length at most
-1,536 tokens (longer rows are dropped and counted), seed 0, fp16 mixed precision. Full fine-tuning of a 1.5B model does not fit a
+Training: 1 epoch on a seeded, template-proportional subsample of 2,000 rows of the train file (the live prompts are about
+2,300 tokens long, so a free T4 trains about 2,000 rows in roughly an hour; the 6,000-row file stays available for a larger
+run), learning rate 2e-4 with cosine schedule and 3% warm-up, effective batch 16, sequence length at most 2,560 tokens
+(longer rows are dropped and counted; the longest validation prompt is 2,325), seed 0, fp16 mixed precision. Full fine-tuning of a 1.5B model does not fit a
 16 GB T4 (weights, gradients and Adam states are about 12 bytes per parameter, 18 GB before activations), so it is not run.
 
-Scoring: P(YES) is the softmax over the next-token logits of `YES` and `NO` at the start of the assistant answer, then a
-Platt map fitted on the validation split only.
+Scoring: P(YES) is the softmax over the next-token logits of `YES` and `NO` (single tokens in the Qwen tokenizer, checked in
+code) at the start of the assistant answer, then a Platt map fitted on the validation split only (all 552 rows).
 
 ## Metrics and decision rules
 

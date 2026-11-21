@@ -1,0 +1,4 @@
+# Experiments lab (SPEC 17): PEFT for the LoRA code and its CPU unit tests. The Colab notebook pins its own
+# packages (bitsandbytes is GPU-only and is not installed here). Apache-2.0. Installed by CI on top of the
+# other requirement files, and by the lab workflows.
+peft==0.22.0

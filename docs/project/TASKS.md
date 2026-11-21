@@ -744,8 +744,9 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
   - Done 2026-11-21: `LabResult`, `lab.html` (EVALUATION banner, planned list, empty state), nav entry, budget rule in `make check`.
 - [x] T243 · Pre-registration `lab/prereg/qlora-forecast.md` and frozen test sets (deps: T241)
   - Done 2026-11-21: prereg committed with split hashes; test sets frozen in `lab/data/` and as golden files `evals/golden/power-2026-10.jsonl`, `power-2026-11a.jsonl`.
-- [ ] T244 · QLoRA training code and the Colab notebook (deps: T243)
-  - Done when: format, train and score code is unit-tested on a tiny random model on CPU; the notebook is complete.
+- [x] T244 · QLoRA training code and the Colab notebook (deps: T243)
+  - Done 2026-11-21: `arena.lab.finetune` (format, train, score, run) unit-tested on CPU with a tiny random Qwen2 model; notebook
+    `notebooks/lab/qlora_qwen_forecast.ipynb` runs QLoRA 1.5B and the LoRA 0.5B ablation and scores val and both test sets on the GPU.
 - [ ] T245 · Owner runs the Colab notebook and uploads the release assets (deps: T244; needs: H26, H28)
 - [ ] T246 · Evaluate the fine-tuned model in `lab-eval.yml` (deps: T245, T242)
 - [ ] T247 · Distillation from Claude (deps: T246; needs: H27)

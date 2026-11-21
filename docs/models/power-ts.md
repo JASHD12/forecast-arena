@@ -1,6 +1,6 @@
-# Model card: power time-series benchmarks (ts_ets, ts_sarimax, ts_chronos)
+# Model card: power time-series benchmarks (ets, sarimax, chronos, chronos2)
 
-**What they are.** Three *local* benchmarks for the power champion. For each question they
+**What they are.** Four *local* benchmarks for the power champion. For each question they
 look only at the as-of context (the daily statistic on the last 28 known days) and forecast
 that statistic for the target day, then read P(YES) from the predictive distribution:
 
@@ -12,6 +12,9 @@ that statistic for the target day, then read P(YES) from the predictive distribu
   time-series foundation model (Amazon, Apache-2.0), zero-shot on the same 28 values,
   CPU, weights pinned to revision `a0e552de`; its nine predicted quantiles 0.1..0.9 are
   interpolated into a CDF.
+- `ts_chronos2` (power-chronos-2-r1): Chronos-2, a 120M-parameter pretrained time-series
+  foundation model (Amazon, Apache-2.0), zero-shot on the same 28 values, CPU, weights pinned
+  to revision `29ec3766`; same quantile-to-CDF step.
 
 **Role.** Benchmarks in the backtest table only; not live forecasters and not candidates
 for promotion. Nothing is trained on other days and nothing is calibrated afterwards.
@@ -19,7 +22,7 @@ for promotion. Nothing is trained on other days and nothing is calibrated afterw
 **Known limits.** 28 values is a short context, chosen so every model sees exactly what
 the live forecasters see. No calendar or holiday features, which the champion has.
 
-## Backtest (run `power-2025-11-01-2026-10-31-20261113T0954`)
+## Backtest (run `power-2025-11-01-2026-10-31-20261121T2224`)
 
 **BACKTEST** (not part of the live record).
 
@@ -34,6 +37,7 @@ Observed YES rate on scored questions: 0.483 (a constant forecast of that rate w
 | ts_ets | 2190 | 0.2441 | [0.2263, 0.2616] | 0.7466 |
 | ts_sarimax | 2190 | 0.2279 | [0.2181, 0.2377] | 0.6607 |
 | ts_chronos | 2190 | 0.2142 | [0.2040, 0.2243] | 0.6227 |
+| ts_chronos2 | 2190 | 0.2073 | [0.1970, 0.2181] | 0.6062 |
 
 Paired Brier differences (negative = first is better), day-block bootstrap, 2000 replicates, fixed seed:
 
@@ -45,9 +49,11 @@ Paired Brier differences (negative = first is better), day-block bootstrap, 2000
 | ts_ets - ml | +0.0511 | [+0.0355, +0.0671] | yes | DM = +5.96, p = 0.000 |
 | ts_sarimax - ml | +0.0349 | [+0.0240, +0.0458] | yes | DM = +6.39, p = 0.000 |
 | ts_chronos - ml | +0.0212 | [+0.0109, +0.0318] | yes | DM = +4.37, p = 0.000 |
+| ts_chronos2 - ml | +0.0143 | [+0.0045, +0.0235] | yes | DM = +3.02, p = 0.003 |
 | ts_ets - base_rate | -0.0025 | [-0.0208, +0.0154] | no (interval includes zero) | DM = -0.23, p = 0.819 |
 | ts_sarimax - base_rate | -0.0187 | [-0.0287, -0.0086] | yes | DM = -2.79, p = 0.006 |
 | ts_chronos - base_rate | -0.0324 | [-0.0431, -0.0215] | yes | DM = -4.66, p = 0.000 |
+| ts_chronos2 - base_rate | -0.0393 | [-0.0498, -0.0278] | yes | DM = -5.94, p = 0.000 |
 
 Notes:
 

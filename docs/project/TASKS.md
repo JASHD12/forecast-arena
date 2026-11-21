@@ -780,7 +780,8 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
   - Done 2026-11-21: `lab/conformal_study.py`; 7 months (Apr-Oct 2026), 214 days: the 80% band covers 71.0% raw and 79.4% after the CQR margin for the daily mean (target 80%); the 90% band 80.4% raw and 92.5% after. Not a live change.
 - [x] T258 · Global LightGBM power model against the per-statistic champion (deps: T242)
   - Done 2026-11-21: `docs/models/power-global.md`; over 365 days the global model scores Brier 0.2079 against 0.1930 for the champion (difference +0.0149 [+0.0097, +0.0198]): worse, so it stays a weekly challenger and is not expected to be promoted. Honest negative result.
-- [ ] T259 · Time-series foundation models, zero-shot, in the power benchmark (deps: T242)
+- [x] T259 · Time-series foundation models, zero-shot, in the power benchmark (deps: T242)
+  - Done 2026-11-21: Chronos-2 added (`ts_chronos2`, revision pinned); 365-day backtest Brier 0.2073 vs Chronos-Bolt 0.2142, persistence 0.2205, champion 0.1930 (Chronos-2 - ml +0.0143 [+0.0045, +0.0235]). TimesFM not tried (licence and CPU feasibility unchecked).
 - [ ] T260 · Per-forecast explanations in the backtest (deps: T242)
 - [x] T261 · ONNX export and serving parity (deps: T242)
   - Done as T277 (2026-11-21): LightGBM families export to ONNX with parity 1e-4 and `POST /predict/power`; the HistGradientBoosting champion does not convert.
@@ -812,7 +813,8 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
 - [x] T275a · Weekly challenger: global LightGBM (family `power-glgbq`) (deps: T270)
   - Done 2026-11-21: `ml_power_global.py` (one LightGBM per level over all five statistics, statistic one-hot, standardised targets), `multi_fitter` hook in
     `ml_power.train`, weekly family `glgbm`, backtest challenger `ml_glgbm`; promotion only by the existing weekly rule.
-- [ ] T275b · Chronos-2 as a challenger (needs a lazily loaded pretrained artefact in the registry; the model weights are about 0.5 GB) (deps: T275a)
+- [x] T275b · Chronos-2 as a challenger (needs a lazily loaded pretrained artefact in the registry; the model weights are about 0.5 GB) (deps: T275a)
+  - Closed 2026-11-21 without building: the backtest (T259) shows Chronos-2 worse than the champion with an interval that excludes zero; a 120M-parameter model in the lock-critical run is not justified. Reopen if a later backtest changes that.
 - [x] T276a · Live monitoring: grounding table and data contracts on Status (deps: T270)
   - Done 2026-11-21: `lab/grounding.rationale_checks` feeds a 7-day table on Status; `ops/contracts.py` checks stored contexts (freshness, completeness,
     ranges), shown on Status and as an informational morning health check (never fails a run or a clean day). First real finding: a brand-new

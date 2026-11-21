@@ -112,6 +112,7 @@ All numbers below are **backtests**: past days replayed through the production c
 | ts_ets | 2190 | 0.2441 | [0.2263, 0.2616] | 0.7466 |
 | ts_sarimax | 2190 | 0.2279 | [0.2181, 0.2377] | 0.6607 |
 | ts_chronos | 2190 | 0.2142 | [0.2040, 0.2243] | 0.6227 |
+| ts_chronos2 | 2190 | 0.2073 | [0.1970, 0.2181] | 0.6062 |
 <!-- results:end -->
 
 </details>

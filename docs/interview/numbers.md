@@ -75,6 +75,7 @@ Source: `docs/models/power-ts.md`
 | ts_ets | 2190 | 0.2441 | [0.2263, 0.2616] | 0.7466 |
 | ts_sarimax | 2190 | 0.2279 | [0.2181, 0.2377] | 0.6607 |
 | ts_chronos | 2190 | 0.2142 | [0.2040, 0.2243] | 0.6227 |
+| ts_chronos2 | 2190 | 0.2073 | [0.1970, 0.2181] | 0.6062 |
 
 | Comparison | Difference | 95% interval | Supported? | Diebold-Mariano |
 |---|---|---|---|---|
@@ -84,9 +85,11 @@ Source: `docs/models/power-ts.md`
 | ts_ets - ml | +0.0511 | [+0.0355, +0.0671] | yes | DM = +5.96, p = 0.000 |
 | ts_sarimax - ml | +0.0349 | [+0.0240, +0.0458] | yes | DM = +6.39, p = 0.000 |
 | ts_chronos - ml | +0.0212 | [+0.0109, +0.0318] | yes | DM = +4.37, p = 0.000 |
+| ts_chronos2 - ml | +0.0143 | [+0.0045, +0.0235] | yes | DM = +3.02, p = 0.003 |
 | ts_ets - base_rate | -0.0025 | [-0.0208, +0.0154] | no (interval includes zero) | DM = -0.23, p = 0.819 |
 | ts_sarimax - base_rate | -0.0187 | [-0.0287, -0.0086] | yes | DM = -2.79, p = 0.006 |
 | ts_chronos - base_rate | -0.0324 | [-0.0431, -0.0215] | yes | DM = -4.66, p = 0.000 |
+| ts_chronos2 - base_rate | -0.0393 | [-0.0498, -0.0278] | yes | DM = -5.94, p = 0.000 |
 
 ### Wikipedia attention - 2026-10-15 to 2026-11-07, 24 batch days
 

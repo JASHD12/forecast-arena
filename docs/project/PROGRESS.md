@@ -65,6 +65,7 @@ Nothing. See the session summary above and `python scripts/status.py`.
   output, not acted on (S11).
 
 ## Done log
+- 2026-11-21 T235: recheck of the live build; question-page chart phone layout, bars row on phones, audit tools robust to real file names
 - 2026-11-21 T234: sweep of all page types at three widths; Status, tables, forest labels, index pages, tap targets fixed; layout audit extended (clipping, headings, ids, document basics)
 - 2026-11-20 T233: site-wide layout system (flow spacing, cards, links, duo rows) and a layout audit in `make a11y`; no number or wording of a result changed
 - 2026-11-20 T232: visual polish of the plain pages (Backtests model cards with chips, contents chips, callout banner, evals table, card spacing); no number or wording of a result changed

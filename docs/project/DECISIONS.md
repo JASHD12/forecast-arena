@@ -804,6 +804,19 @@ Made by: agent
 
 Ideas outside the specification. The agent lists them here and does not build them.
 
+- **Backtest-only QLoRA fine-tune of the open model (owner question 2026-11-21: "do we have LoRA / QLoRA / full
+  fine-tuning?").** Today: no. No fine-tuning of any LLM exists here (search of `src/`, `requirements/`, `docs/`,
+  `scripts/`, `.github/` found no LoRA, QLoRA, PEFT, SFT, RLHF or TRL). LLM use is inference only: Claude Haiku through the
+  API (prompts, JSON contract, tools, evals), Qwen2.5-1.5B (GGUF) through llama.cpp on the CI CPU, and Chronos-Bolt
+  pretrained and zero-shot. The only models that are trained are classical (scikit-learn, LightGBM, a small PyTorch MLP).
+  A possible experiment, not built: supervised fine-tuning of Qwen2.5-1.5B with PEFT/bitsandbytes (4-bit QLoRA) on resolved
+  questions of the days before a cutoff, using the existing `llm_context` prompt as input and the outcome as target, and
+  scored walk-forward on later days with the existing eval harness against `llm_local`, `llm_context` and the gradient-boosted
+  model. It would run by the owner on a free Colab T4 (GitHub Actions has no GPU and S8 forbids paid calls), the adapter
+  would be published with its SHA-256, and it would stay backtest-only (I4, I8) unless the owner later decides to add it as a
+  new forecaster version. Honest expectation: about 1,000 resolved questions on four topics is small, so it will probably
+  not beat the booster, which is itself a valid and explainable result. Needs from the owner: a yes or no, and a Colab session
+  (the agent would then write the training script, the walk-forward split and the HUMAN_TODO steps).
 - **Open public participation ("players vs AI vs ML"), owner question 2026-11-12.** Today
   anyone in any country can *view* the site; nobody can *submit* forecasts. A free design:
   (1) the owner creates a Google Form (nickname, consent checkbox, one probability per

@@ -1149,3 +1149,8 @@ and evidence requirements. Do not backfill historical ML forecasts.
 - Context: the experimental forecasters are switched by repository variables, which the agent cannot set or read; the launch plan needs a measurement of runner time and tokens before any variable is turned on.
 - Decision: `morning.yml` gets a boolean `experimental` input that sets `ARENA_AGENT_HYBRID=1` only when `dry_run` is also true. A live run can never be switched on by it; scheduled runs ignore it. `llm_local_ft` is not measurable until its artefact is pinned (H26/H28).
 - Alternatives: dispatching from a branch (not allowed); asking the owner to set the variable first (turns it on for live runs before measuring).
+
+## 2026-11-21 T259: Chronos-2 as a backtest benchmark
+- Context: the owner asked for the remaining lab tasks in one PR; Chronos-2 is the newer foundation model next to Chronos-Bolt.
+- Decision: `ts_chronos2` joins the power time-series benchmarks (backtest only, zero-shot, revision pinned). It is not a live forecaster or a weekly challenger: the 120M-parameter weights would need a registry artefact and a per-question model call inside the lock-critical morning run, which T275b leaves open until the backtest says it is worth it.
+- Alternatives: weekly challenger now (cost and risk without evidence); TimesFM (licence and CPU feasibility not checked).

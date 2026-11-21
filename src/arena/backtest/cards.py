@@ -125,9 +125,9 @@ def power_mlp_card(report_md: str, run_id: str) -> str:
     return POWER_MLP_CARD + f"\n## Backtest (run `{run_id}`)\n\n" + report_md.split("\n", 2)[2]
 
 
-POWER_TS_CARD = """# Model card: power time-series benchmarks (ts_ets, ts_sarimax, ts_chronos)
+POWER_TS_CARD = """# Model card: power time-series benchmarks (ets, sarimax, chronos, chronos2)
 
-**What they are.** Three *local* benchmarks for the power champion. For each question they
+**What they are.** Four *local* benchmarks for the power champion. For each question they
 look only at the as-of context (the daily statistic on the last 28 known days) and forecast
 that statistic for the target day, then read P(YES) from the predictive distribution:
 
@@ -139,6 +139,9 @@ that statistic for the target day, then read P(YES) from the predictive distribu
   time-series foundation model (Amazon, Apache-2.0), zero-shot on the same 28 values,
   CPU, weights pinned to revision `a0e552de`; its nine predicted quantiles 0.1..0.9 are
   interpolated into a CDF.
+- `ts_chronos2` (power-chronos-2-r1): Chronos-2, a 120M-parameter pretrained time-series
+  foundation model (Amazon, Apache-2.0), zero-shot on the same 28 values, CPU, weights pinned
+  to revision `29ec3766`; same quantile-to-CDF step.
 
 **Role.** Benchmarks in the backtest table only; not live forecasters and not candidates
 for promotion. Nothing is trained on other days and nothing is calibrated afterwards.

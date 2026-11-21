@@ -58,7 +58,7 @@ def site_build(obj: Ctx, out_dir: Path, check_links: bool) -> None:
     "--challenger",
     "challengers",
     multiple=True,
-    type=click.Choice(["lgbm", "mlp", "ets", "sarimax", "chronos"]),
+    type=click.Choice(["lgbm", "mlp", "ets", "sarimax", "chronos", "chronos2"]),
     help="Add a challenger (ml/torch/ts requirements files).",
 )
 @click.option(

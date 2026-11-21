@@ -65,6 +65,24 @@ def test_chronos_path_with_a_fake_pipeline(monkeypatch) -> None:
     assert calls == [(20, 1)]  # cached per (stat, series, horizon)
 
 
+def test_chronos2_path_with_a_fake_pipeline(monkeypatch) -> None:
+    torch = pytest.importorskip("torch")
+    shapes = []
+
+    class FakePipe:
+        def predict_quantiles(self, x, prediction_length, quantile_levels):
+            shapes.append(tuple(x.shape))  # Chronos-2 wants (series, variates, history)
+            last = float(x[0, 0, -1])
+            q = torch.tensor([[[last + 10 * (lv - 0.5) for lv in quantile_levels]]])
+            return [q.repeat(1, prediction_length, 1)], None
+
+    monkeypatch.setattr(ts_bench, "chronos2_pipeline", lambda: FakePipe())
+    m = SeriesBenchmark("chronos2")
+    assert m.probability(Q(50), ctx([50.0] * 20)) == pytest.approx(0.5)
+    assert shapes == [(1, 1, 20)]
+    assert m.version.startswith("power-chronos-2-r") and len(m.model_hash()) == 12
+
+
 def test_too_little_history_or_bad_horizon_becomes_a_skip() -> None:
     m = SeriesBenchmark("ets")
     f = MLForecaster({"power": m})

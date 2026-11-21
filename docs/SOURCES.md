@@ -156,3 +156,6 @@ Used for the one-line "why companies use it" on the Lab page. Confidence: V = pr
 
 ## ONNX export and runtime (T277), checked 2026-11-21
 - `skl2onnx` 1.20.0: conversion of `HistGradientBoostingRegressor(loss="quantile")` fails when building the `TreeEnsembleRegressor` node (tested locally); `onnxmltools` 1.16.0 `convert_lightgbm` works for LightGBM quantile regressors (max difference 1.1e-6 against LightGBM). Licences: onnxmltools Apache-2.0, onnx Apache-2.0, onnxruntime 1.31.1 MIT (package metadata).
+
+## Chronos-2 (T259/T275b), checked 2026-11-21
+- `amazon/chronos-2` on the Hugging Face Hub: licence Apache-2.0 (model card metadata), revision `29ec3766d36d6f73f0696f85560a422f50e8498c`, loaded with `chronos-forecasting` 2.3.2 (`Chronos2Pipeline`, input shape series x variates x history, `predict_quantiles` returns a list of tensors). CPU inference of one 28-value series took about 3 s on first call.

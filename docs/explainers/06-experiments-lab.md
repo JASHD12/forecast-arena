@@ -36,6 +36,27 @@ calibration_study, results), `src/arena/llm/guards.py`, `src/arena/agent/retriev
 6. **Cost is capped.** All paid calls of the lab together stay under US$2.00 and each is a manual, capped workflow run.
    Nothing paid has been run yet.
 
+## What runs live (Phase 15)
+
+The owner decided on 2026-11-21 that lab techniques are also real forecasters, not only evaluations. They go live the way `ml` did:
+backtest first, then freeze the version, then write forecasts before the lock like every other forecaster.
+
+| Forecaster | What it is | Switch |
+|---|---|---|
+| `llm_local_ft` | the QLoRA-tuned Qwen, scored by one forward pass (YES/NO logit margin, Platt calibrated); frozen artefact pinned by SHA-256 | `ARENA_LLM_LOCAL_FT`, off until the Colab run and H32 |
+| `agent_hybrid` | the LangGraph agent with hybrid retrieval (BM25 + dense + RRF + cross-encoder) and harness guards | `ARENA_AGENT_HYBRID`, off until a launch dry run |
+| `llm_router` | cascade over peers: cheap pair when decisive and in agreement, otherwise `llm_context`; registered only when its thresholds file exists | file `lab/artefacts/llm_router.json` |
+| `glgbm` | global LightGBM challenger, promoted only by the weekly 28-day rule | weekly job |
+
+- **Not in the headline.** None of them is in the common set or the ensemble, so the headline board and ensemble do not move. They carry an
+  "experimental, since <day>" label and are compared only on questions they answered.
+- **Never changed by live results (I8).** A new model is a new version string. Retraining is a pre-registered monthly check on the owner's own
+  machine (`lab/prereg/qlora-retrain.md`); a candidate replaces the live model only if it is not worse on a held-out window, through a pull
+  request the owner merges.
+- **Monitoring.** Status shows the grounding rate, the data contracts and the coverage of an experimental 80% conformal band for electricity prices.
+- **Serving parity.** The LightGBM power models export to ONNX and `POST /predict/power` answers with ONNX Runtime (probabilities within 1e-4).
+  The live HistGradientBoosting champion does not convert (skl2onnx 1.20 cannot build its quantile-loss trees), so it stays on joblib.
+
 ## Why it was built this way
 
 - **To show judgement, not a stack of logos.** Each technique has a measured result next to a baseline, and negative

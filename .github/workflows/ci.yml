@@ -16,7 +16,7 @@ concurrency:
 jobs:
   check:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25  # T284: the suite takes 11-13 min on the runner plus 2 min install; 15 min was too tight
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7

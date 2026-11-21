@@ -782,7 +782,8 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
   - Done 2026-11-21: `docs/models/power-global.md`; over 365 days the global model scores Brier 0.2079 against 0.1930 for the champion (difference +0.0149 [+0.0097, +0.0198]): worse, so it stays a weekly challenger and is not expected to be promoted. Honest negative result.
 - [x] T259 · Time-series foundation models, zero-shot, in the power benchmark (deps: T242)
   - Done 2026-11-21: Chronos-2 added (`ts_chronos2`, revision pinned); 365-day backtest Brier 0.2073 vs Chronos-Bolt 0.2142, persistence 0.2205, champion 0.1930 (Chronos-2 - ml +0.0143 [+0.0045, +0.0235]). TimesFM not tried (licence and CPU feasibility unchecked).
-- [ ] T260 · Per-forecast explanations in the backtest (deps: T242)
+- [x] T260 · Per-forecast explanations in the backtest (deps: T242)
+  - Done 2026-11-21: `lab/explanations.py` (occlusion of feature groups, top three effects), `arena lab explain`, card `docs/lab/explanations.md` with three replayed questions; effects are small (about 1 point) because the typical-value background is close to the actual input.
 - [x] T261 · ONNX export and serving parity (deps: T242)
   - Done as T277 (2026-11-21): LightGBM families export to ONNX with parity 1e-4 and `POST /predict/power`; the HistGradientBoosting champion does not convert.
 - [x] T262 · Data contracts and validation (deps: T241)
@@ -828,4 +829,5 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
 - [ ] T281c · Status shows the live model's training cut and months since retrain; HUMAN_TODO launchd steps (deps: T281b)
 - [x] T282 · Rehearsal banner computed from the ledger: clean days so far and the owner's not-before date (deps: T270)
 - [x] T283 · README for hiring managers: by-role guide, generated Experiments lab table, non-stale live status (deps: T270)
+- [x] T284 · CI `check` job timeout 15 -> 25 minutes after a post-merge timeout (deps: T270)
 - [ ] T280 · Showcase and final sweep for the live lab (deps: T272, T274, T276a, T276b)

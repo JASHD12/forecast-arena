@@ -19,6 +19,7 @@ from arena.models import Question
 
 W, H = 640, 240
 PAD = (14, 16, 30, 54)  # top, right, bottom, left
+NARROW = (300, 240, (14, 20, 28, 40))  # phones: text in viewBox units stays readable
 
 
 @dataclass
@@ -102,6 +103,12 @@ def _fmt(v: float) -> str:
 
 
 def series_svg(cd: ChartData) -> Markup:
+    """The line chart in a laptop layout and a phone layout (CSS shows one of them)."""
+    wide = _series_one(cd, W, H, PAD, "wide")
+    return Markup(f"{wide}{_series_one(cd, *NARROW, 'narrow')}") if wide else Markup("")
+
+
+def _series_one(cd: ChartData, W: int, H: int, PAD: tuple[int, int, int, int], sfx: str) -> Markup:
     """A small line chart; days on x (target day last when observed), values on y."""
     days = sorted({d for _, pts in cd.series for d, _ in pts})
     if cd.observed is not None and cd.target_day not in days:
@@ -128,9 +135,10 @@ def series_svg(cd: ChartData) -> Markup:
 
     e = html.escape
     p = [
-        f'<svg class="qchart" viewBox="0 0 {W} {H}" role="img" aria-labelledby="qc-t qc-d">',
-        f'<title id="qc-t">{e(cd.title)}</title>',
-        f'<desc id="qc-d">{e(cd.title)} in {e(cd.unit)} as known at forecast time'
+        f'<svg class="qchart qchart-{sfx}" viewBox="0 0 {W} {H}" role="img" '
+        f'aria-labelledby="qc-t-{sfx} qc-d-{sfx}">',
+        f'<title id="qc-t-{sfx}">{e(cd.title)}</title>',
+        f'<desc id="qc-d-{sfx}">{e(cd.title)} in {e(cd.unit)} as known at forecast time'
         f"{', with the threshold' if cd.reference else ''}"
         f"{' and the observed value' if cd.observed is not None else ''}. "
         "The values are also in the table below.</desc>",

@@ -21,7 +21,9 @@ function pages(dir) {
   const all = pages(root);
   // Every top-level page, plus a sample of question pages (they share one template).
   const qs = all.filter((p) => p.includes(`${path.sep}questions${path.sep}`) && !p.endsWith('index.html'));
-  const list = all.filter((p) => !qs.includes(p)).concat(qs.slice(0, 5));
+  // 404.html loads its CSS through an absolute <base href> (it is served from any path), so opened as a
+  // file it is unstyled and the colour checks would measure the browser defaults.
+  const list = all.filter((p) => !qs.includes(p) && !p.endsWith('404.html')).concat(qs.slice(0, 5));
   const browser = await chromium.launch();
   let serious = 0;
   for (const [w, scheme] of [[1200, 'light'], [390, 'dark']]) {
@@ -29,7 +31,7 @@ function pages(dir) {
     const ctx = await browser.newContext({ viewport: { width: w, height: 900 }, colorScheme: scheme, bypassCSP: true });
     for (const file of list) {
       const page = await ctx.newPage();
-      await page.goto('file://' + file);
+      await page.goto(require('url').pathToFileURL(file).href);
       await page.addScriptTag({ content: axeSource });
       const res = await page.evaluate(() => axe.run(document, { resultTypes: ['violations'] }));
       for (const v of res.violations) {

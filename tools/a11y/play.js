@@ -131,6 +131,10 @@ function fail(msg) { console.error('FAIL ' + msg); process.exitCode = 1; }
   // T203: no top-level page may scroll sideways at phone or laptop width.
   const fs = require('fs');
   const tops = fs.readdirSync(root).filter((f) => f.endsWith('.html') && f !== '404.html');
+  // one question page too: its line chart has a phone layout of its own (names with % need no escaping here)
+  const qdir = path.join(root, 'questions');
+  const qpage = fs.existsSync(qdir) && fs.readdirSync(qdir).find((f) => f.endsWith('.html') && f !== 'index.html' && !f.includes('%'));
+  if (qpage) tops.push('questions/' + qpage);
   for (const width of [390, 1366]) {
     const wctx = await browser.newContext({ viewport: { width, height: 800 } });
     const wp = await wctx.newPage();

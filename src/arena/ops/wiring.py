@@ -354,6 +354,11 @@ def build_forecasters(
                 retriever=retriever,
             )
         )
+    from arena.forecasters import router as router_mod
+
+    rp = router_mod.load_params()
+    if rp is not None:  # listed after the forecasters it reads; not registered until frozen
+        out.append(router_mod.RouterForecaster(rp))
     ens = live_ensemble(ledger, clk.now())
     if ens is not None:  # listed last: it combines the forecasts the others just wrote
         out.append(ens)

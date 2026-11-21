@@ -797,6 +797,8 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
   - Done 2026-11-21: names "(experimental)", colour slots 9 to 11, Methods information-set rows, health roster, Lab page section that lists
     the ones that have published; they are in no common group and not in the ensemble (tests).
 - [ ] T273 · `llm_router`: cascade forecaster over the other forecasts (deps: T271; needs: H31)
+  - Code done 2026-11-21 (`forecasters/router.py`, registered only when `lab/artefacts/llm_router.json` exists, tests); the thresholds delta and gamma are
+    chosen on the validation days from the QLoRA scores and the paid test-set run (H31), then frozen.
 - [x] T274 · `agent_hybrid`: the agent with hybrid retrieval and guards (deps: T270)
   - Done 2026-11-21 (code, flag `ARENA_AGENT_HYBRID` default off): `agent/hybrid.py`, guard hook in the toolbox (flags in the trace), hybrid
     similar-questions tool with the leakage rule, a missing reranker is a visible `model_missing` skip; launch in T279 after a dry-run measurement.

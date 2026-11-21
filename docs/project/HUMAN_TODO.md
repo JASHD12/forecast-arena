@@ -261,3 +261,5 @@ curl -X POST -H "Authorization: Bearer TOKEN" -H "Accept: application/vnd.github
   - Needs your MacBook Air (M5, 16 GB). The agent cannot reach it from the cloud, so it will give you one script to run; send back the printed
     summary (memory, minutes, Brier). Run it on mains power, lid open. Do not schedule anything yet: the monthly schedule steps come after the smoke
     result in T281c.
+- [ ] H34 · Phoenix documentation not reachable (T255b)
+  - The agent could not read `https://arize.com/docs/phoenix/self-hosting/deployment-options/docker` (host does not resolve here), so it did not write a `make smoke-phoenix` target from memory. To unblock: allow the host `arize.com` for the session environment, or paste the page's image name, ports, OTLP traces path and licence into this item. Optional: nothing else depends on it.

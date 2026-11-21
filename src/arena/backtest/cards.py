@@ -103,6 +103,29 @@ def power_lgbm_card(report_md: str, run_id: str) -> str:
     return POWER_LGBM_CARD + f"\n## Backtest (run `{run_id}`)\n\n" + report_md.split("\n", 2)[2]
 
 
+POWER_GLGBM_CARD = """# Model card: power global LightGBM challenger (power-glgbq-r1)
+
+**What it is.** One LightGBM quantile model per level (13 in total) fitted on the rows of all
+five daily price statistics stacked, with the statistic as a one-hot feature and each target
+standardised by its training mean and standard deviation; the pattern used in demand
+forecasting (one global model over related series). Hyperparameters are the LightGBM
+challenger's defaults, not tuned per statistic. Features, calibration (Platt on out-of-fold
+predictions) and question logic are the champion's.
+
+**Role.** A challenger in the weekly champion/challenger job (`glgbm` family): it becomes the
+live `ml` model only if it scores at least as well as the champion on the same recent
+questions. It trains five times fewer models than the per-statistic families.
+
+**Known limits.** Sharing one model across statistics can hurt a statistic with a different
+shape (spread); the standardisation only fixes the scale. Same limits as the champion.
+"""
+
+
+def power_glgbm_card(report_md: str, run_id: str) -> str:
+    """Challenger card with the generated head-to-head backtest report appended."""
+    return POWER_GLGBM_CARD + f"\n## Backtest (run `{run_id}`)\n\n" + report_md.split("\n", 2)[2]
+
+
 POWER_MLP_CARD = """# Model card: power PyTorch challenger (power-mlpq-r1)
 
 **What it is.** The power champion's probabilistic model with a neural learner: one

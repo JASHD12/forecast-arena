@@ -58,12 +58,12 @@ def site_build(obj: Ctx, out_dir: Path, check_links: bool) -> None:
     "--challenger",
     "challengers",
     multiple=True,
-    type=click.Choice(["lgbm", "mlp", "ets", "sarimax", "chronos", "chronos2"]),
+    type=click.Choice(["lgbm", "glgbm", "mlp", "ets", "sarimax", "chronos", "chronos2"]),
     help="Add a challenger (ml/torch/ts requirements files).",
 )
 @click.option(
     "--card-type",
-    type=click.Choice(["champion", "lgbm", "mlp", "ts"]),
+    type=click.Choice(["champion", "lgbm", "glgbm", "mlp", "ts"]),
     default="champion",
     help="Which model card text to write with --card.",
 )
@@ -117,6 +117,7 @@ def report_backtest_power(
         make = {
             "champion": cards.power_card,
             "lgbm": cards.power_lgbm_card,
+            "glgbm": cards.power_glgbm_card,
             "mlp": cards.power_mlp_card,
             "ts": cards.power_ts_card,
         }[card_type]

@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% from "macros.html" import page_head %}
+{% block content %}
+{{ page_head("Experiments lab", "Experiments lab", "Techniques used in real AI products, tried on this project: each one pre-registered, run without leakage and reported with its honest result, including the ones that lose.") }}
+<div class="banner" role="note"><strong>EVALUATION</strong>: everything on this page is an experiment, not the live record. Lab numbers never enter a leaderboard, finding or headline, and no live forecaster changes because of them.</div>
+<section class="card" aria-labelledby="lab-rules"><h2 id="lab-rules">How the lab works</h2>
+<ul class="plain">
+<li><strong>Pre-registered.</strong> The hypothesis, the data windows, the metric and the decision rule are committed before the run.</li>
+<li><strong>No leakage.</strong> Training days come before validation days, which come before the frozen test days.</li>
+<li><strong>Same yardstick.</strong> Brier score on identical questions with a day-block interval, next to the base rate and the gradient-boosted model.</li>
+<li><strong>Capped cost.</strong> All paid calls of the lab together stay under US$2.00 ({{ "%.2f"|format(spent) }} spent so far).</li>
+</ul></section>
+{% for r in results %}
+<section class="card lab-card" id="exp-{{ r.experiment }}" aria-labelledby="exp-{{ r.experiment }}-h">
+<h2 id="exp-{{ r.experiment }}-h">{{ r.title }} <span class="label">evaluation</span></h2>
+<p class="note">{{ r.created_at[:16]|replace("T", " ") }} UTC · {{ r.why }}</p>
+{% if r.metrics %}<div class="table-scroll" tabindex="0" role="region" aria-label="Metrics of {{ r.title }}"><table class="eval-table">
+<thead><tr><th scope="col">Variant</th>{% for c in r.cols %}<th scope="col" class="num">{{ colnames[c] }}</th>{% endfor %}</tr></thead>
+<tbody>{% for name, m in r.metrics.items() %}<tr><th scope="row">{{ name }}</th>{% for c in r.cols %}<td class="num">{{ m.get(c) if m.get(c) is not none else "–" }}</td>{% endfor %}</tr>
+{% endfor %}</tbody></table></div>{% endif %}
+{% if r.paired %}<ul class="plain">{% for p in r.paired %}<li>{{ p.a }} minus {{ p.b }}: Brier difference {{ "%+.4f"|format(p.diff) }}, 95% interval [{{ "%+.4f"|format(p.lo) }}, {{ "%+.4f"|format(p.hi) }}] over {{ p.n }} questions ({% if p.lo > 0 or p.hi < 0 %}interval excludes zero{% else %}interval includes zero: no difference shown{% endif %}).</li>{% endfor %}</ul>{% endif %}
+{% for n in r.notes %}<p class="note">{{ n }}</p>{% endfor %}
+<p class="note">Paid-call cost of this experiment: US${{ "%.2f"|format(r.cost_usd) }}.{% if r.card %} Card: <a href="{{ repo_url }}/blob/main/{{ r.card }}"><code>{{ r.card }}</code></a>.{% endif %}</p>
+</section>
+{% else %}
+<p class="empty">No experiment has finished yet. The first is a QLoRA fine-tune of the small open model; its result will appear here with the interval, whichever way it falls.</p>
+{% endfor %}
+<h2>Planned</h2>
+<ul class="plain">{% for name, status in planned %}<li><strong>{{ name }}</strong> <span class="muted">({{ status }})</span></li>{% endfor %}</ul>
+<p class="note">Design and rules: <a href="{{ repo_url }}/blob/main/docs/project/LAB_PLAN.md"><code>docs/project/LAB_PLAN.md</code></a>.</p>
+{% endblock %}

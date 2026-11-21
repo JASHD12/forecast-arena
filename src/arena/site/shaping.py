@@ -286,8 +286,8 @@ def eval_runs(evals_dir: Path | None) -> list[dict[str, Any]]:
         return []
     runs = []
     for p in sorted(evals_dir.glob("*.json")):
-        if p.name.startswith("fake-"):
-            continue
+        if p.name.startswith(("fake-", "lab-")):
+            continue  # lab results have their own page
         r = json.loads(p.read_text(encoding="utf-8"))
         if r.get("kind") == "evaluation":
             runs.append(r)

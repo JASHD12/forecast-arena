@@ -740,10 +740,10 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
 - [x] T241 · Lab dataset builder `arena lab dataset build` and data card (deps: T240)
   - Done 2026-11-21: power splits train 6,000 (seeded subsample of the replay), val 552, test_oct 186, test_nov 90, gzipped in
     `lab/data/forecast-sft/` (0.8 MB, so the Colab notebook needs no upload); hashes in `manifest.json`; unit tests incl. leakage.
-- [ ] T242 · Lab result schema and `lab.html` skeleton with the EVALUATION banner (deps: T240)
-  - Done when: schema round trip, page renders with an empty state, a11y and layout audit pass.
-- [ ] T243 · Pre-registration `lab/prereg/qlora-forecast.md` and frozen test sets (deps: T241)
-  - Done when: both test sets are built and their hashes committed before any training.
+- [x] T242 · Lab result schema and `lab.html` skeleton with the EVALUATION banner (deps: T240)
+  - Done 2026-11-21: `LabResult`, `lab.html` (EVALUATION banner, planned list, empty state), nav entry, budget rule in `make check`.
+- [x] T243 · Pre-registration `lab/prereg/qlora-forecast.md` and frozen test sets (deps: T241)
+  - Done 2026-11-21: prereg committed with split hashes; test sets frozen in `lab/data/` and as golden files `evals/golden/power-2026-10.jsonl`, `power-2026-11a.jsonl`.
 - [ ] T244 · QLoRA training code and the Colab notebook (deps: T243)
   - Done when: format, train and score code is unit-tested on a tiny random model on CPU; the notebook is complete.
 - [ ] T245 · Owner runs the Colab notebook and uploads the release assets (deps: T244; needs: H26, H28)

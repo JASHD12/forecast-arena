@@ -78,7 +78,6 @@ Each technique is tried against the project's baselines on questions it never sa
 | Unsupervised data-anomaly detection on price windows (Isolation Forest) | evaluated (not a live score) | [docs/lab/anomaly.md](docs/lab/anomaly.md) |
 | Vector database: Qdrant against brute-force dense search | evaluated (not a live score) | [docs/lab/vectordb.md](docs/lab/vectordb.md) |
 | Distillation from Claude | approved 2026-11-22; pre-registered, label workflow built; the paid run follows | - |
-| Cost routing between cheap and paid forecasters | approved 2026-11-22; pre-registered, one paid run (about US$0.15) follows | - |
 | LLM-as-judge with human calibration | approved 2026-11-22; items frozen; the paid run and the owner's 30 labels follow | - |
 
 Live experimental forecasters: the QLoRA-tuned model (running since the first morning after 2026-11-22, with its fixed pre-registered expectations), an agent with hybrid retrieval and guards, and a cascade router (both still switched off until their launch checks). None of them enters the headline board. Details: [Lab page](https://jashd12.github.io/forecast-arena/lab.html), [explainer](docs/explainers/06-experiments-lab.md).

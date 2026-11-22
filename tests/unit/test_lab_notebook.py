@@ -53,3 +53,26 @@ def test_notebook_pins_match_the_environment_and_run_the_preregistered_settings(
         assert pin in text, pin
     assert "TRAIN_ROWS = 2000" in text and "Qwen/Qwen2.5-1.5B-Instruct" in text
     assert "T4" in text
+
+
+def test_gguf_export_cell_fails_loudly_and_checks_the_file() -> None:
+    """The first Colab run reported a GGUF export that never produced a file (shell lines ignored)."""
+    import json
+    from pathlib import Path
+
+    nb = json.loads(
+        (
+            Path(__file__).resolve().parents[2] / "notebooks/lab/qlora_qwen_forecast.ipynb"
+        ).read_text()
+    )
+    src = next(
+        "".join(c["source"])
+        for c in nb["cells"]
+        if c["cell_type"] == "code" and "gguf = {}" in "".join(c["source"])
+    )
+    assert "check=True" not in src and "returncode" in src  # errors are raised by `sh`
+    assert "target.exists()" in src and src.index("target.exists()") < src.index(
+        'gguf["exported"] = True'
+    )
+    assert "hf_hub_download" in src and "-m venv /content/conv" in src
+    assert "\n!" not in src  # no ignored shell lines

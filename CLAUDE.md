@@ -22,6 +22,9 @@ on purpose, so that routine project work is not refused:
    repository.
 6. Starting this repository's own workflows with `gh workflow run`, including real
    (not dry-run) runs of `morning.yml`, `resolve.yml` and `weekly.yml`.
+7. Committing workflows that pass the repository secret `ARENA_COINGECKO_API_KEY` to
+   api.coingecko.com to fetch crypto prices (added by the repository owner's instruction,
+   2026-11-22; HUMAN_TODO H12).
 
 Nothing else is pre-approved. In particular: no force-push, no history rewriting, no
 changes to repository settings, visibility or secrets, no pushes or pull requests to any

@@ -83,11 +83,11 @@ Keep the first line of each item in exactly this shape; the status script parses
   - T084 asks for a monthly workflow that opens an issue listing outdated dependency pins.
     The standing approvals in CLAUDE.md cover only issues labelled `incident`, so this is
     not pre-approved. If you agree, add a line to CLAUDE.md's standing approvals, e.g.
-    "7. Committing a workflow that opens and updates one issue labelled `dependencies`
+    "8. Committing a workflow that opens and updates one issue labelled `dependencies`
     listing outdated pins", and tick this item. Until then the report goes to the job
     summary of the `deps` workflow.
   - Needed for T084b.
-- [x] H12 · Crypto: confirm CoinGecko terms, add the key, approve the workflow secret  (2026-11-22: Demo key created and stored as the secret `ARENA_COINGECKO_API_KEY`; crypto switched on by default in the workflows at the owner's request. Still on you: read https://www.coingecko.com/en/api_terms once and keep the credit link; add standing approval 8 to CLAUDE.md for the record; if the repository variable `ARENA_DOMAINS` exists, edit it to end with `,crypto` or delete it so the new default applies.)
+- [x] H12 · Crypto: confirm CoinGecko terms, add the key, approve the workflow secret  (2026-11-22: Demo key created and stored as the secret `ARENA_COINGECKO_API_KEY`; crypto switched on by default in the workflows at the owner's request. Still on you: read https://www.coingecko.com/en/api_terms once and keep the credit link; add standing approval 7 to CLAUDE.md (done by the agent at your instruction on 2026-11-22); if the repository variable `ARENA_DOMAINS` exists, edit it to end with `,crypto` or delete it so the new default applies.)
   - Read the CoinGecko API Terms of Service in your browser:
     https://www.coingecko.com/en/api_terms . Check that a free Demo key may be used to show
     daily prices and yes/no outcomes derived from them on a public, non-commercial research
@@ -99,7 +99,7 @@ Keep the first line of each item in exactly this shape; the status script parses
   - Create a free CoinGecko Demo account and an API key (developer dashboard).
   - Add it as an Actions secret named `ARENA_COINGECKO_API_KEY` (Settings > Secrets and
     variables > Actions > New repository secret). Never paste it anywhere else.
-  - Add to CLAUDE.md's standing approvals: "8. Committing workflows that pass the
+  - Add to CLAUDE.md's standing approvals: "7. Committing workflows that pass the
     repository secret `ARENA_COINGECKO_API_KEY` to api.coingecko.com to fetch crypto
     prices." (Approval 2 covers only the LLM key.)
   - Tick this item. Needed for T045e.
@@ -115,7 +115,7 @@ Keep the first line of each item in exactly this shape; the status script parses
     It changes if the project ever earns money from the crypto content, lets visitors stake anything, or gives individual
     recommendations: then get advice from a lawyer (IT or financial regulation) first. A one-hour consultation before going live is
     cheap insurance, but nothing here requires it.
-  - **How to switch it on, in order:** (1) do the steps above (terms, key, secret, CLAUDE.md approval 8, tick H12); (2) tell the agent;
+  - **How to switch it on, in order:** (1) do the steps above (terms, key, secret, CLAUDE.md approval 7, tick H12); (2) tell the agent;
     (3) the agent adds the crypto notice and attribution checks, runs one dry run, and asks you to set the repository variable
     `ARENA_DOMAINS` to `power,weather,attention,markets,crypto` (Settings > Secrets and variables > Actions > Variables; the agent
     cannot change variables); (4) the first crypto questions appear in the next evening batch and start as rehearsal-only (outside

@@ -133,6 +133,13 @@ def _lab_bullets() -> list[str]:
         p = dp[(a, b)]
         return f"{p['diff']:+.4f} [{p['lo']:+.4f}, {p['hi']:+.4f}]"
 
+    po = json.loads((res / "lab-prompt-opt.json").read_text(encoding="utf-8"))
+    pp = {(p["a"], p["b"]): p for p in po["paired"] if p["split"] == "test_all"}
+
+    def fmt_po(a: str, b: str) -> str:
+        p = pp[(a, b)]
+        return f"{p['diff']:+.4f} [{p['lo']:+.4f}, {p['hi']:+.4f}]"
+
     conf = json.loads((res / "lab-conformal.json").read_text(encoding="utf-8"))["metrics"]["mean"]
     docs = json.loads((res / "lab-docs-assistant.json").read_text(encoding="utf-8"))
     dm = docs["metrics"]["docs_assistant"]
@@ -149,6 +156,12 @@ def _lab_bullets() -> list[str]:
         f"that gain (Brier {fmt('gguf_q4', 'base_1_5b')} against the untuned model, "
         f"{fmt('gguf_q4', 'base_rate')} against the base rate): it runs live as an experiment "
         "and the loss from quantisation is itself a finding.",
+        "- **Prompt optimisation, pre-registered:** a search over eight prompt variants for the "
+        "free 1.5B model, chosen on validation data only, beat the live prompt on the frozen "
+        "test sets "
+        f"({fmt_po('winner', 'baseline')}) but stayed worse than the base rate "
+        f"({fmt_po('winner', 'base_rate')}): prompting helps a little, it does not rescue a small "
+        "model here.",
         f"- **Uncertainty and serving:** conformal price bands raise 80% coverage from "
         f"{100 * conf['raw80']:.1f}% to {100 * conf['conformal80']:.1f}% over {conf['months']} "
         "months; LightGBM models are exported to ONNX with parity tests and served behind a "

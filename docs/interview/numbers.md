@@ -284,6 +284,25 @@ Source: `evals/results/lab-grounding.json`; card `docs/lab/grounding.md`
 | llm_local | 78 | 337 | 20.5 | 52.6 |
 | llm_plain | 84 | 301 | 40.5 | 52.4 |
 
+### Offline prompt optimisation for the free local model
+
+Source: `evals/results/lab-prompt-opt.json`; card `docs/lab/prompt-opt.md`
+
+| Arm | Questions | Brier | Log score | ECE |
+|---|---|---|---|---|
+| base_rate / test_all | 276 | 0.2182 | 0.6235 | 0.0591 |
+| base_rate / test_nov | 90 | 0.203 | 0.588 | 0.0564 |
+| base_rate / test_oct | 186 | 0.2255 | 0.6406 | 0.0851 |
+| baseline / test_all | 276 | 0.2632 | 0.7201 | 0.1208 |
+| baseline / test_nov | 90 | 0.2648 | 0.7234 | 0.0706 |
+| baseline / test_oct | 186 | 0.2625 | 0.7185 | 0.128 |
+| ml / test_all | 276 | 0.1663 | 0.4944 | 0.0673 |
+| ml / test_nov | 90 | 0.1352 | 0.4376 | 0.1741 |
+| ml / test_oct | 186 | 0.1814 | 0.5219 | 0.1177 |
+| winner / test_all | 276 | 0.2556 | 0.7045 | 0.094 |
+| winner / test_nov | 90 | 0.2539 | 0.701 | 0.0794 |
+| winner / test_oct | 186 | 0.2564 | 0.7063 | 0.107 |
+
 ### Online learning of which forecaster to trust (Hedge and Thompson sampling)
 
 Source: `evals/results/lab-bandit.json`; card `docs/lab/bandit.md`

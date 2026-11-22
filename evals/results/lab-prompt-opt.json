@@ -1,0 +1,187 @@
+{
+ "kind": "evaluation",
+ "experiment": "prompt-opt",
+ "title": "Offline prompt optimisation for the free local model",
+ "created_at": "2026-11-22T20:46:44Z",
+ "why": "Prompt engineering evaluated against a baseline on a time-split set is the standard way to improve an LLM feature without training.",
+ "prereg_sha256": "4d329daac611e7da982e10a7486798f9381797ef9be61d8eed12e351441ff19e",
+ "dataset_sha256": {},
+ "artefacts": {},
+ "metrics": {
+  "baseline / test_oct": {
+   "n": 186,
+   "brier": 0.2625,
+   "log_score": 0.7185,
+   "ece": 0.128
+  },
+  "winner / test_oct": {
+   "n": 186,
+   "brier": 0.2564,
+   "log_score": 0.7063,
+   "ece": 0.107
+  },
+  "base_rate / test_oct": {
+   "n": 186,
+   "brier": 0.2255,
+   "log_score": 0.6406,
+   "ece": 0.0851
+  },
+  "ml / test_oct": {
+   "n": 186,
+   "brier": 0.1814,
+   "log_score": 0.5219,
+   "ece": 0.1177
+  },
+  "baseline / test_nov": {
+   "n": 90,
+   "brier": 0.2648,
+   "log_score": 0.7234,
+   "ece": 0.0706
+  },
+  "winner / test_nov": {
+   "n": 90,
+   "brier": 0.2539,
+   "log_score": 0.701,
+   "ece": 0.0794
+  },
+  "base_rate / test_nov": {
+   "n": 90,
+   "brier": 0.203,
+   "log_score": 0.588,
+   "ece": 0.0564
+  },
+  "ml / test_nov": {
+   "n": 90,
+   "brier": 0.1352,
+   "log_score": 0.4376,
+   "ece": 0.1741
+  },
+  "baseline / test_all": {
+   "n": 276,
+   "brier": 0.2632,
+   "log_score": 0.7201,
+   "ece": 0.1208
+  },
+  "winner / test_all": {
+   "n": 276,
+   "brier": 0.2556,
+   "log_score": 0.7045,
+   "ece": 0.094
+  },
+  "base_rate / test_all": {
+   "n": 276,
+   "brier": 0.2182,
+   "log_score": 0.6235,
+   "ece": 0.0591
+  },
+  "ml / test_all": {
+   "n": 276,
+   "brier": 0.1663,
+   "log_score": 0.4944,
+   "ece": 0.0673
+  }
+ },
+ "paired": [
+  {
+   "a": "winner",
+   "b": "baseline",
+   "split": "test_oct",
+   "diff": -0.006019721737435306,
+   "lo": -0.013080834437519095,
+   "hi": 0.001477379646281509,
+   "n": 186,
+   "days": 31
+  },
+  {
+   "a": "winner",
+   "b": "base_rate",
+   "split": "test_oct",
+   "diff": 0.03092434576272449,
+   "lo": 0.018553313590207156,
+   "hi": 0.042249095999300046,
+   "n": 186,
+   "days": 31
+  },
+  {
+   "a": "winner",
+   "b": "ml",
+   "split": "test_oct",
+   "diff": 0.07502899977624561,
+   "lo": 0.028833280236198532,
+   "hi": 0.11700487257109149,
+   "n": 186,
+   "days": 31
+  },
+  {
+   "a": "winner",
+   "b": "baseline",
+   "split": "test_nov",
+   "diff": -0.01090769406731159,
+   "lo": -0.02037516556104612,
+   "hi": -0.0013946029882928078,
+   "n": 90,
+   "days": 15
+  },
+  {
+   "a": "winner",
+   "b": "base_rate",
+   "split": "test_nov",
+   "diff": 0.050946465958315555,
+   "lo": 0.026347991578815573,
+   "hi": 0.07380387376135414,
+   "n": 90,
+   "days": 15
+  },
+  {
+   "a": "winner",
+   "b": "ml",
+   "split": "test_nov",
+   "diff": 0.11876665580047817,
+   "lo": 0.05491523494364432,
+   "hi": 0.16360503728996725,
+   "n": 90,
+   "days": 15
+  },
+  {
+   "a": "winner",
+   "b": "baseline",
+   "split": "test_all",
+   "diff": -0.0076136257580471395,
+   "lo": -0.01346358368750974,
+   "hi": -0.00171049324875706,
+   "n": 276,
+   "days": 46
+  },
+  {
+   "a": "winner",
+   "b": "base_rate",
+   "split": "test_all",
+   "diff": 0.03745329800041723,
+   "lo": 0.026668985173998128,
+   "hi": 0.04878595905640595,
+   "n": 276,
+   "days": 46
+  },
+  {
+   "a": "winner",
+   "b": "ml",
+   "split": "test_all",
+   "diff": 0.08929127891458231,
+   "lo": 0.05369488416867795,
+   "hi": 0.12360194076535229,
+   "n": 276,
+   "days": 46
+  }
+ ],
+ "cost_usd": 0.0,
+ "notes": [
+  "Winner of the search: i3s0 (baseline i0s0). Search log, cross-fitted Brier on the 48 validation questions per candidate (i = instruction variant, s = solved examples): i0s0 0.2753, i1s0 0.2722, i2s0 0.2581, i3s0 0.2573, i0s4 0.3003, i1s4 0.2781, i2s4 0.2652, i3s4 0.2619.",
+  "Platt maps are fitted on the 48 validation margins of each prompt; the test sets are scored once."
+ ],
+ "limits": [
+  "Electricity only; 276 test questions from 46 days; intervals are wide.",
+  "Eight candidates only, searched on 48 validation questions: a small search.",
+  "One model (Qwen2.5-1.5B-Instruct Q4_K_M); the result does not transfer to Claude."
+ ],
+ "card": "docs/lab/prompt-opt.md"
+}

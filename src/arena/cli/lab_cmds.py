@@ -646,9 +646,16 @@ def lab_prompt_final(
         ml.update(fe.read_backtest(run))
     pairs = [("winner", "baseline"), ("winner", "base_rate")] + ([("winner", "ml")] if ml else [])
     metrics, paired = fe.evaluate(scores, rows, ml, pairs)
+    log = {
+        c.id: round(
+            po.cross_fitted_brier([smargins[f"{c.id}:{i}"] for i in range(len(vrows))], vy), 4
+        )
+        for c in po.candidates()
+    }
     notes = [
-        f"Winner of the search: {winner} (baseline {po.BASELINE.id}); cross-fitted validation "
-        f"Brier is in the search log of the card.",
+        f"Winner of the search: {winner} (baseline {po.BASELINE.id}). Search log, cross-fitted "
+        "Brier on the 48 validation questions per candidate (i = instruction variant, s = "
+        "solved examples): " + ", ".join(f"{k} {v}" for k, v in log.items()) + ".",
         "Platt maps are fitted on the 48 validation margins of each prompt; the test sets are "
         "scored once.",
     ]

@@ -43,10 +43,6 @@ PLANNED: tuple[tuple[str, str], ...] = (
         "approved 2026-11-22; pre-registered, label workflow built; the paid run follows",
     ),
     (
-        "Offline prompt optimisation for the free local model",
-        "pre-registered, framework and manual workflow built; the free CPU run follows",
-    ),
-    (
         "Cost routing between cheap and paid forecasters",
         "approved 2026-11-22; pre-registered, one paid run (about US$0.15) follows",
     ),

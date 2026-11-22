@@ -43,6 +43,7 @@ append-only, hash-chained ledger. When the data arrives, every forecast is score
 - **Forecasts locked before the truth:** an append-only, hash-chained ledger on a git branch; `arena ledger verify --git` lets anyone check that no forecast was written after its question locked. Failures are recorded as skips, never filled in.
 - **Runs itself:** scheduled GitHub Actions jobs, CI-gated promotion to a stable branch, health checks with incident issues, Docker, Kubernetes (kind), dbt and Airflow validated in CI. Live record: "too early to tell" until the statistics can decide.
 - **LLM fine-tuning, measured honestly:** a QLoRA fine-tune of Qwen2.5-1.5B on replayed questions beat its untuned self (-0.0109 [-0.0154, -0.0062]) but not the base rate (+0.0196 [+0.0069, +0.0332]) and not the ML model (+0.0714 [+0.0354, +0.1061]); pre-registered, time-split, negative result published (paired Brier differences, 46 test days). Preference tuning (DPO) also beat the untuned model (-0.0123 [-0.0168, -0.0075]) but was no different from plain fine-tuning (-0.0015 [-0.0032, +0.0005]) and still worse than the base rate (+0.0181 [+0.0054, +0.0311]). The shipped 4-bit GGUF kept almost none of that gain (Brier -0.0013 [-0.0039, +0.0015] against the untuned model, +0.0292 [+0.0160, +0.0427] against the base rate): it runs live as an experiment and the loss from quantisation is itself a finding.
+- **Prompt optimisation, pre-registered:** a search over eight prompt variants for the free 1.5B model, chosen on validation data only, beat the live prompt on the frozen test sets (-0.0076 [-0.0135, -0.0017]) but stayed worse than the base rate (+0.0375 [+0.0267, +0.0488]): prompting helps a little, it does not rescue a small model here.
 - **Uncertainty and serving:** conformal price bands raise 80% coverage from 71.0% to 79.4% over 7 months; LightGBM models are exported to ONNX with parity tests and served behind a REST endpoint; a cited, offline docs assistant answers 60% of a hand-written question set and refuses 83% of the out-of-scope ones.
 <!-- highlights:end -->
 
@@ -67,6 +68,7 @@ Each technique is tried against the project's baselines on questions it never sa
 | DPO preference tuning of Qwen2.5-1.5B on replayed power questions | evaluated (not a live score) | [docs/lab/dpo-r1.md](docs/lab/dpo-r1.md) |
 | Guardrails and red-team suite for untrusted tool and news text | evaluated (not a live score) | [docs/lab/guardrails.md](docs/lab/guardrails.md) |
 | Numeric grounding of model rationales | evaluated (not a live score) | [docs/lab/grounding.md](docs/lab/grounding.md) |
+| Offline prompt optimisation for the free local model | evaluated (not a live score) | [docs/lab/prompt-opt.md](docs/lab/prompt-opt.md) |
 | Online learning of which forecaster to trust (Hedge and Thompson sampling) | evaluated (not a live score) | [docs/lab/bandit.md](docs/lab/bandit.md) |
 | Price-regime clustering (k-means) as a feature for the next day's mean price | evaluated (not a live score) | [docs/lab/regimes.md](docs/lab/regimes.md) |
 | QLoRA fine-tune of Qwen2.5-1.5B on replayed power questions | evaluated (not a live score) | [docs/lab/qlora-r1.md](docs/lab/qlora-r1.md) |
@@ -75,7 +77,6 @@ Each technique is tried against the project's baselines on questions it never sa
 | Unsupervised data-anomaly detection on price windows (Isolation Forest) | evaluated (not a live score) | [docs/lab/anomaly.md](docs/lab/anomaly.md) |
 | Vector database: Qdrant against brute-force dense search | evaluated (not a live score) | [docs/lab/vectordb.md](docs/lab/vectordb.md) |
 | Distillation from Claude | approved 2026-11-22; pre-registered, label workflow built; the paid run follows | - |
-| Offline prompt optimisation for the free local model | pre-registered, framework and manual workflow built; the free CPU run follows | - |
 | Cost routing between cheap and paid forecasters | approved 2026-11-22; pre-registered, one paid run (about US$0.15) follows | - |
 | LLM-as-judge with human calibration | approved 2026-11-22; items frozen; the paid run and the owner's 30 labels follow | - |
 

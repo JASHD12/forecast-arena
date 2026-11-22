@@ -65,6 +65,7 @@ Nothing. See the session summary above and `python scripts/status.py`.
   output, not acted on (S11).
 
 ## Done log
+- 2026-11-22 T295: Prometheus /metrics on the API and a CI job with real Prometheus and Jaeger servers.
 - 2026-11-22 T291: Qdrant vector store with the leakage filter inside the store, parity study (identical to brute force), CI server job.
 - 2026-11-22 T294: unsupervised learning: anomaly check on Status (z-score beats Isolation Forest on short windows) and a regime-clustering study (no gain).
 - 2026-11-22 T290/T293: Phase 16 governance; `bandit_hedge` forecaster, replay study and card (flag ARENA_BANDIT off).

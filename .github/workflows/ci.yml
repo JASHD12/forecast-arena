@@ -104,6 +104,7 @@ jobs:
           for i in $(seq 1 60); do curl -fsS http://127.0.0.1:8000/health && break; sleep 2; done
           curl -fsS "http://127.0.0.1:8000/questions?limit=2" | python3 -c "import json,sys; d=json.load(sys.stdin); assert len(d)==2, d"
           curl -fsS "http://127.0.0.1:8000/leaderboard" | python3 -c "import json,sys; d=json.load(sys.stdin); assert d['rows'], d"
+          curl -fsS http://127.0.0.1:8000/metrics | grep -q '^arena_http_requests_total'  # T295
           test "$(curl -s -o /dev/null -w '%{http_code}' 'http://127.0.0.1:8000/sql?q=DROP%20TABLE%20skips')" = 400
           # T277: the route exists and answers 503 (no model mounted) with onnxruntime importable in the image
           test "$(curl -s -o /dev/null -w '%{http_code}' -X POST -H 'content-type: application/json' -d '{"stat":"mean","target_date":"2026-11-02","daily":[],"threshold":50}' http://127.0.0.1:8000/predict/power)" = 503
@@ -177,6 +178,7 @@ jobs:
           kubectl port-forward service/forecast-arena-api 8000:80 >/tmp/pf.log 2>&1 &
           for i in $(seq 1 30); do curl -fsS http://127.0.0.1:8000/health && break; sleep 2; done
           curl -fsS "http://127.0.0.1:8000/leaderboard" | python3 -c "import json,sys; d=json.load(sys.stdin); assert d['rows'], d"
+          curl -fsS http://127.0.0.1:8000/metrics | grep -q '^arena_http_requests_total'  # T295
       - name: Run the CronJob once and check it succeeds
         run: |
           kubectl create job verify-once --from=cronjob/arena-verify
@@ -216,6 +218,30 @@ jobs:
         run: |
           for i in $(seq 1 30); do curl -fsS http://localhost:6333/healthz && break; sleep 2; done
           .venv/bin/python -m pytest tests/unit/test_vectorstore.py -q
+
+  observability:
+    # T295: Prometheus scrapes the API's /metrics and Jaeger receives OTLP traces (both real servers).
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements/*.txt
+      - name: Install pinned dependencies
+        run: |
+          make setup
+          .venv/bin/pip install -r requirements/api.txt
+      - name: Prometheus scrapes /metrics and Jaeger receives OTLP traces
+        run: scripts/smoke_observability.sh
+      - name: Logs on failure
+        if: failure()
+        run: |
+          docker logs arena-prom 2>&1 | tail -20 || true
+          docker logs arena-jaeger 2>&1 | tail -20 || true
+          tail -20 api.log || true
 
   audit:
     # Vulnerability report for the pinned dependencies. Non-blocking: findings appear in

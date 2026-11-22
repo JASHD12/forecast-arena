@@ -162,3 +162,6 @@ Used for the one-line "why companies use it" on the Lab page. Confidence: V = pr
 
 ## Qdrant (T291), checked 2026-11-22
 - `qdrant-client` 1.20.0 (PyPI metadata: Apache-2.0, Python >= 3.10); server image `qdrant/qdrant:v1.20.2` exists on Docker Hub (tag list read 2026-11-22), Apache-2.0. Local mode (`QdrantClient(":memory:")` or a path) needs no server; `query_points` with a `Filter` of `FieldCondition`/`Range` is the filtered search used for the forecast-time rule.
+
+## Observability stack (T295), checked 2026-11-22
+- `prometheus-client` 0.26.0 (PyPI: Apache-2.0 and BSD-2-Clause, Python >= 3.9). Server images `prom/prometheus:v3.16.0` and `jaegertracing/all-in-one:1.76.0` exist on Docker Hub (tag lists read 2026-11-22); both Apache-2.0. Jaeger accepts OTLP over HTTP on port 4318 (`/v1/traces`, JSON) and serves traces at `/api/traces?service=...` on port 16686.

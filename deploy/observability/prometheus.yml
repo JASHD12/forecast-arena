@@ -1,0 +1,8 @@
+# Scrape config used by the CI job `observability` (T295) and by `make smoke-observability`.
+global:
+  scrape_interval: 5s
+scrape_configs:
+  - job_name: arena-api
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["localhost:8000"]

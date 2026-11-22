@@ -887,7 +887,7 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
   - Done 2026-11-22: golden table reproduced (candidate Brier 0.213333 / clipped 0.2134 vs 0.28 on the same three days; loss 1.00 vs 0.25 per day at 1:4); CI job `forecast-audit` runs on a bare Python 3.12.
 - [x] T321 · German electricity adapter: `examples/forecast-audit/german-electricity/` (46 evening cases, 29 YES / 17 NO, base rate and GGUF probabilities, manifest with hashes, terms and attribution, `expected/` report, DuckDB `audit.sql` agreeing with Python, `build_case.py --check`) (deps: T320)
   - Done 2026-11-22: reproduces the brief's table (Brier 0.2337 vs 0.2499, both models 46 alerts / 17 false / 0 misses / loss 17; never-alert 116). Label: replayed. Only derived binary data shipped; SMARD terms read 2026-11-22 (CC BY 4.0, wholesale-price licensing under review).
-- [ ] T322 · Case and application pages: generated case page, neutral full-time recruiter entry beside the Werkstudent one, German proof line, README block (deps: T321)
+- [x] T322 · Case and application pages: generated case page, neutral full-time recruiter entry beside the Werkstudent one, German proof line, README block (deps: T321)
 - [ ] T323 · Contributor and release path: CONTRIBUTING, issue form, focused test command, release note, archive test, data licence file (deps: T321)
 - [ ] T324 · Owner path and docs: pilot script, upstream candidate note, starter issues, explainer 09, HUMAN_TODO items (deps: T322)
 - [ ] T325 · One role-specific follow-up chosen by role fit or pilot feedback (deferred until selected; owner decision)

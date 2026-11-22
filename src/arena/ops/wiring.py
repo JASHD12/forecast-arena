@@ -377,6 +377,13 @@ def build_forecasters(
     rp = router_mod.load_params()
     if rp is not None:  # listed after the forecasters it reads; not registered until frozen
         out.append(router_mod.RouterForecaster(rp))
+    if settings.bandit:  # T293: reads the peers' forecasts like the ensemble, so listed after them
+        from arena.forecasters import bandit as bandit_mod
+        from arena.scoring.core import load as load_record
+
+        out.append(
+            bandit_mod.BanditForecaster(bandit_mod.train(load_record(ledger).scored, clk.now()))
+        )
     ens = live_ensemble(ledger, clk.now())
     if ens is not None:  # listed last: it combines the forecasts the others just wrote
         out.append(ens)

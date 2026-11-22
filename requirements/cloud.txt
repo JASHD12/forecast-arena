@@ -1,0 +1,25 @@
+# S3 export (T292): boto3 for `arena export s3` and moto's S3 implementation for its tests. Kept out of the main
+# environment because botocore needs python-dateutil<3 while the main pins use 4.x (same reason as
+# requirements/dbt.txt); the CI job `cloud` installs it next to the lock in its own virtual environment.
+# Apache-2.0 (boto3 1.44.9, moto 5.2.5 checked 2026-11-22). Compiled with the lock as a constraint.
+boto3==1.44.9
+botocore==1.44.9
+certifi==2026.11.20
+cffi==2.1.1
+charset-normalizer==3.5.2
+cryptography==50.0.2
+idna==3.20
+jmespath==1.1.0
+markupsafe==3.0.4
+moto[s3]==5.2.5
+py-partiql-parser==0.6.3
+pycparser==3.12
+python-dateutil==2.9.0.post0
+pyyaml==6.0.4
+requests==2.34.2
+responses==0.26.3
+s3transfer==0.19.3
+six==1.17.0
+urllib3==2.8.0
+werkzeug==3.1.9
+xmltodict==1.0.4

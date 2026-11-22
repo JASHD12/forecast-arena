@@ -159,3 +159,21 @@ Used for the one-line "why companies use it" on the Lab page. Confidence: V = pr
 
 ## Chronos-2 (T259/T275b), checked 2026-11-21
 - `amazon/chronos-2` on the Hugging Face Hub: licence Apache-2.0 (model card metadata), revision `29ec3766d36d6f73f0696f85560a422f50e8498c`, loaded with `chronos-forecasting` 2.3.2 (`Chronos2Pipeline`, input shape series x variates x history, `predict_quantiles` returns a list of tensors). CPU inference of one 28-value series took about 3 s on first call.
+
+## Qdrant (T291), checked 2026-11-22
+- `qdrant-client` 1.20.0 (PyPI metadata: Apache-2.0, Python >= 3.10); server image `qdrant/qdrant:v1.20.2` exists on Docker Hub (tag list read 2026-11-22), Apache-2.0. Local mode (`QdrantClient(":memory:")` or a path) needs no server; `query_points` with a `Filter` of `FieldCondition`/`Range` is the filtered search used for the forecast-time rule.
+
+## Observability stack (T295), checked 2026-11-22
+- `prometheus-client` 0.26.0 (PyPI: Apache-2.0 and BSD-2-Clause, Python >= 3.9). Server images `prom/prometheus:v3.16.0` and `jaegertracing/all-in-one:1.76.0` exist on Docker Hub (tag lists read 2026-11-22); both Apache-2.0. Jaeger accepts OTLP over HTTP on port 4318 (`/v1/traces`, JSON) and serves traces at `/api/traces?service=...` on port 16686.
+
+## TypeScript (T296), checked 2026-11-22
+- `typescript` 7.0.2 on npm (Apache-2.0, `npm view`); `module: "none"` is no longer accepted by this version, so the config uses `es2020` for a file without imports or exports, which compiles to a plain script. Installed only in `tools/site-ts` (dev dependency, lock file committed); the site itself loads the compiled `app.js` and ships no TypeScript.
+
+## AWS as code and S3 tests (T292), checked 2026-11-22
+- `boto3` 1.44.9 and `moto` 5.2.5 (PyPI, Apache-2.0); botocore needs `python-dateutil<3`, so they live in their own requirements file and CI environment (like dbt). Terraform image `hashicorp/terraform:1.17.2` exists on Docker Hub (the CLI is under the Business Source License; running `fmt` and `validate` in CI is within its terms). The AWS provider is constrained to `>= 6.0, < 7.0`; its registry page could not be read from the agent environment (the registry host is blocked), so `terraform validate` in CI is the check of the resource arguments.
+- The MinIO image is no longer on Docker Hub (repository not found, 2026-11-22), so the S3 tests use moto's S3 implementation instead of a MinIO container.
+
+## DWD terms for new topics (T302), read 2026-11-22 from the sandbox
+- `https://opendata.dwd.de/README.txt`: free of charge, access without registration, the terms of use are the DWD legal notice; DWD stores IP addresses for at most 7 days.
+- `https://www.dwd.de/EN/service/legal_notice/legal_notice_node.html`: content of dwd.de is re-usable "solely under the terms of the Creative Commons license BY 4.0 providing the source is duly acknowledged"; all open spatial data and high-value datasets likewise. Attribution wording already used on the site: "Deutscher Wetterdienst (DWD)". (The owner declined a pollen topic on 2026-11-22; the DWD terms are kept as the reference for any later DWD data.)
+- Not read (host blocked in this environment, 2026-11-22): umweltbundesamt.de and luftqualitaet.api.bund.dev (air quality), autobahn.api.bund.dev, ec.europa.eu (Eurostat), bundesbank.de. No licence is assumed for any of them.

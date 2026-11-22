@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "ES2019",
+    "lib": ["ES2019", "DOM", "DOM.Iterable"],
+    "module": "es2020",
+    "strict": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "removeComments": false,
+    "newLine": "lf",
+    "rootDir": "../../site_ts",
+    "outDir": "../../src/arena/site/static"
+  },
+  "include": ["../../site_ts/*.ts"]
+}

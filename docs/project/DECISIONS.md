@@ -1190,3 +1190,51 @@ and evidence requirements. Do not backfill historical ML forecasts.
 ## 2026-11-22 T246b: the first lab-eval run failed because the scoring runners have no PyTorch
 - Context: all four shards of `lab-eval.yml` (run 45008783161) failed in under a second at `arena lab ft-score`: `ft_gguf.py` imported `finetune.train`, which imports torch at module level, and the shard jobs install only the lock and local-LLM requirements.
 - Decision: the import moves into `calibrate()` (run locally, where torch exists). A unit test imports the whole scoring path in a subprocess with torch blocked and reads all 828 rows, so a torch import on that path fails CI. No workflow change needed; the run is dispatched again after the merge.
+
+## 2026-11-22 Phase 16: production skills (owner decisions)
+- Context: the owner showed a chart of skills in 2026 AI-engineer postings and asked for the production skills the project lacks, as used in German and US AI/ML/DS product companies.
+- Decisions (owner, in chat): cloud as code and run locally (Terraform for AWS validated in CI and an S3 path tested against MinIO; no account, no spending, so labelled "not deployed"); add all of Qdrant, bandit/online learning, unsupervised learning, observability and TypeScript; LLM work: DPO preference tuning (the owner runs it on Colab), offline prompt optimisation, self-consistency and the LLM judge (paid runs each need the owner's OK). "Something else" was ticked without a named item: nothing extra is added for it.
+- Rules: each new technology gets a SOURCES line (version, licence, docs checked that day) and a DECISIONS line; anything that forecasts is a new experimental forecaster id (frozen version string, no headline board, not in the ensemble); servers (Qdrant, MinIO, Jaeger, Prometheus) run only in CI jobs or `make smoke-*`, never in `make check`.
+
+## 2026-11-22 T293: `bandit_hedge` (Hedge expert advice) replaces "reinforcement learning" with its honest form
+- Context: there is no environment to explore in a forecasting benchmark, only delayed feedback on how each forecaster did, which is the expert-advice / bandit setting.
+- Decision: Hedge weights per topic from the Brier losses of resolved questions at least two batch days old (a pure function of the ledger, so restartable), blend of the peers' probabilities; Thompson sampling only in the replay study. Registered behind `ARENA_BANDIT` (default off), experimental, no headline board, not an ensemble member.
+- Result of the replay on the live record (5 days): better than the equal-weight mean, not better than `ml`; reported as a mechanism check with wide intervals.
+
+## 2026-11-22 T294: two unsupervised experiments, both with negative results, published
+- Anomaly detection (`ops/anomaly.py`, `lab/anomaly_study.py`): an Isolation Forest fitted on 27 days finds fewer injected faults than a robust z-score (spike 56.6% vs 100%, unit error 28.7% vs 69.7%, flat feed 1.6% vs 18.9%, repeated day 9.8% vs 10.7%; false alarms 4.1% vs 7.4%). Decision: Status shows both with thresholds fixed on 2019-2024 clean windows; nothing fails a run (informational like the data contracts).
+- Regimes (`lab/regimes.py`): k-means on standardised 24-hour shapes, k=2 by silhouette (about 49%/51% of days); adding the last day's regime to the champion's 37 features changes the pinball loss of tomorrow's mean price by -0.022 [-0.161, +0.107]: no demonstrable gain, so no `ml_regime` challenger is built.
+
+## 2026-11-22 T291: Qdrant as a vector database; not switched on in the live agent
+- Decision: `agent/vectorstore.py` adds `QdrantIndex` with the same `search` contract as `PastQuestions`; the leakage rule (`resolved_ts < asof`) is a payload filter inside the store. New pinned file `requirements/vectordb.txt` (qdrant-client 1.20.0 and its five new transitive packages). Unit tests run in local mode in `check` and, in the CI job `vectordb`, against a Qdrant v1.20.2 server.
+- Result (`arena lab vectordb`, local mode, 143 queries): nDCG@5, MRR and precision@5 are identical to brute force and the top-5 id set is the same for 100% of queries. Local mode is not an HNSW index, so it gives no speed-up (p50 96 ms against 40 ms in this run); a server benchmark is a CI-log item, not a claim.
+- Not done on purpose: the live `agent` keeps its in-memory retriever. Adding a network service or a new package to the lock-critical morning run is a retriever version change (I8) and the dense results are identical anyway, so there is nothing to gain yet; the owner can ask for it.
+
+## 2026-11-22 T295: Prometheus metrics and Jaeger traces, tested against the real servers in CI
+- Decision: `/metrics` on the REST API with `prometheus-client` (added to `requirements/api.txt`, so the Docker image has it). Labels are route templates, never ids (bounded cardinality); each app has its own registry. A new CI job runs Prometheus and Jaeger as containers on the host network and checks that the scrape shows the request counter and the ledger gauge and that Jaeger stores the three sample spans exported with the OpenTelemetry GenAI attribute names. Arize Phoenix (T255b) stays blocked on H34; Jaeger is the trace viewer that could be verified.
+- Not claimed: dashboards or alerting rules (nothing is deployed for them to run on).
+
+## 2026-11-22 T296: the site's script is written in TypeScript and compiled to the same single file
+- Decision: `site_ts/app.ts` is the source; `src/arena/site/static/app.js` is its committed, generated output (the site stays one self-hosted file, no bundler, no runtime dependency). `make site-ts` compiles; CI recompiles and fails on any difference, so the two cannot drift. Strict mode with no `any`.
+- Alternatives: a bundler such as Vite or esbuild (more tooling than a 350-line file needs); leaving JavaScript (the posting-skills chart lists TypeScript).
+
+## 2026-11-22 Phase 17 requested by the owner: pandas, more topics, crypto, under EU and German rules
+- Owner request (in chat, mid-work): add pandas, and other technology or topics such as crypto that make the project more interesting, following EU and German rules.
+- Decision: recorded as T301 (pandas, as an interface next to Polars and DuckDB, not a replacement), T302 (new open-data topics, terms read first, rehearsal-only until 30 days) and T303 (crypto, blocked on the owner's CoinGecko key H12; no trading, no real money, not-advice notice, attribution). Nothing in the safety rails changes: S1 (no money), S2 (no accounts), S7 (source terms), S12 (research, not advice, no personal data).
+
+## 2026-11-22 T292: AWS as code, not deployed; S3 path tested with moto
+- Decision (owner: "AWS as code, run locally"): Terraform in `infra/aws` for a private S3 bucket served through CloudFront (origin access control), an ECR repository, an ECS Fargate service behind an ALB, a log group, task roles without permissions, and a monthly budget alarm. Nothing is applied: no account, no spending (S1, S2). CI formats and validates it. A budget alarm and an HTTP-only listener are stated limits; a certificate and a custom domain are listed as left out.
+- `arena site publish-s3` uploads a built directory (content types, cache headers, skip unchanged, prune, dry run) and is tested with real boto3 calls against moto. A MinIO container was planned and dropped because the image is no longer on Docker Hub.
+- The AWS provider documentation was not readable from this environment, so resource arguments follow the provider's well-known 6.x schema from memory and are checked only by `terraform validate` in CI; if that fails, the CI log shows the exact argument to fix.
+
+## 2026-11-22 T301: pandas as an interface, not a replacement
+- Decision: `analytics/frames.py` gives pandas views over the scored record (same numbers as `scoring.leaderboard`, a test proves it); pandas is imported inside the functions so the production jobs, which do not install it, never load it. DuckDB and Polars stay the query engines. pandas 2.3.3 is already pinned (`requirements/ml.txt`, via scikit-learn and MLflow tooling).
+- `lab/stacking_study.py` shows the DataFrame stack end to end (ColumnTransformer + Pipeline + LogisticRegression, walk-forward). A first replay on the live record had only 2 test days (32 questions), so no result is published; the command refuses to write a result below 5 test days (T301b waits).
+
+## 2026-11-22 T298/T299: self-consistency as an evaluation variant; DPO reduces to a margin loss
+- T298: the Anthropic adapter does not send a temperature (current models reject it), so self-consistency relies on the provider's default sampling: five calls of the same prompt, mean probability, spread recorded. Evaluation variant only (`llm_context_sc5`, five times the tokens), never live; the paid run waits for the owner's OK (H36).
+- T299: for a one-token YES/NO answer the log-probability difference is exactly the logit margin, so DPO is `-log sigmoid(beta * s * (m - m_ref))` and needs only the untuned model's margins on the training rows (computed once). It reuses the QLoRA training loop, data and budget, so the comparison is clean. Pre-registered hypotheses expect the same negative result as QLoRA.
+
+## 2026-11-22 No pollen topic; crypto assessed under EU and German rules
+- Owner decision (in chat): do not add the DWD pollen topic. T302 is closed without a new topic; the DWD terms stay recorded in SOURCES.
+- Owner question: can crypto forecasts be offered under EU and German rules? Assessment (agent, not legal advice): yes, with conditions, as written in HUMAN_TODO H12 and `docs/COMPLIANCE.md` (free general forecasts, no trading or recommendations, not-advice notice, CoinGecko credit, honest record, complete Impressum, no personal data). The domain stays off until the owner completes H12; switching it on is then a repository variable the owner sets.

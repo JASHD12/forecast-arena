@@ -220,6 +220,7 @@ def _rows(questions: Sequence[Question], rec: Any) -> tuple[list[dict[str, Any]]
         "llm_local_ft",
         "llm_router",
         "agent_hybrid",
+        "bandit_hedge",
     ]
     ordered = [f for f in order if f in fids] + sorted(fids - set(order))
     return rows, ordered
@@ -499,6 +500,21 @@ def phase_line(dec: Any, needed: int, not_before: Any, fallback: str) -> str:
     return (
         f"Rehearsal: {dec.streak} of {needed} clean days in a row so far. The official record "
         f"starts the day after the {needed}th, {gate}; {tail}"
+    )
+
+
+def anomaly_status(ledger: Any, rec: Any) -> dict[str, Any] | None:
+    """Unsupervised anomaly check of the latest batch day's power context (None: nothing)."""
+    from arena.ops.anomaly import THRESHOLD, THRESHOLD_Z, latest_batch_anomaly
+
+    if not rec.questions:
+        return None
+    day = max(q.batch_date for q in rec.questions.values())
+    res = latest_batch_anomaly(ledger, rec, day)
+    return (
+        None
+        if res is None
+        else {**res, "batch_day": day.isoformat(), "limit_if": THRESHOLD, "limit_z": THRESHOLD_Z}
     )
 
 

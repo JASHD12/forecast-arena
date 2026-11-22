@@ -1,0 +1,40 @@
+{
+ "kind": "evaluation",
+ "experiment": "vectordb",
+ "title": "Vector database: Qdrant against brute-force dense search",
+ "created_at": "2026-11-22T10:29:57Z",
+ "why": "A vector database is the standard retrieval store of production RAG systems.",
+ "prereg_sha256": null,
+ "dataset_sha256": {
+  "retrieval-v1": "fd4ceea134597d9b7ff2219cffbe46376c4d5b3645674d8242153ef3dd51825f"
+ },
+ "artefacts": {},
+ "metrics": {
+  "dense_numpy": {
+   "n": 143,
+   "ndcg5": 0.3731,
+   "mrr": 0.5065,
+   "p_at_5": 0.2126,
+   "latency_ms_p50": 39.94
+  },
+  "dense_qdrant": {
+   "n": 143,
+   "ndcg5": 0.3731,
+   "mrr": 0.5065,
+   "p_at_5": 0.2126,
+   "latency_ms_p50": 96.04,
+   "top5_same_set_pct": 100.0
+  }
+ },
+ "paired": [],
+ "cost_usd": 0.0,
+ "notes": [
+  "2004 documents and 143 queries of the frozen retrieval set, the same embedder for both arms; Qdrant location `:memory:` (local mode, no server).",
+  "The forecast-time rule (a document must have resolved before the query's as-of time) is a payload filter inside Qdrant and is covered by unit tests."
+ ],
+ "limits": [
+  "Local mode scans vectors like brute force, so its latency says nothing about a server with an HNSW index; the CI job `vectordb` runs the same tests against a Qdrant server container.",
+  "Two thousand documents are far below the size where an approximate index matters."
+ ],
+ "card": "docs/lab/vectordb.md"
+}

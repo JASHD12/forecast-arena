@@ -32,6 +32,7 @@ class Spec:
     base_id: str
     four_bit: bool = False
     base_name: str = ""  # the untuned model scored the same way, e.g. "base_1_5b"
+    dpo_beta: float | None = None  # preference tuning (DPO) against the untuned model as reference
 
 
 def _score_all(
@@ -98,9 +99,21 @@ def run_variant(
     base_probs, base_platt = _calibrated(base_margins, enc)
     t_base = time.monotonic() - t0
 
+    ref: dict[str, float] | None = None
+    if spec.dpo_beta is not None:  # the untuned model is the frozen DPO reference
+        ref = dict(
+            zip(
+                (e.id for e in enc["train"]),
+                tr.margins(model, enc["train"], fp16=cfg.fp16, **kw),
+                strict=True,
+            )
+        )
     model = add_lora_fn(model)
     t1 = time.monotonic()
-    log = tr.train(model, enc["train"], cfg, on_log=on_log, **train_kw)
+    log = tr.train(
+        model, enc["train"], cfg, on_log=on_log, ref_margins=ref,
+        beta=spec.dpo_beta if spec.dpo_beta is not None else 0.1, **train_kw,
+    )  # fmt: skip
     t_train = time.monotonic() - t1
     model.save_pretrained(str(out_dir / f"adapter_{spec.name}"))
     tuned_margins = _score_all(model, enc, kw, cfg.fp16)

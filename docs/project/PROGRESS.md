@@ -65,6 +65,17 @@ Nothing. See the session summary above and `python scripts/status.py`.
   output, not acted on (S11).
 
 ## Done log
+- 2026-11-22 Pollen declined by the owner; crypto assessed under EU/German rules with go-live steps in H12 and COMPLIANCE.md.
+- 2026-11-22 T300: Phase 16 showcase: skills rows, recruiter links, explainer 08.
+- 2026-11-22 T302: DWD terms read (CC BY 4.0, pollen forecast qualifies); four other sources unreadable until H38.
+- 2026-11-22 T298/T299: self-consistency eval variant (paid run waits for H36); DPO loss, prereg and Colab notebook ready (H35).
+- 2026-11-22 T301: pandas frames over the scored record (equal to the leaderboard by test) and a Pipeline stacking study; live replay waits for 5 test days.
+- 2026-11-22 T292: Terraform for AWS (not applied), S3 publish command with moto tests, CI jobs cloud and terraform; also fixed a YAML error in ci.yml from T296.
+- 2026-11-22 T296: site script moved to TypeScript (strict) compiled to the same app.js; CI checks it is current.
+- 2026-11-22 T295: Prometheus /metrics on the API and a CI job with real Prometheus and Jaeger servers.
+- 2026-11-22 T291: Qdrant vector store with the leakage filter inside the store, parity study (identical to brute force), CI server job.
+- 2026-11-22 T294: unsupervised learning: anomaly check on Status (z-score beats Isolation Forest on short windows) and a regime-clustering study (no gain).
+- 2026-11-22 T290/T293: Phase 16 governance; `bandit_hedge` forecaster, replay study and card (flag ARENA_BANDIT off).
 - 2026-11-22 T246b: first lab-eval run failed in 1 s (shard jobs have no PyTorch; ft_gguf imported the training module); torch import made lazy, test imports the scoring path with torch blocked. Re-dispatch after merge.
 - 2026-11-22 README for hiring managers: at-a-glance table, generated fine-tune/conformal/docs-assistant bullets, new skills rows, stale text fixed, screenshots refreshed from a fresh ledger.
 - 2026-11-22 T271: `llm_local_ft` switched on by default in morning.yml (owner decision); T246b will add a GGUF-calibrated map as a new version.

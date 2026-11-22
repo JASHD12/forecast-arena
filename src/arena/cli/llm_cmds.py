@@ -70,7 +70,7 @@ def eval_build(obj: Ctx, first: object, last: object, out: Path) -> None:
     "--variant",
     "variants",
     multiple=True,
-    type=click.Choice(["llm_plain", "llm_context", "llm_local", "agent"]),
+    type=click.Choice(["llm_plain", "llm_context", "llm_local", "agent", "llm_context_sc5"]),
     default=("llm_plain", "llm_context"),
 )
 @click.option("--limit", type=int, default=None, help="Stratified seeded sample size.")
@@ -93,6 +93,7 @@ def eval_run(
 
     from arena.evals.golden import load
     from arena.evals.run import AGENT_REQUESTS_PER_QUESTION, EvalCaps, run, sample
+    from arena.forecasters.selfconsistency import K as SC_K
     from arena.llm.client import FakeLLM, LLMClient
 
     items, sha = load(golden)
@@ -124,7 +125,15 @@ def eval_run(
     caps = EvalCaps(
         max_requests=max(
             1,
-            len(items) * sum(AGENT_REQUESTS_PER_QUESTION if v == "agent" else 2 for v in clients),
+            len(items)
+            * sum(
+                AGENT_REQUESTS_PER_QUESTION
+                if v == "agent"
+                else 2 * SC_K
+                if v.endswith("_sc5")
+                else 2
+                for v in clients
+            ),
         ),
         max_tokens=max_tokens,
         max_output_tokens=obj.settings.llm_max_output_tokens,

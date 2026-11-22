@@ -13,3 +13,4 @@ questions with honest answers.
 | `05-llm-forecasters-and-agent.md` | 5 | T069 |
 | `06-scoring-and-statistics.md` | 6 | T075 |
 | `07-operations-and-monitoring.md` | 7 | T085 |
+| `08-production-skills.md` | 16 | T300 |

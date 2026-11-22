@@ -16,6 +16,7 @@ from typing import Any, Literal
 from fastapi import FastAPI, HTTPException, Query
 from pydantic import BaseModel
 
+from arena.api.metrics import ApiMetrics, install
 from arena.ledger import Ledger
 from arena.ledger.layout import OFFICIAL_START_PATH
 from arena.mcp_server import Benchmark, SqlRefused
@@ -78,6 +79,11 @@ def create_app(ledger: Ledger) -> FastAPI:
         description="Read-only access to the Forecast Arena record. A research "
         "project, not advice.",
     )
+
+    metrics = ApiMetrics()
+    metrics.questions.set(len(rec.questions))
+    metrics.forecasts.set(len(rec.forecasts))
+    install(app, metrics)
 
     @app.get("/health", response_model=Health)
     def health() -> Health:
@@ -153,6 +159,7 @@ def create_app(ledger: Ledger) -> FastAPI:
     def predict_power(req: PowerRequest) -> PowerPrediction:
         """Probability from the exported LightGBM power model (ONNX Runtime). Research only."""
         if not onnx_dir:
+            metrics.predictions.labels("no_model", "none").inc()
             raise HTTPException(status_code=503, detail="no ONNX model configured (ARENA_ONNX_DIR)")
         try:
             from arena.forecasters.onnx_power import OnnxPowerModel
@@ -172,6 +179,7 @@ def create_app(ledger: Ledger) -> FastAPI:
             )
         except (ValueError, KeyError) as exc:
             raise HTTPException(status_code=422, detail=str(exc)[:300]) from exc
+        metrics.predictions.labels("ok", power_model.version).inc()
         return PowerPrediction(**out)
 
     return app

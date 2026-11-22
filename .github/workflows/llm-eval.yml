@@ -22,6 +22,10 @@ on:
         description: "T223b: also evaluate the tool-using agent (series and base-rate tools only; about 6 requests per question, so raise max_tokens)"
         type: boolean
         default: false
+      self_consistency:
+        description: "T298: also evaluate llm_context sampled five times and averaged (5x the tokens of llm_context; owner OK H36 first; raise max_tokens)"
+        type: boolean
+        default: false
       cache:
         description: "T190: automatic prompt caching (off by default: measured, it raised the cost of one-shot calls)"
         type: boolean
@@ -76,11 +80,13 @@ jobs:
           MAX_TOKENS: ${{ inputs.max_tokens }}
           LOCAL: ${{ inputs.local }}
           AGENT: ${{ inputs.agent }}
+          SC: ${{ inputs.self_consistency }}
         run: |
           set -o pipefail
           variants="--variant llm_plain --variant llm_context"
           if [ "$LOCAL" = "true" ]; then variants="$variants --variant llm_local"; fi
           if [ "$AGENT" = "true" ]; then variants="$variants --variant agent"; fi
+          if [ "$SC" = "true" ]; then variants="$variants --variant llm_context_sc5"; fi
           .venv/bin/arena eval run --golden evals/golden/power-2026-10.jsonl \
             --limit "$LIMIT" --max-tokens "$MAX_TOKENS" $variants | tee eval.log
           { echo "## LLM evaluation (not the live record)"; echo '```'; cat eval.log; echo '```'; } >> "$GITHUB_STEP_SUMMARY"

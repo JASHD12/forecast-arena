@@ -73,6 +73,9 @@
 
 {% if interval %}<section class="card" aria-labelledby="interval-title"><h2 id="interval-title">Experimental 80% price range</h2>
 <p>The ML model's conformal range for electricity prices held the observed value on <strong>{{ interval.hits }} of {{ interval.n }}</strong> resolved days ({{ '%.0f'|format(interval.share * 100) }}%; the target is 80%). Experimental: with so few days this says little yet.</p></section>{% endif %}
+{% if anomaly %}<section class="card" aria-labelledby="anomaly-title"><h2 id="anomaly-title">Data anomaly check (latest batch, {{ anomaly.batch_day }})</h2>
+<p>The newest electricity price day in the stored context ({{ anomaly.day }}) against the 27 days before it: robust z-score <strong>{{ anomaly.robust_z }}</strong> ({{ "flagged" if anomaly.robust_z_flag else "normal" }}, limit {{ anomaly.limit_z }}), Isolation Forest score <strong>{{ anomaly.isolation_score }}</strong> ({{ "flagged" if anomaly.isolation_flag else "normal" }}, limit {{ anomaly.limit_if }}).</p>
+<p class="note">Unsupervised and informational; it never fails a run. The limits give about 5% false alarms on clean history. In the lab study the simple z-score caught more injected faults than the Isolation Forest on windows this short (<a href="lab.html">Lab</a>).</p></section>{% endif %}
 {% if contracts %}<section class="card" aria-labelledby="contracts-title"><h2 id="contracts-title">Data contracts (latest batch, {{ contracts.day }})</h2>
 <p>{{ contracts.checked }} stored contexts checked for freshness, completeness and plausible ranges: <strong>{{ contracts.violations|length }} violation{{ "" if contracts.violations|length == 1 else "s" }}</strong>.</p>
 {% if contracts.violations %}<ul class="plain">{% for v in contracts.violations[:10] %}<li><code>{{ v }}</code></li>{% endfor %}</ul>{% endif %}

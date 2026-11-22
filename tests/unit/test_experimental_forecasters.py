@@ -54,3 +54,19 @@ def test_experimental_live_lists_only_forecasters_that_have_published() -> None:
         }
     ]
     assert experimental_live(NS(forecasts=[]), {}) == []
+
+
+def test_bandit_hedge_is_experimental_but_not_an_llm_forecaster() -> None:
+    from arena.config import Settings
+    from arena.forecasters.ensemble import MEMBERS
+    from arena.ops.health import LLM_FORECASTERS, expected_forecasters
+
+    fid = "bandit_hedge"
+    assert titles.forecaster_name(fid).endswith("(experimental)")
+    assert charts.series_class(fid) == "s-12"
+    assert fid in content.EXPERIMENTAL_FORECASTERS and fid in {
+        r[0] for r in content.INFORMATION_SETS
+    }
+    assert fid not in COMMON_GROUP and fid not in MEMBERS and fid not in LLM_FORECASTERS
+    assert fid not in expected_forecasters(Settings.from_env({}))
+    assert fid in expected_forecasters(Settings.from_env({"ARENA_BANDIT": "1"}))

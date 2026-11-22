@@ -75,6 +75,8 @@ class Settings(BaseModel):
     llm_local: bool = False
     #: T271: run `llm_local_ft`, the QLoRA-fine-tuned model (needs the pin in lab/artefacts).
     llm_local_ft: bool = False
+    #: T293: run `bandit_hedge`, online learning of which forecaster to trust (peers only).
+    bandit: bool = False
     #: Where large model weights are cached (kept apart from the per-run data cache).
     models_dir: Path = Path("models_cache")
 

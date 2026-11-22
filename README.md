@@ -66,8 +66,13 @@ Each technique is tried against the project's baselines on questions it never sa
 | Conformal price bands: coverage by month | evaluated (not a live score) | [docs/lab/conformal.md](docs/lab/conformal.md) |
 | Guardrails and red-team suite for untrusted tool and news text | evaluated (not a live score) | [docs/lab/guardrails.md](docs/lab/guardrails.md) |
 | Numeric grounding of model rationales | evaluated (not a live score) | [docs/lab/grounding.md](docs/lab/grounding.md) |
+| Online learning of which forecaster to trust (Hedge and Thompson sampling) | evaluated (not a live score) | [docs/lab/bandit.md](docs/lab/bandit.md) |
+| Price-regime clustering (k-means) as a feature for the next day's mean price | evaluated (not a live score) | [docs/lab/regimes.md](docs/lab/regimes.md) |
 | QLoRA fine-tune of Qwen2.5-1.5B on replayed power questions | evaluated (not a live score) | [docs/lab/qlora-r1.md](docs/lab/qlora-r1.md) |
 | Retrieval: dense vs BM25 vs hybrid with reranking | evaluated (not a live score) | [docs/lab/retrieval-hybrid.md](docs/lab/retrieval-hybrid.md) |
+| Stacking with a scikit-learn Pipeline on pandas DataFrames | evaluated (not a live score) | [docs/lab/stacking.md](docs/lab/stacking.md) |
+| Unsupervised data-anomaly detection on price windows (Isolation Forest) | evaluated (not a live score) | [docs/lab/anomaly.md](docs/lab/anomaly.md) |
+| Vector database: Qdrant against brute-force dense search | evaluated (not a live score) | [docs/lab/vectordb.md](docs/lab/vectordb.md) |
 | Distillation from Claude | waiting for approval of paid runs (H27) | - |
 | Cost routing between cheap and paid forecasters | waiting for one paid evaluation run (H31) | - |
 | LLM-as-judge with human calibration | waiting for approval of the paid run | - |
@@ -81,7 +86,7 @@ Live experimental forecasters: the QLoRA-tuned model (running since the first mo
 <summary><strong>Tech stack</strong></summary>
 
 <!-- stack:start -->
-**Stack:** Python, typing, testing · SQL, DuckDB, Parquet, Polars · dbt · scikit-learn, calibration · LightGBM, Optuna, SHAP · PyTorch · Time-series models · MLOps: MLflow, Evidently, champion/challenger · Statistics · LLM APIs, prompts, structured output · Agents and tool use · RAG, embeddings · LangGraph · Open-weight models (llama.cpp) · LLM fine-tuning (QLoRA, PEFT, GGUF) · Hybrid retrieval and guardrails · ONNX export and serving · LLM evals, tracing, OpenTelemetry · MCP · REST and JSON APIs · Docker, Kubernetes, Airflow · CI/CD on GitHub Actions · Data integrity · Dashboards and frontend
+**Stack:** Python, typing, testing · SQL, DuckDB, Parquet, Polars · dbt · scikit-learn, calibration · LightGBM, Optuna, SHAP · PyTorch · Time-series models · MLOps: MLflow, Evidently, champion/challenger · Statistics · LLM APIs, prompts, structured output · Agents and tool use · RAG, embeddings · LangGraph · Open-weight models (llama.cpp) · LLM fine-tuning (QLoRA, PEFT, GGUF) · Hybrid retrieval and guardrails · ONNX export and serving · Vector database (Qdrant) · Cloud as code (Terraform, AWS, S3) · Observability (Prometheus, Jaeger, OpenTelemetry) · TypeScript · Online learning and unsupervised learning · pandas and scikit-learn Pipelines · LLM evals, tracing, OpenTelemetry · MCP · REST and JSON APIs · Docker, Kubernetes, Airflow · CI/CD on GitHub Actions · Data integrity · Dashboards and frontend
 <!-- stack:end -->
 
 Airflow, kind and dbt are validated in CI; production runs on GitHub Actions.
@@ -149,6 +154,12 @@ All numbers below are **backtests**: past days replayed through the production c
 | LLM fine-tuning (QLoRA, PEFT, GGUF) | QLoRA fine-tune of a 1.5B model on replayed questions with a leak-free time split, pre-registered hypotheses and a published negative result; merged and quantised for CPU serving | `src/arena/lab/finetune/train.py`<br>`src/arena/lab/ft_eval.py`<br>`src/arena/lab/ft_runtime.py` |
 | Hybrid retrieval and guardrails | BM25 + dense search fused with RRF and a cross-encoder rerank, a prompt-injection guard with a red-team suite, numeric grounding checks of model rationales | `src/arena/agent/retrieval.py`<br>`src/arena/llm/guards.py`<br>`src/arena/lab/grounding.py` |
 | ONNX export and serving | LightGBM quantile models exported to ONNX, parity-tested, served with ONNX Runtime behind a REST endpoint in the container | `src/arena/forecasters/onnx_power.py`<br>`src/arena/api/app.py` |
+| Vector database (Qdrant) | Past-question search on Qdrant with the forecast-time rule as a filter inside the store, checked against brute force; tested against a real server in CI | `src/arena/agent/vectorstore.py`<br>`tests/unit/test_vectorstore.py` |
+| Cloud as code (Terraform, AWS, S3) | Terraform for S3 + CloudFront, ECR, ECS Fargate behind a load balancer and a cost alarm, validated in CI (not deployed: no account); S3 upload tested with boto3 | `infra/aws/main.tf`<br>`src/arena/cloud/s3.py` |
+| Observability (Prometheus, Jaeger, OpenTelemetry) | /metrics with bounded-cardinality labels scraped by Prometheus, OTLP traces stored in Jaeger, both real servers in a CI job | `src/arena/api/metrics.py`<br>`scripts/smoke_observability.sh` |
+| TypeScript | The site's script is strict TypeScript compiled to the same single file; CI fails if the committed output is stale | `site_ts/app.ts`<br>`tools/site-ts/tsconfig.json` |
+| Online learning and unsupervised learning | Hedge expert advice and Thompson sampling to learn which forecaster to trust; Isolation Forest and k-means on price data with their negative results published | `src/arena/forecasters/bandit.py`<br>`src/arena/ops/anomaly.py`<br>`src/arena/lab/regimes.py` |
+| pandas and scikit-learn Pipelines | DataFrame views proved equal to the leaderboard, a ColumnTransformer + LogisticRegression stacking pipeline replayed walk-forward | `src/arena/analytics/frames.py`<br>`src/arena/lab/stacking_study.py` |
 | LLM evals, tracing, OpenTelemetry | Frozen golden set, prompt A/B, JSON validity and cost; one span per model call, exported as OTLP/JSON with the OpenTelemetry GenAI attribute names | `src/arena/evals`<br>`src/arena/llm/tracing.py`<br>`src/arena/llm/otlp.py` |
 | MCP | Read-only MCP server so AI assistants can query the benchmark | `src/arena/mcp_server.py` |
 | REST and JSON APIs | FastAPI service and a static JSON API with schemas generated from pydantic models | `src/arena/api/app.py`<br>`src/arena/site/api.py` |

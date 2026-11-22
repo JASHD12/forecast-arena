@@ -144,6 +144,12 @@ INFORMATION_SETS = (
         "As agent, with hybrid retrieval of past questions and guarded tool text (experimental)",
         "daily sample",
     ),
+    (
+        "bandit_hedge",
+        "The other forecasters' forecasts of the same question, blended with weights learned "
+        "online from resolved questions (Hedge; experimental)",
+        "every question with two or more forecasts",
+    ),
 )
 
 
@@ -160,7 +166,7 @@ AI_FORECASTERS = frozenset(
     }
 )
 #: Experimental forecasters (SPEC 17): named "(experimental)", outside the common-set board.
-EXPERIMENTAL_FORECASTERS = frozenset({"llm_local_ft", "llm_router", "agent_hybrid"})
+EXPERIMENTAL_FORECASTERS = frozenset({"llm_local_ft", "llm_router", "agent_hybrid", "bandit_hedge"})
 
 
 TEMPLATE_VERSION_NOTES = {

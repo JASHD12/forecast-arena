@@ -38,3 +38,4 @@ _site_e2e/
 .venv-airflow/
 coverage.xml
 junit.xml
+.venv-cloud/

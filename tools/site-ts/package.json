@@ -1,0 +1,12 @@
+{
+  "name": "forecast-arena-site-ts",
+  "private": true,
+  "description": "Compiles the site's TypeScript (site_ts/*.ts) to src/arena/site/static/app.js (T296).",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "check": "tsc -p tsconfig.json --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "7.0.2"
+  }
+}

@@ -162,3 +162,34 @@ def test_run_variant_writes_scores_log_and_adapter(tmp_path) -> None:
     assert {__import__("json").loads(x)["split"] for x in lines} == set(SCORED)
     assert (tmp_path / "adapter_tiny").is_dir() and (tmp_path / "train_log_tiny.json").is_file()
     assert out["brier"]["tuned"]["val"] < out["brier"]["base"]["val"]
+
+
+def test_dpo_loss_prefers_moving_towards_the_outcome_and_vanishes_when_far_ahead() -> None:
+    m = torch.tensor([2.0, 1.0, 0.5])
+    ref = torch.zeros(3)
+    yes = torch.ones(3)
+    no = torch.zeros(3)
+    # raising the YES margin above the reference lowers the loss when YES is the outcome
+    assert tr.dpo_loss(m, ref, yes, 1.0) < tr.dpo_loss(-m, ref, yes, 1.0)
+    # the mirror image for NO
+    assert tr.dpo_loss(m, ref, no, 1.0) == pytest.approx(float(tr.dpo_loss(-m, ref, yes, 1.0)))
+    # at the reference the loss is log 2, and far ahead of it the loss goes to zero
+    assert float(tr.dpo_loss(ref, ref, yes, 0.5)) == pytest.approx(0.6931, abs=1e-3)
+    assert float(tr.dpo_loss(torch.tensor([30.0]), torch.zeros(1), torch.ones(1), 1.0)) < 1e-6
+
+
+def test_dpo_run_variant_trains_against_the_untuned_reference(tmp_path) -> None:
+    pytest.importorskip("peft")
+    from arena.lab.finetune.load import add_lora
+    from arena.lab.finetune.run import Spec, run_variant
+
+    rows = {"train": _rows(40), "val": _rows(12), "test_oct": _rows(8), "test_nov": _rows(6)}
+    cfg = tr.TrainConfig(lr=3e-3, epochs=3, batch_size=4, grad_accum=1, log_every=1)
+    out = run_variant(
+        Spec("tiny_dpo", "random", dpo_beta=0.5), rows, CharTokenizer(), _tiny_model,
+        lambda m: add_lora(m, r=4, alpha=8), tmp_path, cfg,
+        device=torch.device("cpu"), train_rows=24, max_len=200,
+    )  # fmt: skip
+    assert out["train_loss_last"] < out["train_loss_first"]  # the DPO loss decreases
+    assert out["train_loss_first"] == pytest.approx(0.6931, abs=0.08)  # starts at the reference
+    assert out["brier"]["tuned"]["val"] < out["brier"]["base"]["val"]

@@ -1,0 +1,87 @@
+{
+ "kind": "evaluation",
+ "experiment": "bandit",
+ "title": "Online learning of which forecaster to trust (Hedge and Thompson sampling)",
+ "created_at": "2026-11-22T10:20:19Z",
+ "why": "Expert-advice and bandit methods are the production form of reinforcement learning for choosing between models from delayed feedback.",
+ "prereg_sha256": null,
+ "dataset_sha256": {},
+ "artefacts": {},
+ "metrics": {
+  "hedge": {
+   "n": 131,
+   "brier": 0.1291
+  },
+  "equal_mean": {
+   "n": 131,
+   "brier": 0.1548
+  },
+  "thompson": {
+   "n": 131,
+   "brier": 0.1482
+  },
+  "base_rate": {
+   "n": 131,
+   "brier": 0.2931
+  },
+  "ml": {
+   "n": 131,
+   "brier": 0.107
+  },
+  "llm_plain": {
+   "n": 48,
+   "brier": 0.2185
+  },
+  "llm_context": {
+   "n": 47,
+   "brier": 0.1608
+  },
+  "agent": {
+   "n": 47,
+   "brier": 0.1433
+  },
+  "best_expert_in_hindsight": {
+   "n": 131,
+   "brier": 0.107
+  }
+ },
+ "paired": [
+  {
+   "a": "hedge",
+   "b": "equal_mean",
+   "diff": -0.025742911792459588,
+   "lo": -0.036337037649795366,
+   "hi": -0.009810196899830504,
+   "n": 131,
+   "days": 5
+  },
+  {
+   "a": "hedge",
+   "b": "ml",
+   "diff": 0.02208017421871131,
+   "lo": -0.0010864459644942337,
+   "hi": 0.04073423742822365,
+   "n": 131,
+   "days": 5
+  },
+  {
+   "a": "hedge",
+   "b": "thompson",
+   "diff": -0.019054178312003914,
+   "lo": -0.036966950492103794,
+   "hi": -0.007481642999795947,
+   "n": 131,
+   "days": 5
+  }
+ ],
+ "cost_usd": 0.0,
+ "notes": [
+  "146 live questions answered by at least two experts over 8 batch days (the live rehearsal record, replayed walk-forward with a two-day outcome lag).",
+  "The best expert in hindsight is ml."
+ ],
+ "limits": [
+  "The live record is only a few days long: the weights barely move and every interval is wide. This is a mechanism check, not evidence that the blend helps.",
+  "The best expert in hindsight is a reference, not something that could be played."
+ ],
+ "card": "docs/lab/bandit.md"
+}

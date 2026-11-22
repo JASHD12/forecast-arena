@@ -262,6 +262,31 @@ Source: `evals/results/lab-grounding.json`; card `docs/lab/grounding.md`
 | llm_local | 78 | 337 | 20.5 | 52.6 |
 | llm_plain | 84 | 301 | 40.5 | 52.4 |
 
+### Online learning of which forecaster to trust (Hedge and Thompson sampling)
+
+Source: `evals/results/lab-bandit.json`; card `docs/lab/bandit.md`
+
+| Arm | Questions | Brier |
+|---|---|---|
+| agent | 47 | 0.1433 |
+| base_rate | 131 | 0.2931 |
+| best_expert_in_hindsight | 131 | 0.107 |
+| equal_mean | 131 | 0.1548 |
+| hedge | 131 | 0.1291 |
+| llm_context | 47 | 0.1608 |
+| llm_plain | 48 | 0.2185 |
+| ml | 131 | 0.107 |
+| thompson | 131 | 0.1482 |
+
+### Price-regime clustering (k-means) as a feature for the next day's mean price
+
+Source: `evals/results/lab-regimes.json`; card `docs/lab/regimes.md`
+
+| Arm | Questions |
+|---|---|
+| with_regime | 365 |
+| without_regime | 365 |
+
 ### QLoRA fine-tune of Qwen2.5-1.5B on replayed power questions
 
 Source: `evals/results/lab-qlora-r1.json`; card `docs/lab/qlora-r1.md`
@@ -297,6 +322,34 @@ Source: `evals/results/lab-retrieval-hybrid.json`; card `docs/lab/retrieval-hybr
 | dense | 143 | 0.3731 | 0.5065 | 0.2126 | 51.92 |
 | hybrid_rerank | 143 | 0.5557 | 0.7425 | 0.3762 | 382.68 |
 | hybrid_rrf | 143 | 0.3464 | 0.6656 | 0.2196 | 59.86 |
+
+### Stacking with a scikit-learn Pipeline on pandas DataFrames
+
+Source: `evals/results/lab-stacking.json`; card `docs/lab/stacking.md`
+
+| Arm | Questions | Brier |
+|---|---|---|
+| equal_mean | 32 | 0.1722 |
+| ml | 32 | 0.1077 |
+| stacking | 32 | 0.0987 |
+
+### Unsupervised data-anomaly detection on price windows (Isolation Forest)
+
+Source: `evals/results/lab-anomaly.json`; card `docs/lab/anomaly.md`
+
+| Arm | Questions |
+|---|---|
+| isolation_forest | 122 |
+| robust_z | 122 |
+
+### Vector database: Qdrant against brute-force dense search
+
+Source: `evals/results/lab-vectordb.json`; card `docs/lab/vectordb.md`
+
+| Arm | Questions | nDCG@5 | MRR | Precision@5 | Latency p50 (ms) |
+|---|---|---|---|---|---|
+| dense_numpy | 143 | 0.3731 | 0.5065 | 0.2126 | 39.94 |
+| dense_qdrant | 143 | 0.3731 | 0.5065 | 0.2126 | 96.04 |
 <!-- lab:end -->
 
 <!-- live:start -->

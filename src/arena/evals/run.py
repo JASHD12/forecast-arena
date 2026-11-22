@@ -24,6 +24,7 @@ from arena.agent.forecaster import AgentForecaster
 from arena.clock import Clock
 from arena.evals.golden import GoldenItem
 from arena.forecasters.llm import LLMContext, LLMForecaster, LLMLocal, LLMPlain
+from arena.forecasters.selfconsistency import SelfConsistency
 from arena.llm.budget import BudgetGuard, Caps, GuardedLLM
 from arena.llm.client import LLMClient, Usage
 from arena.llm.tracing import Tracer, TracingLLM, scope
@@ -37,6 +38,7 @@ VARIANTS: dict[str, type[LLMForecaster]] = {
     "llm_plain": LLMPlain,
     "llm_context": LLMContext,
     "llm_local": LLMLocal,
+    "llm_context_sc5": SelfConsistency,  # T298: five samples averaged (5x the tokens)
 }
 
 

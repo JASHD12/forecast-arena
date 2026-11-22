@@ -5,7 +5,7 @@ from __future__ import annotations
 import math
 import random
 import time
-from collections.abc import Callable, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from typing import Any
 
@@ -48,6 +48,18 @@ def collate(batch: Sequence[Encoded], pad_id: int, device: torch.device) -> dict
     }
 
 
+def dpo_loss(m: torch.Tensor, ref: torch.Tensor, labels: torch.Tensor, beta: float) -> torch.Tensor:
+    """Direct Preference Optimisation (Rafailov et al., 2023) for a one-token YES/NO answer.
+
+    The preferred answer is the one that matches the outcome (YES when `labels` is 1, else NO).
+    With a single answer token, `log pi(YES|x) - log pi(NO|x)` is exactly the logit margin (the
+    softmax normaliser cancels), so the DPO objective
+    `-log sigmoid(beta * [(log pi_w - log pi_ref_w) - (log pi_l - log pi_ref_l)])`
+    becomes `-log sigmoid(beta * s * (m - m_ref))` with `s = +1` for YES and `-1` for NO."""
+    sign = 2.0 * labels - 1.0
+    return -torch.nn.functional.logsigmoid(beta * sign * (m - ref)).mean()
+
+
 def margin(model: Any, batch: dict[str, torch.Tensor], yes_id: int, no_id: int) -> torch.Tensor:
     """logit(YES) - logit(NO) at the start of the answer, for each row (only the last position)."""
     out = model(
@@ -70,8 +82,13 @@ def train(
     no_id: int,
     device: torch.device,
     on_log: Callable[[dict[str, float]], None] | None = None,
+    ref_margins: Mapping[str, float] | None = None,
+    beta: float = 0.1,
 ) -> list[dict[str, float]]:
-    """One pass of binary cross-entropy on the YES/NO logit difference; returns the loss log."""
+    """One pass over the data; returns the loss log.
+
+    The loss is binary cross-entropy on the YES/NO logit difference, or, when `ref_margins`
+    (the frozen reference model's margin per row id) is given, the DPO loss with that reference."""
     from transformers import get_cosine_schedule_with_warmup
 
     rng = random.Random(cfg.seed)
@@ -97,7 +114,13 @@ def train(
             b = collate([data[i] for i in idx], pad_id, device)
             with torch.autocast(device.type, dtype=torch.float16, enabled=use_amp):
                 m = margin(model, b, yes_id, no_id)
-            loss = torch.nn.functional.binary_cross_entropy_with_logits(m, b["labels"])
+            if ref_margins is not None:
+                ref = torch.tensor(
+                    [ref_margins[data[i].id] for i in idx], dtype=m.dtype, device=m.device
+                )
+                loss = dpo_loss(m.float(), ref.float(), b["labels"], beta)
+            else:
+                loss = torch.nn.functional.binary_cross_entropy_with_logits(m, b["labels"])
             scaler.scale(loss / cfg.grad_accum).backward()
             running.append(float(loss.detach()))
             if (k + 1) % cfg.grad_accum == 0 or k == len(batches) - 1:

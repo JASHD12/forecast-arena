@@ -27,7 +27,7 @@ jobs:
           make setup
           .venv/bin/pip install -r requirements/tracking.txt -r requirements/ml.txt
           .venv/bin/pip install -r requirements/torch.txt
-          .venv/bin/pip install -r requirements/ts.txt -r requirements/rag.txt -r requirements/graph.txt -r requirements/mcp.txt -r requirements/dashboard.txt -r requirements/api.txt -r requirements/lab.txt -r requirements/onnx.txt
+          .venv/bin/pip install -r requirements/ts.txt -r requirements/rag.txt -r requirements/graph.txt -r requirements/mcp.txt -r requirements/dashboard.txt -r requirements/api.txt -r requirements/lab.txt -r requirements/onnx.txt -r requirements/vectordb.txt
       - name: make check (with test coverage)
         run: |
           set -o pipefail
@@ -80,6 +80,11 @@ jobs:
         run: |
           npm ci --ignore-scripts
           npx playwright install --with-deps chromium
+      - name: "TypeScript: type-check site_ts and verify the compiled app.js is current (T296)"
+        run: |
+          npm ci --prefix tools/site-ts
+          make site-ts
+          git diff --exit-code src/arena/site/static/app.js
       - name: Accessibility lint (fails on serious or critical issues)
         run: make a11y
       - name: Run the analysis notebook on the e2e export (T138)
@@ -104,6 +109,7 @@ jobs:
           for i in $(seq 1 60); do curl -fsS http://127.0.0.1:8000/health && break; sleep 2; done
           curl -fsS "http://127.0.0.1:8000/questions?limit=2" | python3 -c "import json,sys; d=json.load(sys.stdin); assert len(d)==2, d"
           curl -fsS "http://127.0.0.1:8000/leaderboard" | python3 -c "import json,sys; d=json.load(sys.stdin); assert d['rows'], d"
+          curl -fsS http://127.0.0.1:8000/metrics | grep -q '^arena_http_requests_total'  # T295
           test "$(curl -s -o /dev/null -w '%{http_code}' 'http://127.0.0.1:8000/sql?q=DROP%20TABLE%20skips')" = 400
           # T277: the route exists and answers 503 (no model mounted) with onnxruntime importable in the image
           test "$(curl -s -o /dev/null -w '%{http_code}' -X POST -H 'content-type: application/json' -d '{"stat":"mean","target_date":"2026-11-02","daily":[],"threshold":50}' http://127.0.0.1:8000/predict/power)" = 503
@@ -177,6 +183,7 @@ jobs:
           kubectl port-forward service/forecast-arena-api 8000:80 >/tmp/pf.log 2>&1 &
           for i in $(seq 1 30); do curl -fsS http://127.0.0.1:8000/health && break; sleep 2; done
           curl -fsS "http://127.0.0.1:8000/leaderboard" | python3 -c "import json,sys; d=json.load(sys.stdin); assert d['rows'], d"
+          curl -fsS http://127.0.0.1:8000/metrics | grep -q '^arena_http_requests_total'  # T295
       - name: Run the CronJob once and check it succeeds
         run: |
           kubectl create job verify-once --from=cronjob/arena-verify
@@ -189,6 +196,93 @@ jobs:
           kubectl describe pods | tail -60
           kubectl logs deployment/arena-api --previous --tail=50 || true
           kubectl logs deployment/arena-api --tail=50 || true
+
+  vectordb:
+    # T291: the same retrieval tests against a real Qdrant server (local mode runs in `check`).
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      qdrant:
+        image: qdrant/qdrant:v1.20.2  # Apache-2.0; tag checked on Docker Hub 2026-11-22
+        ports:
+          - 6333:6333
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements/*.txt
+      - name: Install pinned dependencies
+        run: |
+          make setup
+          .venv/bin/pip install -r requirements/vectordb.txt
+      - name: Retrieval tests against the server
+        env:
+          ARENA_QDRANT_URL: http://localhost:6333
+        run: |
+          for i in $(seq 1 30); do curl -fsS http://localhost:6333/healthz && break; sleep 2; done
+          .venv/bin/python -m pytest tests/unit/test_vectorstore.py -q
+
+  observability:
+    # T295: Prometheus scrapes the API's /metrics and Jaeger receives OTLP traces (both real servers).
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements/*.txt
+      - name: Install pinned dependencies
+        run: |
+          make setup
+          .venv/bin/pip install -r requirements/api.txt
+      - name: Prometheus scrapes /metrics and Jaeger receives OTLP traces
+        run: scripts/smoke_observability.sh
+      - name: Logs on failure
+        if: failure()
+        run: |
+          docker logs arena-prom 2>&1 | tail -20 || true
+          docker logs arena-jaeger 2>&1 | tail -20 || true
+          tail -20 api.log || true
+
+  cloud:
+    # T292: the S3 upload against moto's S3 implementation, in its own environment (botocore needs
+    # python-dateutil < 3, the main pins use 4.x).
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements/*.txt
+      - name: Install the lock and the cloud requirements
+        run: |
+          make setup
+          .venv/bin/pip install -r requirements/cloud.txt pytest
+      - name: S3 upload tests
+        env:
+          AWS_ACCESS_KEY_ID: test
+          AWS_SECRET_ACCESS_KEY: test
+          PYTHONPATH: tests/unit
+        run: .venv/bin/python -m pytest tests/unit/test_cloud_s3.py -q
+
+  terraform:
+    # T292: the AWS infrastructure as code is formatted and valid (nothing is applied: no account).
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - name: terraform fmt, init (no backend) and validate
+        run: |
+          T="docker run --rm -v $PWD/infra/aws:/w -w /w hashicorp/terraform:1.17.2"  # tag checked on Docker Hub 2026-11-22
+          $T fmt -check -recursive -diff
+          $T init -backend=false -input=false
+          $T validate
 
   audit:
     # Vulnerability report for the pinned dependencies. Non-blocking: findings appear in

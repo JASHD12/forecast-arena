@@ -1,4 +1,4 @@
-"""T045e: the CoinGecko key reaches exactly the three jobs that need prices, and crypto is a default topic."""
+"""T045e: the CoinGecko key reaches only the three price jobs; crypto is a default topic."""
 
 from __future__ import annotations
 

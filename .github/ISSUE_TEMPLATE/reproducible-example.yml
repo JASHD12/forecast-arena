@@ -1,0 +1,41 @@
+name: Reproducible example (forecast-audit)
+description: The report looks wrong, or the tool rejects input it should accept.
+labels: ["forecast-audit"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please use small CSV files (a few rows). Do not paste data you may not share.
+  - type: textarea
+    id: command
+    attributes:
+      label: Command you ran
+      render: bash
+    validations:
+      required: true
+  - type: textarea
+    id: cases
+    attributes:
+      label: cases.csv
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: predictions
+    attributes:
+      label: predictions.csv
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected, and what you got
+    validations:
+      required: true
+  - type: input
+    id: python
+    attributes:
+      label: Python version (python3 --version)
+    validations:
+      required: true

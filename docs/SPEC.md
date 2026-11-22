@@ -655,3 +655,7 @@ that compare techniques against the existing baselines. Design: `docs/project/LA
 | `bandit_hedge` | the other forecasters' forecasts of the same question (peers only, as the ensemble) and the resolved outcomes of questions at least two batch days old | every question for which two or more experts answered; no model call, no cost |
 
 The daily LLM token cap in the live workflows is 300,000 (SPEC 9.4 default 400,000; owner decision 2026-11-21).
+
+### 17.x Ask the Arena (added 2026-11-22 with the owner's approval)
+
+A static page, `ask.html`, answers questions in the visitor's browser from `chat/pack.json`, a data file written at site build time from the ledger and the project documents. It makes no new predictions, answers nothing about stocks, funds or what to buy or sell, stores nothing and sends nothing. Every answer names its tier and sources. The lab result `lab-ask-arena` is an evaluation, not part of the live record.

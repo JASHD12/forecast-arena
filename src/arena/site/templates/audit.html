@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% from "macros.html" import page_head %}
+{% block content %}
+{{ page_head("Open-source tool and worked case", "Would the extra model have changed any alert?", audit.headline_en) }}
+<p class="note"><strong>Replay, not a live result.</strong> {{ audit.n }} German/Luxembourg evening-price questions with target days {{ audit.first_day }} to {{ audit.last_day }} ({{ audit.yes }} YES, {{ audit.no }} NO). Probabilities are stamped with the as-of time recorded in the frozen question set, so the timing label is <strong>{{ audit.timing_label }}</strong>, not ledger-verified. Costs are <strong>assumed</strong> (a false alert costs {{ "%g"|format(audit.false_cost) }}, a missed event {{ "%g"|format(audit.miss_cost) }}, arbitrary units), so an operator alerts when the probability is at least {{ "%.2f"|format(audit.cutoff) }}. Research project, not advice.</p>
+
+<section class="card" aria-labelledby="a-decision"><h2 id="a-decision">The decision</h2>
+<p>An operations analyst reviews tomorrow's 17:00-20:00 (Berlin time) price block. Is it worth raising an alert because the mean evening price will exceed that question's published threshold? A forecast probability is only useful if acting on it beats a simple rule, so two models are compared on <em>decisions</em> as well as on probability scores: the <strong>base rate</strong> (how often such evenings were expensive before) and a <strong>fine-tuned 1.5B language model</strong> (stored scores of the open model that runs in this project, with its pinned calibration).</p>
+</section>
+
+<h2 id="a-result">The result</h2>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Alerts and loss by policy"><table class="proof">
+<caption>Alerts and total loss over {{ audit.n }} cases (lower Brier and lower loss are better)</caption>
+<thead><tr><th scope="col">Policy</th><th scope="col">Brier</th><th scope="col">Alerts</th><th scope="col">False alerts</th><th scope="col">Misses</th><th scope="col">Loss</th></tr></thead>
+<tbody>{% for r in audit.rows %}<tr><th scope="row">{{ r.name }}</th><td>{{ "%.4f"|format(r.brier) if r.brier is not none else "n/a (fixed action)" }}</td><td>{{ r.alerts }}</td><td>{{ r.false_alerts }}</td><td>{{ r.misses }}</td><td>{{ "%g"|format(r.loss) }}</td></tr>{% endfor %}</tbody></table></div>
+<p>{% if audit.same_decisions %}<strong>The base rate has the better probability score, and both models make exactly the same {{ audit.n }} decisions.</strong> The base rate's probabilities range from {{ "%.3f"|format(audit.prob_range[audit.baseline][0]) }} to {{ "%.3f"|format(audit.prob_range[audit.baseline][1]) }}, the model's from {{ "%.3f"|format(audit.prob_range[audit.candidate][0]) }} to {{ "%.3f"|format(audit.prob_range[audit.candidate][1]) }}; every value is above the {{ "%.2f"|format(audit.cutoff) }} alert threshold, so the extra model changed no action under these costs.{% else %}The two models' alerts differed on {{ audit.differing_decisions }} of {{ audit.n }} days.{% endif %}
+{% if audit.interval.estimated %} Paired day-block interval of the daily loss difference: {{ "%.3f"|format(audit.interval.low) }} to {{ "%.3f"|format(audit.interval.high) }} over {{ audit.interval.days }} days.{% else %} Interval: {{ audit.interval.reason }}.{% endif %}</p>
+
+<h2 id="a-costs">What if the costs were different?</h2>
+<figure class="chart-fig">{{ audit.chart }}
+<ul class="audit-key" aria-label="Bar order in every group">{% for p in ("base_rate", "fine_tuned_gguf", "always_alert") %}<li><span class="dot-key {{ audit_class[p] }}" aria-hidden="true"></span>{{ audit_names[p] }}</li>{% endfor %}</ul>
+<figcaption>Total loss for each cost ratio. "Never alert" is left out of the chart (it loses {% for s in audit.sensitivity %}{{ "%g"|format(s.loss.never_alert) }}{% if not loop.last %}, {% endif %}{% endfor %} at these ratios) but is in the table.</figcaption></figure>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Loss by cost ratio"><table class="proof">
+<caption>Total loss by cost ratio (false alert : missed event) and policy</caption>
+<thead><tr><th scope="col">Cost ratio</th><th scope="col">Alert threshold</th>{% for p in ("base_rate", "fine_tuned_gguf", "always_alert", "never_alert") %}<th scope="col">{{ audit_names[p] }}</th>{% endfor %}</tr></thead>
+<tbody>{% for s in audit.sensitivity %}<tr><th scope="row">{{ s.ratio }}{% if s.primary %} (primary){% endif %}</th><td>{{ "%.2f"|format(s.cutoff) }}</td>{% for p in ("base_rate", "fine_tuned_gguf", "always_alert", "never_alert") %}<td>{{ "%g"|format(s.loss[p]) }}</td>{% endfor %}</tr>{% endfor %}</tbody></table></div>
+
+{% if audit.examples.cutoff is not none %}
+<section class="card" aria-labelledby="a-days"><h2 id="a-days">Two days, chosen by a stated rule</h2>
+<p>At the equal-cost threshold ({{ "%.2f"|format(audit.examples.cutoff) }}) the model sometimes stays silent where the base rate would alert. The rule: the <strong>first day by target date</strong> on which that happens, once for each outcome. No other days were looked at.</p>
+<ul>
+{% if audit.examples.helped %}<li><strong>Helped ({{ audit.examples.helped.day }}):</strong> the model gave {{ "%.3f"|format(audit.examples.helped.p_model) }} (below the threshold, no alert), the base rate {{ "%.3f"|format(audit.examples.helped.p_base) }}. The evening stayed below the price threshold, so a false alert was avoided.</li>{% endif %}
+{% if audit.examples.hurt %}<li><strong>Hurt ({{ audit.examples.hurt.day }}):</strong> the model gave {{ "%.3f"|format(audit.examples.hurt.p_model) }} (no alert), the base rate {{ "%.3f"|format(audit.examples.hurt.p_base) }}. The evening exceeded the price threshold, so the event was missed.</li>{% endif %}
+</ul></section>
+{% endif %}
+
+{% if lineage %}
+<section class="card" aria-labelledby="a-lineage"><h2 id="a-lineage">One question end to end (outside the {{ audit.n }} cases)</h2>
+<p>From the public ledger: <a href="questions/{{ lineage.question_id }}.html">{{ lineage.text }}</a> Batch day {{ lineage.batch_date }}, delivery day {{ lineage.target_date }}, forecasts locked at {{ lineage.lock }}. The ML model wrote {{ "%.3f"|format(lineage.ml) if lineage.ml is not none else "no forecast" }} and persistence {{ "%.3f"|format(lineage.persistence) if lineage.persistence is not none else "no forecast" }} before the lock; the question resolved {{ "YES" if lineage.outcome else "NO" }}{% if lineage.skips %}; skipped forecasters: {% for fid, why in lineage.skips.items() %}{{ fname(fid) }} ({{ why }}){% if not loop.last %}, {% endif %}{% endfor %}{% endif %}. The three dates differ on purpose: batch, delivery and resolution are not the same day.</p>
+</section>
+{% endif %}
+
+<section class="card" aria-labelledby="a-try"><h2 id="a-try">Run it on your own predictions</h2>
+<p>Two CSV files and a standard-library Python 3.12 script; nothing is uploaded and no key or package is needed. It also counts the days your model had no on-time prediction, and shows what the fallback did to the loss.</p>
+<pre tabindex="0"><code>python3 examples/forecast-audit/report.py --cases cases.csv --predictions predictions.csv \
+  --candidate my_model --baseline reference --false-alert-cost 1 --miss-cost 4 --out report/</code></pre>
+<p>The files, the input rules and the outputs are described in the <a href="{{ repo_url }}/blob/main/examples/forecast-audit/SCHEMA.md">contract</a>; the tool is <a href="{{ repo_url }}/blob/main/examples/forecast-audit/forecast_audit.py">one file</a>; this case can be rebuilt with <a href="{{ repo_url }}/tree/main/examples/forecast-audit/german-electricity">its manifest and a SQL cross-check</a>.</p>
+</section>
+
+<section class="card" aria-labelledby="a-limits"><h2 id="a-limits">What this cannot show</h2>
+<ul>
+<li>The costs are assumed, not an operator's; there is no load profile and no measured saving.</li>
+<li>These are replayed days that were studied before; the numbers do not predict future performance.</li>
+<li>The classical gradient-boosted model is not in this comparison: the row-level predictions of its original backtest were not kept. It can be added from a separately identified replay.</li>
+<li>Data: Bundesnetzagentur | SMARD.de (CC BY 4.0). Only yes/no events and probabilities are shipped, no price series; the licence page says wholesale-price licensing is under review.</li>
+</ul></section>
+{% endblock %}

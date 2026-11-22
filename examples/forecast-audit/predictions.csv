@@ -1,0 +1,8 @@
+case_id,model_id,status,probability,issued_at,reason
+day-1,demo,forecast,0,2026-01-01T05:30:00+00:00,
+day-2,demo,forecast,1,2026-01-02T05:30:00+00:00,
+day-3,demo,forecast,0.20,2026-01-03T05:30:00+00:00,
+day-1,reference,forecast,0.80,2026-01-01T05:30:00+00:00,
+day-2,reference,forecast,0.80,2026-01-02T05:30:00+00:00,
+day-3,reference,forecast,0.60,2026-01-03T05:30:00+00:00,
+day-4,reference,forecast,0.75,2026-01-04T05:30:00+00:00,

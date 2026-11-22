@@ -142,7 +142,8 @@ function audit() {
     const page = await ctx.newPage();
     let current = '';
     page.on('pageerror', (e) => { problems += 1; console.log(`LAYOUT ${current} (${width}px): script error: ${String(e).slice(0, 120)}`); });
-    page.on('console', (m) => { if (m.type() === 'error') { problems += 1; console.log(`LAYOUT ${current} (${width}px): console error: ${m.text().slice(0, 120)}`); } });
+    page.on('console', (m) => { // the chat pack cannot be fetched from file:// (play.js checks the chat over http)
+      if (m.type() === 'error' && !/chat\/pack\.json/.test(m.text())) { problems += 1; console.log(`LAYOUT ${current} (${width}px): console error: ${m.text().slice(0, 120)}`); } });
     for (const file of list) {
       current = path.relative(root, file);
       await page.goto(require('url').pathToFileURL(file).href);

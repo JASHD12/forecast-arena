@@ -1,0 +1,53 @@
+{
+ "kind": "evaluation",
+ "experiment": "judge",
+ "title": "LLM-as-judge for stored rationales",
+ "created_at": "2026-11-22T23:04:14Z",
+ "why": "A rubric-based LLM grader, calibrated against a small human-labelled set, is the standard way teams evaluate open-ended LLM output at scale.",
+ "prereg_sha256": null,
+ "dataset_sha256": {},
+ "artefacts": {},
+ "metrics": {
+  "judge / agent": {
+   "n": 20,
+   "data_use": 3.1,
+   "direction": 4.75,
+   "hedging": 3.8
+  },
+  "judge / agent_graph": {
+   "n": 20,
+   "data_use": 3.2,
+   "direction": 4.7,
+   "hedging": 3.85
+  },
+  "judge / llm_context": {
+   "n": 20,
+   "data_use": 3.4,
+   "direction": 4.9,
+   "hedging": 3.85
+  },
+  "judge / llm_local": {
+   "n": 20,
+   "data_use": 1.4,
+   "direction": 2.35,
+   "hedging": 1.75
+  },
+  "judge / llm_plain": {
+   "n": 20,
+   "data_use": 1.85,
+   "direction": 4.4,
+   "hedging": 3.25
+  }
+ },
+ "paired": [],
+ "cost_usd": 0.0364,
+ "notes": [
+  "100 of 100 rationales were graded."
+ ],
+ "limits": [
+  "The judge model is the same family as the forecasters it grades, so it may favour their style.",
+  "At most 30 human labels: the agreement estimate is rough.",
+  "It grades the stated reasoning, not whether the forecast turned out right."
+ ],
+ "card": "docs/lab/judge.md"
+}

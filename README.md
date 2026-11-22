@@ -28,6 +28,7 @@ append-only, hash-chained ledger. When the data arrives, every forecast is score
 **[Live site](https://jashd12.github.io/forecast-arena/)** ·
 **[For recruiters: 60-second tour](https://jashd12.github.io/forecast-arena/recruiters.html)** ·
 **[Status](https://jashd12.github.io/forecast-arena/status.html)** ·
+**[Ask the Arena](https://jashd12.github.io/forecast-arena/ask.html)** ·
 [Code tour](docs/CODE_TOUR.md) · [Architecture](#how-it-works) · [Reproduce it](#reproduce-it)
 
 [![The home page](docs/img/home.png)](https://jashd12.github.io/forecast-arena/)
@@ -62,12 +63,14 @@ Each technique is tried against the project's baselines on questions it never sa
 <!-- lab:start -->
 | Technique | Status | Card |
 |---|---|---|
+| Ask the Arena: tiered chat over the published record | evaluated (not a live score) | [docs/lab/ask-arena.md](docs/lab/ask-arena.md) |
 | Ask the project: cited answers over the project documents | evaluated (not a live score) | [docs/lab/docs-assistant.md](docs/lab/docs-assistant.md) |
 | Calibration methods compared: identity, Platt, isotonic, beta | evaluated (not a live score) | [docs/lab/calibration.md](docs/lab/calibration.md) |
 | Conformal price bands: coverage by month | evaluated (not a live score) | [docs/lab/conformal.md](docs/lab/conformal.md) |
 | Cost routing: a cheap pair first, the paid model only when they are unsure | evaluated (not a live score) | [docs/lab/routing.md](docs/lab/routing.md) |
 | DPO preference tuning of Qwen2.5-1.5B on replayed power questions | evaluated (not a live score) | [docs/lab/dpo-r1.md](docs/lab/dpo-r1.md) |
 | Guardrails and red-team suite for untrusted tool and news text | evaluated (not a live score) | [docs/lab/guardrails.md](docs/lab/guardrails.md) |
+| LLM-as-judge for stored rationales | evaluated (not a live score) | [docs/lab/judge.md](docs/lab/judge.md) |
 | Numeric grounding of model rationales | evaluated (not a live score) | [docs/lab/grounding.md](docs/lab/grounding.md) |
 | Offline prompt optimisation for the free local model | evaluated (not a live score) | [docs/lab/prompt-opt.md](docs/lab/prompt-opt.md) |
 | Online learning of which forecaster to trust (Hedge and Thompson sampling) | evaluated (not a live score) | [docs/lab/bandit.md](docs/lab/bandit.md) |
@@ -78,10 +81,21 @@ Each technique is tried against the project's baselines on questions it never sa
 | Unsupervised data-anomaly detection on price windows (Isolation Forest) | evaluated (not a live score) | [docs/lab/anomaly.md](docs/lab/anomaly.md) |
 | Vector database: Qdrant against brute-force dense search | evaluated (not a live score) | [docs/lab/vectordb.md](docs/lab/vectordb.md) |
 | Distillation from Claude | approved 2026-11-22; pre-registered, label workflow built; the paid run follows | - |
-| LLM-as-judge with human calibration | approved 2026-11-22; items frozen; the paid run and the owner's 30 labels follow | - |
 
 Live experimental forecasters: the QLoRA-tuned model (running since the first morning after 2026-11-22, with its fixed pre-registered expectations), an agent with hybrid retrieval and guards, and a cascade router (both still switched off until their launch checks). None of them enters the headline board. Details: [Lab page](https://jashd12.github.io/forecast-arena/lab.html), [explainer](docs/explainers/06-experiments-lab.md).
 <!-- lab:end -->
+
+## An open-source tool from this project
+
+<!-- audit:start -->
+**[forecast-audit](examples/forecast-audit/)**: a small offline tool (Python 3.12 standard library only) that asks whether alerts sent from a model's probabilities beat a baseline, including the days the model misses. Two CSV files in, a JSON and an HTML report out.
+
+In 46 historical German evening-price cases the base rate had the better Brier score (0.2337 against 0.2499), yet both models triggered an alert on exactly the same days at a 20% alert threshold; 17 of those alerts were false. Lower Brier is better. This is a replay of frozen records, not a live result. [Read the case](https://jashd12.github.io/forecast-arena/audit.html) or run it:
+
+```bash
+make forecast-audit-demo
+```
+<!-- audit:end -->
 
 <details>
 <summary><strong>Tech stack</strong></summary>

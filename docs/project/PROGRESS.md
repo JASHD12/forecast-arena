@@ -65,6 +65,9 @@ Nothing. See the session summary above and `python scripts/status.py`.
   output, not acted on (S11).
 
 ## Done log
+- T310-T315 (Ask the Arena): knowledge pack, TypeScript orchestrator, `ask.html`, golden evaluation (refusals 100%, no invented numbers 100%), explainer 10; T252b judge result (US$0.04); T247 labels complete (1,198 of 1,200, US$0.64 total); lab budget US$0.96 of 2.00.
+- T322, T323, T324 (forecast-audit): case page `audit.html`, `recruiters-ml.html`, German proof line, README block, CONTRIBUTING, issue form, release note, archive test, explainer 09, pilot/upstream notes, H40. T325 deferred.
+- 2026-11-22 T320-T321 (forecast-audit, owner brief): standard-library audit engine with contract, golden four-case fixture and error matrix; German electricity case reproduces the planning table exactly (46 cases, 29 YES; base rate 0.2337, GGUF 0.2499, same 46 decisions, loss 17); DuckDB agrees; CI job on a bare Python 3.12.
 - 2026-11-22 T297 done: prompt optimisation search and final phase (free CPU); winner beats the live prompt by -0.0076 [-0.0135, -0.0017] on 276 test questions, still worse than the base rate; card and README row added.
 - 2026-11-22 T247, T250, T252b (code), T299 (run): owner approved all paid lab runs (H27, H31, H36); pre-registrations, capped workflows, commands and tests for the judge, routing study and distillation labels; DPO evaluated (no gain over QLoRA, better than untuned); race chart axis and label fixed; prompt optimisation final phase running.
 - 2026-11-22 T248, T297 (framework): lineage record of the fine-tuned model tied to the pin and the evaluation by a test; prompt-optimisation pre-registration, code, CLI and manual workflow (run pending, free). Site redeployed from main (resolve run 45049332360, smoke green). morning dry run 45035992475 could not measure (batch already sealed; first real measurement is the 2026-11-23 scheduled morning run, check-in scheduled).

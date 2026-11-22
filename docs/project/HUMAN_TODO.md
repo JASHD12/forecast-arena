@@ -305,3 +305,14 @@ curl -X POST -H "Authorization: Bearer TOKEN" -H "Accept: application/vnd.github
   - Open `notebooks/lab/distill_qwen_forecast.ipynb` (File > Open notebook > GitHub, `JASHD12/forecast-arena`, branch `main`), Runtime > Change runtime type > **T4 GPU**, Runtime > **Run all** (about 1 to 2 hours). It trains the small model on the teacher's probabilities (`lab/data/distill-labels-v1.json`, already in the repository) and prints the SHA-256 of every output file. No GGUF is needed.
   - Download `outputs.zip`, unzip it, then GitHub > Releases > Draft a new release: tag `lab-distill-r1` (target `main`), tick pre-release, attach `scores_distill_1_5b.jsonl`, `run_summary.json`, `SHA256SUMS.json`, `train_log_distill_1_5b.json` (and the adapter file if you like), publish, and paste the release link into the chat. The agent then evaluates it against the teacher, the QLoRA model and the base rate.
 
+- [ ] H40 · forecast-audit: owner-only steps (T324)
+  - Contact and CV: add your CV link / LinkedIn / email to `site_content/recruiter_facts.json` (H16); the recruiter pages show a contact button only when you do.
+  - Confirm the wording "Backend engineer targeting applied ML roles in Germany" on `recruiters-ml.html`, or tell the agent your real title.
+  - GitHub About text and topics (repository settings, so the agent cannot): description "Offline tool that audits alert decisions from forecast probabilities against a baseline" and topics `forecasting`, `forecast-verification`, `python`, `energy`.
+  - Discovery and pilot: run `docs/pilot/forecast-audit-pilot.md` with three volunteers and record the results.
+  - Outreach choice (openmod or PyData Berlin) and whether to open an upstream issue (`docs/upstream/scores-candidate.md`): your decision; the agent posts nothing.
+  - Tagging a `forecast-audit-v0.1` release from `docs/releases/forecast-audit-v0.1.md` is yours.
+
+- [ ] H41 · Optional: decide on the in-browser model tier for Ask the Arena (T316)
+  - Today the chat answers from lookups and document search only; nothing is downloaded. A third tier could rephrase retrieved facts with a small model that runs in the visitor's browser (about 300 MB, loaded only after a click, from a third-party host). It needs your OK because it changes the privacy page and adds an outside download. Reply "yes tier 2" or leave it as is.
+

@@ -833,3 +833,29 @@ main summary { min-height: 1.5rem; }
 .game input[type="range"] { height: 1.5rem; }
 .qchart-narrow { display: none; }
 @media (max-width: 640px) { .qchart-wide { display: none; } .qchart-narrow { display: block; } }
+
+/* Forecast audit case page (T322): grouped bars of loss by policy and cost ratio. */
+.audit-chart { width: 100%; height: auto; display: block; }
+.audit-chart .grid { stroke: var(--line); stroke-width: 1; }
+.audit-chart .tick { fill: var(--muted); font-size: 12px; }
+.audit-chart .bar { fill: var(--c, var(--accent)); }
+.audit-narrow { display: none; }
+.chart-fig { margin: 1rem 0; }
+.chart-fig figcaption { color: var(--muted); font-size: .92rem; margin-top: .4rem; }
+.audit-key { list-style: none; margin: .5rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .25rem 1.25rem; }
+@media (max-width: 640px) {
+  .audit-wide { display: none; }
+  .audit-narrow { display: block; }
+}
+.card pre { max-width: 100%; overflow-x: auto; }
+.ask-log { display: flex; flex-direction: column; gap: var(--s-3); min-height: 8rem; max-height: 28rem; overflow-y: auto; padding: .25rem; }
+.ask-msg { padding: .6rem .8rem; border-radius: 10px; max-width: 46rem; border: 1px solid var(--line); }
+.ask-msg.user { align-self: flex-end; background: var(--accent); color: var(--accent-ink); border-color: transparent; }
+.ask-msg.bot { align-self: flex-start; background: var(--card, transparent); }
+.ask-meta { font-size: .85rem; color: var(--muted); margin-top: .4rem; }
+.ask-form label { display: block; font-weight: 600; margin-bottom: .25rem; }
+.ask-row { display: flex; gap: .5rem; }
+.ask-row input { flex: 1; min-width: 0; padding: .55rem .7rem; font: inherit; border: 1px solid var(--line); border-radius: 8px; background: transparent; color: inherit; }
+.ask-examples button { font: inherit; margin: .2rem .3rem .2rem 0; padding: .3rem .7rem; border-radius: 999px; border: 1px solid var(--line); background: transparent; color: inherit; cursor: pointer; }
+.ask-msg table { border-collapse: collapse; margin-top: .4rem; font-size: .92rem; }
+.ask-msg th, .ask-msg td { padding: .2rem .6rem; border-bottom: 1px solid var(--line); text-align: left; }

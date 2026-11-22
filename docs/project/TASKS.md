@@ -759,6 +759,7 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
   - Code and pre-registration done 2026-11-22 (owner approval H27): `lab/prereg/distill.md`, `arena lab distill-labels`, `lab-distill-labels.yml`, `src/arena/lab/distill.py`, tests with a fake teacher. Open: the paid run after the merge (labels committed as `lab/data/distill-labels-v1.json`), then the student's soft-label training on the owner's Colab (a later H item) and the evaluation.
   - Student training code added 2026-11-22: `Spec.soft_labels` in `lab/finetune/run.py` (trains only the labelled rows, binary cross-entropy against the teacher probability), notebook `notebooks/lab/distill_qwen_forecast.ipynb`, tests on a tiny model. Owner step: H39 (after the labels are committed).
   - Label run 1 done 2026-11-22 (run 45071238970, US$0.4117): 773 of 1,200 labelled before the run's own 2.2M token cap stopped it (average 2.8k tokens per question, my estimate was too low); 1 answer failed the format. The labelled rows are the first 774 of the id-sorted sample, i.e. four templates (`lab/data/distill-run1-probs.json`, hash of the sample checked). Fix: `--start` and `distill-merge`, cap 3.6M. Open: run 2 with `start=774` (about US$0.23, after this PR is merged), then `arena lab distill-merge` to write `lab/data/distill-labels-v1.json` with all templates, then H39.
+  - Label run 2 done 2026-11-22 (run 45079870076, US$0.2289, rows 774 to 1,199): 425 labelled, 1 parse error; merged with run 1 by `arena lab distill-merge` into `lab/data/distill-labels-v1.json` (1,198 of 1,200 rows, total US$0.6406). Open: the owner's Colab run (H39), then evaluation of the student.
 - [x] T248 · Adapter registry and lineage (deps: T246)
   - Done 2026-11-22: `src/arena/lab/lineage.py` + `arena lab lineage` write `docs/lab/runs/qlora-r1.json` (base revision, dataset and pre-registration hashes, Colab code commit and packages, adapter, GGUF and llama.cpp commit, both Platt maps in order); a unit test fails if the pin file, the lineage record and the evaluation result disagree.
 - [x] T249 · Shadow run of the fine-tuned model (deps: T246)
@@ -777,7 +778,7 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
   - Done 2026-11-21: `lab/grounding.py`, result `lab-grounding.json` (share of quoted numbers not literally in the prompt per forecaster; the
     "derived arithmetic" class was dropped because it produced false matches by chance, noted in the module).
 - [ ] T252b · LLM-as-judge with calibration (deps: T252a; needs: H27, H29)
-  - Code done 2026-11-22 (owner approval H27): `lab/prereg/judge.md`, `src/arena/lab/judge.py` (rubric, parser, weighted kappa), `arena lab judge-sheet|judge-run|judge-eval`, `lab-judge.yml`, frozen `lab/judge/items.json` (100) and `lab/judge/label-sheet.csv` (30). Open: the paid run after the merge and the owner's 30 labels (H29).
+  - Code done 2026-11-22 (owner approval H27): `lab/prereg/judge.md`, `src/arena/lab/judge.py` (rubric, parser, weighted kappa), `arena lab judge-sheet|judge-run|judge-eval`, `lab-judge.yml`, frozen `lab/judge/items.json` (100) and `lab/judge/label-sheet.csv` (30). Paid run done 2026-11-22 (run 45079867618, US$0.0364, 100 of 100 scored): `evals/results/lab-judge.json`, `docs/lab/judge.md`; the judge ranks `llm_local` clearly lowest on data use (1.4 of 5) and the Claude variants highest (3.1 to 3.4). Open: the owner's 30 labels (H29) for the agreement estimate; scores stay uncalibrated until then.
 - [x] T253 · Guardrails and red-team suite (deps: T252a)
   - Done 2026-11-21: `llm/guards.py` (injection patterns EN/DE, markup, links, PII, length), 61 cases in `lab/redteam/cases.json`; 35 of 41
     attacks flagged, 6 expected evasions missed, 0 of 20 benign texts flagged; report-only (live agent unchanged).
@@ -880,3 +881,30 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
 - [x] T303 · Crypto domain live: forecasts of price thresholds only, no trading, not-advice notice, CoinGecko attribution (deps: T045d)
   - Done 2026-11-22: topic text states forecasting exercise, no recommendation, no trading; the footer on every page carries the "research project, not advice" notice and, when crypto questions exist, "Data provided by CoinGecko" (existing test); a topic added after the official start joins the overall boards only after 30 days (`settling_rule`, tests in `test_boards.py`).
 - [ ] T280 · Showcase and final sweep for the live lab (deps: T272, T274, T276a, T276b)
+
+## Phase 18 - Ask the Arena (owner decision 2026-11-22: a free, browser-only chat over the published record, with tiers and document search)
+
+- [x] T310 · Governance: SPEC 17 note, DECISIONS (why not a stock chatbot), this phase
+  - Done 2026-11-22: a question like "price of Google stock on 24 Nov" is refused (MAR/BaFin duties, forecast-before-truth, no server or key); the chat only answers from published data.
+- [x] T311 · Knowledge pack builder `src/arena/site/chatpack.py`, wired into `arena site build` (`chat/pack.json`, budget 1.5 MB) (deps: T310)
+  - Done 2026-11-22: recent questions with every locked forecast and outcome, boards, document chunks; 396 KB on the live ledger; tests `tests/unit/test_chatpack.py`.
+- [x] T312 · Orchestrator `site_ts/chat.ts` -> `static/chat.js` (guard, slots, tier 0 lookup, tier 1 BM25 documents, leader choice by difficulty) (deps: T311)
+  - Done 2026-11-22: strict TypeScript, no dependencies; BM25 scores equal the Python index (test); `tests/unit/test_chat_orchestrator.py`.
+- [x] T313 · Page `ask.html`, nav entry, styles, privacy line, accessibility and play tests (deps: T312)
+  - Done 2026-11-22: `make a11y` passes (axe 0, layout, a chat conversation over http with no outside request).
+- [x] T314 · Golden evaluation `evals/golden/chat-v1.jsonl`, Node runner, result `evals/results/lab-ask-arena.json` and card (deps: T312)
+  - Done 2026-11-22: refusals 100%, no false refusals, no invented numbers 100%; the misses are listed on the card.
+- [x] T315 · Explainer `docs/explainers/10-ask-the-arena.md` (deps: T314)
+- [ ] T316 · Optional tier 2: an opt-in in-browser model that only rephrases retrieved facts (deps: T314; needs owner OK: a roughly 300 MB third-party download, privacy page and CSP change)
+
+## Phase 19 - forecast-audit: an open-source release that is also the hiring portfolio (owner brief of 2026-11-22)
+
+- [x] T320 · Contract and offline example: `examples/forecast-audit/` (`forecast_audit.py` standard library only, `report.py`, `SCHEMA.md`, four-case golden fixture, `selfcheck.py`), tests with a bare interpreter from a path with spaces, an input-error matrix (exit 2, field/row message, nothing written) and conformance with `arena.scoring.core` (deps: T246)
+  - Done 2026-11-22: golden table reproduced (candidate Brier 0.213333 / clipped 0.2134 vs 0.28 on the same three days; loss 1.00 vs 0.25 per day at 1:4); CI job `forecast-audit` runs on a bare Python 3.12.
+- [x] T321 · German electricity adapter: `examples/forecast-audit/german-electricity/` (46 evening cases, 29 YES / 17 NO, base rate and GGUF probabilities, manifest with hashes, terms and attribution, `expected/` report, DuckDB `audit.sql` agreeing with Python, `build_case.py --check`) (deps: T320)
+  - Done 2026-11-22: reproduces the brief's table (Brier 0.2337 vs 0.2499, both models 46 alerts / 17 false / 0 misses / loss 17; never-alert 116). Label: replayed. Only derived binary data shipped; SMARD terms read 2026-11-22 (CC BY 4.0, wholesale-price licensing under review).
+- [x] T322 · Case and application pages: generated case page, neutral full-time recruiter entry beside the Werkstudent one, German proof line, README block (deps: T321)
+- [x] T323 · Contributor and release path: CONTRIBUTING, issue form, focused test command, release note, archive test, data licence file (deps: T321)
+- [x] T324 · Owner path and docs: pilot script, upstream candidate note, starter issues, explainer 09, HUMAN_TODO items (deps: T322)
+- [ ] T325 · One role-specific follow-up chosen by role fit or pilot feedback (deferred until selected; owner decision)
+

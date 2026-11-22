@@ -1,0 +1,5 @@
+case_id,group_day,lock_at,outcome_state,outcome
+day-1,2026-01-01,2026-01-01T09:30:00+00:00,resolved,0
+day-2,2026-01-02,2026-01-02T09:30:00+00:00,resolved,1
+day-3,2026-01-03,2026-01-03T09:30:00+00:00,resolved,1
+day-4,2026-01-04,2026-01-04T09:30:00+00:00,resolved,1

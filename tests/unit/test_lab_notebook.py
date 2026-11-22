@@ -56,7 +56,7 @@ def test_notebook_pins_match_the_environment_and_run_the_preregistered_settings(
 
 
 def test_gguf_export_cell_fails_loudly_and_checks_the_file() -> None:
-    """The first Colab run reported a GGUF export that never produced a file (shell lines ignored)."""
+    """The first Colab run reported a GGUF export that never produced a file."""
     import json
     from pathlib import Path
 

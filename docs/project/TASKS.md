@@ -747,8 +747,10 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
 - [x] T244 · QLoRA training code and the Colab notebook (deps: T243)
   - Done 2026-11-21: `arena.lab.finetune` (format, train, score, run) unit-tested on CPU with a tiny random Qwen2 model; notebook
     `notebooks/lab/qlora_qwen_forecast.ipynb` runs QLoRA 1.5B and the LoRA 0.5B ablation and scores val and both test sets on the GPU.
-- [ ] T245 · Owner runs the Colab notebook and uploads the release assets (deps: T244; needs: H26, H28)
-- [ ] T246 · Evaluate the fine-tuned model in `lab-eval.yml` (deps: T245, T242)
+- [x] T245 · Owner runs the Colab notebook and uploads the release assets (deps: T244; needs: H26, H28)
+  - Done 2026-11-22: release `lab-qlora-r1`; pin file `lab/artefacts/llm_local_ft.json` (GGUF SHA-256 verified against the release digest).
+- [x] T246 · Evaluate the fine-tuned model (deps: T245, T242)
+  - Done 2026-11-22 without a new workflow: the Colab score files already hold per-question probabilities of all four variants, so `arena lab ft-eval` pairs them with the base rate and the `ml` backtest on identical items (`evals/results/lab-qlora-r1.json`, card `docs/lab/qlora-r1.md`). GGUF parity on 31 rows missed the pre-registered limit (Brier +0.0123 against < 0.005); a full GGUF run and a GGUF-specific calibration are open (H32 options).
 - [ ] T247 · Distillation from Claude (deps: T246; needs: H27)
 - [ ] T248 · Adapter registry and lineage (deps: T246)
 - [x] T249 · Shadow run of the fine-tuned model (deps: T246)

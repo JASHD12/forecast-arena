@@ -77,9 +77,11 @@ backtest first, then freeze the version, then write forecasts before the lock li
 
 ## Honest limits
 
-- **The fine-tune has not run yet.** The notebook, code and pre-registration are ready; the result needs a Colab run.
-  The expected outcome, written down in advance, is that the tuned model beats its own base model and does not beat the
-  gradient-boosted model on electricity.
+- **The fine-tune ran once (card `docs/lab/qlora-r1.md`).** It beat its own untuned base model, as predicted, and it does **not** beat the
+  gradient-boosted `ml` model, as predicted. Two results were not predicted and are the honest headline: the tuned 1.5B model is also worse
+  than the plain base rate (an interval that excludes zero), and the smaller 0.5B LoRA model scored slightly better than the 1.5B QLoRA model.
+  One run and one seed, so the ranking of the two tuned models is not settled. The 4-bit GGUF that would run live missed the pre-registered
+  parity limit on a 31-question subset, so it is not live yet (owner decision H32).
 - Electricity only (one market, replayed outcomes resolve against current data). Test sets are small (186 and 90 questions)
   and the six questions of a day are correlated, so intervals are day-block bootstrap intervals and wide.
 - The retrieval grades come from question metadata, not from whether retrieval improves a forecast.

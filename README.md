@@ -57,10 +57,10 @@ Each technique is tried against the project's baselines on questions it never sa
 | Conformal price bands: coverage by month | evaluated (not a live score) | [docs/lab/conformal.md](docs/lab/conformal.md) |
 | Guardrails and red-team suite for untrusted tool and news text | evaluated (not a live score) | [docs/lab/guardrails.md](docs/lab/guardrails.md) |
 | Numeric grounding of model rationales | evaluated (not a live score) | [docs/lab/grounding.md](docs/lab/grounding.md) |
+| QLoRA fine-tune of Qwen2.5-1.5B on replayed power questions | evaluated (not a live score) | [docs/lab/qlora-r1.md](docs/lab/qlora-r1.md) |
 | Retrieval: dense vs BM25 vs hybrid with reranking | evaluated (not a live score) | [docs/lab/retrieval-hybrid.md](docs/lab/retrieval-hybrid.md) |
-| QLoRA fine-tune of the open model | notebook ready; waiting for the Colab run | - |
-| Distillation from Claude | waiting for the QLoRA result and approval of paid runs | - |
-| Cost routing between cheap and paid forecasters | waiting for the QLoRA scores | - |
+| Distillation from Claude | waiting for approval of paid runs (H27) | - |
+| Cost routing between cheap and paid forecasters | waiting for one paid evaluation run (H31) | - |
 | LLM-as-judge with human calibration | waiting for approval of the paid run | - |
 | Global LightGBM challenger, experimental conformal interval, ONNX serving | built and running as live challengers or checks; no separate evaluation card yet | - |
 | Chronos-2 foundation-model challenger | planned | - |

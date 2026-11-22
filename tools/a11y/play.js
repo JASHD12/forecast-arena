@@ -174,6 +174,49 @@ function fail(msg) { console.error('FAIL ' + msg); process.exitCode = 1; }
     await wctx.close();
   }
 
+  // T313: Ask the Arena over http (fetch of chat/pack.json does not work from file://): a refusal,
+  // a document answer, and no request outside the site's own origin.
+  {
+    const http = require('http');
+    const fsx = require('fs');
+    const server = http.createServer((req, res) => {
+      const f = path.join(root, decodeURIComponent(req.url.split('?')[0]));
+      if (!f.startsWith(root) || !fsx.existsSync(f) || fsx.statSync(f).isDirectory()) { res.writeHead(404); res.end(); return; }
+      res.writeHead(200, { 'Content-Type': f.endsWith('.js') ? 'text/javascript' : f.endsWith('.json') ? 'application/json' : 'text/html' });
+      res.end(fsx.readFileSync(f));
+    });
+    await new Promise((r) => server.listen(0, '127.0.0.1', r));
+    const base = 'http://127.0.0.1:' + server.address().port;
+    const cctx = await browser.newContext({ viewport: { width: 390, height: 900 } });
+    const cp = await cctx.newPage();
+    const foreign = [];
+    cp.on('request', (r) => { if (!r.url().startsWith(base)) foreign.push(r.url()); });
+    const cerrors = [];
+    cp.on('pageerror', (e) => cerrors.push(String(e)));
+    await cp.goto(base + '/ask.html');
+    await cp.waitForSelector('#ask-examples button');
+    const ask = async (text) => {
+      const before = await cp.locator('.ask-msg.bot').count();
+      await cp.fill('#ask-input', text);
+      await cp.keyboard.press('Enter');
+      await cp.waitForFunction((n) => document.querySelectorAll('.ask-msg.bot').length > n, before);
+      return (await cp.locator('.ask-msg.bot').last().innerText());
+    };
+    const refusal = await ask('What will be the price of Google stock on 24 Nov?');
+    if (!/not advice/.test(refusal)) fail('chat did not refuse a stock question: ' + refusal.slice(0, 80));
+    else console.log('ok   chat refuses a stock question');
+    const docs = await ask('How is the Brier score computed?');
+    if (!/Tier 1/.test(docs) || !/\[docs\//.test(docs)) fail('chat did not answer from the documents with a citation: ' + docs.slice(0, 120));
+    else console.log('ok   chat answers a method question with a citation');
+    if (foreign.length) fail('chat made requests outside the site: ' + foreign.join(', '));
+    else console.log('ok   chat makes no request outside the site');
+    if (cerrors.length) fail('chat page errors: ' + cerrors.join(' | '));
+    const live = await cp.locator('#ask-log').getAttribute('aria-live');
+    if (live !== 'polite') fail('chat log is not a polite live region');
+    await cctx.close();
+    server.close();
+  }
+
   await browser.close();
   console.log(process.exitCode ? 'play: FAIL' : 'play: PASS');
 })();

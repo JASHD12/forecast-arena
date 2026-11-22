@@ -16,6 +16,7 @@ def test_empty_ledger_builds_every_page(tmp_path) -> None:
         "404.html",
         "about.html",
         "api.html",
+        "ask.html",
         "audit.html",
         "backtests.html",
         "calibration.html",
@@ -49,8 +50,9 @@ def test_empty_ledger_builds_every_page(tmp_path) -> None:
         assert "Bundesnetzagentur | SMARD.de" in text
         assert "Rehearsal" in text
         assert 'name="viewport"' in text
-        # every page loads the one self-hosted script (T137), and nothing else
+        # every page loads the one self-hosted script (T137); the chat page adds its own (T313)
         assert 'static/app.js" defer></script>' in text
+        assert ("static/chat.js" in text) == (page == "ask.html")
     css = (res.out_dir / "static" / "style.css").read_text()
     assert "prefers-color-scheme: dark" in css
 

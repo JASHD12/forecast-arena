@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% from "macros.html" import page_head %}
+{% block content %}
+{{ page_head("Ask the Arena", "Ask about the forecasts, the results and the methods", "Answers come only from this site's published forecasts and documents, computed in your browser. Nothing you type is sent or stored.") }}
+<p class="note"><strong>Research project, not advice.</strong> This is not a forecasting service: it makes no new predictions, answers nothing about stocks, funds or what to buy or sell, and says so when a question is outside the published record.</p>
+
+<section class="card ask" aria-labelledby="ask-h">
+<h2 id="ask-h">Chat</h2>
+<noscript><p>This page needs JavaScript to run the chat. Everything it knows is also on the <a href="questions/index.html">questions</a>, <a href="leaderboard.html">leaderboard</a> and <a href="methods.html">methods</a> pages.</p></noscript>
+<div id="ask-log" class="ask-log" role="log" aria-live="polite" aria-label="Conversation"></div>
+<form id="ask-form" class="ask-form" autocomplete="off">
+<label for="ask-input">Your question</label>
+<div class="ask-row"><input id="ask-input" type="text" maxlength="200" placeholder="e.g. What did the ML model forecast for electricity tomorrow?" required><button class="btn btn-accent" type="submit">Ask</button></div>
+</form>
+<div class="ask-examples" id="ask-examples" role="group" aria-label="Example questions"></div>
+</section>
+
+<section class="card" aria-labelledby="ask-how"><h2 id="ask-how">How it answers</h2>
+<ol>
+<li><strong>Guard.</strong> Questions about stocks, funds, crypto trading advice or personal data get a fixed refusal.</li>
+<li><strong>Tier 0, lookup.</strong> If a published question matches, you get its locked forecasts and, if it has resolved, the result.</li>
+<li><strong>Tier 1, documents.</strong> Otherwise it searches the project documents (BM25) and quotes the best sentences with their source; if nothing matches well it says so.</li>
+<li><strong>Which forecaster leads.</strong> For a forecast answer it leads with the ML model when its forecast is decisive (at least 15 points from 50%), otherwise with the forecaster that has the best track record on that topic. This rule is a hypothesis from the routing study, not a validated result. Every locked forecast is always listed.</li>
+</ol>
+</section>
+<script src="{{ root }}static/chat.js" defer></script>
+{% endblock %}

@@ -1,0 +1,73 @@
+{
+ "kind": "evaluation",
+ "experiment": "ask-arena",
+ "title": "Ask the Arena: tiered chat over the published record",
+ "created_at": "2026-11-22T23:10:25Z",
+ "why": "Retrieval-grounded assistants with refusals and tiered routing are the standard pattern for answering questions over a company's own data without inventing facts.",
+ "prereg_sha256": null,
+ "dataset_sha256": {},
+ "artefacts": {},
+ "metrics": {
+  "category: refusal": {
+   "n": 16,
+   "hit_pct": 100
+  },
+  "category: personal": {
+   "n": 3,
+   "hit_pct": 100
+  },
+  "category: benign": {
+   "n": 6,
+   "hit_pct": 100
+  },
+  "category: method": {
+   "n": 12,
+   "hit_pct": 83.3
+  },
+  "category: board": {
+   "n": 5,
+   "hit_pct": 100
+  },
+  "category: status": {
+   "n": 3,
+   "hit_pct": 100
+  },
+  "category: decline": {
+   "n": 10,
+   "hit_pct": 100
+  },
+  "category: lookup": {
+   "n": 30,
+   "hit_pct": 100
+  },
+  "category: result": {
+   "n": 30,
+   "hit_pct": 100
+  },
+  "finance and personal refusals": {
+   "correct_refusal_pct": 100
+  },
+  "benign questions": {
+   "false_refusal_pct": 0
+  },
+  "all answers": {
+   "n": 115,
+   "no_invented_pct": 100
+  }
+ },
+ "paired": [],
+ "cost_usd": 0.0,
+ "notes": [
+  "115 questions on the offline fixture pack (30 questions, 263 document chunks, 227450 bytes).",
+  "Answers by tier: lookup 69, documents 13, declined or refused 33.",
+  "Latency in Node: median 0.7 ms, 95th percentile 8.93 ms.",
+  "Missed in the golden set: 2 question(s); see the failure list in the run output."
+ ],
+ "limits": [
+  "The questions are written by the project owner's agent, so they may not match how visitors phrase things; the rates are not a measure of real-world accuracy.",
+  "'No invented numbers' checks that every number in an answer occurs in the pack or the question (probabilities as whole percentages); it does not check meaning.",
+  "The forecaster-choice rule is a hypothesis from the routing study; this evaluation does not test whether it picks the better forecaster.",
+  "The fixture pack has only one topic; the live pack has five."
+ ],
+ "card": "docs/lab/ask-arena.md"
+}

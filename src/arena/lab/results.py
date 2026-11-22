@@ -42,10 +42,6 @@ PLANNED: tuple[tuple[str, str], ...] = (
         "Distillation from Claude",
         "approved 2026-11-22; pre-registered, label workflow built; the paid run follows",
     ),
-    (
-        "LLM-as-judge with human calibration",
-        "approved 2026-11-22; items frozen; the paid run and the owner's 30 labels follow",
-    ),
 )
 
 
@@ -94,6 +90,7 @@ COLUMNS: dict[str, str] = {
     "answerable": "Answerable questions",
     "hit_pct": "Hit %",
     "false_refusal_pct": "False refusals %",
+    "no_invented_pct": "No invented numbers %",
     "out_of_scope": "Out of scope",
     "correct_refusal_pct": "Correct refusals %",
     "not_in_prompt_pct": "Numbers not in the prompt %",

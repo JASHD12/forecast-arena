@@ -881,6 +881,21 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
   - Done 2026-11-22: topic text states forecasting exercise, no recommendation, no trading; the footer on every page carries the "research project, not advice" notice and, when crypto questions exist, "Data provided by CoinGecko" (existing test); a topic added after the official start joins the overall boards only after 30 days (`settling_rule`, tests in `test_boards.py`).
 - [ ] T280 · Showcase and final sweep for the live lab (deps: T272, T274, T276a, T276b)
 
+## Phase 18 - Ask the Arena (owner decision 2026-11-22: a free, browser-only chat over the published record, with tiers and document search)
+
+- [x] T310 · Governance: SPEC 17 note, DECISIONS (why not a stock chatbot), this phase
+  - Done 2026-11-22: a question like "price of Google stock on 24 Nov" is refused (MAR/BaFin duties, forecast-before-truth, no server or key); the chat only answers from published data.
+- [x] T311 · Knowledge pack builder `src/arena/site/chatpack.py`, wired into `arena site build` (`chat/pack.json`, budget 1.5 MB) (deps: T310)
+  - Done 2026-11-22: recent questions with every locked forecast and outcome, boards, document chunks; 396 KB on the live ledger; tests `tests/unit/test_chatpack.py`.
+- [x] T312 · Orchestrator `site_ts/chat.ts` -> `static/chat.js` (guard, slots, tier 0 lookup, tier 1 BM25 documents, leader choice by difficulty) (deps: T311)
+  - Done 2026-11-22: strict TypeScript, no dependencies; BM25 scores equal the Python index (test); `tests/unit/test_chat_orchestrator.py`.
+- [x] T313 · Page `ask.html`, nav entry, styles, privacy line, accessibility and play tests (deps: T312)
+  - Done 2026-11-22: `make a11y` passes (axe 0, layout, a chat conversation over http with no outside request).
+- [x] T314 · Golden evaluation `evals/golden/chat-v1.jsonl`, Node runner, result `evals/results/lab-ask-arena.json` and card (deps: T312)
+  - Done 2026-11-22: refusals 100%, no false refusals, no invented numbers 100%; the misses are listed on the card.
+- [x] T315 · Explainer `docs/explainers/10-ask-the-arena.md` (deps: T314)
+- [ ] T316 · Optional tier 2: an opt-in in-browser model that only rephrases retrieved facts (deps: T314; needs owner OK: a roughly 300 MB third-party download, privacy page and CSP change)
+
 ## Phase 19 - forecast-audit: an open-source release that is also the hiring portfolio (owner brief of 2026-11-22)
 
 - [x] T320 · Contract and offline example: `examples/forecast-audit/` (`forecast_audit.py` standard library only, `report.py`, `SCHEMA.md`, four-case golden fixture, `selfcheck.py`), tests with a bare interpreter from a path with spaces, an input-error matrix (exit 2, field/row message, nothing written) and conformance with `arena.scoring.core` (deps: T246)

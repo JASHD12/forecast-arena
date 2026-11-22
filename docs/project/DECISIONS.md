@@ -1303,3 +1303,10 @@ and evidence requirements. Do not backfill historical ML forecasts.
 ## 2026-11-22 LLM-as-judge result (T252b): ranking only until the owner's labels exist
 - Run: 100 stored rationales (20 per forecaster), Claude Haiku as judge, US$0.0364, no skips. Mean data-use score: `llm_context` 3.4, `agent_graph` 3.2, `agent` 3.1, `llm_plain` 1.85, `llm_local` 1.4; direction 4.9 to 2.35.
 - Decision: report as an uncalibrated ranking with the same-family-bias caveat; no claim of agreement with humans until H29 (30 labels) provides kappa. No live change (I8).
+
+## 2026-11-22 Ask the Arena: a chat over the published record, not a prediction service
+- Context: the owner asked for a chatbot that predicts any question, for example the price of a stock on a given day. Declined: a stock is a financial instrument (investment-recommendation duties, possible licence for personal advice), an on-demand prediction breaks forecast-before-truth (I1), and a public LLM endpoint needs a server and an exposed key.
+- Decision (owner choices 2026-11-22): a chat that runs free in the browser on the static site, answers only from the published forecasts, results, boards and documents, declines what is not forecast and shows the nearest published question. No new predictions, no stock or advice answers, nothing stored or sent.
+- Design: a guard first; tier 0 looks up a published question (slots: date, topic, threshold) or a board; tier 1 searches the documents with BM25 and quotes the best sentences with citations; otherwise it declines. For a forecast answer the leading forecaster is chosen by difficulty: the ML model when decisive (15 points from 50%), else the forecaster with the best record on that topic (at least 20 questions), else the base rate; all locked forecasts are listed. That rule is the routing study's `ml_only` idea and is labelled a hypothesis.
+- Rejected: an LLM behind a key (cost, abuse, S8), a server, embeddings in the browser (size) and a tier 2 browser model for now (T316 needs the owner's OK).
+- Evaluation: `evals/golden/chat-v1.jsonl` plus lookups generated from the pack; honest limits are on the card.

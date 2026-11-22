@@ -38,6 +38,7 @@ from arena.scoring.findings import findings, power_table
 from arena.site.api import ENDPOINTS, build_api
 from arena.site.cards_page import challenger_backtests, headline_backtest, load_cards
 from arena.site.charts import forest_svg, race_svg, series_class
+from arena.site.chatpack import build_pack, write_pack
 from arena.site.content import (
     AI_FORECASTERS,
     ATTRIBUTIONS,
@@ -106,6 +107,8 @@ from arena.site.titles import FORECASTER_NAMES, domain_name, forecaster_name, pl
 from arena.site.toc import FOLD_PAGES, TOC_PAGES, add_toc, mark_fold
 from arena.site.topics import topic
 from arena.site.typography import nowrap_dates
+
+REPO_ROOT = Path(__file__).resolve().parents[3]
 
 
 @dataclass(frozen=True)
@@ -459,6 +462,7 @@ def build_site(
         )
         ml_ctx = {**pages["recruiters.html"][1], "audience": "engineer"}
         pages["recruiters-ml.html"] = ("For recruiters: ML engineering", ml_ctx)
+    pages["ask.html"] = ("Ask the Arena", {})
     for name, (title, ctx) in pages.items():
         root = "../" if "/" in name else ""
         nav_page = "questions/index.html" if name == "questions/index.html" else name
@@ -568,6 +572,14 @@ def build_site(
         (tmp / "topics" / f"{dom}.html").write_text(html_text, encoding="utf-8")
     for page_file in tmp.rglob("*.html"):
         page_file.write_text(nowrap_dates(page_file.read_text(encoding="utf-8")), encoding="utf-8")
+    pack = build_pack(
+        rec,
+        list(headline if off else rehearsal_boards),
+        phase_line(decision, STREAK, official_not_before, START_RULE),
+        REPO_ROOT,
+        clock.now().date(),
+    )
+    write_pack(pack, tmp)
     static = Path(__file__).parent / "static"
     for f in static.iterdir():
         shutil.copy(f, tmp / "static" / f.name)

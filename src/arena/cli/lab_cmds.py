@@ -711,3 +711,101 @@ def lab_bandit(obj: Ctx, out: Path) -> None:
         click.echo(f"{k}: {m}")
     for p in paired:
         click.echo(p)
+
+
+@lab.command("anomaly")
+@click.option(
+    "--out", type=click.Path(path_type=Path), default=Path("evals/results/lab-anomaly.json")
+)
+@click.pass_obj
+def lab_anomaly(obj: Ctx, out: Path) -> None:
+    """Isolation Forest against a robust z-score on injected faults in real price windows."""
+    from datetime import date
+
+    from arena.domains.power import PowerDomain
+    from arena.domains.power_history import HISTORY_START, PRICE_KEY, PowerHistory
+    from arena.lab import anomaly_study as st
+    from arena.lab.results import LabResult
+    from arena.sources.http import HttpClient
+    from arena.sources.smard import SmardClient
+
+    train, test = (date(2019, 1, 1), date(2024, 12, 31)), (date(2025, 11, 1), date(2026, 10, 31))
+    client = SmardClient(HttpClient(obj.settings.user_agent()), cache_dir=obj.settings.cache_dir)
+    store = PowerHistory(client).store([PRICE_KEY], HISTORY_START, test[1] + timedelta(days=3))
+    res = st.run(PowerDomain(store).all_days(), train, test)
+    result = LabResult(
+        experiment="anomaly",
+        title="Unsupervised data-anomaly detection on price windows (Isolation Forest)",
+        created_at=obj.clock.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+        why=(
+            "Label-free anomaly detection on incoming data is how production ML teams catch broken "
+            "feeds before a model silently uses them."
+        ),
+        metrics=res["metrics"],
+        notes=[
+            f"{res['n_windows']} real 28-day windows from {test[0]} to {test[1]} (every third "
+            f"day); thresholds from clean windows of {train[0]} to {train[1]} for about 5% false "
+            f"alarms: {{k: round(v, 3) for k, v in res['threshold'].items()}}.".replace(
+                "{{k: round(v, 3) for k, v in res['threshold'].items()}}",
+                str({k: round(v, 3) for k, v in res["threshold"].items()}),
+            ),
+            "Faults are injected into the latest day only: a spike (one hour times 8), a unit "
+            "error (prices divided by 1000), a flat feed and a repeated day.",
+        ],
+        limits=[
+            "Injected faults are synthetic; real feed failures can look different.",
+            "A window of 28 days is short; a repeated day is hard for any detector that only "
+            "looks at daily statistics.",
+        ],
+        card="docs/lab/anomaly.md",
+    )
+    out.write_text(result.model_dump_json(indent=1) + "\n", encoding="utf-8")
+    click.echo(json.dumps(res, indent=1))
+
+
+@lab.command("regimes")
+@click.option(
+    "--out", type=click.Path(path_type=Path), default=Path("evals/results/lab-regimes.json")
+)
+@click.pass_obj
+def lab_regimes(obj: Ctx, out: Path) -> None:
+    """Cluster daily price shapes (k-means) and test the regime as a feature (T294)."""
+    from datetime import date
+
+    from arena.domains.power import PowerDomain
+    from arena.domains.power_history import HISTORY_START, PRICE_KEY, PowerHistory
+    from arena.lab import regimes as rg
+    from arena.lab.results import LabResult
+    from arena.sources.http import HttpClient
+    from arena.sources.smard import SmardClient
+
+    train, test = (date(2019, 1, 1), date(2025, 10, 31)), (date(2025, 11, 1), date(2026, 10, 31))
+    client = SmardClient(HttpClient(obj.settings.user_agent()), cache_dir=obj.settings.cache_dir)
+    store = PowerHistory(client).store([PRICE_KEY], HISTORY_START, test[1] + timedelta(days=3))
+    res = rg.run(PowerDomain(store).all_days(), train, test)
+    p = res["paired"]
+    result = LabResult(
+        experiment="regimes",
+        title="Price-regime clustering (k-means) as a feature for the next day's mean price",
+        created_at=obj.clock.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+        why=(
+            "Unsupervised structure (clusters of daily shapes) is a standard source of features "
+            "and of operational monitoring in energy forecasting."
+        ),
+        metrics=res["metrics"],
+        paired=[{"a": "with_regime", "b": "without_regime", "split": "test", **p}],
+        notes=[
+            f"k = {res['info']['k']} chosen by silhouette on {train[0]} to {train[1]} "
+            f"(silhouette by k: {res['info']['silhouette_by_k']}); share of training days per "
+            f"regime in percent: {res['regime_share_pct']}.",
+            "Pinball loss averaged over the 10%, 50% and 90% quantiles of the next day's mean "
+            f"price, test year {test[0]} to {test[1]}; the regime is that of the last known day.",
+        ],
+        limits=[
+            "One market, one year of test days; the interval is a day-block bootstrap.",
+            "Backtest-only: nothing changes in the live `ml` forecaster.",
+        ],
+        card="docs/lab/regimes.md",
+    )
+    out.write_text(result.model_dump_json(indent=1) + "\n", encoding="utf-8")
+    click.echo(json.dumps(res, indent=1))

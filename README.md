@@ -67,8 +67,10 @@ Each technique is tried against the project's baselines on questions it never sa
 | Guardrails and red-team suite for untrusted tool and news text | evaluated (not a live score) | [docs/lab/guardrails.md](docs/lab/guardrails.md) |
 | Numeric grounding of model rationales | evaluated (not a live score) | [docs/lab/grounding.md](docs/lab/grounding.md) |
 | Online learning of which forecaster to trust (Hedge and Thompson sampling) | evaluated (not a live score) | [docs/lab/bandit.md](docs/lab/bandit.md) |
+| Price-regime clustering (k-means) as a feature for the next day's mean price | evaluated (not a live score) | [docs/lab/regimes.md](docs/lab/regimes.md) |
 | QLoRA fine-tune of Qwen2.5-1.5B on replayed power questions | evaluated (not a live score) | [docs/lab/qlora-r1.md](docs/lab/qlora-r1.md) |
 | Retrieval: dense vs BM25 vs hybrid with reranking | evaluated (not a live score) | [docs/lab/retrieval-hybrid.md](docs/lab/retrieval-hybrid.md) |
+| Unsupervised data-anomaly detection on price windows (Isolation Forest) | evaluated (not a live score) | [docs/lab/anomaly.md](docs/lab/anomaly.md) |
 | Distillation from Claude | waiting for approval of paid runs (H27) | - |
 | Cost routing between cheap and paid forecasters | waiting for one paid evaluation run (H31) | - |
 | LLM-as-judge with human calibration | waiting for approval of the paid run | - |

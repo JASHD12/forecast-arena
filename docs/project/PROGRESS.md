@@ -65,6 +65,7 @@ Nothing. See the session summary above and `python scripts/status.py`.
   output, not acted on (S11).
 
 ## Done log
+- 2026-11-22 T294: unsupervised learning: anomaly check on Status (z-score beats Isolation Forest on short windows) and a regime-clustering study (no gain).
 - 2026-11-22 T290/T293: Phase 16 governance; `bandit_hedge` forecaster, replay study and card (flag ARENA_BANDIT off).
 - 2026-11-22 T246b: first lab-eval run failed in 1 s (shard jobs have no PyTorch; ft_gguf imported the training module); torch import made lazy, test imports the scoring path with torch blocked. Re-dispatch after merge.
 - 2026-11-22 README for hiring managers: at-a-glance table, generated fine-tune/conformal/docs-assistant bullets, new skills rows, stale text fixed, screenshots refreshed from a fresh ledger.

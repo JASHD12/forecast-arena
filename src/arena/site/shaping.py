@@ -503,6 +503,21 @@ def phase_line(dec: Any, needed: int, not_before: Any, fallback: str) -> str:
     )
 
 
+def anomaly_status(ledger: Any, rec: Any) -> dict[str, Any] | None:
+    """Unsupervised anomaly check of the latest batch day's power context (None: nothing)."""
+    from arena.ops.anomaly import THRESHOLD, THRESHOLD_Z, latest_batch_anomaly
+
+    if not rec.questions:
+        return None
+    day = max(q.batch_date for q in rec.questions.values())
+    res = latest_batch_anomaly(ledger, rec, day)
+    return (
+        None
+        if res is None
+        else {**res, "batch_day": day.isoformat(), "limit_if": THRESHOLD, "limit_z": THRESHOLD_Z}
+    )
+
+
 def contract_status(ledger: Any, rec: Any) -> dict[str, Any] | None:
     """Data-contract result of the latest batch day for the Status page (None: no questions)."""
     from arena.ops.contracts import check_batch

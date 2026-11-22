@@ -278,6 +278,15 @@ Source: `evals/results/lab-bandit.json`; card `docs/lab/bandit.md`
 | ml | 131 | 0.107 |
 | thompson | 131 | 0.1482 |
 
+### Price-regime clustering (k-means) as a feature for the next day's mean price
+
+Source: `evals/results/lab-regimes.json`; card `docs/lab/regimes.md`
+
+| Arm | Questions |
+|---|---|
+| with_regime | 365 |
+| without_regime | 365 |
+
 ### QLoRA fine-tune of Qwen2.5-1.5B on replayed power questions
 
 Source: `evals/results/lab-qlora-r1.json`; card `docs/lab/qlora-r1.md`
@@ -313,6 +322,15 @@ Source: `evals/results/lab-retrieval-hybrid.json`; card `docs/lab/retrieval-hybr
 | dense | 143 | 0.3731 | 0.5065 | 0.2126 | 51.92 |
 | hybrid_rerank | 143 | 0.5557 | 0.7425 | 0.3762 | 382.68 |
 | hybrid_rrf | 143 | 0.3464 | 0.6656 | 0.2196 | 59.86 |
+
+### Unsupervised data-anomaly detection on price windows (Isolation Forest)
+
+Source: `evals/results/lab-anomaly.json`; card `docs/lab/anomaly.md`
+
+| Arm | Questions |
+|---|---|
+| isolation_forest | 122 |
+| robust_z | 122 |
 <!-- lab:end -->
 
 <!-- live:start -->

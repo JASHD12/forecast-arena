@@ -1,0 +1,42 @@
+{
+ "kind": "evaluation",
+ "experiment": "regimes",
+ "title": "Price-regime clustering (k-means) as a feature for the next day's mean price",
+ "created_at": "2026-11-22T10:27:03Z",
+ "why": "Unsupervised structure (clusters of daily shapes) is a standard source of features and of operational monitoring in energy forecasting.",
+ "prereg_sha256": null,
+ "dataset_sha256": {},
+ "artefacts": {},
+ "metrics": {
+  "without_regime": {
+   "n": 365,
+   "pinball": 7.099
+  },
+  "with_regime": {
+   "n": 365,
+   "pinball": 7.077
+  }
+ },
+ "paired": [
+  {
+   "a": "with_regime",
+   "b": "without_regime",
+   "split": "test",
+   "diff": -0.02180767612080884,
+   "lo": -0.1610708811776771,
+   "hi": 0.10730664871778499,
+   "n": 365,
+   "days": 365
+  }
+ ],
+ "cost_usd": 0.0,
+ "notes": [
+  "k = 2 chosen by silhouette on 2019-01-01 to 2025-10-31 (silhouette by k: {2: 0.3079, 3: 0.2299, 4: 0.2313, 5: 0.2294, 6: 0.1988}); share of training days per regime in percent: [np.float64(48.8), np.float64(51.2)].",
+  "Pinball loss averaged over the 10%, 50% and 90% quantiles of the next day's mean price, test year 2025-11-01 to 2026-10-31; the regime is that of the last known day."
+ ],
+ "limits": [
+  "One market, one year of test days; the interval is a day-block bootstrap.",
+  "Backtest-only: nothing changes in the live `ml` forecaster."
+ ],
+ "card": "docs/lab/regimes.md"
+}

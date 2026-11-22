@@ -1,0 +1,39 @@
+{
+ "kind": "evaluation",
+ "experiment": "anomaly",
+ "title": "Unsupervised data-anomaly detection on price windows (Isolation Forest)",
+ "created_at": "2026-11-22T10:25:21Z",
+ "why": "Label-free anomaly detection on incoming data is how production ML teams catch broken feeds before a model silently uses them.",
+ "prereg_sha256": null,
+ "dataset_sha256": {},
+ "artefacts": {},
+ "metrics": {
+  "isolation_forest": {
+   "false_alarm_pct": 4.1,
+   "n": 122,
+   "spike_detected_pct": 56.6,
+   "unit_error_detected_pct": 28.7,
+   "flat_feed_detected_pct": 1.6,
+   "repeated_day_detected_pct": 9.8
+  },
+  "robust_z": {
+   "false_alarm_pct": 7.4,
+   "n": 122,
+   "spike_detected_pct": 100.0,
+   "unit_error_detected_pct": 69.7,
+   "flat_feed_detected_pct": 18.9,
+   "repeated_day_detected_pct": 10.7
+  }
+ },
+ "paired": [],
+ "cost_usd": 0.0,
+ "notes": [
+  "122 real 28-day windows from 2025-11-01 to 2026-10-31 (every third day); thresholds from clean windows of 2019-01-01 to 2024-12-31 for about 5% false alarms: {k: round(v, 3) for k, v in res['threshold'].items()}.",
+  "Faults are injected into the latest day only: a spike (one hour times 8), a unit error (prices divided by 1000), a flat feed and a repeated day."
+ ],
+ "limits": [
+  "Injected faults are synthetic; real feed failures can look different.",
+  "A window of 28 days is short; a repeated day is hard for any detector that only looks at daily statistics."
+ ],
+ "card": "docs/lab/anomaly.md"
+}

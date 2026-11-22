@@ -840,7 +840,8 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
 - [ ] T292 · AWS as code (Terraform, validated in CI, not deployed) and S3 export tested against MinIO in CI (deps: T290)
 - [x] T293 · `bandit_hedge`: online learning of which forecaster to trust (Hedge, Thompson variant in the replay study) (deps: T290)
   - Done 2026-11-22: `forecasters/bandit.py`, replay `lab/bandit_study.py`, `arena lab bandit`, card `docs/lab/bandit.md`; flag `ARENA_BANDIT` default off. Replay on the live record (131 questions, 5 days): the blend beats the equal-weight mean (-0.0257 [-0.0363, -0.0098]) but not `ml` alone (+0.0221 [-0.0011, +0.0407]).
-- [ ] T294 · Unsupervised learning: Isolation Forest data anomalies on Status, price-regime clustering as a backtest feature (deps: T290)
+- [x] T294 · Unsupervised learning: Isolation Forest data anomalies on Status, price-regime clustering as a backtest feature (deps: T290)
+  - Done 2026-11-22: `ops/anomaly.py` (Status section, informational) and `lab/anomaly_study.py`: on injected faults the plain robust z-score beats the Isolation Forest on 28-day windows (spike 100% vs 57%, unit error 70% vs 29%) at 7.4% vs 4.1% false alarms; `lab/regimes.py`: k-means picks k=2 and the regime feature does not help (pinball -0.022 [-0.161, +0.107]). Both negative results are published.
 - [ ] T295 · Observability: Prometheus `/metrics` on the API, OTLP traces into Jaeger in CI (deps: T290)
 - [ ] T296 · TypeScript: site scripts compiled with `tsc --strict`, compiled output checked in CI (deps: T290)
 - [ ] T297 · Prompt optimisation offline on validation with the free local model (deps: T290)

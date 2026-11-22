@@ -1200,3 +1200,7 @@ and evidence requirements. Do not backfill historical ML forecasts.
 - Context: there is no environment to explore in a forecasting benchmark, only delayed feedback on how each forecaster did, which is the expert-advice / bandit setting.
 - Decision: Hedge weights per topic from the Brier losses of resolved questions at least two batch days old (a pure function of the ledger, so restartable), blend of the peers' probabilities; Thompson sampling only in the replay study. Registered behind `ARENA_BANDIT` (default off), experimental, no headline board, not an ensemble member.
 - Result of the replay on the live record (5 days): better than the equal-weight mean, not better than `ml`; reported as a mechanism check with wide intervals.
+
+## 2026-11-22 T294: two unsupervised experiments, both with negative results, published
+- Anomaly detection (`ops/anomaly.py`, `lab/anomaly_study.py`): an Isolation Forest fitted on 27 days finds fewer injected faults than a robust z-score (spike 56.6% vs 100%, unit error 28.7% vs 69.7%, flat feed 1.6% vs 18.9%, repeated day 9.8% vs 10.7%; false alarms 4.1% vs 7.4%). Decision: Status shows both with thresholds fixed on 2019-2024 clean windows; nothing fails a run (informational like the data contracts).
+- Regimes (`lab/regimes.py`): k-means on standardised 24-hour shapes, k=2 by silhouette (about 49%/51% of days); adding the last day's regime to the champion's 37 features changes the pinball loss of tomorrow's mean price by -0.022 [-0.161, +0.107]: no demonstrable gain, so no `ml_regime` challenger is built.

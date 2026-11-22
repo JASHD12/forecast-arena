@@ -145,9 +145,11 @@ def lab() -> str:
         rows.append(f"| {title} | {state} | - |")
     rows.append("")
     rows.append(
-        "Live experimental forecasters (flagged off until their pre-registered checks): the "
-        "QLoRA-tuned model, an agent with hybrid retrieval and guards, and a cascade router. "
-        "They never enter the headline board. Details: [Lab page](https://jashd12.github.io/"
+        "Live experimental forecasters: the QLoRA-tuned model (running since the first morning "
+        "after 2026-11-22, with its fixed pre-registered expectations), an agent with hybrid "
+        "retrieval and guards, and a cascade router (both still switched off until their launch "
+        "checks). None of them enters the headline board. Details: "
+        "[Lab page](https://jashd12.github.io/"
         "forecast-arena/lab.html), [explainer](docs/explainers/06-experiments-lab.md)."
     )
     return "\n".join(rows)

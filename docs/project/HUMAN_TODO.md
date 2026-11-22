@@ -252,7 +252,7 @@ curl -X POST -H "Authorization: Bearer TOKEN" -H "Accept: application/vnd.github
   - The routing study needs Claude's `llm_context` probabilities on all 276 test questions (`evals/golden/power-2026-10.jsonl` and
     `power-2026-11a.jsonl`). The existing workflow `llm-eval.yml` does it in one dispatch for about US$0.15 (recorded cost per call
     about US$0.0004, total lab budget limit US$2.00). Reply yes and the agent dispatches it once, with a token cap.
-- [ ] H32 · (owner chose (b) on 2026-11-22: calibrate on the GGUF first, then decide (a) or (c) with the new numbers) Decide how the fine-tuned model goes live (needed for T271's go-live; you decided "whatever the result")
+- [x] H32 · (owner decided 2026-11-22: calibrate on the GGUF (b) AND go live now with the pinned map; the workflow default is on, repository variable `ARENA_LLM_LOCAL_FT=0` switches it off) How the fine-tuned model goes live (needed for T271's go-live; you decided "whatever the result")
   - What the evidence says (`docs/lab/qlora-r1.md`, 276 test questions, 46 days; lower Brier is better):
     tuning helps (tuned 1.5B beats its untuned self, interval excludes zero) but the tuned 1.5B model is **worse than the plain base rate**
     and far from the `ml` champion; the 0.5B LoRA model is slightly better than the 1.5B QLoRA model. The 4-bit GGUF that would run live

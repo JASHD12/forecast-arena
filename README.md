@@ -65,7 +65,7 @@ Each technique is tried against the project's baselines on questions it never sa
 | Global LightGBM challenger, experimental conformal interval, ONNX serving | built and running as live challengers or checks; no separate evaluation card yet | - |
 | Chronos-2 foundation-model challenger | planned | - |
 
-Live experimental forecasters (flagged off until their pre-registered checks): the QLoRA-tuned model, an agent with hybrid retrieval and guards, and a cascade router. They never enter the headline board. Details: [Lab page](https://jashd12.github.io/forecast-arena/lab.html), [explainer](docs/explainers/06-experiments-lab.md).
+Live experimental forecasters: the QLoRA-tuned model (running since the first morning after 2026-11-22, with its fixed pre-registered expectations), an agent with hybrid retrieval and guards, and a cascade router (both still switched off until their launch checks). None of them enters the headline board. Details: [Lab page](https://jashd12.github.io/forecast-arena/lab.html), [explainer](docs/explainers/06-experiments-lab.md).
 <!-- lab:end -->
 
 <details>

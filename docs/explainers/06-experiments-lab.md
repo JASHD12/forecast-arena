@@ -43,7 +43,7 @@ backtest first, then freeze the version, then write forecasts before the lock li
 
 | Forecaster | What it is | Switch |
 |---|---|---|
-| `llm_local_ft` | the QLoRA-tuned Qwen, scored by one forward pass (YES/NO logit margin, Platt calibrated); frozen artefact pinned by SHA-256 | `ARENA_LLM_LOCAL_FT`, off until the Colab run and H32 |
+| `llm_local_ft` | the QLoRA-tuned Qwen, scored by one forward pass (YES/NO logit margin, Platt calibrated); frozen artefact pinned by SHA-256 | `ARENA_LLM_LOCAL_FT`, on by default since 2026-11-22 (variable `0` switches off) |
 | `agent_hybrid` | the LangGraph agent with hybrid retrieval (BM25 + dense + RRF + cross-encoder) and harness guards | `ARENA_AGENT_HYBRID`, off until a launch dry run |
 | `llm_router` | cascade over peers: cheap pair when decisive and in agreement, otherwise `llm_context`; registered only when its thresholds file exists | file `lab/artefacts/llm_router.json` |
 | `glgbm` | global LightGBM challenger, promoted only by the weekly 28-day rule | weekly job |

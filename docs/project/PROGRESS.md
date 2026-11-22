@@ -65,6 +65,7 @@ Nothing. See the session summary above and `python scripts/status.py`.
   output, not acted on (S11).
 
 ## Done log
+- 2026-11-22 T271: `llm_local_ft` switched on by default in morning.yml (owner decision); T246b will add a GGUF-calibrated map as a new version.
 - 2026-11-22 T246b prepared: `lab-eval.yml` (4 shards), `arena lab ft-score` and `ft-calibrate`; to dispatch from main after the merge.
 - 2026-11-22 T245/T246: QLoRA run pinned (release lab-qlora-r1), evaluated on both test sets: tuned beats untuned, worse than the base rate, far from ml; GGUF parity missed the 0.005 limit on 31 rows (Brier +0.0123). H32 asks for a decision.
 - 2026-11-21 T260: occlusion-based explanations and card (three replayed questions, effects about 1 point).

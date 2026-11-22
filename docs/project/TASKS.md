@@ -802,9 +802,10 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
 
 - [x] T270 · Governance for going live: SPEC 17 amended, information-set rows, DECISIONS, H32 (deps: T264a)
   - Done 2026-11-21: owner decisions recorded (fine-tuned model live whatever its backtest result; token cap 300,000; all lab techniques live).
-- [ ] T271 · `llm_local_ft`: the fine-tuned model as a live forecaster (deps: T270; needs: H26, H28, H32)
+- [x] T271 · `llm_local_ft`: the fine-tuned model as a live forecaster (deps: T270; needs: H26, H28, H32)
   - Code done 2026-11-21 (forecaster, pin file loader with hash-verified download, llama.cpp scorer, flag `ARENA_LLM_LOCAL_FT` default off,
-    workflow cache step); goes live after the Colab artefacts, the parity check and H32.
+    workflow cache step). Live from the first morning run after the merge: the workflow default is `1` (owner decision 2026-11-22, H32). A
+    GGUF-calibrated map (T246b) will replace the Colab map as a new version.
 - [x] T272 · Site and boards for the experimental forecasters (deps: T271)
   - Done 2026-11-21: names "(experimental)", colour slots 9 to 11, Methods information-set rows, health roster, Lab page section that lists
     the ones that have published; they are in no common group and not in the ensemble (tests).

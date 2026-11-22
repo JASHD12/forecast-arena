@@ -809,3 +809,65 @@ def lab_regimes(obj: Ctx, out: Path) -> None:
     )
     out.write_text(result.model_dump_json(indent=1) + "\n", encoding="utf-8")
     click.echo(json.dumps(res, indent=1))
+
+
+@lab.command("vectordb")
+@click.option("--set", "set_path", type=click.Path(exists=True, path_type=Path),
+              default=Path("evals/golden/retrieval-v1.jsonl"))  # fmt: skip
+@click.option("--location", default=":memory:", show_default=True, help="Qdrant location or URL.")
+@click.option(
+    "--out", type=click.Path(path_type=Path), default=Path("evals/results/lab-vectordb.json")
+)
+@click.pass_obj
+def lab_vectordb(obj: Ctx, set_path: Path, location: str, out: Path) -> None:
+    """Qdrant against brute-force dense search on the frozen retrieval set (T291)."""
+    from datetime import datetime
+
+    from arena.agent.retrieval import FastEmbedder
+    from arena.agent.vectorstore import QdrantIndex
+    from arena.lab import retrieval_eval as re_
+    from arena.lab.results import LabResult
+
+    docs, queries, sha = re_.read_set(set_path)
+    emb = FastEmbedder(cache_dir=obj.settings.cache_dir / "fastembed")
+    index = re_.index_of(docs, emb)
+    qd = QdrantIndex(index.items, emb, location)
+
+    def brute(text: str, asof: datetime, qid: str) -> list[str]:
+        return [p.question_id for p, _ in index.search(text, asof, k=10, exclude=qid)]
+
+    def qdrant(text: str, asof: datetime, qid: str) -> list[str]:
+        return [p.question_id for p, _ in qd.search(text, asof, k=10, exclude=qid)]
+
+    metrics = re_.evaluate(index, queries, {"dense_numpy": brute, "dense_qdrant": qdrant})
+    usable = [q for q in queries if any(g == 2 for g in q["grades"].values())]
+    same = [
+        set(brute(q["text"], datetime.fromisoformat(q["asof"]), q["id"])[:5])
+        == set(qdrant(q["text"], datetime.fromisoformat(q["asof"]), q["id"])[:5])
+        for q in usable
+    ]
+    metrics["dense_qdrant"]["top5_same_set_pct"] = round(100 * sum(same) / len(same), 1)
+    result = LabResult(
+        experiment="vectordb",
+        title="Vector database: Qdrant against brute-force dense search",
+        created_at=obj.clock.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+        why="A vector database is the standard retrieval store of production RAG systems.",
+        dataset_sha256={"retrieval-v1": sha},
+        metrics=metrics,  # type: ignore[arg-type]
+        notes=[
+            f"{len(docs)} documents and {len(usable)} queries of the frozen retrieval set, the "
+            f"same embedder for both arms; Qdrant location `{location}` (local mode, no server).",
+            "The forecast-time rule (a document must have resolved before the query's as-of "
+            "time) is a payload filter inside Qdrant and is covered by unit tests.",
+        ],
+        limits=[
+            "Local mode scans vectors like brute force, so its latency says nothing about a "
+            "server with an HNSW index; the CI job `vectordb` runs the same tests against a Qdrant "
+            "server container.",
+            "Two thousand documents are far below the size where an approximate index matters.",
+        ],
+        card="docs/lab/vectordb.md",
+    )
+    out.write_text(result.model_dump_json(indent=1) + "\n", encoding="utf-8")
+    for k, m in metrics.items():
+        click.echo(f"{k}: {m}")

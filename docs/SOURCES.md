@@ -159,3 +159,6 @@ Used for the one-line "why companies use it" on the Lab page. Confidence: V = pr
 
 ## Chronos-2 (T259/T275b), checked 2026-11-21
 - `amazon/chronos-2` on the Hugging Face Hub: licence Apache-2.0 (model card metadata), revision `29ec3766d36d6f73f0696f85560a422f50e8498c`, loaded with `chronos-forecasting` 2.3.2 (`Chronos2Pipeline`, input shape series x variates x history, `predict_quantiles` returns a list of tensors). CPU inference of one 28-value series took about 3 s on first call.
+
+## Qdrant (T291), checked 2026-11-22
+- `qdrant-client` 1.20.0 (PyPI metadata: Apache-2.0, Python >= 3.10); server image `qdrant/qdrant:v1.20.2` exists on Docker Hub (tag list read 2026-11-22), Apache-2.0. Local mode (`QdrantClient(":memory:")` or a path) needs no server; `query_points` with a `Filter` of `FieldCondition`/`Range` is the filtered search used for the forecast-time rule.

@@ -1,0 +1,8 @@
+# Vector database (T291): the Qdrant client, local mode in tests and the lab study, a Qdrant server
+# container in the CI job `vectordb`. Apache-2.0 (qdrant-client 1.20.0, checked 2026-11-22).
+grpcio==1.85.3
+h2==4.4.1
+hpack==4.2.0
+hyperframe==6.1.0
+portalocker==4.4.2
+qdrant-client==1.20.0

@@ -331,6 +331,15 @@ Source: `evals/results/lab-anomaly.json`; card `docs/lab/anomaly.md`
 |---|---|
 | isolation_forest | 122 |
 | robust_z | 122 |
+
+### Vector database: Qdrant against brute-force dense search
+
+Source: `evals/results/lab-vectordb.json`; card `docs/lab/vectordb.md`
+
+| Arm | Questions | nDCG@5 | MRR | Precision@5 | Latency p50 (ms) |
+|---|---|---|---|---|---|
+| dense_numpy | 143 | 0.3731 | 0.5065 | 0.2126 | 39.94 |
+| dense_qdrant | 143 | 0.3731 | 0.5065 | 0.2126 | 96.04 |
 <!-- lab:end -->
 
 <!-- live:start -->

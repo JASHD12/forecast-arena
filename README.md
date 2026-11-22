@@ -71,6 +71,7 @@ Each technique is tried against the project's baselines on questions it never sa
 | QLoRA fine-tune of Qwen2.5-1.5B on replayed power questions | evaluated (not a live score) | [docs/lab/qlora-r1.md](docs/lab/qlora-r1.md) |
 | Retrieval: dense vs BM25 vs hybrid with reranking | evaluated (not a live score) | [docs/lab/retrieval-hybrid.md](docs/lab/retrieval-hybrid.md) |
 | Unsupervised data-anomaly detection on price windows (Isolation Forest) | evaluated (not a live score) | [docs/lab/anomaly.md](docs/lab/anomaly.md) |
+| Vector database: Qdrant against brute-force dense search | evaluated (not a live score) | [docs/lab/vectordb.md](docs/lab/vectordb.md) |
 | Distillation from Claude | waiting for approval of paid runs (H27) | - |
 | Cost routing between cheap and paid forecasters | waiting for one paid evaluation run (H31) | - |
 | LLM-as-judge with human calibration | waiting for approval of the paid run | - |

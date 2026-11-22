@@ -836,7 +836,8 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
 - [x] T284 · CI `check` job timeout 15 -> 25 minutes after a post-merge timeout (deps: T270)
 ## Phase 16 - Production skills (owner request 2026-11-22: vector DB, cloud as code, RL-style learning, unsupervised learning, observability, TypeScript, advanced LLM)
 - [x] T290 · Governance for Phase 16: decisions, tasks, HUMAN_TODO items (deps: T284)
-- [ ] T291 · Vector database: Qdrant behind the past-question search, leakage filter in the store, parity and latency evaluation, CI server job (deps: T290)
+- [x] T291 · Vector database: Qdrant behind the past-question search, leakage filter in the store, parity and latency evaluation, CI server job (deps: T290)
+  - Done 2026-11-22: `agent/vectorstore.py` (`QdrantIndex`, time filter inside the store), `arena lab vectordb` (143 queries: identical nDCG@5/MRR/precision to brute force, same top-5 set on 100% of queries), CI job `vectordb` with a Qdrant v1.20.2 service container. Not wired into the live agent (see DECISIONS).
 - [ ] T292 · AWS as code (Terraform, validated in CI, not deployed) and S3 export tested against MinIO in CI (deps: T290)
 - [x] T293 · `bandit_hedge`: online learning of which forecaster to trust (Hedge, Thompson variant in the replay study) (deps: T290)
   - Done 2026-11-22: `forecasters/bandit.py`, replay `lab/bandit_study.py`, `arena lab bandit`, card `docs/lab/bandit.md`; flag `ARENA_BANDIT` default off. Replay on the live record (131 questions, 5 days): the blend beats the equal-weight mean (-0.0257 [-0.0363, -0.0098]) but not `ml` alone (+0.0221 [-0.0011, +0.0407]).

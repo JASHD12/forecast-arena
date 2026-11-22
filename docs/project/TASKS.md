@@ -751,6 +751,7 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
   - Done 2026-11-22: release `lab-qlora-r1`; pin file `lab/artefacts/llm_local_ft.json` (GGUF SHA-256 verified against the release digest).
 - [x] T246 · Evaluate the fine-tuned model (deps: T245, T242)
   - Done 2026-11-22 without a new workflow: the Colab score files already hold per-question probabilities of all four variants, so `arena lab ft-eval` pairs them with the base rate and the `ml` backtest on identical items (`evals/results/lab-qlora-r1.json`, card `docs/lab/qlora-r1.md`). GGUF parity on 31 rows missed the pre-registered limit (Brier +0.0123 against < 0.005); a full GGUF run and a GGUF-specific calibration are open (H32 options).
+- [ ] T246b · Calibrate the GGUF on its own validation margins: dispatch `lab-eval.yml` from main after the merge of its PR, merge the four shard logs with `arena lab ft-calibrate`, pin the new Platt map in a small PR (deps: T246; owner chose option (b) of H32 on 2026-11-22)
 - [ ] T247 · Distillation from Claude (deps: T246; needs: H27)
 - [ ] T248 · Adapter registry and lineage (deps: T246)
 - [x] T249 · Shadow run of the fine-tuned model (deps: T246)

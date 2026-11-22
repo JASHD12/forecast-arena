@@ -595,3 +595,71 @@ def lab_ft_eval(
         click.echo(f"{k}: {m}")
     for p in paired:
         click.echo(p)
+
+
+def _ft_rows() -> list[object]:
+    from arena.lab import dataset as ds
+    from arena.lab import ft_gguf as fg
+
+    return [
+        r
+        for name in fg.SPLITS
+        for r in ds.read_split(Path("lab/data/forecast-sft") / f"{name}.jsonl.gz")
+    ]
+
+
+@lab.command("ft-score")
+@click.option("--shard", "index", type=int, required=True)
+@click.option("--of", "count", type=int, required=True)
+@click.option("--cache", type=click.Path(path_type=Path), default=Path("models_cache/ft"))
+@click.option("--out", type=click.Path(path_type=Path), required=True)
+@click.pass_obj
+def lab_ft_score(obj: Ctx, index: int, count: int, cache: Path, out: Path) -> None:
+    """Score one shard of the validation and test rows with the pinned GGUF (CPU)."""
+    import time
+
+    from arena.lab import ft_gguf as fg
+    from arena.lab.artefacts import fetch, load_artefact
+    from arena.lab.ft_runtime import LlamaScorer
+
+    art = load_artefact()
+    if art is None:
+        raise click.ClickException("lab/artefacts/llm_local_ft.json is missing")
+    path = fetch(art, cache, obj.settings.user_agent())
+    rows = fg.shard(_ft_rows(), index, count)
+    scorer = LlamaScorer(
+        path, model=art.name, yes_id=art.yes_id, no_id=art.no_id, run_budget=6 * 3600.0
+    )
+    margins: dict[str, float] = {}
+    start = time.monotonic()
+    for i, r in enumerate(rows, 1):
+        margins[r.id] = scorer.margin(r.system, r.user)
+        if i % 10 == 0 or i == len(rows):
+            click.echo(f"shard {index}: {i}/{len(rows)} rows, {time.monotonic() - start:.0f}s")
+    out.write_text(json.dumps(margins, sort_keys=True), encoding="utf-8")
+    click.echo(f"shard {index}: wrote {len(margins)} margins to {out}")
+    click.echo(
+        f"FT_MARGINS_SHARD_{index}="
+        + json.dumps({k: round(v, 4) for k, v in sorted(margins.items())})
+    )
+
+
+@lab.command("ft-calibrate")
+@click.argument("parts", nargs=-1, required=True, type=click.Path(exists=True, path_type=Path))
+@click.option("--out", type=click.Path(path_type=Path), default=Path("ft-gguf-margins.json"))
+def lab_ft_calibrate(parts: tuple[Path, ...], out: Path) -> None:
+    """Merge shard margins, refit Platt on validation only, print the comparison (L3)."""
+    from arena.lab import ft_gguf as fg
+    from arena.lab.artefacts import load_artefact
+
+    art = load_artefact()
+    if art is None:
+        raise click.ClickException("lab/artefacts/llm_local_ft.json is missing")
+    margins = fg.merge([json.loads(p.read_text(encoding="utf-8")) for p in parts])
+    rows = {r.id: {"split": r.split, "outcome": r.outcome} for r in _ft_rows()}  # type: ignore[attr-defined]
+    res = fg.calibrate(margins, rows, art.platt)
+    out.write_text(json.dumps(margins, sort_keys=True), encoding="utf-8")
+    click.echo("FT_CALIBRATION_JSON=" + json.dumps(res))
+    click.echo(
+        "FT_MARGINS_JSON=" + json.dumps({k: round(v, 4) for k, v in sorted(margins.items())})
+    )

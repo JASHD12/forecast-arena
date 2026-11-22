@@ -165,11 +165,12 @@ def _race_one(
         t = round(t + step, 10)
     yc = y(0.25)
     p.append(f'<line class="coinline" x1="{left}" x2="{left + w}" y1="{yc:.1f}" y2="{yc:.1f}"/>')
-    p.append(
-        f'<text class="tick coin" x="{left + w}" y="{yc - 6:.1f}" text-anchor="end">'
-        "always 50% = 0.25</text>"
-    )
-    ticks = _day_ticks(days, 4 if narrow else 6)
+    if narrow:  # phones have no margin for it: draw it over the plot with a halo (CSS)
+        p.append(
+            f'<text class="tick coin" x="{left + w}" y="{yc - 6:.1f}" text-anchor="end">'
+            "always 50% = 0.25</text>"
+        )
+    ticks = _day_ticks(days, 7 if narrow else 8)  # every day while it fits, never a gap
     for d in ticks:
         anchor = "start" if d == ticks[0] else "end" if d == ticks[-1] else "middle"
         p.append(
@@ -211,6 +212,16 @@ def _race_one(
         p.append(
             f'<text class="endlabel {series_class(fid)}" x="{left + w + 12}" y="{ly + 4:.1f}">'
             f"{escape(label)}</text>"
+        )
+    if not narrow:  # right margin, level with the dashed line, clear of the end labels
+        taken = [ly for ly, *_ in ends]
+        for dy in (0, -16, 16, -32, 32):
+            ly = yc + dy
+            if all(abs(ly - t) >= 15 for t in taken):
+                break
+        p.append(
+            f'<text class="tick coin coin-margin" x="{left + w + 12}" y="{ly + 4:.1f}">'
+            "always 50% = 0.25</text>"
         )
     p.append("</svg>")
     return "".join(p)

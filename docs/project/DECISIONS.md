@@ -1299,3 +1299,7 @@ and evidence requirements. Do not backfill historical ML forecasts.
 - Result recorded: the base rate has the better Brier (0.2337 vs 0.2499) yet both make the same 46 alert decisions (every probability is above the 0.20 cutoff): under these costs the extra model changes nothing. At a 1:1 cost ratio the model's loss is higher than always alerting.
 - Not done by the agent (owner steps): outreach, volunteer pilot, GitHub About text and topics, any upstream pull request, CV and contact details.
 
+
+## 2026-11-22 LLM-as-judge result (T252b): ranking only until the owner's labels exist
+- Run: 100 stored rationales (20 per forecaster), Claude Haiku as judge, US$0.0364, no skips. Mean data-use score: `llm_context` 3.4, `agent_graph` 3.2, `agent` 3.1, `llm_plain` 1.85, `llm_local` 1.4; direction 4.9 to 2.35.
+- Decision: report as an uncalibrated ranking with the same-family-bias caveat; no claim of agreement with humans until H29 (30 labels) provides kappa. No live change (I8).

@@ -10,3 +10,4 @@ sums the `cost_usd` of `evals/results/lab-*.json` and fails `make check` if the 
 | llm-eval with self-consistency k=5 (24 questions; plain, context, context x5) | 2026-11-22 | 45071241581 | 447,202 | 0.09 | 0.28 |
 | lab-distill-labels first run (773 of 1,200 labelled; stopped at its own 2.2M token cap; rows 774 onward still to label) | 2026-11-22 | 45071238970 | 2,197,494 | 0.41 | 0.69 |
 
+| lab-judge (second run, 100 rationales, all scored, no skips) | 2026-11-22 | 45079867618 | 194,536 | 0.04 | 0.73 |

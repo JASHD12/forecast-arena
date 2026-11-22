@@ -777,7 +777,7 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
   - Done 2026-11-21: `lab/grounding.py`, result `lab-grounding.json` (share of quoted numbers not literally in the prompt per forecaster; the
     "derived arithmetic" class was dropped because it produced false matches by chance, noted in the module).
 - [ ] T252b · LLM-as-judge with calibration (deps: T252a; needs: H27, H29)
-  - Code done 2026-11-22 (owner approval H27): `lab/prereg/judge.md`, `src/arena/lab/judge.py` (rubric, parser, weighted kappa), `arena lab judge-sheet|judge-run|judge-eval`, `lab-judge.yml`, frozen `lab/judge/items.json` (100) and `lab/judge/label-sheet.csv` (30). Open: the paid run after the merge and the owner's 30 labels (H29).
+  - Code done 2026-11-22 (owner approval H27): `lab/prereg/judge.md`, `src/arena/lab/judge.py` (rubric, parser, weighted kappa), `arena lab judge-sheet|judge-run|judge-eval`, `lab-judge.yml`, frozen `lab/judge/items.json` (100) and `lab/judge/label-sheet.csv` (30). Paid run done 2026-11-22 (run 45079867618, US$0.0364, 100 of 100 scored): `evals/results/lab-judge.json`, `docs/lab/judge.md`; the judge ranks `llm_local` clearly lowest on data use (1.4 of 5) and the Claude variants highest (3.1 to 3.4). Open: the owner's 30 labels (H29) for the agreement estimate; scores stay uncalibrated until then.
 - [x] T253 · Guardrails and red-team suite (deps: T252a)
   - Done 2026-11-21: `llm/guards.py` (injection patterns EN/DE, markup, links, PII, length), 61 cases in `lab/redteam/cases.json`; 35 of 41
     attacks flagged, 6 expected evasions missed, 0 of 20 benign texts flagged; report-only (live agent unchanged).

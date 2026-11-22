@@ -38,21 +38,22 @@ class LabResult(BaseModel):
 
 #: Experiments that are planned and not yet run (shown as such, never with numbers).
 PLANNED: tuple[tuple[str, str], ...] = (
-    ("Distillation from Claude", "waiting for approval of paid runs (H27)"),
+    (
+        "Distillation from Claude",
+        "approved 2026-11-22; pre-registered, label workflow built; the paid run follows",
+    ),
     (
         "Offline prompt optimisation for the free local model",
         "pre-registered, framework and manual workflow built; the free CPU run follows",
     ),
     (
         "Cost routing between cheap and paid forecasters",
-        "waiting for one paid evaluation run (H31)",
+        "approved 2026-11-22; pre-registered, one paid run (about US$0.15) follows",
     ),
-    ("LLM-as-judge with human calibration", "waiting for approval of the paid run"),
     (
-        "Global LightGBM challenger, experimental conformal interval, ONNX serving",
-        "built and running as live challengers or checks; no separate evaluation card yet",
+        "LLM-as-judge with human calibration",
+        "approved 2026-11-22; items frozen; the paid run and the owner's 30 labels follow",
     ),
-    ("Chronos-2 foundation-model challenger", "planned"),
 )
 
 

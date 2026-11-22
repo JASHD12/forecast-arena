@@ -1,0 +1,50 @@
+name: lab-judge
+
+# T252b: grade 100 frozen rationales with the judge model (about US$0.10).
+# Paid, manual, capped, no ledger write, no deploy (S8). Owner approval: HUMAN_TODO H27 (2026-11-22).
+# The result is one compact line in the job log (`JG_SCORES=`), which the agent reads back; dispatch from main only.
+
+on:
+  workflow_dispatch:
+    inputs:
+      max_tokens:
+        description: "Hard token cap for this run"
+        default: "400000"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lab-judge
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      ARENA_CONTACT: ${{ vars.ARENA_CONTACT }}
+      ARENA_LLM_PROVIDER: ${{ vars.ARENA_LLM_PROVIDER }}
+      ARENA_LLM_MODEL: ${{ vars.ARENA_LLM_MODEL }}
+      ARENA_LLM_EFFORT: ${{ vars.ARENA_LLM_EFFORT || 'low' }}
+      ARENA_LLM_MAX_OUTPUT_TOKENS: ${{ vars.ARENA_LLM_MAX_OUTPUT_TOKENS || '1024' }}
+      ARENA_LLM_BASE_URL: ${{ vars.ARENA_LLM_BASE_URL }}
+      ARENA_LLM_API_KEY: ${{ secrets.ARENA_LLM_API_KEY }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements/*.txt
+      - name: Install pinned dependencies
+        run: make setup
+      - name: Run
+        env:
+          MAX_TOKENS: ${{ inputs.max_tokens }}
+        run: |
+          set -o pipefail
+          .venv/bin/arena lab judge-run --max-tokens "$MAX_TOKENS" | tee run.log
+          { echo "## lab-judge (not the live record)"; echo '```'; grep -v "^JG_SCORES=" run.log | head -40; echo '```'; } >> "$GITHUB_STEP_SUMMARY"

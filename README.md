@@ -74,12 +74,10 @@ Each technique is tried against the project's baselines on questions it never sa
 | Stacking with a scikit-learn Pipeline on pandas DataFrames | evaluated (not a live score) | [docs/lab/stacking.md](docs/lab/stacking.md) |
 | Unsupervised data-anomaly detection on price windows (Isolation Forest) | evaluated (not a live score) | [docs/lab/anomaly.md](docs/lab/anomaly.md) |
 | Vector database: Qdrant against brute-force dense search | evaluated (not a live score) | [docs/lab/vectordb.md](docs/lab/vectordb.md) |
-| Distillation from Claude | waiting for approval of paid runs (H27) | - |
+| Distillation from Claude | approved 2026-11-22; pre-registered, label workflow built; the paid run follows | - |
 | Offline prompt optimisation for the free local model | pre-registered, framework and manual workflow built; the free CPU run follows | - |
-| Cost routing between cheap and paid forecasters | waiting for one paid evaluation run (H31) | - |
-| LLM-as-judge with human calibration | waiting for approval of the paid run | - |
-| Global LightGBM challenger, experimental conformal interval, ONNX serving | built and running as live challengers or checks; no separate evaluation card yet | - |
-| Chronos-2 foundation-model challenger | planned | - |
+| Cost routing between cheap and paid forecasters | approved 2026-11-22; pre-registered, one paid run (about US$0.15) follows | - |
+| LLM-as-judge with human calibration | approved 2026-11-22; items frozen; the paid run and the owner's 30 labels follow | - |
 
 Live experimental forecasters: the QLoRA-tuned model (running since the first morning after 2026-11-22, with its fixed pre-registered expectations), an agent with hybrid retrieval and guards, and a cascade router (both still switched off until their launch checks). None of them enters the headline board. Details: [Lab page](https://jashd12.github.io/forecast-arena/lab.html), [explainer](docs/explainers/06-experiments-lab.md).
 <!-- lab:end -->

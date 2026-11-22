@@ -1,4 +1,4 @@
-"""T296: the site's JavaScript is compiled from TypeScript; the committed output is marked as such."""
+"""T296: the site script is compiled from TypeScript; the committed output is marked as such."""
 
 from pathlib import Path
 

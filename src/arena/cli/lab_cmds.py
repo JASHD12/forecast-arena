@@ -663,3 +663,51 @@ def lab_ft_calibrate(parts: tuple[Path, ...], out: Path) -> None:
     click.echo(
         "FT_MARGINS_JSON=" + json.dumps({k: round(v, 4) for k, v in sorted(margins.items())})
     )
+
+
+@lab.command("bandit")
+@click.option(
+    "--out", type=click.Path(path_type=Path), default=Path("evals/results/lab-bandit.json")
+)
+@click.pass_obj
+def lab_bandit(obj: Ctx, out: Path) -> None:
+    """Replay the Hedge forecaster on the live record (walk-forward, no leakage; T293)."""
+    from arena.lab import bandit_study as bs
+    from arena.lab.results import LabResult
+    from arena.scoring.core import load
+
+    rec = load(obj.ledger)
+    rep = bs.replay(rec.scored)
+    if not rep["y"]:
+        raise click.ClickException("no questions answered by two experts in the ledger")
+    metrics, paired = bs.summarise(rep)
+    result = LabResult(
+        experiment="bandit",
+        title="Online learning of which forecaster to trust (Hedge and Thompson sampling)",
+        created_at=obj.clock.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+        why=(
+            "Expert-advice and bandit methods are the production form of reinforcement learning "
+            "for choosing between models from delayed feedback."
+        ),
+        metrics=metrics,  # type: ignore[arg-type]
+        paired=paired,
+        notes=[
+            f"{len(rep['y'])} live questions answered by at least two experts over "
+            f"{len(set(rep['days']))} batch days (the live rehearsal record, replayed "
+            "walk-forward with a two-day outcome lag).",
+            "The best expert in hindsight is "
+            + min((e for e in metrics if e in bs.bd.EXPERTS), key=lambda e: metrics[e]["brier"])
+            + ".",
+        ],
+        limits=[
+            "The live record is only a few days long: the weights barely move and every "
+            "interval is wide. This is a mechanism check, not evidence that the blend helps.",
+            "The best expert in hindsight is a reference, not something that could be played.",
+        ],
+        card="docs/lab/bandit.md",
+    )
+    out.write_text(result.model_dump_json(indent=1) + "\n", encoding="utf-8")
+    for k, m in metrics.items():
+        click.echo(f"{k}: {m}")
+    for p in paired:
+        click.echo(p)

@@ -26,6 +26,7 @@ FORECASTER_NAMES = {
     "llm_local_ft": "Fine-tuned open model (experimental)",
     "llm_router": "Cascade router (experimental)",
     "agent_hybrid": "AI agent, hybrid retrieval (experimental)",
+    "bandit_hedge": "Learned blend of forecasters (experimental)",
     "ensemble": "Ensemble",
     "human_panel": "Human panel",
 }

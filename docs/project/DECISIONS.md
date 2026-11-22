@@ -1190,3 +1190,13 @@ and evidence requirements. Do not backfill historical ML forecasts.
 ## 2026-11-22 T246b: the first lab-eval run failed because the scoring runners have no PyTorch
 - Context: all four shards of `lab-eval.yml` (run 45008783161) failed in under a second at `arena lab ft-score`: `ft_gguf.py` imported `finetune.train`, which imports torch at module level, and the shard jobs install only the lock and local-LLM requirements.
 - Decision: the import moves into `calibrate()` (run locally, where torch exists). A unit test imports the whole scoring path in a subprocess with torch blocked and reads all 828 rows, so a torch import on that path fails CI. No workflow change needed; the run is dispatched again after the merge.
+
+## 2026-11-22 Phase 16: production skills (owner decisions)
+- Context: the owner showed a chart of skills in 2026 AI-engineer postings and asked for the production skills the project lacks, as used in German and US AI/ML/DS product companies.
+- Decisions (owner, in chat): cloud as code and run locally (Terraform for AWS validated in CI and an S3 path tested against MinIO; no account, no spending, so labelled "not deployed"); add all of Qdrant, bandit/online learning, unsupervised learning, observability and TypeScript; LLM work: DPO preference tuning (the owner runs it on Colab), offline prompt optimisation, self-consistency and the LLM judge (paid runs each need the owner's OK). "Something else" was ticked without a named item: nothing extra is added for it.
+- Rules: each new technology gets a SOURCES line (version, licence, docs checked that day) and a DECISIONS line; anything that forecasts is a new experimental forecaster id (frozen version string, no headline board, not in the ensemble); servers (Qdrant, MinIO, Jaeger, Prometheus) run only in CI jobs or `make smoke-*`, never in `make check`.
+
+## 2026-11-22 T293: `bandit_hedge` (Hedge expert advice) replaces "reinforcement learning" with its honest form
+- Context: there is no environment to explore in a forecasting benchmark, only delayed feedback on how each forecaster did, which is the expert-advice / bandit setting.
+- Decision: Hedge weights per topic from the Brier losses of resolved questions at least two batch days old (a pure function of the ledger, so restartable), blend of the peers' probabilities; Thompson sampling only in the replay study. Registered behind `ARENA_BANDIT` (default off), experimental, no headline board, not an ensemble member.
+- Result of the replay on the live record (5 days): better than the equal-weight mean, not better than `ml`; reported as a mechanism check with wide intervals.

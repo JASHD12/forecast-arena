@@ -270,3 +270,7 @@ curl -X POST -H "Authorization: Bearer TOKEN" -H "Accept: application/vnd.github
     result in T281c.
 - [ ] H34 · Phoenix documentation not reachable (T255b)
   - The agent could not read `https://arize.com/docs/phoenix/self-hosting/deployment-options/docker` (host does not resolve here), so it did not write a `make smoke-phoenix` target from memory. To unblock: allow the host `arize.com` for the session environment, or paste the page's image name, ports, OTLP traces path and licence into this item. Optional: nothing else depends on it.
+- [ ] H35 · Run the DPO notebook on Colab (needed for the DPO result, T299)
+  - Same steps as H26/H28 with `notebooks/lab/dpo_qwen_forecast.ipynb` (free T4, about the same time); upload the outputs as release `lab-dpo-r1` and paste the release URL and hashes. Not needed before the agent has written and pre-registered it.
+- [ ] H36 · OK for the small paid runs of self-consistency (k=5) and the LLM judge (needed for T298)
+  - Each is one capped manual workflow run within the US$2.00 lab budget (`docs/project/LAB_BUDGET.md`); the agent states the estimate and the cap before dispatching and waits for your yes.

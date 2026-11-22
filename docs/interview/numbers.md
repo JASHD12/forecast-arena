@@ -262,6 +262,22 @@ Source: `evals/results/lab-grounding.json`; card `docs/lab/grounding.md`
 | llm_local | 78 | 337 | 20.5 | 52.6 |
 | llm_plain | 84 | 301 | 40.5 | 52.4 |
 
+### Online learning of which forecaster to trust (Hedge and Thompson sampling)
+
+Source: `evals/results/lab-bandit.json`; card `docs/lab/bandit.md`
+
+| Arm | Questions | Brier |
+|---|---|---|
+| agent | 47 | 0.1433 |
+| base_rate | 131 | 0.2931 |
+| best_expert_in_hindsight | 131 | 0.107 |
+| equal_mean | 131 | 0.1548 |
+| hedge | 131 | 0.1291 |
+| llm_context | 47 | 0.1608 |
+| llm_plain | 48 | 0.2185 |
+| ml | 131 | 0.107 |
+| thompson | 131 | 0.1482 |
+
 ### QLoRA fine-tune of Qwen2.5-1.5B on replayed power questions
 
 Source: `evals/results/lab-qlora-r1.json`; card `docs/lab/qlora-r1.md`

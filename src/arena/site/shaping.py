@@ -220,6 +220,7 @@ def _rows(questions: Sequence[Question], rec: Any) -> tuple[list[dict[str, Any]]
         "llm_local_ft",
         "llm_router",
         "agent_hybrid",
+        "bandit_hedge",
     ]
     ordered = [f for f in order if f in fids] + sorted(fids - set(order))
     return rows, ordered

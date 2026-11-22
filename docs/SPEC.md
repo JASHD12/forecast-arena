@@ -652,5 +652,6 @@ that compare techniques against the existing baselines. Design: `docs/project/LA
 | `llm_local_ft` | the `llm_context` prompt (question, rule, as-of context) | Qwen2.5-1.5B fine-tuned with QLoRA on replayed days up to 2026-06-30; answers with one token (YES/NO logits), Platt-calibrated on validation days; runs on the runner CPU; version string carries the artefact hash |
 | `llm_router` | the forecasts of `ml`, `llm_local_ft` and `llm_context` for the same question | picks the cheap pair when both are decisive and agree, otherwise `llm_context`; thresholds frozen from validation days; records the paid calls it would avoid |
 | `agent_hybrid` | as `agent`, with BM25 + dense + rerank retrieval of past questions and guarded tool and news text | same tools, limits and sample as `agent` |
+| `bandit_hedge` | the other forecasters' forecasts of the same question (peers only, as the ensemble) and the resolved outcomes of questions at least two batch days old | every question for which two or more experts answered; no model call, no cost |
 
 The daily LLM token cap in the live workflows is 300,000 (SPEC 9.4 default 400,000; owner decision 2026-11-21).

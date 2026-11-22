@@ -85,6 +85,7 @@ SERIES_SLOTS = {
     "llm_local_ft": 9,  # experimental forecasters (Phase 15): own colours, see DECISIONS
     "llm_router": 10,
     "agent_hybrid": 11,
+    "bandit_hedge": 12,
 }
 RACE_MIN_DAYS = 7  # a line chart over fewer days is noise, not a race
 RACE_WIDE = (700, 300, (16, 220, 34, 44))  # viewBox width, height, pad (top, right, bottom, left)

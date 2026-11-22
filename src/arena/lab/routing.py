@@ -120,7 +120,15 @@ def study(rows: Sequence[Item]) -> dict[str, Any]:
         )
     base_calls = len(rows)
     router_calls = int(arms["router (primary: pair, delta 0.15, gamma 0.10)"]["paid_calls"] or 0)
+    alt = next(c for c in curve if c["rule"] == "ml_only" and c["delta"] == PRIMARY_DELTA)
+    claude_b = arms["claude (llm_context)"]["brier"]
+    ml_b = arms["ml"]["brier"]
     notes = [
+        f"Descriptive, not pre-registered: `ml_only` at delta {PRIMARY_DELTA} escalates "
+        f"{alt['escalated']} of {len(rows)} questions (avoids {alt['avoided_pct']}% of the paid "
+        f"calls) with Brier {alt['brier']}, against {claude_b} for the paid model alone and "
+        f"{ml_b} for `ml` alone. It was chosen after the fact from a grid of twelve points, so it "
+        "is a hypothesis to test on fresh days, not a result.",
         f"{len(rows)} questions with every forecast available; the primary rule escalates "
         f"{router_calls} of {base_calls} ({100 * router_calls / base_calls:.1f}%) to the paid "
         "model.",

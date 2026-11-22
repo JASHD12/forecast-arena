@@ -1,0 +1,201 @@
+{
+ "kind": "evaluation",
+ "experiment": "routing",
+ "title": "Cost routing: a cheap pair first, the paid model only when they are unsure",
+ "created_at": "2026-11-22T21:23:55Z",
+ "why": "Routing easy cases to cheap models and escalating the rest is the standard way to cut LLM cost without losing quality.",
+ "prereg_sha256": "0e566b2cd5d3317b8863a2ba46ff2370f4f1152a780b5f122e5f59040ba94d4d",
+ "dataset_sha256": {},
+ "artefacts": {},
+ "metrics": {
+  "claude (llm_context)": {
+   "n": 276,
+   "brier": 0.1802,
+   "paid_calls": 276
+  },
+  "ml": {
+   "n": 276,
+   "brier": 0.1663,
+   "paid_calls": 0
+  },
+  "ft (open fine-tuned model)": {
+   "n": 276,
+   "brier": 0.2474,
+   "paid_calls": 0
+  },
+  "base_rate": {
+   "n": 276,
+   "brier": 0.2182,
+   "paid_calls": 0
+  },
+  "router (primary: pair, delta 0.15, gamma 0.10)": {
+   "n": 276,
+   "brier": 0.1802,
+   "paid_calls": 276
+  },
+  "curve / pair delta 0.05": {
+   "rule": "pair",
+   "delta": 0.05,
+   "gamma": 0.1,
+   "n": 276,
+   "escalated": 276,
+   "paid_calls_avoided": 0,
+   "avoided_pct": 0.0,
+   "brier": 0.1802
+  },
+  "curve / pair delta 0.10": {
+   "rule": "pair",
+   "delta": 0.1,
+   "gamma": 0.1,
+   "n": 276,
+   "escalated": 276,
+   "paid_calls_avoided": 0,
+   "avoided_pct": 0.0,
+   "brier": 0.1802
+  },
+  "curve / pair delta 0.15": {
+   "rule": "pair",
+   "delta": 0.15,
+   "gamma": 0.1,
+   "n": 276,
+   "escalated": 276,
+   "paid_calls_avoided": 0,
+   "avoided_pct": 0.0,
+   "brier": 0.1802
+  },
+  "curve / pair delta 0.20": {
+   "rule": "pair",
+   "delta": 0.2,
+   "gamma": 0.1,
+   "n": 276,
+   "escalated": 276,
+   "paid_calls_avoided": 0,
+   "avoided_pct": 0.0,
+   "brier": 0.1802
+  },
+  "curve / pair delta 0.25": {
+   "rule": "pair",
+   "delta": 0.25,
+   "gamma": 0.1,
+   "n": 276,
+   "escalated": 276,
+   "paid_calls_avoided": 0,
+   "avoided_pct": 0.0,
+   "brier": 0.1802
+  },
+  "curve / pair delta 0.30": {
+   "rule": "pair",
+   "delta": 0.3,
+   "gamma": 0.1,
+   "n": 276,
+   "escalated": 276,
+   "paid_calls_avoided": 0,
+   "avoided_pct": 0.0,
+   "brier": 0.1802
+  },
+  "curve / ml_only delta 0.05": {
+   "rule": "ml_only",
+   "delta": 0.05,
+   "gamma": null,
+   "n": 276,
+   "escalated": 17,
+   "paid_calls_avoided": 259,
+   "avoided_pct": 93.8,
+   "brier": 0.1637
+  },
+  "curve / ml_only delta 0.10": {
+   "rule": "ml_only",
+   "delta": 0.1,
+   "gamma": null,
+   "n": 276,
+   "escalated": 40,
+   "paid_calls_avoided": 236,
+   "avoided_pct": 85.5,
+   "brier": 0.1594
+  },
+  "curve / ml_only delta 0.15": {
+   "rule": "ml_only",
+   "delta": 0.15,
+   "gamma": null,
+   "n": 276,
+   "escalated": 66,
+   "paid_calls_avoided": 210,
+   "avoided_pct": 76.1,
+   "brier": 0.1565
+  },
+  "curve / ml_only delta 0.20": {
+   "rule": "ml_only",
+   "delta": 0.2,
+   "gamma": null,
+   "n": 276,
+   "escalated": 83,
+   "paid_calls_avoided": 193,
+   "avoided_pct": 69.9,
+   "brier": 0.1606
+  },
+  "curve / ml_only delta 0.25": {
+   "rule": "ml_only",
+   "delta": 0.25,
+   "gamma": null,
+   "n": 276,
+   "escalated": 109,
+   "paid_calls_avoided": 167,
+   "avoided_pct": 60.5,
+   "brier": 0.1653
+  },
+  "curve / ml_only delta 0.30": {
+   "rule": "ml_only",
+   "delta": 0.3,
+   "gamma": null,
+   "n": 276,
+   "escalated": 134,
+   "paid_calls_avoided": 142,
+   "avoided_pct": 51.4,
+   "brier": 0.1675
+  }
+ },
+ "paired": [
+  {
+   "a": "router (primary)",
+   "b": "claude (llm_context)",
+   "split": "test_all",
+   "diff": 0.0,
+   "lo": 0.0,
+   "hi": 0.0,
+   "n": 276,
+   "days": 46
+  },
+  {
+   "a": "router (primary)",
+   "b": "ml",
+   "split": "test_all",
+   "diff": 0.013895387560558341,
+   "lo": -0.016640629491824363,
+   "hi": 0.04333932885958302,
+   "n": 276,
+   "days": 46
+  },
+  {
+   "a": "router (primary)",
+   "b": "base_rate",
+   "split": "test_all",
+   "diff": -0.03794259335360674,
+   "lo": -0.05902609067217336,
+   "hi": -0.015752533235390807,
+   "n": 276,
+   "days": 46
+  }
+ ],
+ "cost_usd": 0.1457,
+ "notes": [
+  "Descriptive, not pre-registered: `ml_only` at delta 0.15 escalates 66 of 276 questions (avoids 76.1% of the paid calls) with Brier 0.1565, against 0.1802 for the paid model alone and 0.1663 for `ml` alone. It was chosen after the fact from a grid of twelve points, so it is a hypothesis to test on fresh days, not a result.",
+  "276 questions with every forecast available; the primary rule escalates 276 of 276 (100.0%) to the paid model.",
+  "The cheap pair is the `ml` backtest and the open fine-tuned GGUF model with its pinned calibration; the paid arm is `llm_context` (Claude Haiku)."
+ ],
+ "limits": [
+  "Electricity only; the cheap pair is the `ml` backtest and the GGUF model, on 276 test questions from 46 days.",
+  "The rule was fixed before the Claude answers existed; the grid is descriptive.",
+  "The saving is counted in paid calls avoided on the shared sample, not measured live."
+ ],
+ "card": "docs/lab/routing.md"
+}

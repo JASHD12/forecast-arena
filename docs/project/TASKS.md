@@ -186,12 +186,13 @@ Keep the first line of each task in exactly this shape; the status script parses
     revisions, `ml` rule, titles, site attribution; fixtures recorded from the real API.
   - Done when: unit tests cover parsing, generation, no leakage, ties, voids, revisions,
     the model, the missing-key skip and the attribution.
-- [!] T045e · Enable crypto (live) (deps: T045d, T046; needs: H12) WAIT(until=2026-11-23)
+- [x] T045e · Enable crypto (live) (deps: T045d, T046; needs: H12)
   - Code and workflows done 2026-11-22 (owner set the secret `ARENA_COINGECKO_API_KEY` and asked for crypto to go live): morning, evening and resolve pass the key and default to `power,weather,attention,markets,crypto`; a unit test limits the secret to those three jobs. Waits for the first live evening or morning run after the merge to write crypto questions and for `verify` to pass.
   - Do: pass `ARENA_COINGECKO_API_KEY` to the morning and resolve workflows; add `crypto`
     to the live domains.
   - Done when: a real morning run writes crypto questions and verify passes, or
     `WAIT(until=<date>)`.
+  - Verified 2026-11-22 21:50 UTC: the first scheduled evening run after the merge (run 45073044132) wrote the crypto questions of the 2026-11-23 batch (5 `up` and 5 `bigmove` for the coins, CoinGecko in the text); the ledger verifies (355 files, 10 batch seals). The first crypto forecasts come with tomorrow's morning run.
 - [x] T045f · Site improvements (owner request 2026-11-12) (deps: T045a)
   - Do: guide/FAQ, question-page verdict and "who was closest", archive by day with topic
     filters, leaderboard bars and friendly names, how-it-works strip, Atom feed, favicon
@@ -756,15 +757,18 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
   - Done 2026-11-22: `lab-eval` run 45011720244 (4 shards, ~1.0-2.0 h each); Platt refitted on the GGUF's 552 validation margins only: (0.5903, 0.1730), pinned in `lab/artefacts/llm_local_ft.json` (new version string). On 276 test questions the GGUF scores Brier 0.2474 (Colab 4-bit adapter 0.2378, untuned base 0.2486, base rate 0.2182, `ml` 0.1663): H-FT3 not met (loss +0.0076 vs 0.005), no measurable gain over the untuned model.
 - [ ] T247 · Distillation from Claude (deps: T246; needs: H27)
   - Code and pre-registration done 2026-11-22 (owner approval H27): `lab/prereg/distill.md`, `arena lab distill-labels`, `lab-distill-labels.yml`, `src/arena/lab/distill.py`, tests with a fake teacher. Open: the paid run after the merge (labels committed as `lab/data/distill-labels-v1.json`), then the student's soft-label training on the owner's Colab (a later H item) and the evaluation.
+  - Student training code added 2026-11-22: `Spec.soft_labels` in `lab/finetune/run.py` (trains only the labelled rows, binary cross-entropy against the teacher probability), notebook `notebooks/lab/distill_qwen_forecast.ipynb`, tests on a tiny model. Owner step: H39 (after the labels are committed).
+  - Label run 1 done 2026-11-22 (run 45071238970, US$0.4117): 773 of 1,200 labelled before the run's own 2.2M token cap stopped it (average 2.8k tokens per question, my estimate was too low); 1 answer failed the format. The labelled rows are the first 774 of the id-sorted sample, i.e. four templates (`lab/data/distill-run1-probs.json`, hash of the sample checked). Fix: `--start` and `distill-merge`, cap 3.6M. Open: run 2 with `start=774` (about US$0.23, after this PR is merged), then `arena lab distill-merge` to write `lab/data/distill-labels-v1.json` with all templates, then H39.
 - [x] T248 · Adapter registry and lineage (deps: T246)
   - Done 2026-11-22: `src/arena/lab/lineage.py` + `arena lab lineage` write `docs/lab/runs/qlora-r1.json` (base revision, dataset and pre-registration hashes, Colab code commit and packages, adapter, GGUF and llama.cpp commit, both Platt maps in order); a unit test fails if the pin file, the lineage record and the evaluation result disagree.
 - [x] T249 · Shadow run of the fine-tuned model (deps: T246)
   - SUPERSEDED 2026-11-21 by Phase 15: the fine-tuned model runs live as `llm_local_ft` (T271); no shadow tree is built.
-- [ ] T250 · Cost routing and cascades (deps: T246; needs: H31)
+- [x] T250 · Cost routing and cascades (deps: T246; needs: H31)
   - Code and pre-registration done 2026-11-22 (owner approval H31): `lab/prereg/routing.md` (primary rule fixed before the answers), `arena lab routing-score|routing`, `lab-routing.yml`, GGUF margins committed. Open: the paid run after the merge, then `arena lab routing`, card and result file.
   - Needs a paid-tier probability on every test item: Claude `llm_context` on the two frozen test sets (276 questions, about US$0.15 at the
     recorded cost per call) through the existing `llm-eval.yml`; the stored eval rows cover only 24 of the 186 October items, too few.
   - Done when: Pareto curve (paid calls saved vs Brier), delta chosen on validation, card generated.
+  - Run done 2026-11-22 (owner approval H31; run 45070266130, US$0.1457, 276/276 answered): primary rule (`pair`, delta 0.15, gamma 0.10) escalated 276 of 276 (the open fine-tuned model is never decisive), so it saves nothing and H-RT1 is not met; H-RT2 holds. Brier: Claude `llm_context` 0.1802, `ml` 0.1663, base rate 0.2182, open model 0.2474; Claude is clearly better than the base rate (-0.0379 [-0.059, -0.0158]) and not clearly worse than `ml` (+0.0139 [-0.0166, +0.0433]). Descriptive only (chosen after the fact): `ml_only` at delta 0.15 escalates 66 of 276 (avoids 76%) with Brier 0.1565, better than either arm alone; a proposal for a new pre-registered test on fresh days. Result `evals/results/lab-routing.json`, card `docs/lab/routing.md`.
 - [x] T251 · Hybrid retrieval: BM25, RRF, optional cross-encoder rerank, retrieval eval (deps: T242)
   - Done 2026-11-21: `PastQuestions.search_hybrid` (live agent unchanged), frozen set `evals/golden/retrieval-v1.jsonl` (2,004 documents, 186
     graded queries), result `evals/results/lab-retrieval-hybrid.json`: nDCG@5 dense 0.373, BM25 0.339, hybrid 0.346, hybrid+rerank 0.556;
@@ -815,7 +819,8 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
 - [x] T272 · Site and boards for the experimental forecasters (deps: T271)
   - Done 2026-11-21: names "(experimental)", colour slots 9 to 11, Methods information-set rows, health roster, Lab page section that lists
     the ones that have published; they are in no common group and not in the ensemble (tests).
-- [ ] T273 · `llm_router`: cascade forecaster over the other forecasts (deps: T271; needs: H31)
+- [x] T273 · `llm_router`: cascade forecaster over the other forecasts (deps: T271; needs: H31)
+  - Closed 2026-11-22 without building the forecaster: its pre-registered build condition (H-RT1, at least 30% paid calls saved) was not met (see T250). A new pre-registration for the `ml_only` rule on fresh days is a proposal in DECISIONS, not a task.
   - Code done 2026-11-21 (`forecasters/router.py`, registered only when `lab/artefacts/llm_router.json` exists, tests); the thresholds delta and gamma are
     chosen on the validation days from the QLoRA scores and the paid test-set run (H31), then frozen.
 - [x] T274 · `agent_hybrid`: the agent with hybrid retrieval and guards (deps: T270)
@@ -857,9 +862,10 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
 - [x] T297 · Prompt optimisation offline on validation with the free local model (deps: T290)
   - Framework done 2026-11-22 (run pending): `lab/prereg/prompt-opt.md` (8 candidates, cross-fitted validation Brier, one test evaluation, hypotheses H-PO1/H-PO2), `src/arena/lab/prompt_opt.py`, `arena lab prompt-score|prompt-search|prompt-final`, manual workflow `lab-prompt-opt.yml` (phase search, then final with the winner; 4 CPU shards; US$0). First dispatch 2026-11-22 failed at once (`huggingface_hub` missing in the shard venv); fixed in the workflow (pinned `huggingface-hub==1.33.0`, same pin as rag.txt) and the run must wait for that fix to be on main, because workflows are dispatched from main only. After that merge: dispatch `search`, read the four `PO_SEARCH_SHARD_n=` log lines, run `arena lab prompt-search`, dispatch `final` with the winner, then `arena lab prompt-final` and `arena lab card`.
   - Run done 2026-11-22 (free CPU, `lab-prompt-opt.yml` runs 45054100456 and 45060503453): search winner `i3s0` (compare the threshold with the last seven daily values, no examples; cross-fitted validation Brier 0.2573 vs 0.2753 for the live prompt). Frozen test sets (276 questions): winner 0.2556 vs live prompt 0.2632 (difference -0.0076 [-0.0135, -0.0017], excludes zero, H-PO1 holds); both worse than the base rate 0.2182 (+0.0375, H-PO2 holds) and than `ml` 0.1663. Result `evals/results/lab-prompt-opt.json`, card `docs/lab/prompt-opt.md`. No live prompt changed (I8); adopting the winning prompt for `llm_local` would need an owner decision and a new version string.
-- [ ] T298 · Self-consistency (k=5) variant and the LLM-as-judge (paid, one owner OK each; needs H36, H29) (deps: T290; needs: H36)
+- [x] T298 · Self-consistency (k=5) variant and the LLM-as-judge (paid, one owner OK each; needs H36, H29) (deps: T290; needs: H36)
   - Owner approved the paid runs (H36, 2026-11-22). After the merge: dispatch `llm-eval.yml` with `self_consistency=true`, `limit=24`, `max_tokens` about 500000.
   - Code done 2026-11-22: `forecasters/selfconsistency.py` (`llm_context_sc5`: five calls of the same prompt, mean probability, spread recorded, at least 3 usable answers or a skip), evaluation variant in `arena eval run` and a `self_consistency` input of `llm-eval.yml`; tests with FakeLLM. The paid run (about 5x the tokens of `llm_context`, so a few cents on 24 questions) waits for H36; the judge waits for H29.
+  - Run done 2026-11-22 (owner approval H36; `llm-eval.yml` run 45071241581, 24 questions, US$0.0871): `llm_context` Brier 0.1937, self-consistency k=5 (`llm_context_sc5`) 0.1961, plain 0.3309. Self-consistency vs single call: -0.0024 [-0.0161, +0.0110] (no difference) at 5.2 times the cost (US$0.067 vs US$0.013); 2 of 120 samples were cut off at the token limit. Result `evals/results/eval-20261122T212735.json`. The judge half of T298 is T252b.
 - [x] T299 · DPO preference tuning notebook for the owner's Colab run (deps: T290; needs: H35 to run)
   - Done 2026-11-22: `lab/prereg/dpo-forecast.md` (hypotheses written first), `dpo_loss` and reference margins in the training loop (CPU-tested on a tiny model), `Spec.dpo_beta`, `notebooks/lab/dpo_qwen_forecast.ipynb` (same data and budget as QLoRA, checked GGUF export). The run itself is the owner's step H35.
   - Run done 2026-11-22 (owner, Colab T4, 85 min): `evals/results/lab-dpo-r1.json`, card `docs/lab/dpo-r1.md` from `arena lab ft-eval --experiment dpo-r1`. Test Brier 0.2363 (276 questions) against 0.2378 QLoRA (difference -0.0015, interval [-0.0032, +0.0005], includes zero), 0.2486 untuned, 0.2182 base rate (DPO worse, interval excludes zero), 0.1663 `ml`. H-DPO1 and H-DPO2 hold; H-DPO3 (export loss) is not tested: the optional GGUF export cell failed on a notebook bug (`gc` not imported), fixed in the notebook. Not a live forecaster.

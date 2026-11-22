@@ -192,6 +192,18 @@ Source: `evals/results/eval-20261119T204603.json`
 | llm_plain | claude-haiku-5-5 | 12 | 12 | 0.2255 | 0.2380 | 100% | 0% | 0.0036 | 5709 |
 
 Paired Brier difference: llm_plain - llm_context: +0.0332 [-0.0997, +0.1732] on 12 items; llm_plain - agent: +0.0199 [-0.1056, +0.1619] on 12 items; llm_context - agent: -0.0133 [-0.0443, +0.0180] on 12 items
+
+### Run `eval-20261122T212735` (24 items; caps 336 requests, 500000 tokens)
+
+Source: `evals/results/eval-20261122T212735.json`
+
+| Forecaster | Model | n | Answered | Brier | Base rate, same items | Valid JSON first try | Repair rate | Cost (USD) | Output tokens |
+|---|---|---|---|---|---|---|---|---|---|
+| llm_context | claude-haiku-5-5 | 24 | 24 | 0.1937 | 0.2081 | 100% | 0% | 0.0129 | 15076 |
+| llm_context_sc5 | claude-haiku-5-5 | 24 | 24 | 0.1961 | 0.2081 | 92% | 8% | 0.0672 | 79719 |
+| llm_plain | claude-haiku-5-5 | 24 | 24 | 0.3309 | 0.2081 | 100% | 0% | 0.0071 | 11280 |
+
+Paired Brier difference: llm_plain - llm_context: +0.1372 [+0.0315, +0.2427] on 24 items; llm_plain - llm_context_sc5: +0.1348 [+0.0336, +0.2349] on 24 items; llm_context - llm_context_sc5: -0.0024 [-0.0161, +0.0110] on 24 items
 <!-- evals:end -->
 
 <!-- lab:start -->
@@ -227,6 +239,30 @@ Source: `evals/results/lab-conformal.json`; card `docs/lab/conformal.md`
 | mean | 214 | 7 | 0.71 | 0.794 | 0.804 | 0.925 |
 | min | 214 | 7 | 0.64 | 0.761 | 0.762 | 0.907 |
 | spread | 214 | 7 | 0.715 | 0.832 | 0.822 | 0.911 |
+
+### Cost routing: a cheap pair first, the paid model only when they are unsure
+
+Source: `evals/results/lab-routing.json`; card `docs/lab/routing.md`
+
+| Arm | Questions | Brier |
+|---|---|---|
+| base_rate | 276 | 0.2182 |
+| claude (llm_context) | 276 | 0.1802 |
+| curve / ml_only delta 0.05 | 276 | 0.1637 |
+| curve / ml_only delta 0.10 | 276 | 0.1594 |
+| curve / ml_only delta 0.15 | 276 | 0.1565 |
+| curve / ml_only delta 0.20 | 276 | 0.1606 |
+| curve / ml_only delta 0.25 | 276 | 0.1653 |
+| curve / ml_only delta 0.30 | 276 | 0.1675 |
+| curve / pair delta 0.05 | 276 | 0.1802 |
+| curve / pair delta 0.10 | 276 | 0.1802 |
+| curve / pair delta 0.15 | 276 | 0.1802 |
+| curve / pair delta 0.20 | 276 | 0.1802 |
+| curve / pair delta 0.25 | 276 | 0.1802 |
+| curve / pair delta 0.30 | 276 | 0.1802 |
+| ft (open fine-tuned model) | 276 | 0.2474 |
+| ml | 276 | 0.1663 |
+| router (primary: pair, delta 0.15, gamma 0.10) | 276 | 0.1802 |
 
 ### DPO preference tuning of Qwen2.5-1.5B on replayed power questions
 

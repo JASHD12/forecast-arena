@@ -29,7 +29,7 @@ class Encoded:
 
     id: str
     ids: list[int]
-    label: int  # 1 = YES
+    label: float  # 1 = YES; a teacher probability when distilling (soft label)
 
 
 def prompt_text(tokenizer: Tokenizer, system: str, user: str) -> str:

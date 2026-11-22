@@ -33,6 +33,9 @@ class Spec:
     four_bit: bool = False
     base_name: str = ""  # the untuned model scored the same way, e.g. "base_1_5b"
     dpo_beta: float | None = None  # preference tuning (DPO) against the untuned model as reference
+    #: distillation: teacher probability per training row id; only those rows are trained on and
+    #: the binary cross-entropy target is the teacher probability instead of the outcome
+    soft_labels: Mapping[str, float] | None = None
 
 
 def _score_all(
@@ -84,13 +87,22 @@ def run_variant(
     kw: dict[str, Any] = {
         "pad_id": pad, "yes_id": yes_id, "no_id": no_id, "device": device, "batch_size": eval_batch,
     }  # fmt: skip
-    tr_rows = ds.subsample(list(rows["train"]), train_rows, seed=cfg.seed)
+    if spec.soft_labels is not None:
+        tr_rows = sorted((r for r in rows["train"] if r.id in spec.soft_labels), key=lambda r: r.id)
+        if not tr_rows:
+            raise ValueError("no training row has a teacher label")
+    else:
+        tr_rows = ds.subsample(list(rows["train"]), train_rows, seed=cfg.seed)
     enc: dict[str, list[fmt.Encoded]] = {}
     dropped: dict[str, int] = {}
     for split, rs in {**rows, "train": tr_rows}.items():
         enc[split], dropped[split] = fmt.encode_rows(tokenizer, rs, max_len)
     if any(not enc[s] for s in SCORED):
         raise ValueError("a scored split is empty after dropping long rows")
+    if spec.soft_labels is not None:  # the training target is the teacher's probability
+        enc["train"] = [
+            fmt.Encoded(e.id, e.ids, float(spec.soft_labels[e.id])) for e in enc["train"]
+        ]
     train_kw = {k: v for k, v in kw.items() if k != "batch_size"}
 
     t0 = time.monotonic()

@@ -145,7 +145,7 @@ def lab_judge_run(obj: Ctx, items_path: Path, max_tokens: int) -> None:
     _refuse_outside_actions()
     items = json.loads(items_path.read_text(encoding="utf-8"))
     run = PaidRun(
-        _client(obj), max_requests=len(items) + 5, max_tokens=max_tokens, max_output_tokens=500
+        _client(obj), max_requests=len(items) + 5, max_tokens=max_tokens, max_output_tokens=1000
     )
     scores: dict[str, list[int] | None] = {}
     skips: dict[str, int] = {}
@@ -386,9 +386,10 @@ def lab_routing(obj: Ctx, probs: Path, ml_runs: tuple[Path, ...], cost: float, o
 
 @lab.command("distill-labels")
 @click.option("--n", "n_rows", type=int, default=DISTILL_N)
-@click.option("--max-tokens", type=int, default=2_200_000, help="Hard token cap for this run.")
+@click.option("--start", type=int, default=0, help="Skip the first rows of the (sorted) sample.")
+@click.option("--max-tokens", type=int, default=3_600_000, help="Hard token cap for this run.")
 @click.pass_obj
-def lab_distill_labels(obj: Ctx, n_rows: int, max_tokens: int) -> None:
+def lab_distill_labels(obj: Ctx, n_rows: int, start: int, max_tokens: int) -> None:
     """The teacher's probability for a seeded sample of training questions (Actions only; T247)."""
     from arena.lab import dataset as ds
     from arena.lab import distill as dl
@@ -399,7 +400,8 @@ def lab_distill_labels(obj: Ctx, n_rows: int, max_tokens: int) -> None:
 
     _refuse_outside_actions()
     train = ds.read_split(Path("lab/data/forecast-sft/train.jsonl.gz"))
-    rows = dl.sample_rows(train, n_rows)
+    sample = dl.sample_rows(train, n_rows)
+    rows = sample[start:]
     run = PaidRun(
         _client(obj),
         max_requests=len(rows) + 100,
@@ -414,17 +416,63 @@ def lab_distill_labels(obj: Ctx, n_rows: int, max_tokens: int) -> None:
         except (ParseError, LLMError, BudgetExhausted) as exc:
             probs.append(None)
             skips[type(exc).__name__] = skips.get(type(exc).__name__, 0) + 1
-    ids = [r.id for r in rows]
+    ids = [r.id for r in sample]
     click.echo(
         "DL_SUMMARY="
         + json.dumps(
             {
                 **run.summary(),
                 "skips": skips,
-                "n": len(ids),
+                "n": len(rows),
+                "start": start,
                 "ids_sha256": hashlib.sha256("\n".join(ids).encode()).hexdigest(),
             },
             sort_keys=True,
         )
     )
     click.echo("DL_PROBS=" + json.dumps(probs))
+
+
+@lab.command("distill-merge")
+@click.option(
+    "--part",
+    "parts",
+    nargs=2,
+    multiple=True,
+    required=True,
+    type=(int, click.Path(exists=True, path_type=Path)),
+    help="START and the file with that run's DL_PROBS list (repeat for each run).",
+)
+@click.option("--cost", type=float, required=True, help="Total US$ of all label runs.")
+@click.option("--model", default="claude-haiku-5-5")
+@click.option("--out", type=click.Path(path_type=Path), default=DISTILL_PATH)
+def lab_distill_merge(
+    parts: tuple[tuple[int, Path], ...], cost: float, model: str, out: Path
+) -> None:
+    """Assemble the committed teacher-label file from one or more label runs (T247)."""
+    from arena.lab import dataset as ds
+    from arena.lab import distill as dl
+
+    train = ds.read_split(Path("lab/data/forecast-sft/train.jsonl.gz"))
+    sample = dl.sample_rows(train, DISTILL_N)
+    probs: list[float | None] = [None] * len(sample)
+    for start, path in parts:
+        for k, v in enumerate(json.loads(path.read_text(encoding="utf-8"))):
+            i = start + k
+            if i >= len(sample):
+                raise click.ClickException(f"part at {start} runs past the sample")
+            if v is not None:
+                if probs[i] is not None:
+                    raise click.ClickException(f"row {i} is labelled twice")
+                probs[i] = float(v)
+    ids = [r.id for r in sample]
+    usable = dl.usable(ids, probs, train)  # raises if a label is not a training row
+    summary: dict[str, object] = {
+        "model": model,
+        "cost_usd": cost,
+        "labelled": len(usable),
+        "sample": len(ids),
+        "note": "probabilities only; the teacher's rationale text is not stored",
+    }
+    dl.write_labels(out, dl.labels_file(ids, probs, summary))
+    click.echo(f"{len(usable)} of {len(ids)} rows labelled -> {out}")

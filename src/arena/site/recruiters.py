@@ -131,6 +131,48 @@ PROOFS: tuple[tuple[str, str, str, tuple[str, ...]], ...] = (
         ("src/arena/forecasters/onnx_power.py", "src/arena/api/app.py"),
     ),
     (
+        "Vector database (Qdrant)",
+        "Past-question search on Qdrant with the forecast-time rule as a filter inside the store, "
+        "checked against brute force; tested against a real server in CI",
+        "lab.html",
+        ("src/arena/agent/vectorstore.py", "tests/unit/test_vectorstore.py"),
+    ),
+    (
+        "Cloud as code (Terraform, AWS, S3)",
+        "Terraform for S3 + CloudFront, ECR, ECS Fargate behind a load balancer and a cost "
+        "alarm, validated in CI (not deployed: no account); S3 upload tested with boto3",
+        "",
+        ("infra/aws/main.tf", "src/arena/cloud/s3.py"),
+    ),
+    (
+        "Observability (Prometheus, Jaeger, OpenTelemetry)",
+        "/metrics with bounded-cardinality labels scraped by Prometheus, OTLP traces stored in "
+        "Jaeger, both real servers in a CI job",
+        "",
+        ("src/arena/api/metrics.py", "scripts/smoke_observability.sh"),
+    ),
+    (
+        "TypeScript",
+        "The site's script is strict TypeScript compiled to the same single file; CI fails if "
+        "the committed output is stale",
+        "",
+        ("site_ts/app.ts", "tools/site-ts/tsconfig.json"),
+    ),
+    (
+        "Online learning and unsupervised learning",
+        "Hedge expert advice and Thompson sampling to learn which forecaster to trust; "
+        "Isolation Forest and k-means on price data with their negative results published",
+        "lab.html",
+        ("src/arena/forecasters/bandit.py", "src/arena/ops/anomaly.py", "src/arena/lab/regimes.py"),
+    ),
+    (
+        "pandas and scikit-learn Pipelines",
+        "DataFrame views proved equal to the leaderboard, a ColumnTransformer + LogisticRegression "
+        "stacking pipeline replayed walk-forward",
+        "",
+        ("src/arena/analytics/frames.py", "src/arena/lab/stacking_study.py"),
+    ),
+    (
         "LLM evals, tracing, OpenTelemetry",
         "Frozen golden set, prompt A/B, JSON validity and cost; one span per model call, "
         "exported as OTLP/JSON with the OpenTelemetry GenAI attribute names",
@@ -194,6 +236,7 @@ ROLE_PATHS: tuple[tuple[str, str, tuple[tuple[str, str, bool], ...]], ...] = (
                 "src/arena/lab/docs_assistant.py",
                 True,
             ),
+            ("Qdrant vector store (code)", "src/arena/agent/vectorstore.py", True),
         ),
     ),
     (
@@ -205,6 +248,8 @@ ROLE_PATHS: tuple[tuple[str, str, tuple[tuple[str, str, bool], ...]], ...] = (
             ("Pipeline status", "status.html", False),
             ("Calibration study (code)", "src/arena/lab/calibration_study.py", True),
             ("ONNX export and serving (code)", "src/arena/forecasters/onnx_power.py", True),
+            ("Prometheus metrics and Jaeger traces (code)", "src/arena/api/metrics.py", True),
+            ("AWS as code (Terraform)", "infra/aws/main.tf", True),
         ),
     ),
     (

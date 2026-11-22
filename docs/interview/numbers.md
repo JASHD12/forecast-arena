@@ -323,6 +323,16 @@ Source: `evals/results/lab-retrieval-hybrid.json`; card `docs/lab/retrieval-hybr
 | hybrid_rerank | 143 | 0.5557 | 0.7425 | 0.3762 | 382.68 |
 | hybrid_rrf | 143 | 0.3464 | 0.6656 | 0.2196 | 59.86 |
 
+### Stacking with a scikit-learn Pipeline on pandas DataFrames
+
+Source: `evals/results/lab-stacking.json`; card `docs/lab/stacking.md`
+
+| Arm | Questions | Brier |
+|---|---|---|
+| equal_mean | 32 | 0.1722 |
+| ml | 32 | 0.1077 |
+| stacking | 32 | 0.0987 |
+
 ### Unsupervised data-anomaly detection on price windows (Isolation Forest)
 
 Source: `evals/results/lab-anomaly.json`; card `docs/lab/anomaly.md`

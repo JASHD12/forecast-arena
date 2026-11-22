@@ -16,6 +16,10 @@ CI_COVERED = (
     "notebooks",  # executed by `make notebook` in the CI a11y job
     "Makefile",
     "analytics/dbt",
+    "infra/aws",  # terraform fmt and validate in the CI job `terraform`
+    "site_ts",  # compiled and compared in the CI a11y job
+    "tools/site-ts",
+    "scripts",  # smoke_observability.sh runs in the CI job `observability`
     "apps/dashboard",
     "tools/a11y",
     "Dockerfile",

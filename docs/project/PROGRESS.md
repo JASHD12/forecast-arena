@@ -65,6 +65,7 @@ Nothing. See the session summary above and `python scripts/status.py`.
   output, not acted on (S11).
 
 ## Done log
+- 2026-11-22 T300: Phase 16 showcase: skills rows, recruiter links, explainer 08.
 - 2026-11-22 T302: DWD terms read (CC BY 4.0, pollen forecast qualifies); four other sources unreadable until H38.
 - 2026-11-22 T298/T299: self-consistency eval variant (paid run waits for H36); DPO loss, prereg and Colab notebook ready (H35).
 - 2026-11-22 T301: pandas frames over the scored record (equal to the leaderboard by test) and a Pipeline stacking study; live replay waits for 5 test days.

@@ -717,14 +717,25 @@ def lab_lineage(summary: Path, out: Path) -> None:
 @click.argument("scores", nargs=-1, required=True, type=click.Path(exists=True, path_type=Path))
 @click.option("--ml-run", "ml_runs", multiple=True, type=click.Path(exists=True, path_type=Path))
 @click.option("--parity", type=click.Path(exists=True, path_type=Path), default=None)
+@click.option("--experiment", type=click.Choice(["qlora-r1", "dpo-r1"]), default="qlora-r1")
+@click.option(
+    "--summary", "summary_path", type=click.Path(exists=True, path_type=Path), default=None
+)
 @click.option(
     "--out", type=click.Path(path_type=Path), default=Path("evals/results/lab-qlora-r1.json")
 )
 @click.pass_obj
 def lab_ft_eval(
-    obj: Ctx, scores: tuple[Path, ...], ml_runs: tuple[Path, ...], parity: Path | None, out: Path
+    obj: Ctx,
+    scores: tuple[Path, ...],
+    ml_runs: tuple[Path, ...],
+    parity: Path | None,
+    experiment: str,
+    summary_path: Path | None,
+    out: Path,
 ) -> None:
-    """Evaluate the QLoRA run on the frozen test sets from its Colab score files (T246)."""
+    """Evaluate a Colab run (QLoRA, or DPO with --experiment dpo-r1) on the frozen test sets
+    from its score files (T246)."""
     import hashlib
 
     from arena.lab import dataset as ds
@@ -749,25 +760,46 @@ def lab_ft_eval(
     ml: dict[str, float] = {}
     for run in ml_runs:
         ml.update(fe.read_backtest(run))
-    pairs = [
-        ("qlora_1_5b", "base_1_5b"),
-        ("qlora_1_5b", "base_rate"),
-        ("qlora_1_5b", "ml"),
-        ("lora_0_5b", "base_0_5b"),
-        ("lora_0_5b", "base_rate"),
-        ("lora_0_5b", "qlora_1_5b"),
-        ("ml", "base_rate"),
-        ("gguf_q4", "qlora_1_5b"),
-        ("gguf_q4", "base_1_5b"),
-        ("gguf_q4", "base_rate"),
-        ("gguf_q4", "ml"),
-    ]
+    dpo = experiment == "dpo-r1"
+    pairs = (
+        [
+            ("dpo_1_5b", "base_1_5b"),
+            ("dpo_1_5b", "qlora_1_5b"),
+            ("dpo_1_5b", "base_rate"),
+            ("dpo_1_5b", "ml"),
+            ("qlora_1_5b", "base_rate"),
+            ("ml", "base_rate"),
+        ]
+        if dpo
+        else [
+            ("qlora_1_5b", "base_1_5b"),
+            ("qlora_1_5b", "base_rate"),
+            ("qlora_1_5b", "ml"),
+            ("lora_0_5b", "base_0_5b"),
+            ("lora_0_5b", "base_rate"),
+            ("lora_0_5b", "qlora_1_5b"),
+            ("ml", "base_rate"),
+            ("gguf_q4", "qlora_1_5b"),
+            ("gguf_q4", "base_1_5b"),
+            ("gguf_q4", "base_rate"),
+            ("gguf_q4", "ml"),
+        ]
+    )
     metrics, paired = fe.evaluate(fe.read_scores(list(scores)), rows, ml, pairs)
     notes = [
-        "Probabilities of the Colab arms are the Colab scores (4-bit model plus adapter, Platt "
-        "map fitted on the validation split only). The arm `gguf_q4` is the live model: the "
-        "Q4_K_M GGUF scored by llama.cpp on CPU, with its own Platt map fitted on the GGUF's "
-        "validation margins only.",
+        (
+            "All probabilities are the Colab scores (4-bit model plus adapter, Platt map fitted "
+            "on the validation split only). No GGUF was exported for this run (the optional "
+            "export cell failed on a notebook bug, fixed since), so hypothesis H-DPO3 (export "
+            "loss) is not tested, and the DPO model is not a live forecaster."
+        )
+        if dpo
+        else (
+            "Probabilities of the Colab arms are the Colab scores (4-bit model plus adapter, "
+            "Platt map fitted on the validation split only). The arm `gguf_q4` is the live "
+            "model: the Q4_K_M GGUF scored by llama.cpp on CPU, with its own Platt map fitted "
+            "on the GGUF's validation margins only."
+        ),
         f"Test sets: {sum(1 for r in rows.values() if r['split'] == 'test_oct')} questions "
         f"(October 2026) and {sum(1 for r in rows.values() if r['split'] == 'test_nov')} "
         "(1 to 15 November 2026); the six questions of a day are correlated, so intervals are "
@@ -783,18 +815,38 @@ def lab_ft_eval(
             f"{par['brier_colab']} (Colab), loss {par['brier_loss']:+}; "
             f"{par['seconds_per_question']} s per question on CPU."
         )
-    summary = json.loads((Path(scores[0]).parent / "run_summary.json").read_text("utf-8"))
+    summary_file = summary_path or Path(scores[0]).parent / "run_summary.json"
+    summary = json.loads(summary_file.read_text("utf-8"))
+    sums = json.loads((summary_file.parent / "SHA256SUMS.json").read_text("utf-8")) if dpo else {}
+    artefacts = (
+        {
+            "adapter": sums["adapter_dpo_1_5b/adapter_model.safetensors"],
+            "release": "https://github.com/JASHD12/forecast-arena/releases/tag/lab-dpo-r1",
+        }
+        if dpo
+        else {"gguf": art.sha256, "adapter": art.adapter_sha256, "release": art.url}
+    )
+    prereg = "lab/prereg/dpo-forecast.md" if dpo else "lab/prereg/qlora-forecast.md"
     result = LabResult(
-        experiment="qlora-r1",
-        title="QLoRA fine-tune of Qwen2.5-1.5B on replayed power questions",
+        experiment="dpo-r1" if dpo else "qlora-r1",
+        title=(
+            "DPO preference tuning of Qwen2.5-1.5B on replayed power questions"
+            if dpo
+            else "QLoRA fine-tune of Qwen2.5-1.5B on replayed power questions"
+        ),
         created_at=obj.clock.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
         why=(
-            "Parameter-efficient fine-tuning of a small open model is the standard way companies "
-            "adapt an LLM to a narrow task; the comparison with a classical model is the point."
+            "Preference tuning (DPO) is the standard follow-up to supervised fine-tuning for "
+            "aligning a model with outcomes; comparing it with plain fine-tuning and a classical "
+            "model shows what the extra step buys."
+            if dpo
+            else "Parameter-efficient fine-tuning of a small open model is the standard way "
+            "companies adapt an LLM to a narrow task; the comparison with a classical model is "
+            "the point."
         ),
-        prereg_sha256=hashlib.sha256(Path("lab/prereg/qlora-forecast.md").read_bytes()).hexdigest(),
+        prereg_sha256=hashlib.sha256(Path(prereg).read_bytes()).hexdigest(),
         dataset_sha256={k: v for k, v in summary["dataset_sha256"].items()},
-        artefacts={"gguf": art.sha256, "adapter": art.adapter_sha256, "release": art.url},
+        artefacts=artefacts,
         metrics=metrics,  # type: ignore[arg-type]
         paired=paired,
         notes=notes,
@@ -807,7 +859,7 @@ def lab_ft_eval(
             "The untuned arms use their own Platt map fitted on validation, so they are not raw "
             "model probabilities.",
         ],
-        card="docs/lab/qlora-r1.md",
+        card="docs/lab/dpo-r1.md" if dpo else "docs/lab/qlora-r1.md",
     )
     out.write_text(result.model_dump_json(indent=1) + "\n", encoding="utf-8")
     for k, m in metrics.items():

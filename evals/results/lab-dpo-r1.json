@@ -1,0 +1,305 @@
+{
+ "kind": "evaluation",
+ "experiment": "dpo-r1",
+ "title": "DPO preference tuning of Qwen2.5-1.5B on replayed power questions",
+ "created_at": "2026-11-22T20:06:52Z",
+ "why": "Preference tuning (DPO) is the standard follow-up to supervised fine-tuning for aligning a model with outcomes; comparing it with plain fine-tuning and a classical model shows what the extra step buys.",
+ "prereg_sha256": "3bda4b8151f1859d45fa095cf493342d23c3a7546145dce2f8ae64271ecd6d73",
+ "dataset_sha256": {
+  "test_nov": "b45e6a5440f9a1857e01abd82c6a6520054f994bfa261c2b2e8a2fb3a75d5eae",
+  "test_oct": "f120884a109778ea0be0674f8649a50548f2668417fadd7a6ce61401ed03c4f8",
+  "train": "63d387c583ecdaaf61d1df1a9158e576ab0341f274638411e2fd857923266f7f",
+  "val": "ffb1d23a2240f4e0de6209775406062d79c6022ebf669eb20a7229aa0a880ee5"
+ },
+ "artefacts": {
+  "adapter": "294efd8b991352022fc3ed66c288f8dfc1512c7d31fb061ea987d87ff65d7831",
+  "release": "https://github.com/JASHD12/forecast-arena/releases/tag/lab-dpo-r1"
+ },
+ "metrics": {
+  "base_1_5b / test_oct": {
+   "n": 186,
+   "brier": 0.249,
+   "log_score": 0.6912,
+   "ece": 0.0817
+  },
+  "dpo_1_5b / test_oct": {
+   "n": 186,
+   "brier": 0.2383,
+   "log_score": 0.6692,
+   "ece": 0.0832
+  },
+  "qlora_1_5b / test_oct": {
+   "n": 186,
+   "brier": 0.24,
+   "log_score": 0.6729,
+   "ece": 0.0902
+  },
+  "base_rate / test_oct": {
+   "n": 186,
+   "brier": 0.2255,
+   "log_score": 0.6406,
+   "ece": 0.0851
+  },
+  "ml / test_oct": {
+   "n": 186,
+   "brier": 0.1814,
+   "log_score": 0.5219,
+   "ece": 0.1177
+  },
+  "base_1_5b / test_nov": {
+   "n": 90,
+   "brier": 0.2477,
+   "log_score": 0.6886,
+   "ece": 0.0491
+  },
+  "dpo_1_5b / test_nov": {
+   "n": 90,
+   "brier": 0.2321,
+   "log_score": 0.6564,
+   "ece": 0.1075
+  },
+  "qlora_1_5b / test_nov": {
+   "n": 90,
+   "brier": 0.233,
+   "log_score": 0.6586,
+   "ece": 0.1175
+  },
+  "base_rate / test_nov": {
+   "n": 90,
+   "brier": 0.203,
+   "log_score": 0.588,
+   "ece": 0.0564
+  },
+  "ml / test_nov": {
+   "n": 90,
+   "brier": 0.1352,
+   "log_score": 0.4376,
+   "ece": 0.1741
+  },
+  "base_1_5b / test_all": {
+   "n": 276,
+   "brier": 0.2486,
+   "log_score": 0.6904,
+   "ece": 0.0585
+  },
+  "dpo_1_5b / test_all": {
+   "n": 276,
+   "brier": 0.2363,
+   "log_score": 0.665,
+   "ece": 0.0971
+  },
+  "qlora_1_5b / test_all": {
+   "n": 276,
+   "brier": 0.2378,
+   "log_score": 0.6683,
+   "ece": 0.0687
+  },
+  "base_rate / test_all": {
+   "n": 276,
+   "brier": 0.2182,
+   "log_score": 0.6235,
+   "ece": 0.0591
+  },
+  "ml / test_all": {
+   "n": 276,
+   "brier": 0.1663,
+   "log_score": 0.4944,
+   "ece": 0.0673
+  }
+ },
+ "paired": [
+  {
+   "a": "dpo_1_5b",
+   "b": "base_1_5b",
+   "split": "test_oct",
+   "diff": -0.010701688798202214,
+   "lo": -0.01610672797537748,
+   "hi": -0.004284398732356606,
+   "n": 186,
+   "days": 31
+  },
+  {
+   "a": "dpo_1_5b",
+   "b": "qlora_1_5b",
+   "split": "test_oct",
+   "diff": -0.0016934797205667522,
+   "lo": -0.0037255333370369913,
+   "hi": 0.0006757996469904269,
+   "n": 186,
+   "days": 31
+  },
+  {
+   "a": "dpo_1_5b",
+   "b": "base_rate",
+   "split": "test_oct",
+   "diff": 0.012826822241010604,
+   "lo": 0.0007966265176871811,
+   "hi": 0.02442246106778222,
+   "n": 186,
+   "days": 31
+  },
+  {
+   "a": "dpo_1_5b",
+   "b": "ml",
+   "split": "test_oct",
+   "diff": 0.05693147625453172,
+   "lo": 0.01103276195638721,
+   "hi": 0.09809981811763144,
+   "n": 186,
+   "days": 31
+  },
+  {
+   "a": "qlora_1_5b",
+   "b": "base_rate",
+   "split": "test_oct",
+   "diff": 0.01452030196157736,
+   "lo": 0.0020803312362190156,
+   "hi": 0.026190544304398294,
+   "n": 186,
+   "days": 31
+  },
+  {
+   "a": "ml",
+   "b": "base_rate",
+   "split": "test_oct",
+   "diff": -0.0441046540135211,
+   "lo": -0.08781837471920845,
+   "hi": 0.0019249568761598175,
+   "n": 186,
+   "days": 31
+  },
+  {
+   "a": "dpo_1_5b",
+   "b": "base_1_5b",
+   "split": "test_nov",
+   "diff": -0.01565782853722149,
+   "lo": -0.02436745053797279,
+   "hi": -0.0074050660448223326,
+   "n": 90,
+   "days": 15
+  },
+  {
+   "a": "dpo_1_5b",
+   "b": "qlora_1_5b",
+   "split": "test_nov",
+   "diff": -0.0009536609035198198,
+   "lo": -0.0034712332401812093,
+   "hi": 0.0023164566565041416,
+   "n": 90,
+   "days": 15
+  },
+  {
+   "a": "dpo_1_5b",
+   "b": "base_rate",
+   "split": "test_nov",
+   "diff": 0.029097152035771713,
+   "lo": -0.00372060592206646,
+   "hi": 0.058027330586860874,
+   "n": 90,
+   "days": 15
+  },
+  {
+   "a": "dpo_1_5b",
+   "b": "ml",
+   "split": "test_nov",
+   "diff": 0.09691734187793434,
+   "lo": 0.02447949639932796,
+   "hi": 0.14552677258855024,
+   "n": 90,
+   "days": 15
+  },
+  {
+   "a": "qlora_1_5b",
+   "b": "base_rate",
+   "split": "test_nov",
+   "diff": 0.030050812939291547,
+   "lo": -0.003949891975192599,
+   "hi": 0.06026130898623906,
+   "n": 90,
+   "days": 15
+  },
+  {
+   "a": "ml",
+   "b": "base_rate",
+   "split": "test_nov",
+   "diff": -0.0678201898421626,
+   "lo": -0.11616126605348515,
+   "hi": -0.00221683811324369,
+   "n": 90,
+   "days": 15
+  },
+  {
+   "a": "dpo_1_5b",
+   "b": "base_1_5b",
+   "split": "test_all",
+   "diff": -0.012317821321795453,
+   "lo": -0.016760259239746517,
+   "hi": -0.0074833271478307786,
+   "n": 276,
+   "days": 46
+  },
+  {
+   "a": "dpo_1_5b",
+   "b": "qlora_1_5b",
+   "split": "test_all",
+   "diff": -0.0014522344541384052,
+   "lo": -0.003163672519151858,
+   "hi": 0.0004944818278704982,
+   "n": 276,
+   "days": 46
+  },
+  {
+   "a": "dpo_1_5b",
+   "b": "base_rate",
+   "split": "test_all",
+   "diff": 0.01813236456538923,
+   "lo": 0.005402297348838961,
+   "hi": 0.031118446237767067,
+   "n": 276,
+   "days": 46
+  },
+  {
+   "a": "dpo_1_5b",
+   "b": "ml",
+   "split": "test_all",
+   "diff": 0.06997034547955432,
+   "lo": 0.034418934018977554,
+   "hi": 0.10404343202725437,
+   "n": 276,
+   "days": 46
+  },
+  {
+   "a": "qlora_1_5b",
+   "b": "base_rate",
+   "split": "test_all",
+   "diff": 0.019584599019527638,
+   "lo": 0.006853155146246655,
+   "hi": 0.03319929617225501,
+   "n": 276,
+   "days": 46
+  },
+  {
+   "a": "ml",
+   "b": "base_rate",
+   "split": "test_all",
+   "diff": -0.05183798091416508,
+   "lo": -0.08507714829535078,
+   "hi": -0.01659979078276073,
+   "n": 276,
+   "days": 46
+  }
+ ],
+ "cost_usd": 0.0,
+ "notes": [
+  "All probabilities are the Colab scores (4-bit model plus adapter, Platt map fitted on the validation split only). No GGUF was exported for this run (the optional export cell failed on a notebook bug, fixed since), so hypothesis H-DPO3 (export loss) is not tested, and the DPO model is not a live forecaster.",
+  "Test sets: 186 questions (October 2026) and 90 (1 to 15 November 2026); the six questions of a day are correlated, so intervals are day-block bootstrap intervals.",
+  "The `ml` champion covers 2280 of these questions (backtest rows)."
+ ],
+ "limits": [
+  "Electricity only; 276 test questions from about 45 days; intervals are wide.",
+  "One training run, one seed: a different seed could change the ranking of the two tuned models.",
+  "Colab ran transformers 5.22.2, not the pinned version.",
+  "The untuned arms use their own Platt map fitted on validation, so they are not raw model probabilities."
+ ],
+ "card": "docs/lab/dpo-r1.md"
+}

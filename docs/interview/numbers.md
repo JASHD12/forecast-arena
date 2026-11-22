@@ -228,6 +228,28 @@ Source: `evals/results/lab-conformal.json`; card `docs/lab/conformal.md`
 | min | 214 | 7 | 0.64 | 0.761 | 0.762 | 0.907 |
 | spread | 214 | 7 | 0.715 | 0.832 | 0.822 | 0.911 |
 
+### DPO preference tuning of Qwen2.5-1.5B on replayed power questions
+
+Source: `evals/results/lab-dpo-r1.json`; card `docs/lab/dpo-r1.md`
+
+| Arm | Questions | Brier | Log score | ECE |
+|---|---|---|---|---|
+| base_1_5b / test_all | 276 | 0.2486 | 0.6904 | 0.0585 |
+| base_1_5b / test_nov | 90 | 0.2477 | 0.6886 | 0.0491 |
+| base_1_5b / test_oct | 186 | 0.249 | 0.6912 | 0.0817 |
+| base_rate / test_all | 276 | 0.2182 | 0.6235 | 0.0591 |
+| base_rate / test_nov | 90 | 0.203 | 0.588 | 0.0564 |
+| base_rate / test_oct | 186 | 0.2255 | 0.6406 | 0.0851 |
+| dpo_1_5b / test_all | 276 | 0.2363 | 0.665 | 0.0971 |
+| dpo_1_5b / test_nov | 90 | 0.2321 | 0.6564 | 0.1075 |
+| dpo_1_5b / test_oct | 186 | 0.2383 | 0.6692 | 0.0832 |
+| ml / test_all | 276 | 0.1663 | 0.4944 | 0.0673 |
+| ml / test_nov | 90 | 0.1352 | 0.4376 | 0.1741 |
+| ml / test_oct | 186 | 0.1814 | 0.5219 | 0.1177 |
+| qlora_1_5b / test_all | 276 | 0.2378 | 0.6683 | 0.0687 |
+| qlora_1_5b / test_nov | 90 | 0.233 | 0.6586 | 0.1175 |
+| qlora_1_5b / test_oct | 186 | 0.24 | 0.6729 | 0.0902 |
+
 ### Guardrails and red-team suite for untrusted tool and news text
 
 Source: `evals/results/lab-guardrails.json`; card `docs/lab/guardrails.md`

@@ -1260,3 +1260,9 @@ and evidence requirements. Do not backfill historical ML forecasts.
 - Regulatory framing (assessment, not legal advice, docs/COMPLIANCE.md, H12): free forecasts, no trading, no recommendation, notice and credit on every page; the Impressum street address (H14) is still the owner's.
 - Cost: US$0; the secret is sent only to api.coingecko.com.
 
+## 2026-11-22 DPO result (T299): no gain over plain fine-tuning; no GGUF, not live
+- Context: the owner ran `dpo_qwen_forecast.ipynb` on a Colab T4 (release `lab-dpo-r1`, all four asset hashes checked against GitHub's digests, pre-registration hash matches the committed file).
+- Result (276 frozen test questions, 46 days, paired day-block intervals): DPO Brier 0.2363; QLoRA 0.2378 (difference -0.0015 [-0.0032, +0.0005]); untuned 0.2486 (-0.0123, excludes zero); base rate 0.2182 (+0.0181, excludes zero); `ml` 0.1663. H-DPO1 and H-DPO2 hold as expected; H-DPO3 is untested.
+- No GGUF: the notebook's optional export cell raised `NameError: gc` (my bug, fixed). Because the QLoRA export lost most of its gain, and DPO is no better than QLoRA, a DPO GGUF is not worth another Colab session now; DPO is not a live forecaster. If the owner wants one anyway it needs the export, a CPU calibration run and a new forecaster id.
+- Cost: US$0.
+

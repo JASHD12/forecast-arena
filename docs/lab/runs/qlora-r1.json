@@ -1,0 +1,64 @@
+{
+ "adapter_sha256": "8ae397866c7b11f5564d99ac10916438c044016e06a2ec88ad9efa9174ccfe93",
+ "base_model": "Qwen/Qwen2.5-1.5B-Instruct",
+ "base_revision": "989aa7980e4cf806f80c7fef2b1adb7bc71aa306",
+ "calibrations": [
+  {
+   "fitted_on": "validation margins of the Colab 4-bit model plus adapter (552 rows)",
+   "platt": [
+    2.605708652161696,
+    0.5474124423307355
+   ],
+   "source": "Colab run_summary.json",
+   "when": "2026-11-22"
+  },
+  {
+   "fitted_on": "validation margins of the GGUF itself (552 rows, CPU, 4 shards)",
+   "platt": [
+    0.5902640387475047,
+    0.17304395312180548
+   ],
+   "source": "lab-eval run 45011720244, arena lab ft-calibrate",
+   "when": "2026-11-22"
+  }
+ ],
+ "code_commit": "3f9aa00a5839613229918f58fe62d3739869a9d8",
+ "colab_finished_utc": "2026-11-22T00:22:32Z",
+ "dataset_sha256": {
+  "test_nov": "b45e6a5440f9a1857e01abd82c6a6520054f994bfa261c2b2e8a2fb3a75d5eae",
+  "test_oct": "f120884a109778ea0be0674f8649a50548f2668417fadd7a6ce61401ed03c4f8",
+  "train": "63d387c583ecdaaf61d1df1a9158e576ab0341f274638411e2fd857923266f7f",
+  "val": "ffb1d23a2240f4e0de6209775406062d79c6022ebf669eb20a7229aa0a880ee5"
+ },
+ "evaluation": "evals/results/lab-qlora-r1.json",
+ "gguf": {
+  "llama_cpp_commit": "cbb1c1c50bba81929387dea473873d1df87a6212",
+  "quantisation": "Q4_K_M",
+  "sha256": "aecc894877d19d4bacdabe3346fc2a3c36bf4f991909c3c939b88a6843521e0f",
+  "url": "https://github.com/JASHD12/forecast-arena/releases/download/lab-qlora-r1/qwen2.5-1.5b-qlora-q4_k_m.gguf"
+ },
+ "live_platt": [
+  0.5902640387475047,
+  0.17304395312180548
+ ],
+ "name": "qwen2.5-1.5b-qlora-r1",
+ "no_id": 8996,
+ "packages_colab": {
+  "accelerate": "1.15.0",
+  "bitsandbytes": "0.50.2",
+  "peft": "0.22.0",
+  "scikit-learn": "1.9.1",
+  "torch": "2.11.0+cpu",
+  "transformers": "4.57.6"
+ },
+ "prereg_sha256": "617830f741e9ec3e89440e33d62da8273e67a978e64d03ca8ca0330843fdf522",
+ "recipe": {
+  "gpu": "Tesla T4",
+  "method": "QLoRA (4-bit NF4, LoRA r16), one YES/NO token, loss on the answer only",
+  "seconds_training": 5922.8,
+  "train_loss_first": 1.5893,
+  "train_loss_last": 0.6918,
+  "train_rows": 2000
+ },
+ "yes_id": 14004
+}

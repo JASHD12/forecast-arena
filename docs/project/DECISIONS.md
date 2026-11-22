@@ -1246,3 +1246,10 @@ and evidence requirements. Do not backfill historical ML forecasts.
 - Alternatives: keep the Colab map (worse and not fitted to the deployed model); drop the forecaster (the owner decided otherwise); try Q8_0 or fp16 GGUF as a new artefact version (proposal: a Q8_0 export is a cheap next run, 1.6 GB, if the owner wants the gain back).
 - Cost: US$0 (Actions CPU).
 
+## 2026-11-22 Prompt optimisation design (T297) and lineage record (T248)
+- Context: the owner chose prompt optimisation (offline, free) in Phase 16. Every candidate costs CPU time on the open model (about 30 s per question), so a search over hundreds of prompts is out of reach.
+- Decision: a small, pre-registered search: 4 instruction variants x {0, 4} shots = 8 candidates, scored by the single-token margin of the free local GGUF on a 48-question validation subsample, selected by cross-fitted Brier (Platt fitted on one half, scored on the other), winner and baseline evaluated once on the frozen test sets. In-house code (no DSPy: its optimisers need many sampled generations and a hosted model). Shots come from the train split only and contain only the question and the answer, because full prompts are about 1,100 tokens each. Ties and anything not strictly better keep the live prompt; no live prompt changes because of the result (I8).
+- Lineage: one JSON record per fine-tuned artefact (`docs/lab/runs/qlora-r1.json`) with every hash, the Colab code commit and package versions and both Platt maps in order; a unit test fails when the pin file, the record and the evaluation result disagree.
+- Alternatives: DSPy bootstrapped demos (needs paid or slow generations); a larger search (CPU budget); full prompts as shots (context limit 4,096 tokens).
+- Cost: US$0 (Actions CPU).
+

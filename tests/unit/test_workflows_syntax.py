@@ -24,4 +24,4 @@ def test_every_workflow_is_valid_yaml_with_closed_expressions() -> None:
 def test_scheduled_workflows_default_to_the_live_domains() -> None:
     for name in ("morning", "evening", "resolve"):
         text = (WORKFLOWS[0].parent / f"{name}.yml").read_text(encoding="utf-8")
-        assert "vars.ARENA_DOMAINS || 'power,weather,attention,markets'" in text, name
+        assert "vars.ARENA_DOMAINS || 'power,weather,attention,markets,crypto'" in text, name

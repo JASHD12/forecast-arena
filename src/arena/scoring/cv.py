@@ -11,7 +11,7 @@ from __future__ import annotations
 from datetime import date
 
 from arena.ledger import Ledger
-from arena.scoring.boards import TOO_EARLY, board, official
+from arena.scoring.boards import TOO_EARLY, board, official, settling_rule
 from arena.scoring.core import counts, load
 from arena.site.build import official_start
 
@@ -32,7 +32,7 @@ def cv_lines(ledger: Ledger) -> list[str]:
         f"Questions: {c.questions}; resolved: {c.resolved}; voided: {sum(c.voided.values())};"
         f" forecasts: {c.forecasts}",
     ]
-    b = board(off, "common", "overall", off_days)
+    b = board(off, "common", "overall", off_days, settling_rule(rec.scored, start))
     lines.append(
         f"Headline (common set, official record): {b.questions} questions, "
         f"forecasters {', '.join(b.forecasters) or 'none'}"

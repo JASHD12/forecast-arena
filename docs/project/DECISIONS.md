@@ -1253,3 +1253,10 @@ and evidence requirements. Do not backfill historical ML forecasts.
 - Alternatives: DSPy bootstrapped demos (needs paid or slow generations); a larger search (CPU budget); full prompts as shots (context limit 4,096 tokens).
 - Cost: US$0 (Actions CPU).
 
+## 2026-11-22 Crypto goes live; new topics join the overall boards after 30 days
+- Context: the owner created a free CoinGecko Demo key, stored it as the secret `ARENA_COINGECKO_API_KEY` and asked for crypto to go live (CLAUDE.md approval 8 for this secret is not written yet; the request in chat is the authorisation for this one change, and the agent did not edit CLAUDE.md).
+- Decision: morning, evening and resolve pass the secret to the process (a test limits it to those three workflows); the default topics now include crypto. Usage is about 5 calls per run, 40 a day, against 10,000 credits a month.
+- Integrity: the official record starts on 2026-11-23, so crypto joins an already running headline. Conservative reading (AGENTS 3, I8): a topic first seen after the official start has its own board from day one and enters the overall boards after 30 days (`scoring.boards.settling_rule`, used by the site, the JSON API and the CLI summary); topics live before the start are unaffected. This protects the headline and changes no scoring formula.
+- Regulatory framing (assessment, not legal advice, docs/COMPLIANCE.md, H12): free forecasts, no trading, no recommendation, notice and credit on every page; the Impressum street address (H14) is still the owner's.
+- Cost: US$0; the secret is sent only to api.coingecko.com.
+

@@ -9,9 +9,9 @@ rehearsal days are excluded and counted.
 
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field
-from datetime import date
+from datetime import date, timedelta
 
 from arena.scoring.core import REFERENCE, Scored, log_score
 from arena.scoring.stats import Interval, day_block_bootstrap, paired_brier_difference
@@ -21,6 +21,29 @@ ALL_GROUP = ("base_rate", "persistence", "ml", "ensemble")
 MIN_DAYS = 30
 MIN_COMMON = 300
 TOO_EARLY = "too early to tell"
+SETTLING_DAYS = 30
+
+
+def settling_rule(all_scored: Sequence[Scored], start: date | None) -> Callable[[Scored], bool]:
+    """True for forecasts of a topic added after the official start, in its first 30 days.
+
+    Such a topic has its own board from day one, but stays out of the overall boards until it has
+    30 days of results, so adding a topic never changes the headline that was already running
+    (conservative reading of SPEC 10 and I8; DECISIONS 2026-11-22). Topics that were live before
+    the official start are never settling. `all_scored` is the whole scored record, rehearsal days
+    included, so the first day of a topic is found correctly."""
+    first: dict[str, date] = {}
+    for s in all_scored:
+        if s.domain not in first or s.batch_date < first[s.domain]:
+            first[s.domain] = s.batch_date
+
+    def settling(s: Scored) -> bool:
+        if start is None:
+            return False
+        f = first.get(s.domain)
+        return f is not None and f > start and s.batch_date < f + timedelta(days=SETTLING_DAYS)
+
+    return settling
 
 
 @dataclass(frozen=True)
@@ -89,14 +112,22 @@ def _rows(by: dict[str, dict[str, Scored]], qs: list[str]) -> list[BoardRow]:
 
 
 def board(
-    scored: Sequence[Scored], kind: str, domain: str = "overall", official_days: int | None = None
+    scored: Sequence[Scored],
+    kind: str,
+    domain: str = "overall",
+    official_days: int | None = None,
+    settling: Callable[[Scored], bool] | None = None,
 ) -> Board:
-    """Build one board from (already filtered) scored forecasts."""
+    """Build one board from (already filtered) scored forecasts.
+
+    `settling` (see `settling_rule`) removes new topics from the overall boards only."""
     group = COMMON_GROUP if kind == "common" else ALL_GROUP
     pool = [
         s
         for s in scored
-        if s.forecaster_id in group and (domain == "overall" or s.domain == domain)
+        if s.forecaster_id in group
+        and (domain == "overall" or s.domain == domain)
+        and not (domain == "overall" and settling is not None and settling(s))
     ]
     by: dict[str, dict[str, Scored]] = {}
     for s in pool:
@@ -129,11 +160,14 @@ def board(
 
 
 def all_boards(
-    scored: Sequence[Scored], domains: Sequence[str], official_days: int | None = None
+    scored: Sequence[Scored],
+    domains: Sequence[str],
+    official_days: int | None = None,
+    settling: Callable[[Scored], bool] | None = None,
 ) -> list[Board]:
     """Common and all-question boards, overall and per domain."""
     out = []
     for kind in ("common", "all"):
         for d in ("overall", *domains):
-            out.append(board(scored, kind, d, official_days))
+            out.append(board(scored, kind, d, official_days, settling))
     return out

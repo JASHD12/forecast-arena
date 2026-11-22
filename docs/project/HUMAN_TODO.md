@@ -87,7 +87,7 @@ Keep the first line of each item in exactly this shape; the status script parses
     listing outdated pins", and tick this item. Until then the report goes to the job
     summary of the `deps` workflow.
   - Needed for T084b.
-- [ ] H12 · Crypto: confirm CoinGecko terms, add the key, approve the workflow secret
+- [x] H12 · Crypto: confirm CoinGecko terms, add the key, approve the workflow secret  (2026-11-22: Demo key created and stored as the secret `ARENA_COINGECKO_API_KEY`; crypto switched on by default in the workflows at the owner's request. Still on you: read https://www.coingecko.com/en/api_terms once and keep the credit link; add standing approval 8 to CLAUDE.md for the record; if the repository variable `ARENA_DOMAINS` exists, edit it to end with `,crypto` or delete it so the new default applies.)
   - Read the CoinGecko API Terms of Service in your browser:
     https://www.coingecko.com/en/api_terms . Check that a free Demo key may be used to show
     daily prices and yes/no outcomes derived from them on a public, non-commercial research

@@ -49,7 +49,10 @@ TOPIC_INFO: dict[str, tuple[str, str, str, str]] = {
         "https://www.ecb.europa.eu",
     ),
     "crypto": (
-        "Daily cryptocurrency prices at 00:00 UTC.",
+        "Daily cryptocurrency prices at 00:00 UTC: will a coin close above its previous close, or move "
+        "more than a stated amount. A forecasting exercise only: nothing here is a recommendation "
+        "to buy or sell, and no trading is involved. A topic added after the official start has "
+        "its own board from day one and joins the overall boards after 30 days.",
         CG_ATTRIBUTION,
         "CoinGecko API terms, attribution required",
         "https://www.coingecko.com",

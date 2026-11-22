@@ -9,12 +9,12 @@
 **Can an LLM agent beat a classical ML model at forecasting tomorrow?** Forecast Arena is a
 live, public benchmark: every day, baselines, a gradient-boosted model and several LLM
 forecasters publish a probability for yes/no questions about tomorrow (electricity prices,
-weather, Wikipedia attention, exchange rates) **before the answer exists**, into an
+weather, Wikipedia attention, exchange rates, and from 23 November 2026 crypto prices) **before the answer exists**, into an
 append-only, hash-chained ledger. When the data arrives, every forecast is scored.
 
 | | |
 |---|---|
-| **Live since** | 13 November 2026, four topics (electricity, weather, Wikipedia attention, exchange rates), about 30 questions a day |
+| **Live since** | 13 November 2026, four topics (electricity, weather, Wikipedia attention, exchange rates), about 30 questions a day; a fifth, crypto prices (forecasting exercise only, no trading, data from CoinGecko), is added on 23 November 2026 and joins the overall boards after 30 days |
 | **Status** | rehearsal phase: results are shown but do not count towards headline scores; the official record starts after five clean days in a row, not before 23 November 2026 |
 | **Who forecasts** | base rate, persistence, a gradient-boosted ML model, Claude (plain, with data, with tools, as a LangGraph agent), an open 1.5B model on CPU, and an experimental QLoRA-tuned model |
 | **Honest so far** | the ML model beats the baselines in backtest; whether an LLM agent beats it live is too early to tell; the fine-tuned model is live as an experiment and, measured on 276 frozen test questions, has no edge over its untuned base (the 4-bit export lost the gain; the [evaluation card](docs/lab/qlora-r1.md) says why) |

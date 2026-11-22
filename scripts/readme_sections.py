@@ -134,7 +134,10 @@ def _lab_bullets() -> list[str]:
         f"questions beat its untuned self ({fmt('qlora_1_5b', 'base_1_5b')}) but not the base "
         f"rate ({fmt('qlora_1_5b', 'base_rate')}) and not the ML model "
         f"({fmt('qlora_1_5b', 'ml')}); pre-registered, time-split, negative result published "
-        "(paired Brier differences, 46 test days).",
+        "(paired Brier differences, 46 test days). The shipped 4-bit GGUF kept almost none of "
+        f"that gain (Brier {fmt('gguf_q4', 'base_1_5b')} against the untuned model, "
+        f"{fmt('gguf_q4', 'base_rate')} against the base rate): it runs live as an experiment "
+        "and the loss from quantisation is itself a finding.",
         f"- **Uncertainty and serving:** conformal price bands raise 80% coverage from "
         f"{100 * conf['raw80']:.1f}% to {100 * conf['conformal80']:.1f}% over {conf['months']} "
         "months; LightGBM models are exported to ONNX with parity tests and served behind a "

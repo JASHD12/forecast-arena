@@ -544,11 +544,17 @@ def lab_ft_eval(
         ("lora_0_5b", "base_rate"),
         ("lora_0_5b", "qlora_1_5b"),
         ("ml", "base_rate"),
+        ("gguf_q4", "qlora_1_5b"),
+        ("gguf_q4", "base_1_5b"),
+        ("gguf_q4", "base_rate"),
+        ("gguf_q4", "ml"),
     ]
     metrics, paired = fe.evaluate(fe.read_scores(list(scores)), rows, ml, pairs)
     notes = [
-        "Probabilities are the Colab scores (4-bit model plus adapter, Platt map fitted on the "
-        "validation split only); the live model is the Q4_K_M GGUF of the merged adapter.",
+        "Probabilities of the Colab arms are the Colab scores (4-bit model plus adapter, Platt "
+        "map fitted on the validation split only). The arm `gguf_q4` is the live model: the "
+        "Q4_K_M GGUF scored by llama.cpp on CPU, with its own Platt map fitted on the GGUF's "
+        "validation margins only.",
         f"Test sets: {sum(1 for r in rows.values() if r['split'] == 'test_oct')} questions "
         f"(October 2026) and {sum(1 for r in rows.values() if r['split'] == 'test_nov')} "
         "(1 to 15 November 2026); the six questions of a day are correlated, so intervals are "

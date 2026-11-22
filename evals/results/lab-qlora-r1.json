@@ -2,7 +2,7 @@
  "kind": "evaluation",
  "experiment": "qlora-r1",
  "title": "QLoRA fine-tune of Qwen2.5-1.5B on replayed power questions",
- "created_at": "2026-11-22T01:40:43Z",
+ "created_at": "2026-11-22T12:54:53Z",
  "why": "Parameter-efficient fine-tuning of a small open model is the standard way companies adapt an LLM to a narrow task; the comparison with a classical model is the point.",
  "prereg_sha256": "617830f741e9ec3e89440e33d62da8273e67a978e64d03ca8ca0330843fdf522",
  "dataset_sha256": {
@@ -41,6 +41,12 @@
    "log_score": 0.653,
    "ece": 0.0962
   },
+  "gguf_q4 / test_oct": {
+   "n": 186,
+   "brier": 0.2474,
+   "log_score": 0.6879,
+   "ece": 0.0787
+  },
   "base_rate / test_oct": {
    "n": 186,
    "brier": 0.2255,
@@ -77,6 +83,12 @@
    "log_score": 0.6439,
    "ece": 0.1017
   },
+  "gguf_q4 / test_nov": {
+   "n": 90,
+   "brier": 0.2473,
+   "log_score": 0.6877,
+   "ece": 0.0214
+  },
   "base_rate / test_nov": {
    "n": 90,
    "brier": 0.203,
@@ -112,6 +124,12 @@
    "brier": 0.2293,
    "log_score": 0.65,
    "ece": 0.0875
+  },
+  "gguf_q4 / test_all": {
+   "n": 276,
+   "brier": 0.2474,
+   "log_score": 0.6879,
+   "ece": 0.0568
   },
   "base_rate / test_all": {
    "n": 276,
@@ -198,6 +216,46 @@
    "days": 31
   },
   {
+   "a": "gguf_q4",
+   "b": "qlora_1_5b",
+   "split": "test_oct",
+   "diff": 0.007356337100183914,
+   "lo": 0.0008310953435097248,
+   "hi": 0.013657293629924794,
+   "n": 186,
+   "days": 31
+  },
+  {
+   "a": "gguf_q4",
+   "b": "base_1_5b",
+   "split": "test_oct",
+   "diff": -0.001651871977451544,
+   "lo": -0.004672139970942566,
+   "hi": 0.001821001409741811,
+   "n": 186,
+   "days": 31
+  },
+  {
+   "a": "gguf_q4",
+   "b": "base_rate",
+   "split": "test_oct",
+   "diff": 0.021876639061761276,
+   "lo": 0.006578643017203115,
+   "hi": 0.03592868000532891,
+   "n": 186,
+   "days": 31
+  },
+  {
+   "a": "gguf_q4",
+   "b": "ml",
+   "split": "test_oct",
+   "diff": 0.06598129307528239,
+   "lo": 0.020081587853285263,
+   "hi": 0.10773450814590138,
+   "n": 186,
+   "days": 31
+  },
+  {
    "a": "qlora_1_5b",
    "b": "base_1_5b",
    "split": "test_nov",
@@ -264,6 +322,46 @@
    "diff": -0.0678201898421626,
    "lo": -0.11616126605348515,
    "hi": -0.00221683811324369,
+   "n": 90,
+   "days": 15
+  },
+  {
+   "a": "gguf_q4",
+   "b": "qlora_1_5b",
+   "split": "test_nov",
+   "diff": 0.014262528840512339,
+   "lo": 0.00786282128007214,
+   "hi": 0.020901360080425122,
+   "n": 90,
+   "days": 15
+  },
+  {
+   "a": "gguf_q4",
+   "b": "base_1_5b",
+   "split": "test_nov",
+   "diff": -0.00044163879318933003,
+   "lo": -0.005445441540419596,
+   "hi": 0.005485728026446477,
+   "n": 90,
+   "days": 15
+  },
+  {
+   "a": "gguf_q4",
+   "b": "base_rate",
+   "split": "test_nov",
+   "diff": 0.04431334177980387,
+   "lo": 0.012746499649349003,
+   "hi": 0.07141161236488305,
+   "n": 90,
+   "days": 15
+  },
+  {
+   "a": "gguf_q4",
+   "b": "ml",
+   "split": "test_nov",
+   "diff": 0.1121335316219665,
+   "lo": 0.037420200434753595,
+   "hi": 0.16428060648285825,
    "n": 90,
    "days": 15
   },
@@ -336,14 +434,54 @@
    "hi": -0.01659979078276073,
    "n": 276,
    "days": 46
+  },
+  {
+   "a": "gguf_q4",
+   "b": "qlora_1_5b",
+   "split": "test_all",
+   "diff": 0.009608356145943185,
+   "lo": 0.0048301669699651675,
+   "hi": 0.014228083316290453,
+   "n": 276,
+   "days": 46
+  },
+  {
+   "a": "gguf_q4",
+   "b": "base_1_5b",
+   "split": "test_all",
+   "diff": -0.0012572307217138656,
+   "lo": -0.003927172558633467,
+   "hi": 0.0015032915030262905,
+   "n": 276,
+   "days": 46
+  },
+  {
+   "a": "gguf_q4",
+   "b": "base_rate",
+   "split": "test_all",
+   "diff": 0.029192955165470817,
+   "lo": 0.015984926862587404,
+   "hi": 0.0426967143346645,
+   "n": 276,
+   "days": 46
+  },
+  {
+   "a": "gguf_q4",
+   "b": "ml",
+   "split": "test_all",
+   "diff": 0.0810309360796359,
+   "lo": 0.043476858926056336,
+   "hi": 0.11630455625574977,
+   "n": 276,
+   "days": 46
   }
  ],
  "cost_usd": 0.0,
  "notes": [
-  "Probabilities are the Colab scores (4-bit model plus adapter, Platt map fitted on the validation split only); the live model is the Q4_K_M GGUF of the merged adapter.",
+  "Probabilities of the Colab arms are the Colab scores (4-bit model plus adapter, Platt map fitted on the validation split only). The arm `gguf_q4` is the live model: the Q4_K_M GGUF scored by llama.cpp on CPU, with its own Platt map fitted on the GGUF's validation margins only.",
   "Test sets: 186 questions (October 2026) and 90 (1 to 15 November 2026); the six questions of a day are correlated, so intervals are day-block bootstrap intervals.",
   "The `ml` champion covers 2280 of these questions (backtest rows).",
-  "GGUF parity on 31 test rows: mean absolute margin difference 0.0881, Brier 0.2131 (GGUF) against 0.2008 (Colab), loss +0.0123; 29.6 s per question on CPU."
+  "GGUF parity on 276 test rows: mean absolute margin difference 0.1423, Brier 0.2454 (GGUF) against 0.2378 (Colab), loss +0.0076; 33.0 s per question on CPU."
  ],
  "limits": [
   "Electricity only; 276 test questions from about 45 days; intervals are wide.",

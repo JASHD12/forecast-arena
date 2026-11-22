@@ -1238,3 +1238,11 @@ and evidence requirements. Do not backfill historical ML forecasts.
 ## 2026-11-22 No pollen topic; crypto assessed under EU and German rules
 - Owner decision (in chat): do not add the DWD pollen topic. T302 is closed without a new topic; the DWD terms stay recorded in SOURCES.
 - Owner question: can crypto forecasts be offered under EU and German rules? Assessment (agent, not legal advice): yes, with conditions, as written in HUMAN_TODO H12 and `docs/COMPLIANCE.md` (free general forecasts, no trading or recommendations, not-advice notice, CoinGecko credit, honest record, complete Impressum, no personal data). The domain stays off until the owner completes H12; switching it on is then a repository variable the owner sets.
+
+## 2026-11-22 GGUF calibration pinned (T246b): the live fine-tuned model has no measurable edge
+- Context: owner chose option (b) of H32 (calibrate on the GGUF) and to go live whatever the result. Four CPU shards of `lab-eval` scored all 828 validation and test rows with the pinned GGUF.
+- Decision: pin the Platt map fitted on the GGUF's own validation margins only (a=0.5903, b=0.1730; the test sets played no part in the choice). The old map came from the Colab 4-bit model and was wrong for the quantised model (test_nov Brier 0.2508 with it, 0.2473 with the new one). The forecaster version string changes (`platt-0.5903-0.1730`), so the record shows the change; history of other forecasters is untouched (I8: chosen on validation and replay, not on live results).
+- Result, reported as is: test Brier 0.2474 (276 questions) for the GGUF against 0.2378 for the Colab 4-bit adapter, 0.2486 untuned, 0.2182 base rate, 0.1663 `ml`; margin correlation GGUF vs Colab only 0.54. H-FT3 (loss < 0.005) is not met (+0.0076). The merge-and-quantise step lost most of the fine-tuning gain; the live forecaster is expected to be near a coin flip. It stays live as an experimental forecaster as decided, and the negative result is the finding (card `docs/lab/qlora-r1.md`).
+- Alternatives: keep the Colab map (worse and not fitted to the deployed model); drop the forecaster (the owner decided otherwise); try Q8_0 or fp16 GGUF as a new artefact version (proposal: a Q8_0 export is a cheap next run, 1.6 GB, if the owner wants the gain back).
+- Cost: US$0 (Actions CPU).
+

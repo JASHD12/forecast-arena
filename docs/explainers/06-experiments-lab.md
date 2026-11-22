@@ -121,3 +121,36 @@ backtest first, then freeze the version, then write forecasts before the lock li
     Run the 6,000-row training file for more than one epoch, add a preference-tuning step, distil from the paid model with the
     budget the owner approved, route questions between cheap and paid models by uncertainty, and put a held-out live period behind
     every claim.
+
+## Update of 2026-11-22: what the later experiments showed
+
+All numbers below are from the committed result files in `evals/results/` and the cards in `docs/lab/`; the shared test sets are the
+276 frozen power questions (46 days), Brier score, lower is better.
+
+- **Quantisation cost most of the fine-tuning gain.** The tuned 4-bit model scored 0.2378; the Q4_K_M GGUF that actually runs
+  live scores 0.2474, the same as the untuned model (0.2486). The pre-registered limit for the export loss (0.005) was missed
+  (+0.0076), and the GGUF's logit margins correlate only 0.54 with the Colab scores. Lesson: evaluate the artefact you deploy,
+  not the one you trained.
+- **DPO on top of QLoRA changed nothing measurable** (0.2363 against 0.2378, interval includes zero), but it beat the untuned
+  model like QLoRA did. Both tuned models remain worse than the base rate (0.2182) and far from the gradient-boosted model (0.1663).
+- **Prompt optimisation is a small, real gain that does not rescue the small model.** A pre-registered search over eight prompts,
+  chosen on 48 validation questions, beat the live prompt by about 0.008 Brier on the test sets (interval excludes zero) but still
+  lands at 0.2556. Solved examples made things worse.
+- **Claude is clearly better than the base rate on these questions** (0.1802, interval excludes zero) and not distinguishable from
+  the gradient-boosted model. The pre-registered cascade (cheap pair first) saved nothing because the open model is never confident;
+  a simpler `ml`-first cascade looks promising (about three quarters of paid calls avoided at a better Brier) but it was picked from
+  a grid after the fact, so it is a hypothesis for new days, not a result.
+- **Self-consistency (five samples averaged) did not help** (-0.002, interval includes zero) and cost 5.2 times as much.
+
+### More questions an interviewer may ask
+
+11. **Why is your deployed model worse than the one you evaluated in Colab?**
+    The export to 4-bit GGUF changed the numbers: the quantised merged model gives different logits. I measured it on all 276 test
+    questions, refitted the calibration on the GGUF's own validation margins, and published the loss instead of hiding it.
+12. **Why did you refuse to build the router after the study?**
+    I wrote the build condition (at least 30% of paid calls saved) before the paid answers existed; the pre-registered rule saved 0%.
+    The better-looking rule is a hypothesis from a post-hoc grid, so the honest next step is a new pre-registration, not a build.
+13. **When is an LLM judge trustworthy?**
+    Only as far as it agrees with a human on the same items. I froze 100 rationales, hid the forecaster name, and have 30 human labels
+    pending to report weighted kappa; my first run also showed the usual failure (answers cut off by an output cap), which I fixed
+    and recorded instead of dropping the run.

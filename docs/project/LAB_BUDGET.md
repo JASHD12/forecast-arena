@@ -7,3 +7,4 @@ sums the `cost_usd` of `evals/results/lab-*.json` and fails `make check` if the 
 |---|---|---|---|---|---|
 | lab-judge (first run; no result file: 63 of 100 answers failed the format, output cap 500 was too low, fixed to 1,000) | 2026-11-22 | 45070263620 | 197,531 | 0.04 | 0.04 |
 | lab-routing (Claude `llm_context` on 276 test questions) | 2026-11-22 | 45070266130 | 784,145 | 0.15 | 0.19 |
+| llm-eval with self-consistency k=5 (24 questions; plain, context, context x5) | 2026-11-22 | 45071241581 | 447,202 | 0.09 | 0.28 |

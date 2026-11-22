@@ -1284,3 +1284,7 @@ and evidence requirements. Do not backfill historical ML forecasts.
 - Findings worth keeping: Claude's probabilities are clearly better than the base rate on these questions (Brier 0.1802 vs 0.2182, interval excludes zero) and not distinguishable from `ml` (0.1663; difference +0.0139 [-0.0166, +0.0433]). Descriptively, answering with `ml` alone when it is decisive and escalating the rest (delta 0.15) avoids 76% of the paid calls at Brier 0.1565, better than either alone. That rule was picked from a grid after the fact, so it is a hypothesis: a new pre-registration with a frozen delta, tested on later days (the live shared sample or a new golden set), would be the next step. Proposal recorded; not started.
 - Cost: US$0.15 of the US$2.00 lab budget.
 
+## 2026-11-22 Self-consistency result (T298): no gain for five times the cost
+- Run (owner approval H36): five samples of the `llm_context` prompt averaged, on the 24 frozen test questions, US$0.0871 in total. Brier 0.1961 against 0.1937 for one call: difference -0.0024 [-0.0161, +0.0110], so no measurable gain, at 5.2 times the cost (US$0.067 vs US$0.013 for 24 questions). 2 of 120 samples stopped at the output limit.
+- Decision: self-consistency is not added to any live forecaster; the card stays in the eval table (small sample, wide interval). The variant and its tests stay in the code as a reproducible negative result.
+

@@ -218,6 +218,24 @@ def lab() -> str:
     return "\n".join(rows)
 
 
+def audit() -> str:
+    """The forecast-audit block: the headline sentence and the commands, from the report (I5)."""
+    from arena.site.forecast_audit import load_case
+
+    case = load_case()
+    if case is None:
+        return "_The forecast-audit example files are missing._"
+    return (
+        "**[forecast-audit](examples/forecast-audit/)**: a small offline tool (Python 3.12 "
+        "standard library only) that asks whether alerts sent from a model's probabilities "
+        "beat a baseline, including the days the model misses. Two CSV files in, a JSON and "
+        "an HTML report out.\n\n"
+        f"{case['headline_en']} This is a replay of frozen records, not a live result. "
+        "[Read the case](https://jashd12.github.io/forecast-arena/audit.html) or run it:\n\n"
+        "```bash\nmake forecast-audit-demo\n```"
+    )
+
+
 def stack() -> str:
     return "**Stack:** " + " · ".join(skill for skill, _, _, _ in PROOFS)
 
@@ -235,6 +253,7 @@ def render(readme: str) -> str:
         ("headline", headline()),
         ("highlights", highlights()),
         ("lab", lab()),
+        ("audit", audit()),
         ("stack", stack()),
         ("results", results()),
         ("skills", skills()),

@@ -83,6 +83,18 @@ Each technique is tried against the project's baselines on questions it never sa
 Live experimental forecasters: the QLoRA-tuned model (running since the first morning after 2026-11-22, with its fixed pre-registered expectations), an agent with hybrid retrieval and guards, and a cascade router (both still switched off until their launch checks). None of them enters the headline board. Details: [Lab page](https://jashd12.github.io/forecast-arena/lab.html), [explainer](docs/explainers/06-experiments-lab.md).
 <!-- lab:end -->
 
+## An open-source tool from this project
+
+<!-- audit:start -->
+**[forecast-audit](examples/forecast-audit/)**: a small offline tool (Python 3.12 standard library only) that asks whether alerts sent from a model's probabilities beat a baseline, including the days the model misses. Two CSV files in, a JSON and an HTML report out.
+
+In 46 historical German evening-price cases the base rate had the better Brier score (0.2337 against 0.2499), yet both models triggered an alert on exactly the same days at a 20% alert threshold; 17 of those alerts were false. Lower Brier is better. This is a replay of frozen records, not a live result. [Read the case](https://jashd12.github.io/forecast-arena/audit.html) or run it:
+
+```bash
+make forecast-audit-demo
+```
+<!-- audit:end -->
+
 <details>
 <summary><strong>Tech stack</strong></summary>
 

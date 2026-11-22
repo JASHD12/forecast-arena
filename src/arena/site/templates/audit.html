@@ -42,7 +42,7 @@
 
 <section class="card" aria-labelledby="a-try"><h2 id="a-try">Run it on your own predictions</h2>
 <p>Two CSV files and a standard-library Python 3.12 script; nothing is uploaded and no key or package is needed. It also counts the days your model had no on-time prediction, and shows what the fallback did to the loss.</p>
-<pre><code>python3 examples/forecast-audit/report.py --cases cases.csv --predictions predictions.csv \
+<pre tabindex="0"><code>python3 examples/forecast-audit/report.py --cases cases.csv --predictions predictions.csv \
   --candidate my_model --baseline reference --false-alert-cost 1 --miss-cost 4 --out report/</code></pre>
 <p>The files, the input rules and the outputs are described in the <a href="{{ repo_url }}/blob/main/examples/forecast-audit/SCHEMA.md">contract</a>; the tool is <a href="{{ repo_url }}/blob/main/examples/forecast-audit/forecast_audit.py">one file</a>; this case can be rebuilt with <a href="{{ repo_url }}/tree/main/examples/forecast-audit/german-electricity">its manifest and a SQL cross-check</a>.</p>
 </section>

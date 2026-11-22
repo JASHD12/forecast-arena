@@ -847,3 +847,4 @@ main summary { min-height: 1.5rem; }
   .audit-wide { display: none; }
   .audit-narrow { display: block; }
 }
+.card pre { max-width: 100%; overflow-x: auto; }

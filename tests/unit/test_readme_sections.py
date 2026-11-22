@@ -68,3 +68,17 @@ def test_readme_has_role_guide_and_generated_lab_table() -> None:
     block = text[text.index("<!-- lab:start -->") : text.index("<!-- lab:end -->")]
     assert "docs/lab/retrieval-hybrid.md" in block and "docs/lab/qlora-r1.md" in block
     assert "rehearsal phase since the first batch (2026-11-13)" in text
+
+
+def test_readme_first_screen_has_an_at_a_glance_table_and_current_facts() -> None:
+    """The hiring manager's first screen: status table, honest result, fresh screenshot."""
+    text = (ROOT / "README.md").read_text(encoding="utf-8")
+    top = text[: text.index("## What this shows")]
+    for must in ("**Live since**", "**Status**", "**Who forecasts**", "**Honest so far**"):
+        assert must in top, must
+    assert top.index("**Live since**") < top.index("<!-- headline:start -->")
+    assert "switch on next" not in text and "(live now)" not in text  # stale statements removed
+    assert "`llm_local_ft` (experimental)" in text and "agent_graph" in text
+    # the highlights carry the generated fine-tune and conformal figures
+    hl = text[text.index("<!-- highlights:start -->") : text.index("<!-- highlights:end -->")]
+    assert "LLM fine-tuning, measured honestly" in hl and "conformal price bands" in hl

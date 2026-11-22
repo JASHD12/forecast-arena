@@ -12,6 +12,13 @@ forecasters publish a probability for yes/no questions about tomorrow (electrici
 weather, Wikipedia attention, exchange rates) **before the answer exists**, into an
 append-only, hash-chained ledger. When the data arrives, every forecast is scored.
 
+| | |
+|---|---|
+| **Live since** | 13 November 2026, four topics (electricity, weather, Wikipedia attention, exchange rates), about 30 questions a day |
+| **Status** | rehearsal phase: results are shown but do not count towards headline scores; the official record starts after five clean days in a row, not before 23 November 2026 |
+| **Who forecasts** | base rate, persistence, a gradient-boosted ML model, Claude (plain, with data, with tools, as a LangGraph agent), an open 1.5B model on CPU, and an experimental QLoRA-tuned model |
+| **Honest so far** | the ML model beats the baselines in backtest; whether an LLM agent beats it live is too early to tell; the fine-tuned model is expected to lose (and the evaluation says why) |
+
 <!-- headline:start -->
 **Result so far (backtest, not the live record):** over 365 days of German day-ahead electricity, the gradient-boosted model scores Brier 0.1930 against 0.2205 for "same as last time" and 0.2466 for the base rate (lower is better; always saying 50% scores 0.25). Paired difference to persistence: -0.0275 [-0.0378, -0.0162], supported. Caveat: the 2190 questions come from only 365 independent days (about 6 correlated questions per day), so intervals resample whole days.
 
@@ -25,16 +32,18 @@ append-only, hash-chained ledger. When the data arrives, every forecast is score
 
 [![The home page](docs/img/home.png)](https://jashd12.github.io/forecast-arena/)
 
-*Screenshot of the site built from the public ledger on 2026-11-19. Research project, not advice.*
+*Screenshot of the site built from the public ledger on 2026-11-22. Research project, not advice.*
 
 ## What this shows
 
 <!-- highlights:start -->
 - **A classical model that clearly beats the base rate** (backtest, 365 days of German electricity): Brier 0.1930 vs 0.2466, paired difference -0.0536 [-0.0655, -0.0414]. Calibrated gradient-boosted quantile regression.
-- **Honest champion/challenger:** an Optuna-tuned LightGBM challenger improved Brier by -0.0045 [-0.0069, -0.0021] (supported); a PyTorch network (-0.0003 [-0.0087, +0.0081], interval includes zero) and three time-series models (Chronos-Bolt 0.2142, SARIMAX 0.2279, ETS 0.2441) did not beat the champion, and say so.
+- **Honest champion/challenger:** an Optuna-tuned LightGBM challenger improved Brier by -0.0045 [-0.0069, -0.0021] (supported); a PyTorch network (-0.0003 [-0.0087, +0.0081], interval includes zero), four time-series models (Chronos-2 0.2073, Chronos-Bolt 0.2142, SARIMAX 0.2279, ETS 0.2441) and a global LightGBM (+0.0149 [+0.0097, +0.0198], supported) did not beat the champion, and say so.
 - **LLM engineering with evals:** a frozen golden set caught a silent output-cap truncation; first-try valid JSON went from 17% to 100%. Tool-using agent, LangGraph agent, RAG over past questions, tracing, hard daily cost caps.
 - **Forecasts locked before the truth:** an append-only, hash-chained ledger on a git branch; `arena ledger verify --git` lets anyone check that no forecast was written after its question locked. Failures are recorded as skips, never filled in.
 - **Runs itself:** scheduled GitHub Actions jobs, CI-gated promotion to a stable branch, health checks with incident issues, Docker, Kubernetes (kind), dbt and Airflow validated in CI. Live record: "too early to tell" until the statistics can decide.
+- **LLM fine-tuning, measured honestly:** a QLoRA fine-tune of Qwen2.5-1.5B on replayed questions beat its untuned self (-0.0109 [-0.0154, -0.0062]) but not the base rate (+0.0196 [+0.0069, +0.0332]) and not the ML model (+0.0714 [+0.0354, +0.1061]); pre-registered, time-split, negative result published (paired Brier differences, 46 test days).
+- **Uncertainty and serving:** conformal price bands raise 80% coverage from 71.0% to 79.4% over 7 months; LightGBM models are exported to ONNX with parity tests and served behind a REST endpoint; a cited, offline docs assistant answers 60% of a hand-written question set and refuses 83% of the out-of-scope ones.
 <!-- highlights:end -->
 
 ## Where to look, by role
@@ -47,7 +56,7 @@ append-only, hash-chained ledger. When the data arrives, every forecast is score
 
 ## Experiments lab
 
-Each technique is tried against the project's baselines on questions it never saw, pre-registered, with negative results published.
+Each technique is tried against the project's baselines on questions it never saw, pre-registered, with negative results published. The fine-tune is the clearest example: it learned something (it beats its untuned self) and still loses to a simple baseline and to the gradient-boosted model; the card says so and shows the intervals.
 
 <!-- lab:start -->
 | Technique | Status | Card |
@@ -72,7 +81,7 @@ Live experimental forecasters: the QLoRA-tuned model (running since the first mo
 <summary><strong>Tech stack</strong></summary>
 
 <!-- stack:start -->
-**Stack:** Python, typing, testing · SQL, DuckDB, Parquet, Polars · dbt · scikit-learn, calibration · LightGBM, Optuna, SHAP · PyTorch · Time-series models · MLOps: MLflow, Evidently, champion/challenger · Statistics · LLM APIs, prompts, structured output · Agents and tool use · RAG, embeddings · LangGraph · Open-weight models (llama.cpp) · LLM evals, tracing, OpenTelemetry · MCP · REST and JSON APIs · Docker, Kubernetes, Airflow · CI/CD on GitHub Actions · Data integrity · Dashboards and frontend
+**Stack:** Python, typing, testing · SQL, DuckDB, Parquet, Polars · dbt · scikit-learn, calibration · LightGBM, Optuna, SHAP · PyTorch · Time-series models · MLOps: MLflow, Evidently, champion/challenger · Statistics · LLM APIs, prompts, structured output · Agents and tool use · RAG, embeddings · LangGraph · Open-weight models (llama.cpp) · LLM fine-tuning (QLoRA, PEFT, GGUF) · Hybrid retrieval and guardrails · ONNX export and serving · LLM evals, tracing, OpenTelemetry · MCP · REST and JSON APIs · Docker, Kubernetes, Airflow · CI/CD on GitHub Actions · Data integrity · Dashboards and frontend
 <!-- stack:end -->
 
 Airflow, kind and dbt are validated in CI; production runs on GitHub Actions.
@@ -137,6 +146,9 @@ All numbers below are **backtests**: past days replayed through the production c
 | RAG, embeddings | Local ONNX embeddings, similarity search over past questions with a no-leakage rule | `src/arena/agent/retrieval.py` |
 | LangGraph | The agent as a state machine (plan, retrieve, tools, critique) behind the same caps | `src/arena/agent/graph.py` |
 | Open-weight models (llama.cpp) | A 1.5B model on the CI runner's CPU, same contract as the API model, no API cost | `src/arena/llm/local.py` |
+| LLM fine-tuning (QLoRA, PEFT, GGUF) | QLoRA fine-tune of a 1.5B model on replayed questions with a leak-free time split, pre-registered hypotheses and a published negative result; merged and quantised for CPU serving | `src/arena/lab/finetune/train.py`<br>`src/arena/lab/ft_eval.py`<br>`src/arena/lab/ft_runtime.py` |
+| Hybrid retrieval and guardrails | BM25 + dense search fused with RRF and a cross-encoder rerank, a prompt-injection guard with a red-team suite, numeric grounding checks of model rationales | `src/arena/agent/retrieval.py`<br>`src/arena/llm/guards.py`<br>`src/arena/lab/grounding.py` |
+| ONNX export and serving | LightGBM quantile models exported to ONNX, parity-tested, served with ONNX Runtime behind a REST endpoint in the container | `src/arena/forecasters/onnx_power.py`<br>`src/arena/api/app.py` |
 | LLM evals, tracing, OpenTelemetry | Frozen golden set, prompt A/B, JSON validity and cost; one span per model call, exported as OTLP/JSON with the OpenTelemetry GenAI attribute names | `src/arena/evals`<br>`src/arena/llm/tracing.py`<br>`src/arena/llm/otlp.py` |
 | MCP | Read-only MCP server so AI assistants can query the benchmark | `src/arena/mcp_server.py` |
 | REST and JSON APIs | FastAPI service and a static JSON API with schemas generated from pydantic models | `src/arena/api/app.py`<br>`src/arena/site/api.py` |
@@ -222,14 +234,14 @@ flowchart LR
 Times are the intended ones; GitHub can start scheduled jobs late, so each job is scheduled
 many times and a gate lets the first run with work do it (`src/arena/ops/schedule.py`).
 
-1. **Evening (18:00 UTC, the day before).** Yes/no questions are generated from live
-   public data: German day-ahead electricity prices (live now); the weather at four DWD
-   stations, attention to Wikipedia articles and ECB exchange rates are built and
-   backtested and switch on next. Questions are public from then on, so people can
-   answer too.
-2. **Morning (05:30 UTC).** Every forecaster publishes a probability (and any
-   topic the evening missed gets its questions now). The batch is written to the ledger
-   and sealed **before the 09:30 UTC lock**.
+1. **Evening (from 16:00 UTC, the day before).** Yes/no questions are generated from live
+   public data: German day-ahead electricity prices, the weather at four DWD stations,
+   attention to Wikipedia articles and ECB exchange rates. Questions are public from then
+   on, so people can answer too.
+2. **Morning (before the 09:30 UTC lock).** Every forecaster publishes a probability (and
+   any topic the evening missed gets its questions now). The batch is written to the
+   ledger and sealed **before the lock**; a forecast written after it would be invalid
+   and is recorded as a miss instead.
 3. **Resolve (every 3 hours).** When the answers are published, questions are
    resolved with evidence, finished days are sealed into a hash chain, and the site is
    rebuilt.
@@ -242,8 +254,13 @@ many times and a gate lets the first run with work do it (`src/arena/ops/schedul
 | `base_rate`, `persistence` | past outcomes of the same question template |
 | `ml` | the as-of data; one model per domain (`docs/models/`) |
 | `llm_plain` / `llm_context` | the question (and, for context, the as-of data) |
-| `agent` | as `llm_context`, plus read-only tools, at most 4 calls |
+| `agent`, `agent_graph` | as `llm_context`, plus read-only tools (plain loop and LangGraph), call limits |
+| `llm_local` | the open Qwen2.5-1.5B model on the CI runner's CPU, same prompt as `llm_context` |
+| `llm_local_ft` (experimental) | the QLoRA-tuned model, one forward pass, calibrated probability; in no headline board |
 | `ensemble`, `human_panel` | later phases |
+
+The LLM forecasters answer a seeded daily sample, so the board compares forecasters only on
+the questions they all answered.
 
 Integrity rules: forecasts are written before the answer exists and never backdated; the
 ledger is append-only and hash-chained; forecasters only see data available at forecast
@@ -322,8 +339,8 @@ score on electricity questions?"
 ## Auf Deutsch
 
 Forecast Arena ist ein öffentlicher Forschungs-Benchmark. Jeden Abend entstehen aus
-öffentlichen Daten Ja/Nein-Fragen über die nächsten Tage (zunächst deutsche
-Day-Ahead-Strompreise). Am Morgen darauf geben Basisrate, ein Gradient-Boosting-Modell,
+öffentlichen Daten Ja/Nein-Fragen über die nächsten Tage (deutsche
+Day-Ahead-Strompreise, Wetter, Wikipedia-Aufmerksamkeit, Wechselkurse). Am Morgen darauf geben Basisrate, ein Gradient-Boosting-Modell,
 Sprachmodelle und zwei KI-Agenten ihre Wahrscheinlichkeit ab, **bevor** die Antwort feststeht; alles wird in
 ein öffentliches, nur erweiterbares und per Hash verkettetes Protokoll geschrieben und am
 nächsten Tag mit dem Brier-Score bewertet. Forschungsfrage: Wann schlägt ein KI-Agent ein

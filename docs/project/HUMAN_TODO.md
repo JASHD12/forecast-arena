@@ -103,6 +103,23 @@ Keep the first line of each item in exactly this shape; the status script parses
     repository secret `ARENA_COINGECKO_API_KEY` to api.coingecko.com to fetch crypto
     prices." (Approval 2 covers only the LLM key.)
   - Tick this item. Needed for T045e.
+  - **EU/German rules check (agent's assessment of 2026-11-22; not legal advice).** Publishing free probability forecasts of daily
+    crypto price moves, with no trading, no recommendation and no money involved, is not a regulated crypto-asset service under MiCA
+    (Regulation (EU) 2023/1114: issuance, custody, exchange, advice and similar services need authorisation; a general forecast is not
+    personalised advice) and not investment advice or a financial analysis under the WpHG, because crypto-assets are not financial
+    instruments and nothing says "buy" or "sell". The rules that do apply: (1) MiCA's ban on market manipulation and misleading
+    information, so never present a forecast as certain and state the track record honestly (the site already does); (2) no
+    recommendations, no price targets as advice, no links to exchanges, no affiliate links, no donations tied to crypto content;
+    (3) the "research project, not advice" notice on every page and the CoinGecko credit "Data provided by CoinGecko" with a link;
+    (4) a complete Impressum (H14: street address) and the privacy page, as for the rest of the site; (5) no personal data.
+    It changes if the project ever earns money from the crypto content, lets visitors stake anything, or gives individual
+    recommendations: then get advice from a lawyer (IT or financial regulation) first. A one-hour consultation before going live is
+    cheap insurance, but nothing here requires it.
+  - **How to switch it on, in order:** (1) do the steps above (terms, key, secret, CLAUDE.md approval 8, tick H12); (2) tell the agent;
+    (3) the agent adds the crypto notice and attribution checks, runs one dry run, and asks you to set the repository variable
+    `ARENA_DOMAINS` to `power,weather,attention,markets,crypto` (Settings > Secrets and variables > Actions > Variables; the agent
+    cannot change variables); (4) the first crypto questions appear in the next evening batch and start as rehearsal-only (outside
+    the headline until 30 days). To stop at any time, set the variable back without `crypto`.
 - [x] H13 · Optional: switch the AI forecasters to a frontier model
   - Declined by the owner on 2026-11-12: the project must stay (almost) free. The AI
     forecasters stay on `claude-haiku-5-5`, and the daily token cap in the workflows is
@@ -278,5 +295,5 @@ curl -X POST -H "Authorization: Bearer TOKEN" -H "Accept: application/vnd.github
 - [ ] H37 · Optional: check the Terraform formatting on your own machine (T292)
   - The agent wanted to download the Terraform CLI from releases.hashicorp.com and run `terraform fmt -check -recursive infra/aws` locally before pushing; the permission system refused that action, so the agent did not retry or look for another route. The same check runs in CI (job `terraform`), which is enough; nothing is blocked. If you want to see it locally: install Terraform 1.17 from the official site and run `terraform fmt -check -recursive -diff` in `infra/aws`.
 
-- [ ] H38 · Optional: allow four more data hosts so the agent can read their terms and record real responses (T302)
-  - Blocked by the cloud environment's network allowlist (not by the sources): `www.umweltbundesamt.de`, `luftqualitaet.api.bund.dev` (air quality), `autobahn.api.bund.dev` (roadworks and traffic), `ec.europa.eu` (Eurostat), `www.bundesbank.de`. To allow them: claude.ai > Settings > the environment "forecast-arena" > Network access > add the hosts (exact names), then tell the agent. Nothing is blocked meanwhile: the first new topic is the DWD pollen forecast, whose host is already allowed. Crypto stays off until H12.
+- [ ] H38 · Optional, only if you name a new topic: allow more data hosts so the agent can read their terms and record real responses (T302)
+  - Blocked by the cloud environment's network allowlist (not by the sources): `www.umweltbundesamt.de`, `luftqualitaet.api.bund.dev` (air quality), `autobahn.api.bund.dev` (roadworks and traffic), `ec.europa.eu` (Eurostat), `www.bundesbank.de`. To allow them: claude.ai > Settings > the environment "forecast-arena" > Network access > add the hosts (exact names), then tell the agent. Nothing is blocked meanwhile. The owner said no to a pollen topic (2026-11-22); this item matters only if you name another topic. Crypto stays off until H12.

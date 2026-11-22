@@ -1234,3 +1234,7 @@ and evidence requirements. Do not backfill historical ML forecasts.
 ## 2026-11-22 T298/T299: self-consistency as an evaluation variant; DPO reduces to a margin loss
 - T298: the Anthropic adapter does not send a temperature (current models reject it), so self-consistency relies on the provider's default sampling: five calls of the same prompt, mean probability, spread recorded. Evaluation variant only (`llm_context_sc5`, five times the tokens), never live; the paid run waits for the owner's OK (H36).
 - T299: for a one-token YES/NO answer the log-probability difference is exactly the logit margin, so DPO is `-log sigmoid(beta * s * (m - m_ref))` and needs only the untuned model's margins on the training rows (computed once). It reuses the QLoRA training loop, data and budget, so the comparison is clean. Pre-registered hypotheses expect the same negative result as QLoRA.
+
+## 2026-11-22 No pollen topic; crypto assessed under EU and German rules
+- Owner decision (in chat): do not add the DWD pollen topic. T302 is closed without a new topic; the DWD terms stay recorded in SOURCES.
+- Owner question: can crypto forecasts be offered under EU and German rules? Assessment (agent, not legal advice): yes, with conditions, as written in HUMAN_TODO H12 and `docs/COMPLIANCE.md` (free general forecasts, no trading or recommendations, not-advice notice, CoinGecko credit, honest record, complete Impressum, no personal data). The domain stays off until the owner completes H12; switching it on is then a repository variable the owner sets.

@@ -1,0 +1,60 @@
+name: lab-prompt-opt
+
+# T297: offline prompt optimisation for the free local model (pre-registration
+# lab/prereg/prompt-opt.md). CPU only, no API key, no ledger write, no deploy, cost US$0.
+# Two manual phases, four parallel shards each; every shard prints its margins as one
+# PO_<PHASE>_SHARD_<n>= line in its log, and the agent merges them locally:
+#   phase=search: 8 candidates x 48 validation questions; `arena lab prompt-search` names the winner;
+#   phase=final:  baseline and winner on the 276 frozen test questions (`winner` input).
+# Dispatch from main only, after this file and the pre-registration are on main.
+
+on:
+  workflow_dispatch:
+    inputs:
+      phase:
+        description: "search (validation subsample, all candidates) or final (test sets, baseline and winner)"
+        type: choice
+        options: [search, final]
+        default: search
+      winner:
+        description: "Candidate id from the search, for example i2s4 (final phase only)"
+        type: string
+        default: ""
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lab-prompt-opt
+  cancel-in-progress: false
+
+jobs:
+  score:
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements/*.txt
+      - name: Install pinned dependencies
+        run: make setup
+      - name: Install the local LLM runtime
+        env:
+          CMAKE_ARGS: "-DGGML_NATIVE=OFF"
+        run: .venv/bin/pip install -r requirements/local.txt
+      - name: Restore the cached open model (Qwen2.5-1.5B-Instruct GGUF, pinned revision)
+        uses: actions/cache@v6
+        with:
+          path: models_cache/po
+          key: models-po-${{ hashFiles('src/arena/llm/local.py') }}
+      - name: Score this shard
+        run: >-
+          .venv/bin/arena lab prompt-score --phase ${{ inputs.phase }} --shard ${{ matrix.shard }}
+          --of 4 ${{ inputs.phase == 'final' && format('--winner {0}', inputs.winner) || '' }}

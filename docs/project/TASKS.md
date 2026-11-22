@@ -754,7 +754,8 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
 - [x] T246b · Calibrate the GGUF on its own validation margins: dispatch `lab-eval.yml` from main after the merge of its PR, merge the four shard logs with `arena lab ft-calibrate`, pin the new Platt map in a small PR (deps: T246; owner chose option (b) of H32 on 2026-11-22)
   - Done 2026-11-22: `lab-eval` run 45011720244 (4 shards, ~1.0-2.0 h each); Platt refitted on the GGUF's 552 validation margins only: (0.5903, 0.1730), pinned in `lab/artefacts/llm_local_ft.json` (new version string). On 276 test questions the GGUF scores Brier 0.2474 (Colab 4-bit adapter 0.2378, untuned base 0.2486, base rate 0.2182, `ml` 0.1663): H-FT3 not met (loss +0.0076 vs 0.005), no measurable gain over the untuned model.
 - [ ] T247 · Distillation from Claude (deps: T246; needs: H27)
-- [ ] T248 · Adapter registry and lineage (deps: T246)
+- [x] T248 · Adapter registry and lineage (deps: T246)
+  - Done 2026-11-22: `src/arena/lab/lineage.py` + `arena lab lineage` write `docs/lab/runs/qlora-r1.json` (base revision, dataset and pre-registration hashes, Colab code commit and packages, adapter, GGUF and llama.cpp commit, both Platt maps in order); a unit test fails if the pin file, the lineage record and the evaluation result disagree.
 - [x] T249 · Shadow run of the fine-tuned model (deps: T246)
   - SUPERSEDED 2026-11-21 by Phase 15: the fine-tuned model runs live as `llm_local_ft` (T271); no shadow tree is built.
 - [ ] T250 · Cost routing and cascades (deps: T246; needs: H31)
@@ -850,7 +851,7 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
 - [x] T296 · TypeScript: site scripts compiled with `tsc --strict`, compiled output checked in CI (deps: T290)
   - Done 2026-11-22: `site_ts/app.ts` (typed port of the 290-line `app.js`, `strict`, `noUnusedLocals`, no `any`), `tools/site-ts` (TypeScript 7.0.2, Apache-2.0), `make site-ts`; CI `a11y` job type-checks, recompiles and fails if the committed `app.js` differs; the existing browser tests (`make a11y`: game, sorting, theme, search, countdown, fold) pass on the compiled output.
 - [ ] T297 · Prompt optimisation offline on validation with the free local model (deps: T290)
-  - Not started: every candidate needs about 20 minutes of CPU per 40 validation questions, so it needs a manual workflow like `lab-eval.yml`; planned for after this PR (the framework, then the run).
+  - Framework done 2026-11-22 (run pending): `lab/prereg/prompt-opt.md` (8 candidates, cross-fitted validation Brier, one test evaluation, hypotheses H-PO1/H-PO2), `src/arena/lab/prompt_opt.py`, `arena lab prompt-score|prompt-search|prompt-final`, manual workflow `lab-prompt-opt.yml` (phase search, then final with the winner; 4 CPU shards; US$0). After the merge: dispatch `search`, read the four `PO_SEARCH_SHARD_n=` log lines, run `arena lab prompt-search`, dispatch `final` with the winner, then `arena lab prompt-final` and `arena lab card`.
 - [ ] T298 · Self-consistency (k=5) variant and the LLM-as-judge (paid, one owner OK each; needs H36, H29) (deps: T290; needs: H36)
   - Code done 2026-11-22: `forecasters/selfconsistency.py` (`llm_context_sc5`: five calls of the same prompt, mean probability, spread recorded, at least 3 usable answers or a skip), evaluation variant in `arena eval run` and a `self_consistency` input of `llm-eval.yml`; tests with FakeLLM. The paid run (about 5x the tokens of `llm_context`, so a few cents on 24 questions) waits for H36; the judge waits for H29.
 - [x] T299 · DPO preference tuning notebook for the owner's Colab run (deps: T290; needs: H35 to run)

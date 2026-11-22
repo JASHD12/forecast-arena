@@ -17,7 +17,7 @@ append-only, hash-chained ledger. When the data arrives, every forecast is score
 | **Live since** | 13 November 2026, four topics (electricity, weather, Wikipedia attention, exchange rates), about 30 questions a day |
 | **Status** | rehearsal phase: results are shown but do not count towards headline scores; the official record starts after five clean days in a row, not before 23 November 2026 |
 | **Who forecasts** | base rate, persistence, a gradient-boosted ML model, Claude (plain, with data, with tools, as a LangGraph agent), an open 1.5B model on CPU, and an experimental QLoRA-tuned model |
-| **Honest so far** | the ML model beats the baselines in backtest; whether an LLM agent beats it live is too early to tell; the fine-tuned model is expected to lose (and the evaluation says why) |
+| **Honest so far** | the ML model beats the baselines in backtest; whether an LLM agent beats it live is too early to tell; the fine-tuned model is live as an experiment and, measured on 276 frozen test questions, has no edge over its untuned base (the 4-bit export lost the gain; the [evaluation card](docs/lab/qlora-r1.md) says why) |
 
 <!-- headline:start -->
 **Result so far (backtest, not the live record):** over 365 days of German day-ahead electricity, the gradient-boosted model scores Brier 0.1930 against 0.2205 for "same as last time" and 0.2466 for the base rate (lower is better; always saying 50% scores 0.25). Paired difference to persistence: -0.0275 [-0.0378, -0.0162], supported. Caveat: the 2190 questions come from only 365 independent days (about 6 correlated questions per day), so intervals resample whole days.
@@ -74,6 +74,7 @@ Each technique is tried against the project's baselines on questions it never sa
 | Unsupervised data-anomaly detection on price windows (Isolation Forest) | evaluated (not a live score) | [docs/lab/anomaly.md](docs/lab/anomaly.md) |
 | Vector database: Qdrant against brute-force dense search | evaluated (not a live score) | [docs/lab/vectordb.md](docs/lab/vectordb.md) |
 | Distillation from Claude | waiting for approval of paid runs (H27) | - |
+| Offline prompt optimisation for the free local model | pre-registered, framework and manual workflow built; the free CPU run follows | - |
 | Cost routing between cheap and paid forecasters | waiting for one paid evaluation run (H31) | - |
 | LLM-as-judge with human calibration | waiting for approval of the paid run | - |
 | Global LightGBM challenger, experimental conformal interval, ONNX serving | built and running as live challengers or checks; no separate evaluation card yet | - |

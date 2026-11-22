@@ -40,6 +40,10 @@ class LabResult(BaseModel):
 PLANNED: tuple[tuple[str, str], ...] = (
     ("Distillation from Claude", "waiting for approval of paid runs (H27)"),
     (
+        "Offline prompt optimisation for the free local model",
+        "pre-registered, framework and manual workflow built; the free CPU run follows",
+    ),
+    (
         "Cost routing between cheap and paid forecasters",
         "waiting for one paid evaluation run (H31)",
     ),

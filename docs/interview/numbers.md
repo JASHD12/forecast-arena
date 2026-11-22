@@ -228,6 +228,30 @@ Source: `evals/results/lab-conformal.json`; card `docs/lab/conformal.md`
 | min | 214 | 7 | 0.64 | 0.761 | 0.762 | 0.907 |
 | spread | 214 | 7 | 0.715 | 0.832 | 0.822 | 0.911 |
 
+### Cost routing: a cheap pair first, the paid model only when they are unsure
+
+Source: `evals/results/lab-routing.json`; card `docs/lab/routing.md`
+
+| Arm | Questions | Brier |
+|---|---|---|
+| base_rate | 276 | 0.2182 |
+| claude (llm_context) | 276 | 0.1802 |
+| curve / ml_only delta 0.05 | 276 | 0.1637 |
+| curve / ml_only delta 0.10 | 276 | 0.1594 |
+| curve / ml_only delta 0.15 | 276 | 0.1565 |
+| curve / ml_only delta 0.20 | 276 | 0.1606 |
+| curve / ml_only delta 0.25 | 276 | 0.1653 |
+| curve / ml_only delta 0.30 | 276 | 0.1675 |
+| curve / pair delta 0.05 | 276 | 0.1802 |
+| curve / pair delta 0.10 | 276 | 0.1802 |
+| curve / pair delta 0.15 | 276 | 0.1802 |
+| curve / pair delta 0.20 | 276 | 0.1802 |
+| curve / pair delta 0.25 | 276 | 0.1802 |
+| curve / pair delta 0.30 | 276 | 0.1802 |
+| ft (open fine-tuned model) | 276 | 0.2474 |
+| ml | 276 | 0.1663 |
+| router (primary: pair, delta 0.15, gamma 0.10) | 276 | 0.1802 |
+
 ### DPO preference tuning of Qwen2.5-1.5B on replayed power questions
 
 Source: `evals/results/lab-dpo-r1.json`; card `docs/lab/dpo-r1.md`

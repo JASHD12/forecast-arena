@@ -1278,3 +1278,9 @@ and evidence requirements. Do not backfill historical ML forecasts.
 - Result: winner `i3s0` beat the live prompt on 276 frozen test questions by -0.0076 [-0.0135, -0.0017] (Brier 0.2556 vs 0.2632). Both are worse than a coin flip's 0.25 and than the base rate 0.2182; the Platt maps were fitted on only 48 validation margins per prompt, which is noisy and is the main limit. Solved examples made things worse in every variant.
 - Decision: published as a small positive and an honest overall negative. The live `llm_local` prompt is unchanged; adopting `i3s0` needs an owner decision and a new version string (I8). Cost US$0.
 
+## 2026-11-22 Routing study result (T250): the pre-registered cascade saves nothing; a simpler one is a hypothesis
+- Context: owner-approved paid run (H31): Claude `llm_context` on the 276 frozen test questions, US$0.1457, all answered. Rule fixed before the answers existed (`lab/prereg/routing.md`).
+- Result: the primary `pair` rule (mean of `ml` and the open fine-tuned model when both are decisive and agree) escalates every question, because the GGUF model is never decisive. H-RT1 (at least 30% saved) is not met and H-RT2 (it escalates almost everything) holds. A live `llm_router` (T273) is therefore not built, as the pre-registration says.
+- Findings worth keeping: Claude's probabilities are clearly better than the base rate on these questions (Brier 0.1802 vs 0.2182, interval excludes zero) and not distinguishable from `ml` (0.1663; difference +0.0139 [-0.0166, +0.0433]). Descriptively, answering with `ml` alone when it is decisive and escalating the rest (delta 0.15) avoids 76% of the paid calls at Brier 0.1565, better than either alone. That rule was picked from a grid after the fact, so it is a hypothesis: a new pre-registration with a frozen delta, tested on later days (the live shared sample or a new golden set), would be the next step. Proposal recorded; not started.
+- Cost: US$0.15 of the US$2.00 lab budget.
+

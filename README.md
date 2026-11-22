@@ -65,6 +65,7 @@ Each technique is tried against the project's baselines on questions it never sa
 | Ask the project: cited answers over the project documents | evaluated (not a live score) | [docs/lab/docs-assistant.md](docs/lab/docs-assistant.md) |
 | Calibration methods compared: identity, Platt, isotonic, beta | evaluated (not a live score) | [docs/lab/calibration.md](docs/lab/calibration.md) |
 | Conformal price bands: coverage by month | evaluated (not a live score) | [docs/lab/conformal.md](docs/lab/conformal.md) |
+| Cost routing: a cheap pair first, the paid model only when they are unsure | evaluated (not a live score) | [docs/lab/routing.md](docs/lab/routing.md) |
 | DPO preference tuning of Qwen2.5-1.5B on replayed power questions | evaluated (not a live score) | [docs/lab/dpo-r1.md](docs/lab/dpo-r1.md) |
 | Guardrails and red-team suite for untrusted tool and news text | evaluated (not a live score) | [docs/lab/guardrails.md](docs/lab/guardrails.md) |
 | Numeric grounding of model rationales | evaluated (not a live score) | [docs/lab/grounding.md](docs/lab/grounding.md) |

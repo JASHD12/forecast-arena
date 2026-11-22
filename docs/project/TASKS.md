@@ -760,11 +760,12 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
   - Done 2026-11-22: `src/arena/lab/lineage.py` + `arena lab lineage` write `docs/lab/runs/qlora-r1.json` (base revision, dataset and pre-registration hashes, Colab code commit and packages, adapter, GGUF and llama.cpp commit, both Platt maps in order); a unit test fails if the pin file, the lineage record and the evaluation result disagree.
 - [x] T249 · Shadow run of the fine-tuned model (deps: T246)
   - SUPERSEDED 2026-11-21 by Phase 15: the fine-tuned model runs live as `llm_local_ft` (T271); no shadow tree is built.
-- [ ] T250 · Cost routing and cascades (deps: T246; needs: H31)
+- [x] T250 · Cost routing and cascades (deps: T246; needs: H31)
   - Code and pre-registration done 2026-11-22 (owner approval H31): `lab/prereg/routing.md` (primary rule fixed before the answers), `arena lab routing-score|routing`, `lab-routing.yml`, GGUF margins committed. Open: the paid run after the merge, then `arena lab routing`, card and result file.
   - Needs a paid-tier probability on every test item: Claude `llm_context` on the two frozen test sets (276 questions, about US$0.15 at the
     recorded cost per call) through the existing `llm-eval.yml`; the stored eval rows cover only 24 of the 186 October items, too few.
   - Done when: Pareto curve (paid calls saved vs Brier), delta chosen on validation, card generated.
+  - Run done 2026-11-22 (owner approval H31; run 45070266130, US$0.1457, 276/276 answered): primary rule (`pair`, delta 0.15, gamma 0.10) escalated 276 of 276 (the open fine-tuned model is never decisive), so it saves nothing and H-RT1 is not met; H-RT2 holds. Brier: Claude `llm_context` 0.1802, `ml` 0.1663, base rate 0.2182, open model 0.2474; Claude is clearly better than the base rate (-0.0379 [-0.059, -0.0158]) and not clearly worse than `ml` (+0.0139 [-0.0166, +0.0433]). Descriptive only (chosen after the fact): `ml_only` at delta 0.15 escalates 66 of 276 (avoids 76%) with Brier 0.1565, better than either arm alone; a proposal for a new pre-registered test on fresh days. Result `evals/results/lab-routing.json`, card `docs/lab/routing.md`.
 - [x] T251 · Hybrid retrieval: BM25, RRF, optional cross-encoder rerank, retrieval eval (deps: T242)
   - Done 2026-11-21: `PastQuestions.search_hybrid` (live agent unchanged), frozen set `evals/golden/retrieval-v1.jsonl` (2,004 documents, 186
     graded queries), result `evals/results/lab-retrieval-hybrid.json`: nDCG@5 dense 0.373, BM25 0.339, hybrid 0.346, hybrid+rerank 0.556;
@@ -815,7 +816,8 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
 - [x] T272 · Site and boards for the experimental forecasters (deps: T271)
   - Done 2026-11-21: names "(experimental)", colour slots 9 to 11, Methods information-set rows, health roster, Lab page section that lists
     the ones that have published; they are in no common group and not in the ensemble (tests).
-- [ ] T273 · `llm_router`: cascade forecaster over the other forecasts (deps: T271; needs: H31)
+- [x] T273 · `llm_router`: cascade forecaster over the other forecasts (deps: T271; needs: H31)
+  - Closed 2026-11-22 without building the forecaster: its pre-registered build condition (H-RT1, at least 30% paid calls saved) was not met (see T250). A new pre-registration for the `ml_only` rule on fresh days is a proposal in DECISIONS, not a task.
   - Code done 2026-11-21 (`forecasters/router.py`, registered only when `lab/artefacts/llm_router.json` exists, tests); the thresholds delta and gamma are
     chosen on the validation days from the QLoRA scores and the paid test-set run (H31), then frozen.
 - [x] T274 · `agent_hybrid`: the agent with hybrid retrieval and guards (deps: T270)

@@ -48,3 +48,19 @@ def test_calibration_requires_a_margin_for_every_row() -> None:
     rows = _rows()
     with pytest.raises(ValueError, match="no margin"):
         fg.calibrate({"val-0": 0.0}, rows, (0.1, 0.0))
+
+
+def test_scoring_modules_import_without_pytorch() -> None:
+    """The lab-eval shard jobs install no PyTorch: they must reach the scorer without it."""
+    import subprocess
+    import sys
+
+    code = (
+        "import sys; sys.modules['torch'] = None\n"
+        "from arena.lab import ft_gguf, dataset, artefacts, ft_runtime\n"
+        "assert ft_gguf.shard(list(range(5)), 1, 2) == [1, 3]\n"
+        "from arena.cli import lab_cmds\n"
+        "assert len(lab_cmds._ft_rows()) == 828\n"
+    )
+    res = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True)
+    assert res.returncode == 0, res.stderr[-500:]

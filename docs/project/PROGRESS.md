@@ -65,6 +65,7 @@ Nothing. See the session summary above and `python scripts/status.py`.
   output, not acted on (S11).
 
 ## Done log
+- 2026-11-22 T246b: first lab-eval run failed in 1 s (shard jobs have no PyTorch; ft_gguf imported the training module); torch import made lazy, test imports the scoring path with torch blocked. Re-dispatch after merge.
 - 2026-11-22 README for hiring managers: at-a-glance table, generated fine-tune/conformal/docs-assistant bullets, new skills rows, stale text fixed, screenshots refreshed from a fresh ledger.
 - 2026-11-22 T271: `llm_local_ft` switched on by default in morning.yml (owner decision); T246b will add a GGUF-calibrated map as a new version.
 - 2026-11-22 T246b prepared: `lab-eval.yml` (4 shards), `arena lab ft-score` and `ft-calibrate`; to dispatch from main after the merge.

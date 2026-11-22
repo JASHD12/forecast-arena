@@ -12,8 +12,6 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 from typing import Any
 
-from arena.lab.finetune import train as tr
-
 SPLITS = ("val", "test_oct", "test_nov")
 
 
@@ -43,6 +41,9 @@ def calibrate(
     """Refit Platt on validation margins only; Brier of the old and the new map per split.
 
     `rows` maps id to {split, outcome}. Every row of the three splits must have a margin."""
+    # imported here: the scoring runners have no PyTorch, only the calibration step needs it
+    from arena.lab.finetune import train as tr
+
     missing = [i for i, r in rows.items() if r["split"] in SPLITS and i not in margins]
     if missing:
         raise ValueError(f"{len(missing)} rows have no margin, e.g. {missing[0]}")

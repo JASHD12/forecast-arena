@@ -209,6 +209,25 @@ Paired Brier difference: llm_plain - llm_context: +0.1372 [+0.0315, +0.2427] on 
 <!-- lab:start -->
 ## Experiments lab (evaluations; not the live record)
 
+### Ask the Arena: tiered chat over the published record
+
+Source: `evals/results/lab-ask-arena.json`; card `docs/lab/ask-arena.md`
+
+| Arm | Questions | Hit % | False refusals % | No invented numbers % | Correct refusals % |
+|---|---|---|---|---|---|
+| all answers | 115 | - | - | 100 | - |
+| benign questions | - | - | 0 | - | - |
+| category: benign | 6 | 100 | - | - | - |
+| category: board | 5 | 100 | - | - | - |
+| category: decline | 10 | 100 | - | - | - |
+| category: lookup | 30 | 100 | - | - | - |
+| category: method | 12 | 83.3 | - | - | - |
+| category: personal | 3 | 100 | - | - | - |
+| category: refusal | 16 | 100 | - | - | - |
+| category: result | 30 | 100 | - | - | - |
+| category: status | 3 | 100 | - | - | - |
+| finance and personal refusals | - | - | - | - | 100 |
+
 ### Ask the project: cited answers over the project documents
 
 Source: `evals/results/lab-docs-assistant.json`; card `docs/lab/docs-assistant.md`
@@ -307,6 +326,18 @@ Source: `evals/results/lab-guardrails.json`; card `docs/lab/guardrails.md`
 | too_long | 1 | 1 | 100.0 | - |
 | tool_spoof | 3 | 3 | 100.0 | - |
 | url | 2 | 2 | 100.0 | - |
+
+### LLM-as-judge for stored rationales
+
+Source: `evals/results/lab-judge.json`; card `docs/lab/judge.md`
+
+| Arm | Questions |
+|---|---|
+| judge / agent | 20 |
+| judge / agent_graph | 20 |
+| judge / llm_context | 20 |
+| judge / llm_local | 20 |
+| judge / llm_plain | 20 |
 
 ### Numeric grounding of model rationales
 

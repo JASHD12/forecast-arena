@@ -32,7 +32,7 @@ from arena.llm.otlp import otlp_names, write_otlp
 from arena.models import Question
 from arena.ops.official import STREAK, update_official_start
 from arena.ops.weekly import summaries as weekly_summaries
-from arena.scoring.boards import MIN_DAYS, all_boards, official
+from arena.scoring.boards import MIN_DAYS, all_boards, official, settling_rule
 from arena.scoring.core import counts, excluded, load
 from arena.scoring.findings import findings, power_table
 from arena.site.api import ENDPOINTS, build_api
@@ -191,7 +191,7 @@ def build_site(
     rehearsal = [s for s in rec.scored if start is None or s.batch_date < start]
     off_days = len({s.batch_date for s in off})
     domains = sorted({q.domain for q in rec.questions.values()})
-    headline = all_boards(off, domains, off_days)
+    headline = all_boards(off, domains, off_days, settling_rule(rec.scored, start))
     rehearsal_boards = all_boards(rehearsal, domains)
     common = {
         "nav": NAV,

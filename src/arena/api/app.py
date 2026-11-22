@@ -20,7 +20,7 @@ from arena.api.metrics import ApiMetrics, install
 from arena.ledger import Ledger
 from arena.ledger.layout import OFFICIAL_START_PATH
 from arena.mcp_server import Benchmark, SqlRefused
-from arena.scoring.boards import board, official
+from arena.scoring.boards import board, official, settling_rule
 from arena.site.api import LeaderboardFile, LeaderboardRow, QuestionOut, _question
 from arena.site.build import question_href
 
@@ -119,7 +119,7 @@ def create_app(ledger: Ledger) -> FastAPI:
     def leaderboard(domain: str = "overall") -> LeaderboardFile:
         scored = official(rec.scored, start) if start else rec.scored
         days = len({s.batch_date for s in scored}) if start else None
-        bd = board(scored, "all", domain, days)
+        bd = board(scored, "all", domain, days, settling_rule(rec.scored, start))
         rows = [
             LeaderboardRow(
                 forecaster_id=r.forecaster_id,

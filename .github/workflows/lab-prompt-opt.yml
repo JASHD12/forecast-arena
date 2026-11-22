@@ -48,7 +48,7 @@ jobs:
       - name: Install the local LLM runtime
         env:
           CMAKE_ARGS: "-DGGML_NATIVE=OFF"
-        run: .venv/bin/pip install -r requirements/local.txt
+        run: .venv/bin/pip install -r requirements/local.txt huggingface-hub==1.33.0  # same pin as requirements/rag.txt
       - name: Restore the cached open model (Qwen2.5-1.5B-Instruct GGUF, pinned revision)
         uses: actions/cache@v6
         with:

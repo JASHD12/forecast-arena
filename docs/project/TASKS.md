@@ -186,7 +186,8 @@ Keep the first line of each task in exactly this shape; the status script parses
     revisions, `ml` rule, titles, site attribution; fixtures recorded from the real API.
   - Done when: unit tests cover parsing, generation, no leakage, ties, voids, revisions,
     the model, the missing-key skip and the attribution.
-- [!] T045e · Enable crypto (live) (deps: T045d, T046; needs: H12) BLOCKED(needs H12)
+- [!] T045e · Enable crypto (live) (deps: T045d, T046; needs: H12) WAIT(until=2026-11-23)
+  - Code and workflows done 2026-11-22 (owner set the secret `ARENA_COINGECKO_API_KEY` and asked for crypto to go live): morning, evening and resolve pass the key and default to `power,weather,attention,markets,crypto`; a unit test limits the secret to those three jobs. Waits for the first live evening or morning run after the merge to write crypto questions and for `verify` to pass.
   - Do: pass `ARENA_COINGECKO_API_KEY` to the morning and resolve workflows; add `crypto`
     to the live domains.
   - Done when: a real morning run writes crypto questions and verify passes, or
@@ -851,7 +852,7 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
 - [x] T296 · TypeScript: site scripts compiled with `tsc --strict`, compiled output checked in CI (deps: T290)
   - Done 2026-11-22: `site_ts/app.ts` (typed port of the 290-line `app.js`, `strict`, `noUnusedLocals`, no `any`), `tools/site-ts` (TypeScript 7.0.2, Apache-2.0), `make site-ts`; CI `a11y` job type-checks, recompiles and fails if the committed `app.js` differs; the existing browser tests (`make a11y`: game, sorting, theme, search, countdown, fold) pass on the compiled output.
 - [ ] T297 · Prompt optimisation offline on validation with the free local model (deps: T290)
-  - Framework done 2026-11-22 (run pending): `lab/prereg/prompt-opt.md` (8 candidates, cross-fitted validation Brier, one test evaluation, hypotheses H-PO1/H-PO2), `src/arena/lab/prompt_opt.py`, `arena lab prompt-score|prompt-search|prompt-final`, manual workflow `lab-prompt-opt.yml` (phase search, then final with the winner; 4 CPU shards; US$0). After the merge: dispatch `search`, read the four `PO_SEARCH_SHARD_n=` log lines, run `arena lab prompt-search`, dispatch `final` with the winner, then `arena lab prompt-final` and `arena lab card`.
+  - Framework done 2026-11-22 (run pending): `lab/prereg/prompt-opt.md` (8 candidates, cross-fitted validation Brier, one test evaluation, hypotheses H-PO1/H-PO2), `src/arena/lab/prompt_opt.py`, `arena lab prompt-score|prompt-search|prompt-final`, manual workflow `lab-prompt-opt.yml` (phase search, then final with the winner; 4 CPU shards; US$0). First dispatch 2026-11-22 failed at once (`huggingface_hub` missing in the shard venv); fixed in the workflow (pinned `huggingface-hub==1.33.0`, same pin as rag.txt) and the run must wait for that fix to be on main, because workflows are dispatched from main only. After that merge: dispatch `search`, read the four `PO_SEARCH_SHARD_n=` log lines, run `arena lab prompt-search`, dispatch `final` with the winner, then `arena lab prompt-final` and `arena lab card`.
 - [ ] T298 · Self-consistency (k=5) variant and the LLM-as-judge (paid, one owner OK each; needs H36, H29) (deps: T290; needs: H36)
   - Code done 2026-11-22: `forecasters/selfconsistency.py` (`llm_context_sc5`: five calls of the same prompt, mean probability, spread recorded, at least 3 usable answers or a skip), evaluation variant in `arena eval run` and a `self_consistency` input of `llm-eval.yml`; tests with FakeLLM. The paid run (about 5x the tokens of `llm_context`, so a few cents on 24 questions) waits for H36; the judge waits for H29.
 - [x] T299 · DPO preference tuning notebook for the owner's Colab run (deps: T290; needs: H35 to run)
@@ -864,5 +865,6 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
 - [!] T301b · Run `arena lab stacking` on the live record and publish the card (deps: T301) WAIT(until=2026-11-30)
 - [x] T302 · New topics: read terms and licences first (DWD pollen, UBA air quality, Autobahn API, Eurostat, Bundesbank), then add the domains that qualify as rehearsal-only (deps: T290)
   - Owner decision 2026-11-22: **no pollen topic**. DWD terms were read (CC BY 4.0, no registration) and are recorded in SOURCES; no other new topic is started. UBA, Autobahn, Eurostat and Bundesbank could not be read (hosts not on the network allowlist, H38) and are only considered if the owner names one.
-- [!] T303 · Crypto domain live: forecasts of price thresholds only, no trading, not-advice notice, CoinGecko attribution (deps: T045d) BLOCKED(needs H12)
+- [x] T303 · Crypto domain live: forecasts of price thresholds only, no trading, not-advice notice, CoinGecko attribution (deps: T045d)
+  - Done 2026-11-22: topic text states forecasting exercise, no recommendation, no trading; the footer on every page carries the "research project, not advice" notice and, when crypto questions exist, "Data provided by CoinGecko" (existing test); a topic added after the official start joins the overall boards only after 30 days (`settling_rule`, tests in `test_boards.py`).
 - [ ] T280 · Showcase and final sweep for the live lab (deps: T272, T274, T276a, T276b)

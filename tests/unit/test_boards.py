@@ -82,3 +82,32 @@ def test_skip_by_any_required_member_excludes_the_question(skipping: str) -> Non
     b = board(s, "common")
     assert b.missing_forecasters == []
     assert b.questions == 2 and all(r.n == 2 for r in b.rows)
+
+
+def test_new_topic_stays_out_of_overall_boards_for_30_days() -> None:
+    from arena.scoring.boards import SETTLING_DAYS, all_boards, settling_rule
+
+    old = make(60, 2, SKILLS, domain="power")
+    new = make(60, 2, SKILLS, domain="crypto", seed=1)
+    new = [s for s in new if s.batch_date >= START + timedelta(days=20)]  # crypto starts on day 20
+    scored = old + new
+    start = START + timedelta(days=10)  # official start; power was live before, crypto came later
+    rule = settling_rule(scored, start)
+    assert not any(rule(s) for s in old)  # live before the start: never settling
+    first = START + timedelta(days=20)
+    assert all(rule(s) == (s.batch_date < first + timedelta(days=SETTLING_DAYS)) for s in new)
+    off = official(scored, start)
+    boards = {(b.kind, b.domain): b for b in all_boards(off, ["power", "crypto"], 30, rule)}
+    crypto_all = boards[("all", "crypto")]
+    overall = boards[("all", "overall")]
+    assert crypto_all.questions == 2 * len([d for d in range(20, 60)])  # own board: every day
+    assert overall.questions == 2 * 50 + 2 * (60 - 20 - SETTLING_DAYS)  # power + crypto after 30 d
+    plain = {(b.kind, b.domain): b for b in all_boards(off, ["power", "crypto"], 30)}
+    assert plain[("all", "overall")].questions > overall.questions  # the rule removed something
+
+
+def test_no_official_start_means_nothing_is_settling() -> None:
+    from arena.scoring.boards import settling_rule
+
+    s = make(5, 1, SKILLS, domain="crypto")
+    assert not any(settling_rule(s, None)(x) for x in s)

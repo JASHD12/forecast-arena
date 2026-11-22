@@ -44,6 +44,27 @@ jobs:
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
 
+  forecast-audit:
+    # T320: the example runs on a bare Python 3.12 (no pip install, no network): the contract for a newcomer
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Four-case example against the documented table
+        run: python3 -I examples/forecast-audit/selfcheck.py
+      - name: German electricity case from its shipped files
+        run: >-
+          python3 -I examples/forecast-audit/report.py
+          --cases examples/forecast-audit/german-electricity/cases.csv
+          --predictions examples/forecast-audit/german-electricity/predictions.csv
+          --candidate fine_tuned_gguf --baseline base_rate --timing-label replayed
+          --false-alert-cost 1 --miss-cost 4 --out "$RUNNER_TEMP/electricity report"
+      - name: The report equals the committed expected report
+        run: diff "$RUNNER_TEMP/electricity report/report.json" examples/forecast-audit/german-electricity/expected/report.json
+
   ml-inference:
     # The morning environment must load every promotable artifact without training extras.
     runs-on: ubuntu-latest

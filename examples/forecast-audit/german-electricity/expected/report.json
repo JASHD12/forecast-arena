@@ -1,0 +1,255 @@
+{
+ "baseline": "base_rate",
+ "candidate": "fine_tuned_gguf",
+ "case_states": {
+  "pending": 0,
+  "resolved": 46,
+  "void": 0
+ },
+ "coverage": {
+  "base_rate": {
+   "absent": 0,
+   "late": 0,
+   "on_time": 46,
+   "scheduled": 46,
+   "skipped": 0
+  },
+  "fine_tuned_gguf": {
+   "absent": 0,
+   "late": 0,
+   "on_time": 46,
+   "scheduled": 46,
+   "skipped": 0
+  }
+ },
+ "decision": {
+  "cutoff": 0.2,
+  "false_alert_cost": 1.0,
+  "miss_cost": 4.0,
+  "policies": [
+   {
+    "alerts": 46,
+    "cases": 46,
+    "days": 46,
+    "fallback_used": 0,
+    "false_alerts": 17,
+    "loss_per_case": 0.3695652173913043,
+    "mean_daily_total_loss": 0.3695652173913043,
+    "misses": 0,
+    "policy": "fine_tuned_gguf",
+    "total_loss": 17.0
+   },
+   {
+    "alerts": 46,
+    "cases": 46,
+    "days": 46,
+    "fallback_used": 0,
+    "false_alerts": 17,
+    "loss_per_case": 0.3695652173913043,
+    "mean_daily_total_loss": 0.3695652173913043,
+    "misses": 0,
+    "policy": "base_rate",
+    "total_loss": 17.0
+   },
+   {
+    "alerts": 46,
+    "cases": 46,
+    "days": 46,
+    "fallback_used": 0,
+    "false_alerts": 17,
+    "loss_per_case": 0.3695652173913043,
+    "mean_daily_total_loss": 0.3695652173913043,
+    "misses": 0,
+    "policy": "always_alert",
+    "total_loss": 17.0
+   },
+   {
+    "alerts": 0,
+    "cases": 46,
+    "days": 46,
+    "fallback_used": 0,
+    "false_alerts": 0,
+    "loss_per_case": 2.5217391304347827,
+    "mean_daily_total_loss": 2.5217391304347827,
+    "misses": 29,
+    "policy": "never_alert",
+    "total_loss": 116.0
+   }
+  ]
+ },
+ "inputs": {
+  "cases.csv": "a21446de81ecdc896f77221372c8b5ed9f44844ab64bb245b987501ddc4a5313",
+  "predictions.csv": "398a8b68263e97a3277f8ea324c9b3bacce88cc26f5e08891c2fe1441e3f296c"
+ },
+ "intervals": {
+  "day_block": {
+   "block_days": 1,
+   "days": 46,
+   "estimated": true,
+   "high": 0.0,
+   "low": 0.0,
+   "mean_difference": 0.0,
+   "note": "negative favours the candidate; days are serially correlated, so blocks are resampled"
+  }
+ },
+ "models": [
+  "base_rate",
+  "fine_tuned_gguf"
+ ],
+ "quality": {
+  "models": {
+   "base_rate": {
+    "brier": 0.23372393213208695,
+    "brier_clipped": 0.23372393213208695
+   },
+   "fine_tuned_gguf": {
+    "brier": 0.24987085331419567,
+    "brier_clipped": 0.24987085331419567
+   }
+  },
+  "own_cases_not_comparable": {
+   "base_rate": {
+    "brier": 0.23372393213208695,
+    "cases": 46
+   },
+   "fine_tuned_gguf": {
+    "brier": 0.24987085331419567,
+    "cases": 46
+   }
+  },
+  "shared_cases": 46
+ },
+ "roster": "known",
+ "rule": {
+  "alert": "p >= false_alert_cost / (false_alert_cost + miss_cost); ties alert",
+  "brier_clip": [
+   0.01,
+   0.99
+  ],
+  "on_missing": "no-alert",
+  "on_time": "issued_at strictly before lock_at (equality is late)"
+ },
+ "schema_version": "1",
+ "sensitivity": [
+  {
+   "cutoff": 0.5,
+   "false_alert_cost": 1.0,
+   "miss_cost": 1.0,
+   "policies": [
+    {
+     "alerts": 32,
+     "cases": 46,
+     "days": 46,
+     "fallback_used": 0,
+     "false_alerts": 14,
+     "loss_per_case": 0.5434782608695652,
+     "mean_daily_total_loss": 0.5434782608695652,
+     "misses": 11,
+     "policy": "fine_tuned_gguf",
+     "total_loss": 25.0
+    },
+    {
+     "alerts": 46,
+     "cases": 46,
+     "days": 46,
+     "fallback_used": 0,
+     "false_alerts": 17,
+     "loss_per_case": 0.3695652173913043,
+     "mean_daily_total_loss": 0.3695652173913043,
+     "misses": 0,
+     "policy": "base_rate",
+     "total_loss": 17.0
+    },
+    {
+     "alerts": 46,
+     "cases": 46,
+     "days": 46,
+     "fallback_used": 0,
+     "false_alerts": 17,
+     "loss_per_case": 0.3695652173913043,
+     "mean_daily_total_loss": 0.3695652173913043,
+     "misses": 0,
+     "policy": "always_alert",
+     "total_loss": 17.0
+    },
+    {
+     "alerts": 0,
+     "cases": 46,
+     "days": 46,
+     "fallback_used": 0,
+     "false_alerts": 0,
+     "loss_per_case": 0.6304347826086957,
+     "mean_daily_total_loss": 0.6304347826086957,
+     "misses": 29,
+     "policy": "never_alert",
+     "total_loss": 29.0
+    }
+   ]
+  },
+  {
+   "cutoff": 0.1,
+   "false_alert_cost": 1.0,
+   "miss_cost": 9.0,
+   "policies": [
+    {
+     "alerts": 46,
+     "cases": 46,
+     "days": 46,
+     "fallback_used": 0,
+     "false_alerts": 17,
+     "loss_per_case": 0.3695652173913043,
+     "mean_daily_total_loss": 0.3695652173913043,
+     "misses": 0,
+     "policy": "fine_tuned_gguf",
+     "total_loss": 17.0
+    },
+    {
+     "alerts": 46,
+     "cases": 46,
+     "days": 46,
+     "fallback_used": 0,
+     "false_alerts": 17,
+     "loss_per_case": 0.3695652173913043,
+     "mean_daily_total_loss": 0.3695652173913043,
+     "misses": 0,
+     "policy": "base_rate",
+     "total_loss": 17.0
+    },
+    {
+     "alerts": 46,
+     "cases": 46,
+     "days": 46,
+     "fallback_used": 0,
+     "false_alerts": 17,
+     "loss_per_case": 0.3695652173913043,
+     "mean_daily_total_loss": 0.3695652173913043,
+     "misses": 0,
+     "policy": "always_alert",
+     "total_loss": 17.0
+    },
+    {
+     "alerts": 0,
+     "cases": 46,
+     "days": 46,
+     "fallback_used": 0,
+     "false_alerts": 0,
+     "loss_per_case": 5.673913043478261,
+     "mean_daily_total_loss": 5.673913043478261,
+     "misses": 29,
+     "policy": "never_alert",
+     "total_loss": 261.0
+    }
+   ]
+  }
+ ],
+ "time_scope": {
+  "cases": 46,
+  "days": 46,
+  "first_day": "2026-10-02",
+  "last_day": "2026-11-16"
+ },
+ "timing_label": "replayed",
+ "timing_note": "a historical replay: probabilities were computed after the fact from data available at the as-of time",
+ "tool_version": "0.1.0",
+ "units": "arbitrary loss units: an unnecessary alert costs false_alert_cost, a miss miss_cost, correct actions cost 0"
+}

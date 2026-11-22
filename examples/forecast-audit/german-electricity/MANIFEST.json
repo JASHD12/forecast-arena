@@ -1,0 +1,55 @@
+{
+ "cost_units": {
+  "false_alert": 1.0,
+  "miss": 4.0
+ },
+ "data_source": {
+  "attribution": "Bundesnetzagentur | SMARD.de",
+  "name": "SMARD day-ahead wholesale prices, DE/LU",
+  "terms_checked": "2026-11-22: CC BY 4.0 with this attribution; the page also states that the licensing of wholesale prices is under review (HEDWIG procedure), so only derived binary events and probabilities are shipped",
+  "terms_url": "https://www.smard.de/home/datennutzung"
+ },
+ "event": "mean of the three hourly day-ahead prices 17:00-20:00 Europe/Berlin on the target day is above that question's published price threshold",
+ "inputs_in_repository": [
+  {
+   "path": "evals/golden/power-2026-10.jsonl",
+   "sha256": "29939ca9268558fc6e153e3859fa57924536d00ed5530a83808d26a8bdcf8194"
+  },
+  {
+   "path": "evals/golden/power-2026-11a.jsonl",
+   "sha256": "fd31d14b6c5123b30e1c95c18063b28dd41718414af7826d1de02da48801ceac"
+  },
+  {
+   "path": "lab/artefacts/llm_local_ft.margins.json",
+   "sha256": "602c2cbb5f29760cf3b03a438a51e5d47067af908a0e15209549d510ab9ea816"
+  },
+  {
+   "path": "lab/artefacts/llm_local_ft.json",
+   "sha256": "91b597ea54d684ad4eaba7ddf918bc0addf6eb3001c61d0199b1aec235d872e7"
+  }
+ ],
+ "licences": {
+  "code": "MIT (repository LICENSE)",
+  "data": "see DATA_LICENSE.md"
+ },
+ "name": "forecast-audit German electricity example",
+ "schema_version": "1",
+ "scope": "46 DE_LU evening-price questions, batch days 2026-10-01 to 2026-11-15; 29 YES, 17 NO",
+ "shipped_files": {
+  "cases.csv": "a21446de81ecdc896f77221372c8b5ed9f44844ab64bb245b987501ddc4a5313",
+  "expected/cases-audited.csv": "07d4b4272447ce19c9e58c47e595367d7e44fc8c0f0472f51f5f70e77f83b867",
+  "expected/report.html": "ee263708bc89fe0e6e409303bb9d269e38ccdc84ac7bdf5900e94871265adb0e",
+  "expected/report.json": "2a8752ce4de15ef18dd3cad641ea02db8998b25b7aa1466a5c5523e1309e0b6d",
+  "predictions.csv": "398a8b68263e97a3277f8ea324c9b3bacce88cc26f5e08891c2fe1441e3f296c"
+ },
+ "source_revision": "4f370c93ebbb2e77b1f6460123fc838eb5747b56",
+ "timing_label": "replayed",
+ "transformations": [
+  "kept evening_gt / DE_LU questions only",
+  "group_day = target (delivery) day; lock_at = the question's lock time",
+  "base_rate = the leak-free base rate stored with the golden question",
+  "fine_tuned_gguf = Platt(stored GGUF margin), clipped to [0.01, 0.99]",
+  "issued_at = the question's as-of time (a replay stamp, not a live time)",
+  "no hourly prices are shipped; only binary outcomes and probabilities"
+ ]
+}

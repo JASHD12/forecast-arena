@@ -22,8 +22,8 @@ setup-offline:  ## Like setup, but reuse already-installed system packages (no n
 	$(VENV)/bin/pip install --no-deps --no-build-isolation --no-index -e .
 
 lint:
-	$(RUFF) check src tests scripts apps orchestration
-	$(RUFF) format --check src tests scripts apps orchestration
+	$(RUFF) check src tests scripts apps orchestration examples
+	$(RUFF) format --check src tests scripts apps orchestration examples
 	$(PY) -m mypy src/arena
 
 PYTEST_ARGS ?=
@@ -69,3 +69,11 @@ site-ts:  ## T296: compile site_ts/*.ts (tsc --strict) to src/arena/site/static/
 
 smoke-observability: ## T295: needs Docker; Prometheus scrapes the API, Jaeger receives OTLP traces (the CI job `observability` runs the same script)
 	scripts/smoke_observability.sh
+
+.PHONY: forecast-audit-demo forecast-audit-test
+forecast-audit-demo:  ## T321: the four-case example and the German electricity case (offline, standard library only)
+	python3 -I examples/forecast-audit/report.py --cases examples/forecast-audit/cases.csv --predictions examples/forecast-audit/predictions.csv --candidate demo --baseline reference --false-alert-cost 1 --miss-cost 4 --on-missing no-alert --out build/forecast-audit-four-cases
+	python3 -I examples/forecast-audit/report.py --cases examples/forecast-audit/german-electricity/cases.csv --predictions examples/forecast-audit/german-electricity/predictions.csv --candidate fine_tuned_gguf --baseline base_rate --timing-label replayed --false-alert-cost 1 --miss-cost 4 --out build/forecast-audit-electricity
+
+forecast-audit-test:  ## T323: only the forecast-audit tests (offline)
+	$(PY) -m pytest tests/unit/test_forecast_audit.py tests/unit/test_forecast_audit_electricity.py -q

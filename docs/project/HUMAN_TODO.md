@@ -277,3 +277,6 @@ curl -X POST -H "Authorization: Bearer TOKEN" -H "Accept: application/vnd.github
 
 - [ ] H37 · Optional: check the Terraform formatting on your own machine (T292)
   - The agent wanted to download the Terraform CLI from releases.hashicorp.com and run `terraform fmt -check -recursive infra/aws` locally before pushing; the permission system refused that action, so the agent did not retry or look for another route. The same check runs in CI (job `terraform`), which is enough; nothing is blocked. If you want to see it locally: install Terraform 1.17 from the official site and run `terraform fmt -check -recursive -diff` in `infra/aws`.
+
+- [ ] H38 · Optional: allow four more data hosts so the agent can read their terms and record real responses (T302)
+  - Blocked by the cloud environment's network allowlist (not by the sources): `www.umweltbundesamt.de`, `luftqualitaet.api.bund.dev` (air quality), `autobahn.api.bund.dev` (roadworks and traffic), `ec.europa.eu` (Eurostat), `www.bundesbank.de`. To allow them: claude.ai > Settings > the environment "forecast-arena" > Network access > add the hosts (exact names), then tell the agent. Nothing is blocked meanwhile: the first new topic is the DWD pollen forecast, whose host is already allowed. Crypto stays off until H12.

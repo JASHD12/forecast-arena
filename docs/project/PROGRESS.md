@@ -65,6 +65,7 @@ Nothing. See the session summary above and `python scripts/status.py`.
   output, not acted on (S11).
 
 ## Done log
+- 2026-11-22 T246b: GGUF calibrated on its own validation margins (lab-eval run 45011720244); new Platt (0.5903, 0.1730) pinned; evaluation arm `gguf_q4` added to `lab-qlora-r1` (Brier 0.2474 on 276 test questions: no measurable gain over the untuned model, H-FT3 not met); card and model card updated. PR #31 merged earlier the same day, CI and promote green.
 - 2026-11-22 Pollen declined by the owner; crypto assessed under EU/German rules with go-live steps in H12 and COMPLIANCE.md.
 - 2026-11-22 T300: Phase 16 showcase: skills rows, recruiter links, explainer 08.
 - 2026-11-22 T302: DWD terms read (CC BY 4.0, pollen forecast qualifies); four other sources unreadable until H38.

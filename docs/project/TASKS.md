@@ -747,8 +747,11 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
 - [x] T244 · QLoRA training code and the Colab notebook (deps: T243)
   - Done 2026-11-21: `arena.lab.finetune` (format, train, score, run) unit-tested on CPU with a tiny random Qwen2 model; notebook
     `notebooks/lab/qlora_qwen_forecast.ipynb` runs QLoRA 1.5B and the LoRA 0.5B ablation and scores val and both test sets on the GPU.
-- [ ] T245 · Owner runs the Colab notebook and uploads the release assets (deps: T244; needs: H26, H28)
-- [ ] T246 · Evaluate the fine-tuned model in `lab-eval.yml` (deps: T245, T242)
+- [x] T245 · Owner runs the Colab notebook and uploads the release assets (deps: T244; needs: H26, H28)
+  - Done 2026-11-22: release `lab-qlora-r1`; pin file `lab/artefacts/llm_local_ft.json` (GGUF SHA-256 verified against the release digest).
+- [x] T246 · Evaluate the fine-tuned model (deps: T245, T242)
+  - Done 2026-11-22 without a new workflow: the Colab score files already hold per-question probabilities of all four variants, so `arena lab ft-eval` pairs them with the base rate and the `ml` backtest on identical items (`evals/results/lab-qlora-r1.json`, card `docs/lab/qlora-r1.md`). GGUF parity on 31 rows missed the pre-registered limit (Brier +0.0123 against < 0.005); a full GGUF run and a GGUF-specific calibration are open (H32 options).
+- [ ] T246b · Calibrate the GGUF on its own validation margins: dispatch `lab-eval.yml` from main after the merge of its PR, merge the four shard logs with `arena lab ft-calibrate`, pin the new Platt map in a small PR (deps: T246; owner chose option (b) of H32 on 2026-11-22)
 - [ ] T247 · Distillation from Claude (deps: T246; needs: H27)
 - [ ] T248 · Adapter registry and lineage (deps: T246)
 - [x] T249 · Shadow run of the fine-tuned model (deps: T246)
@@ -799,9 +802,10 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
 
 - [x] T270 · Governance for going live: SPEC 17 amended, information-set rows, DECISIONS, H32 (deps: T264a)
   - Done 2026-11-21: owner decisions recorded (fine-tuned model live whatever its backtest result; token cap 300,000; all lab techniques live).
-- [ ] T271 · `llm_local_ft`: the fine-tuned model as a live forecaster (deps: T270; needs: H26, H28, H32)
+- [x] T271 · `llm_local_ft`: the fine-tuned model as a live forecaster (deps: T270; needs: H26, H28, H32)
   - Code done 2026-11-21 (forecaster, pin file loader with hash-verified download, llama.cpp scorer, flag `ARENA_LLM_LOCAL_FT` default off,
-    workflow cache step); goes live after the Colab artefacts, the parity check and H32.
+    workflow cache step). Live from the first morning run after the merge: the workflow default is `1` (owner decision 2026-11-22, H32). A
+    GGUF-calibrated map (T246b) will replace the Colab map as a new version.
 - [x] T272 · Site and boards for the experimental forecasters (deps: T271)
   - Done 2026-11-21: names "(experimental)", colour slots 9 to 11, Methods information-set rows, health roster, Lab page section that lists
     the ones that have published; they are in no common group and not in the ensemble (tests).

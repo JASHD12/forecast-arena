@@ -77,7 +77,12 @@ def highlights() -> str:
     d, ci, _ = _diff(power, "ml - base_rate")
     ld, lci, lok = _diff(lgbm, "ml_lgbm - ml")
     md, mci, mok = _diff(mlp, "ml_mlp - ml")
-    ts_rows = {fid: _brier(ts, fid) for fid in ("ts_chronos", "ts_sarimax", "ts_ets")}
+    ts_rows = {
+        fid: _brier(ts, fid) for fid in ("ts_chronos2", "ts_chronos", "ts_sarimax", "ts_ets")
+    }
+    glob = _card("power-global")
+    gd, gci, gok = _diff(glob, "ml_glgbm - ml")
+    lab = _lab_bullets()
     runs = [
         json.loads(f.read_text(encoding="utf-8"))
         for f in sorted((ROOT / "evals" / "results").glob("eval-*.json"))
@@ -91,9 +96,11 @@ def highlights() -> str:
         f"paired difference {d} {ci}. Calibrated gradient-boosted quantile regression.",
         f"- **Honest champion/challenger:** an Optuna-tuned LightGBM challenger improved Brier by "
         f"{ld} {lci} ({'supported' if lok else 'not supported'}); a PyTorch network "
-        f"({md} {mci}, {'supported' if mok else 'interval includes zero'}) and three "
-        f"time-series models (Chronos-Bolt {ts_rows['ts_chronos']}, SARIMAX "
-        f"{ts_rows['ts_sarimax']}, ETS {ts_rows['ts_ets']}) did not beat the champion, and say so.",
+        f"({md} {mci}, {'supported' if mok else 'interval includes zero'}), four "
+        f"time-series models (Chronos-2 {ts_rows['ts_chronos2']}, Chronos-Bolt "
+        f"{ts_rows['ts_chronos']}, SARIMAX {ts_rows['ts_sarimax']}, ETS {ts_rows['ts_ets']}) and a "
+        f"global LightGBM ({gd} {gci}, {'supported' if gok else 'interval includes zero'}) "
+        "did not beat the champion, and say so.",
         f"- **LLM engineering with evals:** a frozen golden set caught a silent output-cap "
         f"truncation; first-try valid JSON went from {pct(first)} to {pct(last)}. Tool-using "
         "agent, LangGraph agent, RAG over past questions, tracing, hard daily cost caps.",
@@ -104,8 +111,37 @@ def highlights() -> str:
         "branch, health checks with incident issues, Docker, Kubernetes (kind), dbt and "
         'Airflow validated in CI. Live record: "too early to tell" until the statistics '
         "can decide.",
+        *lab,
     ]
     return "\n".join(lines)
+
+
+def _lab_bullets() -> list[str]:
+    """Bullets about the experiments lab, every figure read from the committed result files."""
+    res = ROOT / "evals" / "results"
+    ft = json.loads((res / "lab-qlora-r1.json").read_text(encoding="utf-8"))
+    pair = {(p["a"], p["b"]): p for p in ft["paired"] if p["split"] == "test_all"}
+
+    def fmt(a: str, b: str) -> str:
+        p = pair[(a, b)]
+        return f"{p['diff']:+.4f} [{p['lo']:+.4f}, {p['hi']:+.4f}]"
+
+    conf = json.loads((res / "lab-conformal.json").read_text(encoding="utf-8"))["metrics"]["mean"]
+    docs = json.loads((res / "lab-docs-assistant.json").read_text(encoding="utf-8"))
+    dm = docs["metrics"]["docs_assistant"]
+    return [
+        "- **LLM fine-tuning, measured honestly:** a QLoRA fine-tune of Qwen2.5-1.5B on replayed "
+        f"questions beat its untuned self ({fmt('qlora_1_5b', 'base_1_5b')}) but not the base "
+        f"rate ({fmt('qlora_1_5b', 'base_rate')}) and not the ML model "
+        f"({fmt('qlora_1_5b', 'ml')}); pre-registered, time-split, negative result published "
+        "(paired Brier differences, 46 test days).",
+        f"- **Uncertainty and serving:** conformal price bands raise 80% coverage from "
+        f"{100 * conf['raw80']:.1f}% to {100 * conf['conformal80']:.1f}% over {conf['months']} "
+        "months; LightGBM models are exported to ONNX with parity tests and served behind a "
+        "REST endpoint; a cited, offline docs assistant answers "
+        f"{dm['hit_pct']:.0f}% of a hand-written question set and refuses "
+        f"{dm['correct_refusal_pct']:.0f}% of the out-of-scope ones.",
+    ]
 
 
 def headline() -> str:
@@ -145,9 +181,11 @@ def lab() -> str:
         rows.append(f"| {title} | {state} | - |")
     rows.append("")
     rows.append(
-        "Live experimental forecasters (flagged off until their pre-registered checks): the "
-        "QLoRA-tuned model, an agent with hybrid retrieval and guards, and a cascade router. "
-        "They never enter the headline board. Details: [Lab page](https://jashd12.github.io/"
+        "Live experimental forecasters: the QLoRA-tuned model (running since the first morning "
+        "after 2026-11-22, with its fixed pre-registered expectations), an agent with hybrid "
+        "retrieval and guards, and a cascade router (both still switched off until their launch "
+        "checks). None of them enters the headline board. Details: "
+        "[Lab page](https://jashd12.github.io/"
         "forecast-arena/lab.html), [explainer](docs/explainers/06-experiments-lab.md)."
     )
     return "\n".join(rows)

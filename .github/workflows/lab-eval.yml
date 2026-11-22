@@ -1,0 +1,47 @@
+name: lab-eval
+
+# T246b: score the validation and test questions with the pinned fine-tuned GGUF itself and
+# refit the Platt map on the validation margins only (lab rule L3). CPU only, no API key, no
+# ledger write, no deploy. Four parallel shards (each about 200 questions at about 30 s on a
+# 4-core runner); each prints its margins as one FT_MARGINS_SHARD_<n>= line in its log. The agent
+# reads the four lines and runs `arena lab ft-calibrate` locally (no artifact action needed).
+# Dispatch from main only, after the pin file lab/artefacts/llm_local_ft.json is on main.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lab-eval
+  cancel-in-progress: false
+
+jobs:
+  score:
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements/*.txt
+      - name: Install pinned dependencies
+        run: make setup
+      - name: Install the local LLM runtime
+        env:
+          CMAKE_ARGS: "-DGGML_NATIVE=OFF"
+        run: .venv/bin/pip install -r requirements/local.txt
+      - name: Restore the cached fine-tuned model (keyed by the pin file)
+        uses: actions/cache@v6
+        with:
+          path: models_cache/ft
+          key: models-ft-${{ hashFiles('lab/artefacts/llm_local_ft.json') }}
+      - name: Score this shard (downloads the GGUF and checks its SHA-256)
+        run: .venv/bin/arena lab ft-score --shard ${{ matrix.shard }} --of 4 --out margins-${{ matrix.shard }}.json

@@ -105,6 +105,32 @@ PROOFS: tuple[tuple[str, str, str, tuple[str, ...]], ...] = (
         ("src/arena/llm/local.py",),
     ),
     (
+        "LLM fine-tuning (QLoRA, PEFT, GGUF)",
+        "QLoRA fine-tune of a 1.5B model on replayed questions with a leak-free time split, "
+        "pre-registered hypotheses and a published negative result; merged and quantised for "
+        "CPU serving",
+        "lab.html",
+        (
+            "src/arena/lab/finetune/train.py",
+            "src/arena/lab/ft_eval.py",
+            "src/arena/lab/ft_runtime.py",
+        ),
+    ),
+    (
+        "Hybrid retrieval and guardrails",
+        "BM25 + dense search fused with RRF and a cross-encoder rerank, a prompt-injection guard "
+        "with a red-team suite, numeric grounding checks of model rationales",
+        "lab.html",
+        ("src/arena/agent/retrieval.py", "src/arena/llm/guards.py", "src/arena/lab/grounding.py"),
+    ),
+    (
+        "ONNX export and serving",
+        "LightGBM quantile models exported to ONNX, parity-tested, served with ONNX Runtime "
+        "behind a REST endpoint in the container",
+        "",
+        ("src/arena/forecasters/onnx_power.py", "src/arena/api/app.py"),
+    ),
+    (
         "LLM evals, tracing, OpenTelemetry",
         "Frozen golden set, prompt A/B, JSON validity and cost; one span per model call, "
         "exported as OTLP/JSON with the OpenTelemetry GenAI attribute names",

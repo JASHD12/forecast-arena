@@ -262,6 +262,31 @@ Source: `evals/results/lab-grounding.json`; card `docs/lab/grounding.md`
 | llm_local | 78 | 337 | 20.5 | 52.6 |
 | llm_plain | 84 | 301 | 40.5 | 52.4 |
 
+### QLoRA fine-tune of Qwen2.5-1.5B on replayed power questions
+
+Source: `evals/results/lab-qlora-r1.json`; card `docs/lab/qlora-r1.md`
+
+| Arm | Questions | Brier | Log score | ECE |
+|---|---|---|---|---|
+| base_0_5b / test_all | 276 | 0.2511 | 0.6954 | 0.143 |
+| base_0_5b / test_nov | 90 | 0.2513 | 0.6958 | 0.1719 |
+| base_0_5b / test_oct | 186 | 0.251 | 0.6952 | 0.1291 |
+| base_1_5b / test_all | 276 | 0.2486 | 0.6904 | 0.0585 |
+| base_1_5b / test_nov | 90 | 0.2477 | 0.6886 | 0.0491 |
+| base_1_5b / test_oct | 186 | 0.249 | 0.6912 | 0.0817 |
+| base_rate / test_all | 276 | 0.2182 | 0.6235 | 0.0591 |
+| base_rate / test_nov | 90 | 0.203 | 0.588 | 0.0564 |
+| base_rate / test_oct | 186 | 0.2255 | 0.6406 | 0.0851 |
+| lora_0_5b / test_all | 276 | 0.2293 | 0.65 | 0.0875 |
+| lora_0_5b / test_nov | 90 | 0.2262 | 0.6439 | 0.1017 |
+| lora_0_5b / test_oct | 186 | 0.2308 | 0.653 | 0.0962 |
+| ml / test_all | 276 | 0.1663 | 0.4944 | 0.0673 |
+| ml / test_nov | 90 | 0.1352 | 0.4376 | 0.1741 |
+| ml / test_oct | 186 | 0.1814 | 0.5219 | 0.1177 |
+| qlora_1_5b / test_all | 276 | 0.2378 | 0.6683 | 0.0687 |
+| qlora_1_5b / test_nov | 90 | 0.233 | 0.6586 | 0.1175 |
+| qlora_1_5b / test_oct | 186 | 0.24 | 0.6729 | 0.0902 |
+
 ### Retrieval: dense vs BM25 vs hybrid with reranking
 
 Source: `evals/results/lab-retrieval-hybrid.json`; card `docs/lab/retrieval-hybrid.md`

@@ -1,0 +1,355 @@
+{
+ "kind": "evaluation",
+ "experiment": "qlora-r1",
+ "title": "QLoRA fine-tune of Qwen2.5-1.5B on replayed power questions",
+ "created_at": "2026-11-22T01:40:43Z",
+ "why": "Parameter-efficient fine-tuning of a small open model is the standard way companies adapt an LLM to a narrow task; the comparison with a classical model is the point.",
+ "prereg_sha256": "617830f741e9ec3e89440e33d62da8273e67a978e64d03ca8ca0330843fdf522",
+ "dataset_sha256": {
+  "test_nov": "b45e6a5440f9a1857e01abd82c6a6520054f994bfa261c2b2e8a2fb3a75d5eae",
+  "test_oct": "f120884a109778ea0be0674f8649a50548f2668417fadd7a6ce61401ed03c4f8",
+  "train": "63d387c583ecdaaf61d1df1a9158e576ab0341f274638411e2fd857923266f7f",
+  "val": "ffb1d23a2240f4e0de6209775406062d79c6022ebf669eb20a7229aa0a880ee5"
+ },
+ "artefacts": {
+  "gguf": "aecc894877d19d4bacdabe3346fc2a3c36bf4f991909c3c939b88a6843521e0f",
+  "adapter": "8ae397866c7b11f5564d99ac10916438c044016e06a2ec88ad9efa9174ccfe93",
+  "release": "https://github.com/JASHD12/forecast-arena/releases/download/lab-qlora-r1/qwen2.5-1.5b-qlora-q4_k_m.gguf"
+ },
+ "metrics": {
+  "base_1_5b / test_oct": {
+   "n": 186,
+   "brier": 0.249,
+   "log_score": 0.6912,
+   "ece": 0.0817
+  },
+  "qlora_1_5b / test_oct": {
+   "n": 186,
+   "brier": 0.24,
+   "log_score": 0.6729,
+   "ece": 0.0902
+  },
+  "base_0_5b / test_oct": {
+   "n": 186,
+   "brier": 0.251,
+   "log_score": 0.6952,
+   "ece": 0.1291
+  },
+  "lora_0_5b / test_oct": {
+   "n": 186,
+   "brier": 0.2308,
+   "log_score": 0.653,
+   "ece": 0.0962
+  },
+  "base_rate / test_oct": {
+   "n": 186,
+   "brier": 0.2255,
+   "log_score": 0.6406,
+   "ece": 0.0851
+  },
+  "ml / test_oct": {
+   "n": 186,
+   "brier": 0.1814,
+   "log_score": 0.5219,
+   "ece": 0.1177
+  },
+  "base_1_5b / test_nov": {
+   "n": 90,
+   "brier": 0.2477,
+   "log_score": 0.6886,
+   "ece": 0.0491
+  },
+  "qlora_1_5b / test_nov": {
+   "n": 90,
+   "brier": 0.233,
+   "log_score": 0.6586,
+   "ece": 0.1175
+  },
+  "base_0_5b / test_nov": {
+   "n": 90,
+   "brier": 0.2513,
+   "log_score": 0.6958,
+   "ece": 0.1719
+  },
+  "lora_0_5b / test_nov": {
+   "n": 90,
+   "brier": 0.2262,
+   "log_score": 0.6439,
+   "ece": 0.1017
+  },
+  "base_rate / test_nov": {
+   "n": 90,
+   "brier": 0.203,
+   "log_score": 0.588,
+   "ece": 0.0564
+  },
+  "ml / test_nov": {
+   "n": 90,
+   "brier": 0.1352,
+   "log_score": 0.4376,
+   "ece": 0.1741
+  },
+  "base_1_5b / test_all": {
+   "n": 276,
+   "brier": 0.2486,
+   "log_score": 0.6904,
+   "ece": 0.0585
+  },
+  "qlora_1_5b / test_all": {
+   "n": 276,
+   "brier": 0.2378,
+   "log_score": 0.6683,
+   "ece": 0.0687
+  },
+  "base_0_5b / test_all": {
+   "n": 276,
+   "brier": 0.2511,
+   "log_score": 0.6954,
+   "ece": 0.143
+  },
+  "lora_0_5b / test_all": {
+   "n": 276,
+   "brier": 0.2293,
+   "log_score": 0.65,
+   "ece": 0.0875
+  },
+  "base_rate / test_all": {
+   "n": 276,
+   "brier": 0.2182,
+   "log_score": 0.6235,
+   "ece": 0.0591
+  },
+  "ml / test_all": {
+   "n": 276,
+   "brier": 0.1663,
+   "log_score": 0.4944,
+   "ece": 0.0673
+  }
+ },
+ "paired": [
+  {
+   "a": "qlora_1_5b",
+   "b": "base_1_5b",
+   "split": "test_oct",
+   "diff": -0.009008209077635462,
+   "lo": -0.01478890360638394,
+   "hi": -0.0027589262424852425,
+   "n": 186,
+   "days": 31
+  },
+  {
+   "a": "qlora_1_5b",
+   "b": "base_rate",
+   "split": "test_oct",
+   "diff": 0.01452030196157736,
+   "lo": 0.0020803312362190156,
+   "hi": 0.026190544304398294,
+   "n": 186,
+   "days": 31
+  },
+  {
+   "a": "qlora_1_5b",
+   "b": "ml",
+   "split": "test_oct",
+   "diff": 0.058624955975098474,
+   "lo": 0.012097330929814187,
+   "hi": 0.10008324319773744,
+   "n": 186,
+   "days": 31
+  },
+  {
+   "a": "lora_0_5b",
+   "b": "base_0_5b",
+   "split": "test_oct",
+   "diff": -0.020233065012667136,
+   "lo": -0.029431055724213177,
+   "hi": -0.010964097453962282,
+   "n": 186,
+   "days": 31
+  },
+  {
+   "a": "lora_0_5b",
+   "b": "base_rate",
+   "split": "test_oct",
+   "diff": 0.0052852159637730295,
+   "lo": -0.01320931295894573,
+   "hi": 0.023041850283314694,
+   "n": 186,
+   "days": 31
+  },
+  {
+   "a": "lora_0_5b",
+   "b": "qlora_1_5b",
+   "split": "test_oct",
+   "diff": -0.00923508599780433,
+   "lo": -0.01758965078096368,
+   "hi": -0.001224549379613639,
+   "n": 186,
+   "days": 31
+  },
+  {
+   "a": "ml",
+   "b": "base_rate",
+   "split": "test_oct",
+   "diff": -0.0441046540135211,
+   "lo": -0.08781837471920845,
+   "hi": 0.0019249568761598175,
+   "n": 186,
+   "days": 31
+  },
+  {
+   "a": "qlora_1_5b",
+   "b": "base_1_5b",
+   "split": "test_nov",
+   "diff": -0.014704167633701672,
+   "lo": -0.022131218358045057,
+   "hi": -0.007918680845751688,
+   "n": 90,
+   "days": 15
+  },
+  {
+   "a": "qlora_1_5b",
+   "b": "base_rate",
+   "split": "test_nov",
+   "diff": 0.030050812939291547,
+   "lo": -0.003949891975192599,
+   "hi": 0.06026130898623906,
+   "n": 90,
+   "days": 15
+  },
+  {
+   "a": "qlora_1_5b",
+   "b": "ml",
+   "split": "test_nov",
+   "diff": 0.09787100278145415,
+   "lo": 0.02436522086706515,
+   "hi": 0.14690239075344072,
+   "n": 90,
+   "days": 15
+  },
+  {
+   "a": "lora_0_5b",
+   "b": "base_0_5b",
+   "split": "test_nov",
+   "diff": -0.02515452406687536,
+   "lo": -0.03705938530812651,
+   "hi": -0.014038716698424748,
+   "n": 90,
+   "days": 15
+  },
+  {
+   "a": "lora_0_5b",
+   "b": "base_rate",
+   "split": "test_nov",
+   "diff": 0.02321885651047036,
+   "lo": -0.01763614975902232,
+   "hi": 0.05917106303392512,
+   "n": 90,
+   "days": 15
+  },
+  {
+   "a": "lora_0_5b",
+   "b": "qlora_1_5b",
+   "split": "test_nov",
+   "diff": -0.006831956428821177,
+   "lo": -0.016125072678730354,
+   "hi": 0.0011643147891333924,
+   "n": 90,
+   "days": 15
+  },
+  {
+   "a": "ml",
+   "b": "base_rate",
+   "split": "test_nov",
+   "diff": -0.0678201898421626,
+   "lo": -0.11616126605348515,
+   "hi": -0.00221683811324369,
+   "n": 90,
+   "days": 15
+  },
+  {
+   "a": "qlora_1_5b",
+   "b": "base_1_5b",
+   "split": "test_all",
+   "diff": -0.010865586867657049,
+   "lo": -0.01540931146848528,
+   "hi": -0.0061576203514686996,
+   "n": 276,
+   "days": 46
+  },
+  {
+   "a": "qlora_1_5b",
+   "b": "base_rate",
+   "split": "test_all",
+   "diff": 0.019584599019527638,
+   "lo": 0.006853155146246655,
+   "hi": 0.03319929617225501,
+   "n": 276,
+   "days": 46
+  },
+  {
+   "a": "qlora_1_5b",
+   "b": "ml",
+   "split": "test_all",
+   "diff": 0.07142257993369272,
+   "lo": 0.03544487537184796,
+   "hi": 0.10610921781329415,
+   "n": 276,
+   "days": 46
+  },
+  {
+   "a": "lora_0_5b",
+   "b": "base_0_5b",
+   "split": "test_all",
+   "diff": -0.021837888617300256,
+   "lo": -0.028878657264798588,
+   "hi": -0.014377621801892069,
+   "n": 276,
+   "days": 46
+  },
+  {
+   "a": "lora_0_5b",
+   "b": "base_rate",
+   "split": "test_all",
+   "diff": 0.011133142229000418,
+   "lo": -0.005498949536167842,
+   "hi": 0.028789154589926372,
+   "n": 276,
+   "days": 46
+  },
+  {
+   "a": "lora_0_5b",
+   "b": "qlora_1_5b",
+   "split": "test_all",
+   "diff": -0.008451456790527214,
+   "lo": -0.014600484737748144,
+   "hi": -0.0021818902925921035,
+   "n": 276,
+   "days": 46
+  },
+  {
+   "a": "ml",
+   "b": "base_rate",
+   "split": "test_all",
+   "diff": -0.05183798091416508,
+   "lo": -0.08507714829535078,
+   "hi": -0.01659979078276073,
+   "n": 276,
+   "days": 46
+  }
+ ],
+ "cost_usd": 0.0,
+ "notes": [
+  "Probabilities are the Colab scores (4-bit model plus adapter, Platt map fitted on the validation split only); the live model is the Q4_K_M GGUF of the merged adapter.",
+  "Test sets: 186 questions (October 2026) and 90 (1 to 15 November 2026); the six questions of a day are correlated, so intervals are day-block bootstrap intervals.",
+  "The `ml` champion covers 2280 of these questions (backtest rows).",
+  "GGUF parity on 31 test rows: mean absolute margin difference 0.0881, Brier 0.2131 (GGUF) against 0.2008 (Colab), loss +0.0123; 29.6 s per question on CPU."
+ ],
+ "limits": [
+  "Electricity only; 276 test questions from about 45 days; intervals are wide.",
+  "One training run, one seed: a different seed could change the ranking of the two tuned models.",
+  "Colab ran transformers 4.57.6, not the pinned version.",
+  "The untuned arms use their own Platt map fitted on validation, so they are not raw model probabilities."
+ ],
+ "card": "docs/lab/qlora-r1.md"
+}

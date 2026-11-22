@@ -150,3 +150,39 @@ def test_wiring_registers_the_forecaster_only_when_switched_on(tmp_path, monkeyp
     assert isinstance(out, Skip) and out.reason_code == "model_missing"
     ids = [f.forecaster_id for f in on]
     assert ids.index("llm_local_ft") > ids.index("agent")
+
+
+def test_llama_scorer_reads_the_last_token_logits_not_a_scores_table() -> None:
+    """Regression: llama-cpp-python keeps `scores` only with logits_all=True (T245 real run)."""
+    import ctypes
+
+    from arena.lab.ft_runtime import LlamaScorer
+
+    n_vocab = 20
+    logits = (ctypes.c_float * n_vocab)(*[0.0] * n_vocab)
+    logits[3], logits[5] = 2.5, 0.5
+
+    class Ctx:
+        def get_logits(self):
+            return logits
+
+    class Llm:
+        _ctx = Ctx()
+        n_tokens = 99999  # would be out of range for a batch-sized scores array
+
+        def n_vocab(self):
+            return n_vocab
+
+        def tokenize(self, text, add_bos=False, special=False):
+            return [1, 2, 3]
+
+        def reset(self):
+            pass
+
+        def eval(self, tokens):
+            pass
+
+    sc = LlamaScorer.__new__(LlamaScorer)
+    sc.llm, sc.yes_id, sc.no_id, sc.n_ctx = Llm(), 3, 5, 4096
+    sc.run_budget, sc.spent, sc.monotonic, sc.model = 100.0, 0.0, lambda: 0.0, "m"
+    assert sc.margin("s", "u") == 2.0

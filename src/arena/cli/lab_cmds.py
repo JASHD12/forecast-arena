@@ -460,3 +460,206 @@ def lab_explain(obj: Ctx, cut: str, day: str, out: Path) -> None:
         lines.append("")
     out.write_text("\n".join(lines), encoding="utf-8")
     click.echo(f"explanations -> {out}")
+
+
+@lab.command("ft-parity")
+@click.argument("gguf", type=click.Path(exists=True, path_type=Path))
+@click.argument("scores", type=click.Path(exists=True, path_type=Path))
+@click.option("--every", type=int, default=9, show_default=True, help="Score every n-th test row.")
+@click.option("--out", type=click.Path(path_type=Path), default=Path("/tmp/ft-parity.json"))
+def lab_ft_parity(gguf: Path, scores: Path, every: int, out: Path) -> None:
+    """Score a subset of the frozen test rows with the GGUF and compare with the Colab scores."""
+    import time
+
+    from arena.lab import dataset as ds
+    from arena.lab.artefacts import load_artefact
+    from arena.lab.ft_parity import colab_margins, compare
+    from arena.lab.ft_runtime import LlamaScorer
+
+    art = load_artefact()
+    if art is None:
+        raise click.ClickException("lab/artefacts/llm_local_ft.json is missing")
+    rows = [
+        r
+        for name in ("test_oct", "test_nov")
+        for r in ds.read_split(Path("lab/data/forecast-sft") / f"{name}.jsonl.gz")
+    ][:: max(1, every)]
+    scorer = LlamaScorer(
+        gguf, model=art.name, yes_id=art.yes_id, no_id=art.no_id, run_budget=3 * 3600.0
+    )
+    margins: dict[str, float] = {}
+    start = time.monotonic()
+    for i, r in enumerate(rows, 1):
+        margins[r.id] = scorer.margin(r.system, r.user)
+        click.echo(
+            f"{i}/{len(rows)} {r.id} margin {margins[r.id]:.3f} ({time.monotonic() - start:.0f}s)"
+        )
+    res = compare(margins, colab_margins(scores), art.platt)
+    res["seconds_per_question"] = round((time.monotonic() - start) / len(rows), 1)
+    out.write_text(json.dumps(res, indent=1), encoding="utf-8")
+    click.echo(json.dumps(res, indent=1))
+
+
+@lab.command("ft-eval")
+@click.argument("scores", nargs=-1, required=True, type=click.Path(exists=True, path_type=Path))
+@click.option("--ml-run", "ml_runs", multiple=True, type=click.Path(exists=True, path_type=Path))
+@click.option("--parity", type=click.Path(exists=True, path_type=Path), default=None)
+@click.option(
+    "--out", type=click.Path(path_type=Path), default=Path("evals/results/lab-qlora-r1.json")
+)
+@click.pass_obj
+def lab_ft_eval(
+    obj: Ctx, scores: tuple[Path, ...], ml_runs: tuple[Path, ...], parity: Path | None, out: Path
+) -> None:
+    """Evaluate the QLoRA run on the frozen test sets from its Colab score files (T246)."""
+    import hashlib
+
+    from arena.lab import dataset as ds
+    from arena.lab import ft_eval as fe
+    from arena.lab.artefacts import load_artefact
+    from arena.lab.results import LabResult
+
+    art = load_artefact()
+    if art is None:
+        raise click.ClickException("lab/artefacts/llm_local_ft.json is missing")
+    data = Path("lab/data/forecast-sft")
+    rows = {
+        r.id: {
+            "split": name,
+            "batch_date": r.batch_date,
+            "base_rate": r.base_rate,
+            "outcome": r.outcome,
+        }
+        for name in fe.SPLITS
+        for r in ds.read_split(data / f"{name}.jsonl.gz")
+    }
+    ml: dict[str, float] = {}
+    for run in ml_runs:
+        ml.update(fe.read_backtest(run))
+    pairs = [
+        ("qlora_1_5b", "base_1_5b"),
+        ("qlora_1_5b", "base_rate"),
+        ("qlora_1_5b", "ml"),
+        ("lora_0_5b", "base_0_5b"),
+        ("lora_0_5b", "base_rate"),
+        ("lora_0_5b", "qlora_1_5b"),
+        ("ml", "base_rate"),
+    ]
+    metrics, paired = fe.evaluate(fe.read_scores(list(scores)), rows, ml, pairs)
+    notes = [
+        "Probabilities are the Colab scores (4-bit model plus adapter, Platt map fitted on the "
+        "validation split only); the live model is the Q4_K_M GGUF of the merged adapter.",
+        f"Test sets: {sum(1 for r in rows.values() if r['split'] == 'test_oct')} questions "
+        f"(October 2026) and {sum(1 for r in rows.values() if r['split'] == 'test_nov')} "
+        "(1 to 15 November 2026); the six questions of a day are correlated, so intervals are "
+        "day-block bootstrap intervals.",
+    ]
+    if ml:
+        notes.append(f"The `ml` champion covers {len(ml)} of these questions (backtest rows).")
+    if parity is not None:
+        par = json.loads(parity.read_text(encoding="utf-8"))
+        notes.append(
+            f"GGUF parity on {par['n']} test rows: mean absolute margin difference "
+            f"{par['margin_mean_abs_diff']}, Brier {par['brier_gguf']} (GGUF) against "
+            f"{par['brier_colab']} (Colab), loss {par['brier_loss']:+}; "
+            f"{par['seconds_per_question']} s per question on CPU."
+        )
+    summary = json.loads((Path(scores[0]).parent / "run_summary.json").read_text("utf-8"))
+    result = LabResult(
+        experiment="qlora-r1",
+        title="QLoRA fine-tune of Qwen2.5-1.5B on replayed power questions",
+        created_at=obj.clock.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+        why=(
+            "Parameter-efficient fine-tuning of a small open model is the standard way companies "
+            "adapt an LLM to a narrow task; the comparison with a classical model is the point."
+        ),
+        prereg_sha256=hashlib.sha256(Path("lab/prereg/qlora-forecast.md").read_bytes()).hexdigest(),
+        dataset_sha256={k: v for k, v in summary["dataset_sha256"].items()},
+        artefacts={"gguf": art.sha256, "adapter": art.adapter_sha256, "release": art.url},
+        metrics=metrics,  # type: ignore[arg-type]
+        paired=paired,
+        notes=notes,
+        limits=[
+            "Electricity only; 276 test questions from about 45 days; intervals are wide.",
+            "One training run, one seed: a different seed could change the ranking of the two "
+            "tuned models.",
+            "Colab ran transformers "
+            f"{summary['packages'].get('transformers')}, not the pinned version.",
+            "The untuned arms use their own Platt map fitted on validation, so they are not raw "
+            "model probabilities.",
+        ],
+        card="docs/lab/qlora-r1.md",
+    )
+    out.write_text(result.model_dump_json(indent=1) + "\n", encoding="utf-8")
+    for k, m in metrics.items():
+        click.echo(f"{k}: {m}")
+    for p in paired:
+        click.echo(p)
+
+
+def _ft_rows() -> list[object]:
+    from arena.lab import dataset as ds
+    from arena.lab import ft_gguf as fg
+
+    return [
+        r
+        for name in fg.SPLITS
+        for r in ds.read_split(Path("lab/data/forecast-sft") / f"{name}.jsonl.gz")
+    ]
+
+
+@lab.command("ft-score")
+@click.option("--shard", "index", type=int, required=True)
+@click.option("--of", "count", type=int, required=True)
+@click.option("--cache", type=click.Path(path_type=Path), default=Path("models_cache/ft"))
+@click.option("--out", type=click.Path(path_type=Path), required=True)
+@click.pass_obj
+def lab_ft_score(obj: Ctx, index: int, count: int, cache: Path, out: Path) -> None:
+    """Score one shard of the validation and test rows with the pinned GGUF (CPU)."""
+    import time
+
+    from arena.lab import ft_gguf as fg
+    from arena.lab.artefacts import fetch, load_artefact
+    from arena.lab.ft_runtime import LlamaScorer
+
+    art = load_artefact()
+    if art is None:
+        raise click.ClickException("lab/artefacts/llm_local_ft.json is missing")
+    path = fetch(art, cache, obj.settings.user_agent())
+    rows = fg.shard(_ft_rows(), index, count)
+    scorer = LlamaScorer(
+        path, model=art.name, yes_id=art.yes_id, no_id=art.no_id, run_budget=6 * 3600.0
+    )
+    margins: dict[str, float] = {}
+    start = time.monotonic()
+    for i, r in enumerate(rows, 1):
+        margins[r.id] = scorer.margin(r.system, r.user)
+        if i % 10 == 0 or i == len(rows):
+            click.echo(f"shard {index}: {i}/{len(rows)} rows, {time.monotonic() - start:.0f}s")
+    out.write_text(json.dumps(margins, sort_keys=True), encoding="utf-8")
+    click.echo(f"shard {index}: wrote {len(margins)} margins to {out}")
+    click.echo(
+        f"FT_MARGINS_SHARD_{index}="
+        + json.dumps({k: round(v, 4) for k, v in sorted(margins.items())})
+    )
+
+
+@lab.command("ft-calibrate")
+@click.argument("parts", nargs=-1, required=True, type=click.Path(exists=True, path_type=Path))
+@click.option("--out", type=click.Path(path_type=Path), default=Path("ft-gguf-margins.json"))
+def lab_ft_calibrate(parts: tuple[Path, ...], out: Path) -> None:
+    """Merge shard margins, refit Platt on validation only, print the comparison (L3)."""
+    from arena.lab import ft_gguf as fg
+    from arena.lab.artefacts import load_artefact
+
+    art = load_artefact()
+    if art is None:
+        raise click.ClickException("lab/artefacts/llm_local_ft.json is missing")
+    margins = fg.merge([json.loads(p.read_text(encoding="utf-8")) for p in parts])
+    rows = {r.id: {"split": r.split, "outcome": r.outcome} for r in _ft_rows()}  # type: ignore[attr-defined]
+    res = fg.calibrate(margins, rows, art.platt)
+    out.write_text(json.dumps(margins, sort_keys=True), encoding="utf-8")
+    click.echo("FT_CALIBRATION_JSON=" + json.dumps(res))
+    click.echo(
+        "FT_MARGINS_JSON=" + json.dumps({k: round(v, 4) for k, v in sorted(margins.items())})
+    )

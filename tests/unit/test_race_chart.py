@@ -70,4 +70,19 @@ def test_days_axis_shows_several_days_not_just_two() -> None:
     day_labels = re.findall(
         r'class="tick" x="[\d.]+" y="\d+" text-anchor="\w+">(\d\d-\d\d)</text>', wide
     )
-    assert 5 <= len(day_labels) <= 7 and day_labels[0] == "11-16" and day_labels[-1] == "11-25"
+    assert 5 <= len(day_labels) <= 8 and day_labels[0] == "11-16" and day_labels[-1] == "11-25"
+
+
+def test_every_day_is_labelled_and_the_coin_label_sits_in_the_margin() -> None:
+    series, ds = _series(7)
+    out = race_svg(series, FORECASTER_NAMES, ds)
+    wide, narrow = out.split("race-narrow")[0], "race-narrow" + out.split("race-narrow")[1]
+    for d in ds:  # no gap in the axis, on either layout
+        assert wide.count(f">{d[5:]}</text>") == 1 and narrow.count(f">{d[5:]}</text>") == 1
+    left, right = RACE_WIDE[2][3], RACE_WIDE[2][1]
+    m = re.search(r'class="tick coin coin-margin" x="([\d.]+)" y="([\d.]+)"', wide)
+    assert m and float(m.group(1)) >= RACE_WIDE[0] - right  # in the right margin, off the lines
+    assert "coin-margin" not in narrow  # phones keep it over the plot (with a halo)
+    ends = [float(y) for y in re.findall(r'class="endlabel [^"]*" x="[\d.]+" y="([\d.]+)"', wide)]
+    assert all(abs(float(m.group(2)) - e) >= 14 for e in ends)  # never on top of an end label
+    assert left > 0

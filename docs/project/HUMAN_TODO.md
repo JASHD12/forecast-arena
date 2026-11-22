@@ -250,7 +250,7 @@ curl -X POST -H "Authorization: Bearer TOKEN" -H "Accept: application/vnd.github
     badge at the top of the notebook), Runtime > Change runtime type > T4 GPU, then Runtime > Run all. It takes about 30 to 60
     minutes. At the end it prints the SHA-256 of every output file and writes `outputs.zip`; download it.
   - You need a Google account. The agent cannot do this (AGENTS.md S2: no accounts, no signing up).
-- [ ] H27 · Approve the use of the Claude API key for non-forecast lab runs (needed for T247 and T252b)
+- [x] H27 · Approve the use of the Claude API key for non-forecast lab runs (needed for T247 and T252b)  (approved by the owner in chat, 2026-11-22: distillation labels and the LLM judge, within the US$2.00 lab budget; each run is still a manual dispatch)
   - CLAUDE.md standing approval 2 covers workflows that use `ARENA_LLM_API_KEY` to generate forecasts. The lab also wants two
     small paid runs: distillation labels (about US$0.35) and an LLM-as-judge run (about US$0.10), together at most US$2.00
     (`docs/project/LAB_BUDGET.md`). Reply yes to allow the agent to commit those two workflows; each is still a manual dispatch.
@@ -259,13 +259,17 @@ curl -X POST -H "Authorization: Bearer TOKEN" -H "Accept: application/vnd.github
     (adapter, GGUF, logs; the training data is already in the repository, nothing to upload for it), publish.
     Paste the printed SHA-256 values and the release URL into the chat. The agent then pins them in code.
 - [ ] H29 · Label 30 model rationales for the judge calibration (needed for T252b)
-  - The agent will write `lab/judge/label-sheet.csv` (30 stored rationales, no names of forecasters). Fill the three columns
-    `uses_data`, `direction_ok`, `hedged` with 0 or 1, commit nothing, and send the file back in the chat.
+  - Open `lab/judge/label-sheet.csv` (GitHub > the file > "Raw", or download it; 30 rationales, no forecaster names; it is on `main` after
+    the next PR). For each row read the question, the data excerpt, the probability and the rationale, then give three whole numbers
+    from 1 (poor) to 5 (excellent): **data_use** (are the numbers used correctly, none invented), **direction** (does the probability
+    follow from the rationale), **hedging** (is the confidence right for the evidence). Do not guess the outcome.
+  - Send me 30 lines in the chat, nothing else: `id,data_use,direction,hedging` (for example `9dcceff67a,4,5,3`). The agent writes
+    the labels file and computes the agreement with the judge.
 - [x] H30 · Decision: allow shadow forecasting (no longer needed: the lab techniques run live as normal forecasters, Phase 15)
   - A shadow forecaster writes real forecasts before the lock into a separate `shadow/` tree on the ledger that no board reads.
     It needs a small ledger-schema change. Reply yes to allow it, or no to keep both tasks as written proposals.
 
-- [ ] H31 · Approve one paid `llm-eval` run on the two frozen lab test sets (needed for T250)
+- [x] H31 · Approve one paid `llm-eval` run on the two frozen lab test sets (needed for T250)  (approved by the owner in chat, 2026-11-22; workflow `lab-routing.yml`, about US$0.15)
   - The routing study needs Claude's `llm_context` probabilities on all 276 test questions (`evals/golden/power-2026-10.jsonl` and
     `power-2026-11a.jsonl`). The existing workflow `llm-eval.yml` does it in one dispatch for about US$0.15 (recorded cost per call
     about US$0.0004, total lab budget limit US$2.00). Reply yes and the agent dispatches it once, with a token cap.
@@ -287,9 +291,9 @@ curl -X POST -H "Authorization: Bearer TOKEN" -H "Accept: application/vnd.github
     result in T281c.
 - [ ] H34 · Phoenix documentation not reachable (T255b)
   - The agent could not read `https://arize.com/docs/phoenix/self-hosting/deployment-options/docker` (host does not resolve here), so it did not write a `make smoke-phoenix` target from memory. To unblock: allow the host `arize.com` for the session environment, or paste the page's image name, ports, OTLP traces path and licence into this item. Optional: nothing else depends on it.
-- [ ] H35 · Run the DPO notebook on Colab (needed for the DPO result, T299)
+- [x] H35 · Run the DPO notebook on Colab (needed for the DPO result, T299)  (done 2026-11-22: release `lab-dpo-r1`; no GGUF, the optional export cell failed on a notebook bug that is now fixed; rerun only if you want a DPO GGUF)
   - Ready: `notebooks/lab/dpo_qwen_forecast.ipynb` with the pre-registration `lab/prereg/dpo-forecast.md` (both on `main` after this PR is merged). Same steps as H26/H28: Colab, free T4, Runtime > Run all (about 1.5 to 2.5 hours), upload `outputs.zip` and the `.gguf` as release `lab-dpo-r1`, paste the release URL and the hashes (also `run_summary.json`). The export step stops with a clear error if the GGUF is not produced.
-- [ ] H36 · OK for the small paid runs of self-consistency (k=5) and the LLM judge (needed for T298)
+- [x] H36 · OK for the small paid runs of self-consistency (k=5) and the LLM judge (needed for T298)  (approved by the owner in chat, 2026-11-22)
   - Each is one capped manual workflow run within the US$2.00 lab budget (`docs/project/LAB_BUDGET.md`); the agent states the estimate and the cap before dispatching and waits for your yes.
 
 - [ ] H37 · Optional: check the Terraform formatting on your own machine (T292)

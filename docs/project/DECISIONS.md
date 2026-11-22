@@ -1260,3 +1260,21 @@ and evidence requirements. Do not backfill historical ML forecasts.
 - Regulatory framing (assessment, not legal advice, docs/COMPLIANCE.md, H12): free forecasts, no trading, no recommendation, notice and credit on every page; the Impressum street address (H14) is still the owner's.
 - Cost: US$0; the secret is sent only to api.coingecko.com.
 
+## 2026-11-22 DPO result (T299): no gain over plain fine-tuning; no GGUF, not live
+- Context: the owner ran `dpo_qwen_forecast.ipynb` on a Colab T4 (release `lab-dpo-r1`, all four asset hashes checked against GitHub's digests, pre-registration hash matches the committed file).
+- Result (276 frozen test questions, 46 days, paired day-block intervals): DPO Brier 0.2363; QLoRA 0.2378 (difference -0.0015 [-0.0032, +0.0005]); untuned 0.2486 (-0.0123, excludes zero); base rate 0.2182 (+0.0181, excludes zero); `ml` 0.1663. H-DPO1 and H-DPO2 hold as expected; H-DPO3 is untested.
+- No GGUF: the notebook's optional export cell raised `NameError: gc` (my bug, fixed). Because the QLoRA export lost most of its gain, and DPO is no better than QLoRA, a DPO GGUF is not worth another Colab session now; DPO is not a live forecaster. If the owner wants one anyway it needs the export, a CPU calibration run and a new forecaster id.
+- Cost: US$0.
+
+## 2026-11-22 Paid lab runs approved (H27, H31, H36): judge, routing study, distillation labels, self-consistency
+- Context: the owner approved in chat all four paid lab items and the free CPU ones (the global LightGBM and Chronos-2 rows of the Lab page were already built: model cards `docs/models/power-global.md` and `power-ts.md`; the planned list was stale and is updated).
+- Decision: CLAUDE.md standing approval 2 covers the API key for forecasts only, so the owner's chat approval (H27) is the authority for three new manual, capped workflows that send `ARENA_LLM_API_KEY` for non-forecast purposes: `lab-judge.yml` (100 rationales, about US$0.10), `lab-routing.yml` (276 test questions, about US$0.15), `lab-distill-labels.yml` (1,200 training questions, at most 1,300 requests, about US$0.35). The self-consistency run uses the existing `llm-eval.yml` input. Total well under the US$2.00 lab budget (`docs/project/LAB_BUDGET.md`). Each workflow has read-only permissions, a token cap input, and refuses to run its command outside GitHub Actions in code (S8). Results are read back from one compact log line (`JG_SCORES=`, `RT_PROBS=`, `DL_PROBS=`) because the artifact host is blocked from the agent's sandbox.
+- Pre-registered before any call: `lab/prereg/routing.md` (rule fixed: pair, delta 0.15, gamma 0.10), `distill.md`, `judge.md`. The judge items are frozen from the public ledger (`lab/judge/items.json`), the judge never sees the forecaster, and the owner labels 30 of them (H29) so the judge is reported with its agreement, not on trust.
+- Honest limits: distillation stores only the teacher's probability (rationale text cannot be read back through logs); the student's Colab training (soft-label recipe) needs the labels first and is a later owner step. The router forecaster (T273) is only built if the routing study's hypothesis H-RT1 holds. GGUF validation and test margins are committed (`lab/artefacts/llm_local_ft.margins.json`) so the routing and evaluation numbers are reproducible.
+- Cost: no spend yet. All runs are dispatches from `main` after the PR is merged.
+
+## 2026-11-22 Prompt-optimisation result (T297): a better prompt, still worse than the base rate
+- Context: pre-registered search (`lab/prereg/prompt-opt.md`), eight candidates scored with the free local GGUF on 48 validation questions (cross-fitted Brier), then one test evaluation. First dispatch failed at once (`huggingface_hub` missing in the shard venv); fixed and re-run.
+- Result: winner `i3s0` beat the live prompt on 276 frozen test questions by -0.0076 [-0.0135, -0.0017] (Brier 0.2556 vs 0.2632). Both are worse than a coin flip's 0.25 and than the base rate 0.2182; the Platt maps were fitted on only 48 validation margins per prompt, which is noisy and is the main limit. Solved examples made things worse in every variant.
+- Decision: published as a small positive and an honest overall negative. The live `llm_local` prompt is unchanged; adopting `i3s0` needs an owner decision and a new version string (I8). Cost US$0.
+

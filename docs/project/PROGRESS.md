@@ -65,6 +65,7 @@ Nothing. See the session summary above and `python scripts/status.py`.
   output, not acted on (S11).
 
 ## Done log
+- T322, T323, T324 (forecast-audit): case page `audit.html`, `recruiters-ml.html`, German proof line, README block, CONTRIBUTING, issue form, release note, archive test, explainer 09, pilot/upstream notes, H40. T325 deferred.
 - 2026-11-22 T320-T321 (forecast-audit, owner brief): standard-library audit engine with contract, golden four-case fixture and error matrix; German electricity case reproduces the planning table exactly (46 cases, 29 YES; base rate 0.2337, GGUF 0.2499, same 46 decisions, loss 17); DuckDB agrees; CI job on a bare Python 3.12.
 - 2026-11-22 T297 done: prompt optimisation search and final phase (free CPU); winner beats the live prompt by -0.0076 [-0.0135, -0.0017] on 276 test questions, still worse than the base rate; card and README row added.
 - 2026-11-22 T247, T250, T252b (code), T299 (run): owner approved all paid lab runs (H27, H31, H36); pre-registrations, capped workflows, commands and tests for the judge, routing study and distillation labels; DPO evaluated (no gain over QLoRA, better than untuned); race chart axis and label fixed; prompt optimisation final phase running.

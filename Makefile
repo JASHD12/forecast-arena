@@ -76,4 +76,4 @@ forecast-audit-demo:  ## T321: the four-case example and the German electricity 
 	python3 -I examples/forecast-audit/report.py --cases examples/forecast-audit/german-electricity/cases.csv --predictions examples/forecast-audit/german-electricity/predictions.csv --candidate fine_tuned_gguf --baseline base_rate --timing-label replayed --false-alert-cost 1 --miss-cost 4 --out build/forecast-audit-electricity
 
 forecast-audit-test:  ## T323: only the forecast-audit tests (offline)
-	$(PY) -m pytest tests/unit/test_forecast_audit.py tests/unit/test_forecast_audit_electricity.py -q
+	$(PY) -m pytest tests/unit/test_forecast_audit.py tests/unit/test_forecast_audit_electricity.py tests/unit/test_forecast_audit_archive.py -q

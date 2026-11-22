@@ -1217,3 +1217,7 @@ and evidence requirements. Do not backfill historical ML forecasts.
 ## 2026-11-22 T296: the site's script is written in TypeScript and compiled to the same single file
 - Decision: `site_ts/app.ts` is the source; `src/arena/site/static/app.js` is its committed, generated output (the site stays one self-hosted file, no bundler, no runtime dependency). `make site-ts` compiles; CI recompiles and fails on any difference, so the two cannot drift. Strict mode with no `any`.
 - Alternatives: a bundler such as Vite or esbuild (more tooling than a 350-line file needs); leaving JavaScript (the posting-skills chart lists TypeScript).
+
+## 2026-11-22 Phase 17 requested by the owner: pandas, more topics, crypto, under EU and German rules
+- Owner request (in chat, mid-work): add pandas, and other technology or topics such as crypto that make the project more interesting, following EU and German rules.
+- Decision: recorded as T301 (pandas, as an interface next to Polars and DuckDB, not a replacement), T302 (new open-data topics, terms read first, rehearsal-only until 30 days) and T303 (crypto, blocked on the owner's CoinGecko key H12; no trading, no real money, not-advice notice, attribution). Nothing in the safety rails changes: S1 (no money), S2 (no accounts), S7 (source terms), S12 (research, not advice, no personal data).

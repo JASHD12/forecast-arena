@@ -39,7 +39,7 @@ Score each dimension from 1 (poor) to 5 (excellent):
 - hedging: is the confidence appropriate for the evidence (no certainty from thin data, no
   needless vagueness)?
 
-First think step by step in 'reasoning' (at most 80 words), then answer with exactly one JSON
+First think step by step in 'reasoning' (at most 40 words), then answer with exactly one JSON
 object and nothing else:
 {"reasoning": "...", "data_use": 1-5, "direction": 1-5, "hedging": 1-5}"""
 

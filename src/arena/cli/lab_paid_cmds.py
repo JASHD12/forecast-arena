@@ -145,7 +145,7 @@ def lab_judge_run(obj: Ctx, items_path: Path, max_tokens: int) -> None:
     _refuse_outside_actions()
     items = json.loads(items_path.read_text(encoding="utf-8"))
     run = PaidRun(
-        _client(obj), max_requests=len(items) + 5, max_tokens=max_tokens, max_output_tokens=500
+        _client(obj), max_requests=len(items) + 5, max_tokens=max_tokens, max_output_tokens=1000
     )
     scores: dict[str, list[int] | None] = {}
     skips: dict[str, int] = {}

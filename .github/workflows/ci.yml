@@ -80,6 +80,11 @@ jobs:
         run: |
           npm ci --ignore-scripts
           npx playwright install --with-deps chromium
+      - name: TypeScript: type-check site_ts and verify the compiled app.js is current (T296)
+        run: |
+          npm ci --prefix tools/site-ts
+          make site-ts
+          git diff --exit-code src/arena/site/static/app.js
       - name: Accessibility lint (fails on serious or critical issues)
         run: make a11y
       - name: Run the analysis notebook on the e2e export (T138)

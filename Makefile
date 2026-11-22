@@ -6,7 +6,7 @@ export PYTHONPATH := src
 # One OpenMP thread: deterministic model fits and no oversubscription in parallel jobs.
 export OMP_NUM_THREADS ?= 1
 
-.PHONY: setup setup-offline lint test e2e check status smoke-sources smoke-site smoke-observability schemas site-e2e a11y notebook dbt
+.PHONY: setup setup-offline lint test e2e check status smoke-sources smoke-site smoke-observability site-ts schemas site-e2e a11y notebook dbt
 
 setup:  ## Create .venv and install pinned dependencies
 	@if uv --version >/dev/null 2>&1; then \
@@ -63,6 +63,9 @@ notebook: site-e2e  ## Execute notebooks/explore.ipynb on the e2e Parquet export
 dbt: site-e2e  ## dbt build over the e2e export (dbt in its own venv: .venv-dbt, requirements/dbt.txt)
 	test -x .venv-dbt/bin/dbt || (python3 -m venv .venv-dbt && .venv-dbt/bin/pip install -r requirements/dbt.txt)
 	cd analytics/dbt && DBT_SEND_ANONYMOUS_USAGE_STATS=false ARENA_DATA_DIR=$(CURDIR)/_site_e2e/data ../../.venv-dbt/bin/dbt build --profiles-dir .
+
+site-ts:  ## T296: compile site_ts/*.ts (tsc --strict) to src/arena/site/static/app.js (needs `npm ci --prefix tools/site-ts`)
+	cd tools/site-ts && npx tsc -p tsconfig.json
 
 smoke-observability: ## T295: needs Docker; Prometheus scrapes the API, Jaeger receives OTLP traces (the CI job `observability` runs the same script)
 	scripts/smoke_observability.sh

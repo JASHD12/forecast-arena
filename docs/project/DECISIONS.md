@@ -1213,3 +1213,7 @@ and evidence requirements. Do not backfill historical ML forecasts.
 ## 2026-11-22 T295: Prometheus metrics and Jaeger traces, tested against the real servers in CI
 - Decision: `/metrics` on the REST API with `prometheus-client` (added to `requirements/api.txt`, so the Docker image has it). Labels are route templates, never ids (bounded cardinality); each app has its own registry. A new CI job runs Prometheus and Jaeger as containers on the host network and checks that the scrape shows the request counter and the ledger gauge and that Jaeger stores the three sample spans exported with the OpenTelemetry GenAI attribute names. Arize Phoenix (T255b) stays blocked on H34; Jaeger is the trace viewer that could be verified.
 - Not claimed: dashboards or alerting rules (nothing is deployed for them to run on).
+
+## 2026-11-22 T296: the site's script is written in TypeScript and compiled to the same single file
+- Decision: `site_ts/app.ts` is the source; `src/arena/site/static/app.js` is its committed, generated output (the site stays one self-hosted file, no bundler, no runtime dependency). `make site-ts` compiles; CI recompiles and fails on any difference, so the two cannot drift. Strict mode with no `any`.
+- Alternatives: a bundler such as Vite or esbuild (more tooling than a 350-line file needs); leaving JavaScript (the posting-skills chart lists TypeScript).

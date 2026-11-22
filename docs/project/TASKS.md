@@ -845,7 +845,8 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
   - Done 2026-11-22: `ops/anomaly.py` (Status section, informational) and `lab/anomaly_study.py`: on injected faults the plain robust z-score beats the Isolation Forest on 28-day windows (spike 100% vs 57%, unit error 70% vs 29%) at 7.4% vs 4.1% false alarms; `lab/regimes.py`: k-means picks k=2 and the regime feature does not help (pinball -0.022 [-0.161, +0.107]). Both negative results are published.
 - [x] T295 · Observability: Prometheus `/metrics` on the API, OTLP traces into Jaeger in CI (deps: T290)
   - Done 2026-11-22: `api/metrics.py` (per-app registry, route-template labels, ledger gauges, predict counter), `/metrics`; CI job `observability` runs `scripts/smoke_observability.sh` (Prometheus v3.16.0 scrapes the API, Jaeger 1.76.0 receives the OTLP spans of `scripts/otlp_sample.py`), docker and kubernetes jobs also check `/metrics`; `make smoke-observability`.
-- [ ] T296 · TypeScript: site scripts compiled with `tsc --strict`, compiled output checked in CI (deps: T290)
+- [x] T296 · TypeScript: site scripts compiled with `tsc --strict`, compiled output checked in CI (deps: T290)
+  - Done 2026-11-22: `site_ts/app.ts` (typed port of the 290-line `app.js`, `strict`, `noUnusedLocals`, no `any`), `tools/site-ts` (TypeScript 7.0.2, Apache-2.0), `make site-ts`; CI `a11y` job type-checks, recompiles and fails if the committed `app.js` differs; the existing browser tests (`make a11y`: game, sorting, theme, search, countdown, fold) pass on the compiled output.
 - [ ] T297 · Prompt optimisation offline on validation with the free local model (deps: T290)
 - [ ] T298 · Self-consistency (k=5) variant and the LLM-as-judge (paid, one owner OK each; needs H36, H29) (deps: T290; needs: H36)
 - [ ] T299 · DPO preference tuning notebook for the owner's Colab run (deps: T290; needs: H35 to run)

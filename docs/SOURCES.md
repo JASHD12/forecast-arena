@@ -165,3 +165,6 @@ Used for the one-line "why companies use it" on the Lab page. Confidence: V = pr
 
 ## Observability stack (T295), checked 2026-11-22
 - `prometheus-client` 0.26.0 (PyPI: Apache-2.0 and BSD-2-Clause, Python >= 3.9). Server images `prom/prometheus:v3.16.0` and `jaegertracing/all-in-one:1.76.0` exist on Docker Hub (tag lists read 2026-11-22); both Apache-2.0. Jaeger accepts OTLP over HTTP on port 4318 (`/v1/traces`, JSON) and serves traces at `/api/traces?service=...` on port 16686.
+
+## TypeScript (T296), checked 2026-11-22
+- `typescript` 7.0.2 on npm (Apache-2.0, `npm view`); `module: "none"` is no longer accepted by this version, so the config uses `es2020` for a file without imports or exports, which compiles to a plain script. Installed only in `tools/site-ts` (dev dependency, lock file committed); the site itself loads the compiled `app.js` and ships no TypeScript.

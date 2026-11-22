@@ -75,6 +75,17 @@ class LlamaScorer:
         self.run_budget, self.spent, self.monotonic = run_budget, 0.0, monotonic
         self.n_ctx = n_ctx
 
+    def _last_logits(self) -> Any:
+        """Logits of the last evaluated token.
+
+        llama-cpp-python only keeps per-position `scores` with `logits_all=True`, which would hold
+        n_ctx x vocabulary floats (about 2.5 GB); the context keeps the logits of the last token of
+        the last batch, which is all a next-token margin needs."""
+        import numpy as np
+
+        n_vocab = int(self.llm.n_vocab())
+        return np.ctypeslib.as_array(self.llm._ctx.get_logits(), shape=(n_vocab,))
+
     def margin(self, system: str, user: str) -> float:
         """logit(YES) - logit(NO) for one prompt; raises `LLMError` past the run budget."""
         if self.spent >= self.run_budget:
@@ -85,7 +96,7 @@ class LlamaScorer:
             raise LLMError(f"prompt of {len(tokens)} tokens does not fit the context")
         self.llm.reset()
         self.llm.eval(tokens)
-        logits = self.llm.scores[self.llm.n_tokens - 1]
+        logits = self._last_logits()
         value = float(logits[self.yes_id] - logits[self.no_id])
         self.spent += self.monotonic() - start
         if not math.isfinite(value):

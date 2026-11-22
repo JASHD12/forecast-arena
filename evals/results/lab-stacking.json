@@ -1,0 +1,53 @@
+{
+ "kind": "evaluation",
+ "experiment": "stacking",
+ "title": "Stacking with a scikit-learn Pipeline on pandas DataFrames",
+ "created_at": "2026-11-22T10:40:06Z",
+ "why": "pandas DataFrames feeding scikit-learn Pipelines and ColumnTransformers are the everyday modelling stack of most data science teams.",
+ "prereg_sha256": null,
+ "dataset_sha256": {},
+ "artefacts": {},
+ "metrics": {
+  "stacking": {
+   "n": 32,
+   "brier": 0.0987
+  },
+  "equal_mean": {
+   "n": 32,
+   "brier": 0.1722
+  },
+  "ml": {
+   "n": 32,
+   "brier": 0.1077
+  }
+ },
+ "paired": [
+  {
+   "a": "stacking",
+   "b": "equal_mean",
+   "diff": -0.07352101138377662,
+   "lo": -0.11302532720232192,
+   "hi": -0.0662053973433053,
+   "n": 32,
+   "days": 2
+  },
+  {
+   "a": "stacking",
+   "b": "ml",
+   "diff": -0.009064975141698366,
+   "lo": -0.044981928242948346,
+   "hi": -0.0024136875303557744,
+   "n": 32,
+   "days": 2
+  }
+ ],
+ "cost_usd": 0.0,
+ "notes": [
+  "32 live questions answered by every peer (ml, base_rate, persistence), replayed walk-forward with a two-day outcome lag; refitted each batch day."
+ ],
+ "limits": [
+  "Only a few live days: the stacker has little to learn from; intervals are wide.",
+  "A mechanism check of the DataFrame stack, not a proposal for a new forecaster."
+ ],
+ "card": "docs/lab/stacking.md"
+}

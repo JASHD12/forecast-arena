@@ -871,3 +871,67 @@ def lab_vectordb(obj: Ctx, set_path: Path, location: str, out: Path) -> None:
     out.write_text(result.model_dump_json(indent=1) + "\n", encoding="utf-8")
     for k, m in metrics.items():
         click.echo(f"{k}: {m}")
+
+
+@lab.command("stacking")
+@click.option(
+    "--out", type=click.Path(path_type=Path), default=Path("evals/results/lab-stacking.json")
+)
+@click.pass_obj
+def lab_stacking(obj: Ctx, out: Path) -> None:
+    """Replay a pandas + scikit-learn Pipeline stacker on the live record (T301)."""
+    from arena.lab import stacking_study as st
+    from arena.lab.results import LabResult
+    from arena.scoring import stats
+    from arena.scoring.core import load
+
+    rep = st.replay(load(obj.ledger).scored)
+    n_days = len(set(rep["days"]))
+    if n_days < 5:
+        raise click.ClickException(
+            f"only {len(rep['y'])} stacked questions over {n_days} test day(s); need 5 days"
+        )
+    y = rep["y"]
+    metrics = {
+        k: {"n": len(v), "brier": round(float(sum(stats.brier_terms(v, y)) / len(v)), 4)}
+        for k, v in rep["arms"].items()
+    }
+    paired = []
+    for a, b in (("stacking", "equal_mean"), ("stacking", "ml")):
+        iv = stats.paired_brier_difference(rep["days"], rep["arms"][a], rep["arms"][b], y)
+        paired.append(
+            {
+                "a": a,
+                "b": b,
+                "diff": iv.estimate,
+                "lo": iv.low,
+                "hi": iv.high,
+                "n": iv.n,
+                "days": iv.days,
+            }
+        )
+    result = LabResult(
+        experiment="stacking",
+        title="Stacking with a scikit-learn Pipeline on pandas DataFrames",
+        created_at=obj.clock.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+        why=(
+            "pandas DataFrames feeding scikit-learn Pipelines and ColumnTransformers are the "
+            "everyday modelling stack of most data science teams."
+        ),
+        metrics=metrics,  # type: ignore[arg-type]
+        paired=paired,
+        notes=[
+            f"{len(y)} live questions answered by every peer ({', '.join(st.PEERS)}), replayed "
+            "walk-forward with a two-day outcome lag; refitted each batch day."
+        ],
+        limits=[
+            "Only a few live days: the stacker has little to learn from; intervals are wide.",
+            "A mechanism check of the DataFrame stack, not a proposal for a new forecaster.",
+        ],
+        card="docs/lab/stacking.md",
+    )
+    out.write_text(result.model_dump_json(indent=1) + "\n", encoding="utf-8")
+    for k, m in metrics.items():
+        click.echo(f"{k}: {m}")
+    for p in paired:
+        click.echo(p)

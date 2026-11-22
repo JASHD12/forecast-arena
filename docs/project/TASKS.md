@@ -853,7 +853,9 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
 - [ ] T299 · DPO preference tuning notebook for the owner's Colab run (deps: T290; needs: H35 to run)
 - [ ] T300 · Showcase of Phase 16: skills rows, recruiter links, explainer 07, interview numbers (deps: T291, T292, T293, T294, T295, T296)
 ## Phase 17 - pandas and more topics (owner request 2026-11-22; EU and German rules)
-- [ ] T301 · pandas: DataFrame interface of `arena.analytics`, cross-check test, sklearn Pipeline on DataFrames (deps: T290)
+- [x] T301 · pandas: DataFrame interface of `arena.analytics`, cross-check test, sklearn Pipeline on DataFrames (deps: T290)
+  - Done 2026-11-22: `analytics/frames.py` (scored, leaderboard, calibration, wide and rolling views; a test proves the leaderboard frame equals `scoring.leaderboard`), `lab/stacking_study.py` (ColumnTransformer + LogisticRegression Pipeline on DataFrames, walk-forward, tested on synthetic data), `arena lab stacking`. pandas 2.3.3 was already pinned (ml.txt); it is now a direct, tested interface. The replay on the live record needs 5 test days: T301b.
+- [!] T301b · Run `arena lab stacking` on the live record and publish the card (deps: T301) WAIT(until=2026-11-30)
 - [ ] T302 · New topics: read terms and licences first (DWD pollen, UBA air quality, Autobahn API, Eurostat, Bundesbank), then add the domains that qualify as rehearsal-only (deps: T290)
 - [!] T303 · Crypto domain live: forecasts of price thresholds only, no trading, not-advice notice, CoinGecko attribution (deps: T045d) BLOCKED(needs H12)
 - [ ] T280 · Showcase and final sweep for the live lab (deps: T272, T274, T276a, T276b)

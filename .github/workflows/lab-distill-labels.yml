@@ -9,7 +9,10 @@ on:
     inputs:
       max_tokens:
         description: "Hard token cap for this run"
-        default: "2200000"
+        default: "3600000"
+      start:
+        description: "Skip the first rows of the sorted 1,200-row sample (for the second run: 774)"
+        default: "0"
 
 permissions:
   contents: read
@@ -44,7 +47,8 @@ jobs:
       - name: Run
         env:
           MAX_TOKENS: ${{ inputs.max_tokens }}
+          START: ${{ inputs.start }}
         run: |
           set -o pipefail
-          .venv/bin/arena lab distill-labels --max-tokens "$MAX_TOKENS" | tee run.log
+          .venv/bin/arena lab distill-labels --max-tokens "$MAX_TOKENS" --start "$START" | tee run.log
           { echo "## lab-distill-labels (not the live record)"; echo '```'; grep -v "^DL_PROBS=" run.log | head -40; echo '```'; } >> "$GITHUB_STEP_SUMMARY"

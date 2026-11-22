@@ -219,3 +219,38 @@ def test_routing_score_and_study_end_to_end_with_fakes(
     d = json.loads(out.read_text(encoding="utf-8"))
     assert d["experiment"] == "routing" and d["metrics"]["ml"]["n"] == 276
     assert res2.exit_code == 0
+
+
+def test_distill_start_and_merge_cover_the_full_sample(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    _live(monkeypatch, json.dumps({"probability": 0.37, "rationale": "x", "key_factors": []}))
+    res = _run("lab", "distill-labels", "--n", "6", "--start", "4")
+    summary = json.loads(
+        next(x for x in res.output.splitlines() if x.startswith("DL_SUMMARY=")).removeprefix(
+            "DL_SUMMARY="
+        )
+    )
+    probs = json.loads(
+        next(x for x in res.output.splitlines() if x.startswith("DL_PROBS=")).removeprefix(
+            "DL_PROBS="
+        )
+    )
+    assert summary["n"] == 2 and summary["start"] == 4 and probs == [0.37, 0.37]
+
+
+def test_committed_first_label_run_matches_its_recorded_sample() -> None:
+    import hashlib
+
+    train = read_split(ROOT / "lab/data/forecast-sft/train.jsonl.gz")
+    ids = [r.id for r in dl.sample_rows(train, dl.DISTILL_N if hasattr(dl, "DISTILL_N") else 1200)]
+    # the run logged this hash of the full sorted sample (run 45071238970)
+    assert (
+        hashlib.sha256("\n".join(ids).encode()).hexdigest()
+        == "a65f226077d310ef96eb85c9c8727c6bd989d57f94f0be976d9006aea0ea9847"
+    )
+    part = json.loads((ROOT / "lab/data/distill-run1-probs.json").read_text(encoding="utf-8"))
+    assert len(part) == 774 and sum(p is None for p in part) == 1
+    assert all(p is None or 0 <= p <= 1 for p in part)
+    train_ids = {r.id for r in train}
+    assert set(ids[:774]) <= train_ids  # labels belong to training rows only (no leakage)

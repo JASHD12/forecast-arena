@@ -178,7 +178,7 @@ def sigmoid(x: float) -> float:
     return 1 / (1 + math.exp(-x)) if x >= 0 else math.exp(x) / (1 + math.exp(x))
 
 
-def fit_platt(margins_val: Sequence[float], outcomes: Sequence[int]) -> tuple[float, float]:
+def fit_platt(margins_val: Sequence[float], outcomes: Sequence[float]) -> tuple[float, float]:
     """Platt map P = sigmoid(a * margin + b), fitted on validation data only."""
     if len(set(outcomes)) < 2:
         raise ValueError("calibration needs both outcomes")
@@ -192,6 +192,6 @@ def apply_platt(margin_value: float, a: float, b: float) -> float:
     return min(0.99, max(0.01, sigmoid(a * margin_value + b)))
 
 
-def brier(probs: Sequence[float], outcomes: Sequence[int]) -> float:
+def brier(probs: Sequence[float], outcomes: Sequence[float]) -> float:
     """Mean squared error of probabilities (lower is better)."""
     return sum((p - y) ** 2 for p, y in zip(probs, outcomes, strict=True)) / len(probs)

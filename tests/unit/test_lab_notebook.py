@@ -91,3 +91,24 @@ def test_dpo_notebook_is_valid_uses_its_own_prereg_and_the_dpo_spec() -> None:
     )
     ast.parse(cleaned)
     assert "target.exists()" in code  # the loud, checked GGUF export
+
+
+def test_distillation_notebook_compiles_and_uses_soft_labels_not_outcomes() -> None:
+    path = NB.with_name("distill_qwen_forecast.ipynb")
+    nb = json.loads(path.read_text())
+    src = []
+    for c in nb["cells"]:
+        if c["cell_type"] == "code":
+            src.append(
+                "\n".join(
+                    ln[: len(ln) - len(ln.lstrip())] + "pass"
+                    if ln.lstrip().startswith(("!", "%"))
+                    else ln
+                    for ln in "".join(c["source"]).splitlines()
+                )
+            )
+    code = "\n\n".join(src)
+    ast.parse(code)
+    assert "soft_labels=SOFT" in code and "dpo_beta" not in code
+    assert "lab/prereg/distill.md" in code and "lab/data/distill-labels-v1.json" in code
+    assert "EXPORT_GGUF = False" in code

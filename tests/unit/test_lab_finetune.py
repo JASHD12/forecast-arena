@@ -193,3 +193,28 @@ def test_dpo_run_variant_trains_against_the_untuned_reference(tmp_path) -> None:
     assert out["train_loss_last"] < out["train_loss_first"]  # the DPO loss decreases
     assert out["train_loss_first"] == pytest.approx(0.6931, abs=0.08)  # starts at the reference
     assert out["brier"]["tuned"]["val"] < out["brier"]["base"]["val"]
+
+
+def test_soft_label_run_trains_only_labelled_rows_on_the_teacher_probability(tmp_path) -> None:
+    pytest.importorskip("peft")
+    from arena.lab.finetune.load import add_lora
+    from arena.lab.finetune.run import Spec, run_variant
+
+    rows = {"train": _rows(40), "val": _rows(12), "test_oct": _rows(8), "test_nov": _rows(6)}
+    labelled = {
+        r.id: 0.8 if r.outcome else 0.2 for r in rows["train"][:20]
+    }  # a teacher, half the rows
+    cfg = tr.TrainConfig(lr=3e-3, epochs=3, batch_size=4, grad_accum=1, log_every=1)
+    out = run_variant(
+        Spec("tiny_soft", "random", soft_labels=labelled), rows, CharTokenizer(), _tiny_model,
+        lambda m: add_lora(m, r=4, alpha=8), tmp_path, cfg,
+        device=torch.device("cpu"), train_rows=999, max_len=200,
+    )  # fmt: skip
+    assert out["rows"]["train"] == 20  # only the labelled rows, not the 999 requested
+    assert out["train_loss_last"] < out["train_loss_first"]
+    with pytest.raises(ValueError, match="teacher label"):
+        run_variant(
+            Spec("none", "random", soft_labels={"nobody": 0.5}), rows, CharTokenizer(),
+            _tiny_model, lambda m: add_lora(m, r=4, alpha=8), tmp_path, cfg,
+            device=torch.device("cpu"), max_len=200,
+        )  # fmt: skip

@@ -302,6 +302,9 @@ Source: `evals/results/lab-qlora-r1.json`; card `docs/lab/qlora-r1.md`
 | base_rate / test_all | 276 | 0.2182 | 0.6235 | 0.0591 |
 | base_rate / test_nov | 90 | 0.203 | 0.588 | 0.0564 |
 | base_rate / test_oct | 186 | 0.2255 | 0.6406 | 0.0851 |
+| gguf_q4 / test_all | 276 | 0.2474 | 0.6879 | 0.0568 |
+| gguf_q4 / test_nov | 90 | 0.2473 | 0.6877 | 0.0214 |
+| gguf_q4 / test_oct | 186 | 0.2474 | 0.6879 | 0.0787 |
 | lora_0_5b / test_all | 276 | 0.2293 | 0.65 | 0.0875 |
 | lora_0_5b / test_nov | 90 | 0.2262 | 0.6439 | 0.1017 |
 | lora_0_5b / test_oct | 186 | 0.2308 | 0.653 | 0.0962 |

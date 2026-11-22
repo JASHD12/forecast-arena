@@ -93,7 +93,9 @@ def test_no_third_party_requests_scripts_only_self_hosted(tmp_path) -> None:
         for kind, src in p.scripts:
             assert kind in ("src", "application/json"), f"inline script in {page}"
             if kind == "src":
-                assert src.endswith("static/app.js"), f"{page} loads script {src}"
+                assert src.endswith(("static/app.js", "static/chat.js")), (
+                    f"{page} loads script {src}"
+                )
         assert not p.handlers, f"inline event handlers {p.handlers} in {page}"
         assert "Content-Security-Policy" in text and "script-src 'self'" in text, page
     css = (res.out_dir / "static" / "style.css").read_text()
@@ -110,6 +112,11 @@ def test_no_third_party_requests_scripts_only_self_hosted(tmp_path) -> None:
         "https://",
     ):
         assert banned not in js, banned
+    # the chat script reads only the site's own data file: no storage, no cookies, no outside URL
+    chat = (res.out_dir / "static" / "chat.js").read_text()
+    for banned in ("XMLHttpRequest", "localStorage", "sessionStorage", "cookie", "indexedDB",
+                   "http://", "https://"):  # fmt: skip
+        assert banned not in chat, banned
 
 
 def test_legal_pages_pending_until_owner_writes_them(tmp_path) -> None:

@@ -8,6 +8,10 @@
 <div class="kpi"><span class="kpi-n">{{ k.forecasts }}</span><span class="kpi-l">Prognosen vor der Antwort veröffentlicht</span></div>
 <div class="kpi"><span class="kpi-n">{{ k.forecasters }}</span><span class="kpi-l">Prognosemodelle im Vergleich</span></div>
 </div>
+{% if audit %}<section class="card" aria-labelledby="de-fall"><h2 id="de-fall">Ein Entscheidungsfall aus den Strompreisen</h2>
+<p>{{ audit.headline_de }} Die Kosten sind angenommen (Fehlalarm {{ "%g"|format(audit.false_cost) }}, verpasstes Ereignis {{ "%g"|format(audit.miss_cost) }}), die Fälle sind ein historischer Nachlauf und keine Live-Ergebnisse. <a href="audit.html">Der Fall auf Englisch, mit Daten und Code</a>.</p>
+</section>
+{% endif %}
 <section class="card" aria-labelledby="de-was"><h2 id="de-was">Worum es geht</h2>
 <p>Jeden Abend veröffentlicht das System Ja/Nein-Fragen über die nächsten Tage aus öffentlichen Daten, zunächst zu den deutschen Day-Ahead-Strompreisen (Bundesnetzagentur, SMARD). Beispiel: „Liegt der durchschnittliche Strompreis morgen über 80 €/MWh?“ Am nächsten Morgen geben mehrere Prognosemodelle jeweils eine Wahrscheinlichkeit ab, <strong>bevor</strong> die Antwort feststeht. Am nächsten Tag kommen die echten Daten, jede Prognose wird bewertet, und diese Website zeigt die Ergebnisse.</p>
 </section>

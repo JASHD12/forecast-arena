@@ -833,3 +833,17 @@ main summary { min-height: 1.5rem; }
 .game input[type="range"] { height: 1.5rem; }
 .qchart-narrow { display: none; }
 @media (max-width: 640px) { .qchart-wide { display: none; } .qchart-narrow { display: block; } }
+
+/* Forecast audit case page (T322): grouped bars of loss by policy and cost ratio. */
+.audit-chart { width: 100%; height: auto; display: block; }
+.audit-chart .grid { stroke: var(--line); stroke-width: 1; }
+.audit-chart .tick { fill: var(--muted); font-size: 12px; }
+.audit-chart .bar { fill: var(--c, var(--accent)); }
+.audit-narrow { display: none; }
+.chart-fig { margin: 1rem 0; }
+.chart-fig figcaption { color: var(--muted); font-size: .92rem; margin-top: .4rem; }
+.audit-key { list-style: none; margin: .5rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .25rem 1.25rem; }
+@media (max-width: 640px) {
+  .audit-wide { display: none; }
+  .audit-narrow { display: block; }
+}

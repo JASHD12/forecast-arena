@@ -849,8 +849,11 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
 - [x] T296 · TypeScript: site scripts compiled with `tsc --strict`, compiled output checked in CI (deps: T290)
   - Done 2026-11-22: `site_ts/app.ts` (typed port of the 290-line `app.js`, `strict`, `noUnusedLocals`, no `any`), `tools/site-ts` (TypeScript 7.0.2, Apache-2.0), `make site-ts`; CI `a11y` job type-checks, recompiles and fails if the committed `app.js` differs; the existing browser tests (`make a11y`: game, sorting, theme, search, countdown, fold) pass on the compiled output.
 - [ ] T297 · Prompt optimisation offline on validation with the free local model (deps: T290)
+  - Not started: every candidate needs about 20 minutes of CPU per 40 validation questions, so it needs a manual workflow like `lab-eval.yml`; planned for after this PR (the framework, then the run).
 - [ ] T298 · Self-consistency (k=5) variant and the LLM-as-judge (paid, one owner OK each; needs H36, H29) (deps: T290; needs: H36)
-- [ ] T299 · DPO preference tuning notebook for the owner's Colab run (deps: T290; needs: H35 to run)
+  - Code done 2026-11-22: `forecasters/selfconsistency.py` (`llm_context_sc5`: five calls of the same prompt, mean probability, spread recorded, at least 3 usable answers or a skip), evaluation variant in `arena eval run` and a `self_consistency` input of `llm-eval.yml`; tests with FakeLLM. The paid run (about 5x the tokens of `llm_context`, so a few cents on 24 questions) waits for H36; the judge waits for H29.
+- [x] T299 · DPO preference tuning notebook for the owner's Colab run (deps: T290; needs: H35 to run)
+  - Done 2026-11-22: `lab/prereg/dpo-forecast.md` (hypotheses written first), `dpo_loss` and reference margins in the training loop (CPU-tested on a tiny model), `Spec.dpo_beta`, `notebooks/lab/dpo_qwen_forecast.ipynb` (same data and budget as QLoRA, checked GGUF export). The run itself is the owner's step H35.
 - [ ] T300 · Showcase of Phase 16: skills rows, recruiter links, explainer 07, interview numbers (deps: T291, T292, T293, T294, T295, T296)
 ## Phase 17 - pandas and more topics (owner request 2026-11-22; EU and German rules)
 - [x] T301 · pandas: DataFrame interface of `arena.analytics`, cross-check test, sklearn Pipeline on DataFrames (deps: T290)

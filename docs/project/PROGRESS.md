@@ -65,6 +65,7 @@ Nothing. See the session summary above and `python scripts/status.py`.
   output, not acted on (S11).
 
 ## Done log
+- 2026-11-22 T298/T299: self-consistency eval variant (paid run waits for H36); DPO loss, prereg and Colab notebook ready (H35).
 - 2026-11-22 T301: pandas frames over the scored record (equal to the leaderboard by test) and a Pipeline stacking study; live replay waits for 5 test days.
 - 2026-11-22 T292: Terraform for AWS (not applied), S3 publish command with moto tests, CI jobs cloud and terraform; also fixed a YAML error in ci.yml from T296.
 - 2026-11-22 T296: site script moved to TypeScript (strict) compiled to the same app.js; CI checks it is current.

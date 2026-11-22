@@ -76,3 +76,18 @@ def test_gguf_export_cell_fails_loudly_and_checks_the_file() -> None:
     )
     assert "hf_hub_download" in src and "-m venv /content/conv" in src
     assert "\n!" not in src  # no ignored shell lines
+
+
+def test_dpo_notebook_is_valid_uses_its_own_prereg_and_the_dpo_spec() -> None:
+    nb_path = NB.with_name("dpo_qwen_forecast.ipynb")
+    nb = json.loads(nb_path.read_text())
+    code = "\n".join("".join(c["source"]) for c in nb["cells"] if c["cell_type"] == "code")
+    assert "lab/prereg/dpo-forecast.md" in code and "dpo_beta=BETA" in code and "BETA = 0.1" in code
+    assert "qlora-forecast" not in code and "qlora_1_5b" not in code
+    assert (nb_path.parents[2] / "lab/prereg/dpo-forecast.md").is_file()
+    cleaned = "\n".join(
+        ln[: len(ln) - len(ln.lstrip())] + "pass" if ln.lstrip().startswith(("!", "%")) else ln
+        for ln in code.splitlines()
+    )
+    ast.parse(cleaned)
+    assert "target.exists()" in code  # the loud, checked GGUF export

@@ -274,3 +274,6 @@ curl -X POST -H "Authorization: Bearer TOKEN" -H "Accept: application/vnd.github
   - Same steps as H26/H28 with `notebooks/lab/dpo_qwen_forecast.ipynb` (free T4, about the same time); upload the outputs as release `lab-dpo-r1` and paste the release URL and hashes. Not needed before the agent has written and pre-registered it.
 - [ ] H36 · OK for the small paid runs of self-consistency (k=5) and the LLM judge (needed for T298)
   - Each is one capped manual workflow run within the US$2.00 lab budget (`docs/project/LAB_BUDGET.md`); the agent states the estimate and the cap before dispatching and waits for your yes.
+
+- [ ] H37 · Optional: check the Terraform formatting on your own machine (T292)
+  - The agent wanted to download the Terraform CLI from releases.hashicorp.com and run `terraform fmt -check -recursive infra/aws` locally before pushing; the permission system refused that action, so the agent did not retry or look for another route. The same check runs in CI (job `terraform`), which is enough; nothing is blocked. If you want to see it locally: install Terraform 1.17 from the official site and run `terraform fmt -check -recursive -diff` in `infra/aws`.

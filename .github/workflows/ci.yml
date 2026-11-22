@@ -80,7 +80,7 @@ jobs:
         run: |
           npm ci --ignore-scripts
           npx playwright install --with-deps chromium
-      - name: TypeScript: type-check site_ts and verify the compiled app.js is current (T296)
+      - name: "TypeScript: type-check site_ts and verify the compiled app.js is current (T296)"
         run: |
           npm ci --prefix tools/site-ts
           make site-ts
@@ -247,6 +247,42 @@ jobs:
           docker logs arena-prom 2>&1 | tail -20 || true
           docker logs arena-jaeger 2>&1 | tail -20 || true
           tail -20 api.log || true
+
+  cloud:
+    # T292: the S3 upload against moto's S3 implementation, in its own environment (botocore needs
+    # python-dateutil < 3, the main pins use 4.x).
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements/*.txt
+      - name: Install the lock and the cloud requirements
+        run: |
+          make setup
+          .venv/bin/pip install -r requirements/cloud.txt pytest
+      - name: S3 upload tests
+        env:
+          AWS_ACCESS_KEY_ID: test
+          AWS_SECRET_ACCESS_KEY: test
+          PYTHONPATH: tests/unit
+        run: .venv/bin/python -m pytest tests/unit/test_cloud_s3.py -q
+
+  terraform:
+    # T292: the AWS infrastructure as code is formatted and valid (nothing is applied: no account).
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - name: terraform fmt, init (no backend) and validate
+        run: |
+          T="docker run --rm -v $PWD/infra/aws:/w -w /w hashicorp/terraform:1.17.2"  # tag checked on Docker Hub 2026-11-22
+          $T fmt -check -recursive -diff
+          $T init -backend=false -input=false
+          $T validate
 
   audit:
     # Vulnerability report for the pinned dependencies. Non-blocking: findings appear in

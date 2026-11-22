@@ -15,6 +15,38 @@ from arena.cli import (
 )
 
 
+@site.command("publish-s3")
+@click.option("--bucket", required=True, help="S3 bucket (the `site_bucket` output of infra/aws).")
+@click.option("--prefix", default="", show_default=True, help="Key prefix inside the bucket.")
+@click.option(
+    "--dir", "src", type=click.Path(path_type=Path, exists=True, file_okay=False),
+    default=Path("site"), show_default=True, help="Directory to upload (the built site).",
+)  # fmt: skip
+@click.option("--endpoint-url", default=None, help="S3-compatible endpoint (default: AWS).")
+@click.option(
+    "--prune/--no-prune",
+    default=False,
+    help="Delete objects under the prefix that are gone locally.",
+)
+@click.option("--dry-run/--no-dry-run", default=False, help="Only report what would change.")
+def site_publish_s3(
+    bucket: str, prefix: str, src: Path, endpoint_url: str | None, prune: bool, dry_run: bool
+) -> None:
+    """Upload a built directory to S3 (boto3 from requirements/cloud.txt, AWS credential chain)."""
+    try:
+        import boto3
+    except ImportError as exc:  # pragma: no cover - environment without boto3
+        raise click.ClickException("boto3 is not installed (requirements/cloud.txt)") from exc
+    from arena.cloud.s3 import upload_dir
+
+    client = boto3.client("s3", endpoint_url=endpoint_url)
+    rep = upload_dir(client, bucket, src, prefix, prune=prune, dry_run=dry_run)
+    mode = "would upload" if dry_run else "uploaded"
+    click.echo(
+        f"{mode} {len(rep.uploaded)}, skipped {len(rep.skipped)}, deleted {len(rep.deleted)}"
+    )
+
+
 @site.command("build")
 @click.option(
     "--out",

@@ -168,3 +168,7 @@ Used for the one-line "why companies use it" on the Lab page. Confidence: V = pr
 
 ## TypeScript (T296), checked 2026-11-22
 - `typescript` 7.0.2 on npm (Apache-2.0, `npm view`); `module: "none"` is no longer accepted by this version, so the config uses `es2020` for a file without imports or exports, which compiles to a plain script. Installed only in `tools/site-ts` (dev dependency, lock file committed); the site itself loads the compiled `app.js` and ships no TypeScript.
+
+## AWS as code and S3 tests (T292), checked 2026-11-22
+- `boto3` 1.44.9 and `moto` 5.2.5 (PyPI, Apache-2.0); botocore needs `python-dateutil<3`, so they live in their own requirements file and CI environment (like dbt). Terraform image `hashicorp/terraform:1.17.2` exists on Docker Hub (the CLI is under the Business Source License; running `fmt` and `validate` in CI is within its terms). The AWS provider is constrained to `>= 6.0, < 7.0`; its registry page could not be read from the agent environment (the registry host is blocked), so `terraform validate` in CI is the check of the resource arguments.
+- The MinIO image is no longer on Docker Hub (repository not found, 2026-11-22), so the S3 tests use moto's S3 implementation instead of a MinIO container.

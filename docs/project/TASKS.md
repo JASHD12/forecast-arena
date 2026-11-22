@@ -186,12 +186,13 @@ Keep the first line of each task in exactly this shape; the status script parses
     revisions, `ml` rule, titles, site attribution; fixtures recorded from the real API.
   - Done when: unit tests cover parsing, generation, no leakage, ties, voids, revisions,
     the model, the missing-key skip and the attribution.
-- [!] T045e · Enable crypto (live) (deps: T045d, T046; needs: H12) WAIT(until=2026-11-23)
+- [x] T045e · Enable crypto (live) (deps: T045d, T046; needs: H12)
   - Code and workflows done 2026-11-22 (owner set the secret `ARENA_COINGECKO_API_KEY` and asked for crypto to go live): morning, evening and resolve pass the key and default to `power,weather,attention,markets,crypto`; a unit test limits the secret to those three jobs. Waits for the first live evening or morning run after the merge to write crypto questions and for `verify` to pass.
   - Do: pass `ARENA_COINGECKO_API_KEY` to the morning and resolve workflows; add `crypto`
     to the live domains.
   - Done when: a real morning run writes crypto questions and verify passes, or
     `WAIT(until=<date>)`.
+  - Verified 2026-11-22 21:50 UTC: the first scheduled evening run after the merge (run 45073044132) wrote the crypto questions of the 2026-11-23 batch (5 `up` and 5 `bigmove` for the coins, CoinGecko in the text); the ledger verifies (355 files, 10 batch seals). The first crypto forecasts come with tomorrow's morning run.
 - [x] T045f · Site improvements (owner request 2026-11-12) (deps: T045a)
   - Do: guide/FAQ, question-page verdict and "who was closest", archive by day with topic
     filters, leaderboard bars and friendly names, how-it-works strip, Atom feed, favicon

@@ -105,3 +105,44 @@ def test_golden_evaluation_meets_the_stated_floors(tmp_path: Path) -> None:
     assert m["refusal_pct"] == 100 and m["false_refusal_pct"] == 0
     assert m["no_invented_numbers_pct"] == 100
     assert cats["decline"] == 100 and cats["lookup"] >= 95 and cats["result"] >= 95
+
+
+LLM = ROOT / "src" / "arena" / "site" / "static" / "chat-llm.js"
+
+
+def _tier2(script: str) -> object:
+    code = (
+        f"const c=require({json.dumps(str(CHAT))});const l=require({json.dumps(str(LLM))});{script}"
+    )
+    out = subprocess.run(["node", "-e", code], capture_output=True, text=True, check=True)
+    return json.loads(out.stdout)
+
+
+def test_grounding_check_rejects_numbers_that_are_not_in_the_facts() -> None:
+    facts = "ML model 20% Base rate 50% Brier 0.2434 over 30 questions"
+    got = _tier2(
+        f"const f={json.dumps(facts)};console.log(JSON.stringify(["
+        "c.grounded('The ML model says 20% and the base rate 50%.', f),"
+        "c.grounded('The ML model says 25%.', f),"
+        "c.grounded('You should buy now at 20%.', f),"
+        "c.grounded('', f)]))"
+    )
+    assert [g["ok"] for g in got] == [True, False, False, False]  # type: ignore[index,union-attr]
+    assert got[1]["bad"] == [25]  # type: ignore[index]
+
+
+def test_rephraser_sends_only_the_facts_and_returns_the_model_text() -> None:
+    got = _tier2(
+        "let seen;const engine={chat:{completions:{create:async(r)=>{seen=r;"
+        "return {choices:[{message:{content:' Two plain sentences. '}}]};}}}};"
+        "const rp=l.createRephraser(engine);"
+        "rp('ML model 20%').then(o=>console.log(JSON.stringify({o,t:seen.temperature,"
+        "sys:seen.messages[0].content,user:seen.messages[1].content})))"
+    )
+    assert got["o"] == "Two plain sentences." and got["t"] == 0  # type: ignore[index]
+    assert got["user"] == "ML model 20%" and "Use only those facts" in got["sys"]  # type: ignore[index]
+
+
+def test_model_and_library_are_pinned() -> None:
+    got = _tier2("console.log(JSON.stringify({m:l.MODEL_ID,h:l.LIB_SHA256}))")
+    assert got["m"] == "Qwen2.5-0.5B-Instruct-q4f16_1-MLC" and len(got["h"]) == 64  # type: ignore[index]

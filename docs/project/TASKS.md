@@ -896,7 +896,8 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
 - [x] T314 · Golden evaluation `evals/golden/chat-v1.jsonl`, Node runner, result `evals/results/lab-ask-arena.json` and card (deps: T312)
   - Done 2026-11-22: refusals 100%, no false refusals, no invented numbers 100%; the misses are listed on the card.
 - [x] T315 · Explainer `docs/explainers/10-ask-the-arena.md` (deps: T314)
-- [ ] T316 · Optional tier 2: an opt-in in-browser model that only rephrases retrieved facts (deps: T314; needs owner OK: a roughly 300 MB third-party download, privacy page and CSP change)
+- [x] T316 · Optional tier 2: an opt-in in-browser model that only rephrases retrieved facts (deps: T314; owner OK 2026-11-23: H41)
+  - Done 2026-11-23: `site_ts/chat-llm.ts` (button after a WebGPU adapter check, library fetched from a pinned URL and refused unless its SHA-256 matches, Qwen2.5-0.5B via WebLLM 0.2.87), grounding check in `chat.ts` (every number must be in the facts, guard on the output), page-specific CSP on `ask.html` only, privacy line, Node tests with a fake engine, browser test of the button. Not run against a real WebGPU browser in this environment (owner check).
 
 ## Phase 19 - forecast-audit: an open-source release that is also the hiring portfolio (owner brief of 2026-11-22)
 

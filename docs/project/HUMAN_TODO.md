@@ -313,8 +313,9 @@ curl -X POST -H "Authorization: Bearer TOKEN" -H "Accept: application/vnd.github
   - Outreach choice (openmod or PyData Berlin) and whether to open an upstream issue (`docs/upstream/scores-candidate.md`): your decision; the agent posts nothing.
   - Tagging a `forecast-audit-v0.1` release from `docs/releases/forecast-audit-v0.1.md` is yours.
 
-- [ ] H41 · Optional: decide on the in-browser model tier for Ask the Arena (T316)
+- [x] H41 · Optional: decide on the in-browser model tier for Ask the Arena (T316)
   - Today the chat answers from lookups and document search only; nothing is downloaded. A third tier could rephrase retrieved facts with a small model that runs in the visitor's browser (about 300 MB, loaded only after a click, from a third-party host). It needs your OK because it changes the privacy page and adds an outside download. Reply "yes tier 2" or leave it as is.
+  - Answered yes 2026-11-23 (chat): tier 2 is built. Please test it once after the redeploy, in a recent desktop Chrome or Edge: open Ask the Arena, click "Load the in-browser model" (about 290 MB), ask "Who is winning?" and tell me what appears. The agent could not run it on a real WebGPU browser or reach jsDelivr, so this is the first real test.
 
 - [ ] H42 · Put Forecast Arena on your GitHub profile (T326)
   - The agent cannot do this: the profile page is the README of a separate repository (`JASHD12/JASHD12`), and About text, topics and pinning are repository settings.

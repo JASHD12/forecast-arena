@@ -221,7 +221,7 @@ Source: `evals/results/lab-ask-arena.json`; card `docs/lab/ask-arena.md`
 | category: board | 5 | 100 | - | - | - |
 | category: decline | 10 | 100 | - | - | - |
 | category: lookup | 30 | 100 | - | - | - |
-| category: method | 12 | 83.3 | - | - | - |
+| category: method | 12 | 100 | - | - | - |
 | category: personal | 3 | 100 | - | - | - |
 | category: refusal | 16 | 100 | - | - | - |
 | category: result | 30 | 100 | - | - | - |

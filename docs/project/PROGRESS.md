@@ -65,6 +65,7 @@ Nothing. See the session summary above and `python scripts/status.py`.
   output, not acted on (S11).
 
 ## Done log
+- T316: Ask the Arena tier 2 (opt-in in-browser model, rewords facts only, grounded check, pinned library hash); untested on a real WebGPU browser, owner check in H41.
 - T326: GitHub profile README draft generated (`docs/profile/PROFILE_README.md`), owner steps in H42.
 - T247 (distillation) evaluated from release `lab-distill-r1`: student Brier 0.2365 vs teacher 0.1802, QLoRA 0.2378, base rate 0.2182; not live.
 - T310-T315 (Ask the Arena): knowledge pack, TypeScript orchestrator, `ask.html`, golden evaluation (refusals 100%, no invented numbers 100%), explainer 10; T252b judge result (US$0.04); T247 labels complete (1,198 of 1,200, US$0.64 total); lab budget US$0.96 of 2.00.

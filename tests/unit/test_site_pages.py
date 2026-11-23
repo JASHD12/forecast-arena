@@ -93,7 +93,7 @@ def test_no_third_party_requests_scripts_only_self_hosted(tmp_path) -> None:
         for kind, src in p.scripts:
             assert kind in ("src", "application/json"), f"inline script in {page}"
             if kind == "src":
-                assert src.endswith(("static/app.js", "static/chat.js")), (
+                assert src.endswith(("static/app.js", "static/chat.js", "static/chat-llm.js")), (
                     f"{page} loads script {src}"
                 )
         assert not p.handlers, f"inline event handlers {p.handlers} in {page}"
@@ -250,3 +250,19 @@ def test_leaderboard_forest_and_about_architecture(tmp_path) -> None:
     about = (res.out_dir / "about.html").read_text()
     assert "Jashdeep Singh" in about and "As-of gateway" in about
     assert "As-of gateway" in (res.out_dir / "methods.html").read_text()
+
+
+def test_chat_tier2_script_names_only_its_pinned_hosts(tmp_path) -> None:
+    """Tier 2 (T316) is the only script that may name an outside URL, and only the pinned ones;
+    the CSP that allows those hosts is on the chat page alone."""
+    _, res = _site(tmp_path)
+    llm = (res.out_dir / "static" / "chat-llm.js").read_text()
+    urls = set(re.findall(r"https?://[^\s'\"]+", llm))
+    assert urls == {"https://cdn.jsdelivr.net/npm/@mlc-ai/web-llm@0.2.87/lib/index.js"}
+    assert "3bff4c55cd2f0200711517341babcebe7a91a8ef85b983420439fcf26835a674" in llm
+    for banned in ("localStorage", "sessionStorage", "cookie", "XMLHttpRequest"):
+        assert banned not in llm, banned
+    for page in res.out_dir.rglob("*.html"):
+        text = page.read_text()
+        outside = "cdn.jsdelivr.net" in text.split("</head>")[0]
+        assert outside == (page.name == "ask.html"), page

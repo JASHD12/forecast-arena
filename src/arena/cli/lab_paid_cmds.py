@@ -182,12 +182,24 @@ def lab_judge_run(
 @click.option("--name-a", default="judge A")
 @click.option("--name-b", default="judge B")
 @click.option("--cost", type=float, default=0.0, help="US$ of the second judge run (JG_SUMMARY).")
+@click.option("--experiment", default="judge-llm", help="Result id; the card is docs/lab/<id>.md.")
+@click.option("--title", default="Two LLM judges compared (not human calibration)")
+@click.option("--limit", "extra_limits", multiple=True, help="An extra limit to print on the card.")
 @click.option(
     "--out", type=click.Path(path_type=Path), default=Path("evals/results/lab-judge-llm.json")
 )
 @click.pass_obj
 def lab_judge_compare(
-    obj: Ctx, scores_a: Path, scores_b: Path, name_a: str, name_b: str, cost: float, out: Path
+    obj: Ctx,
+    scores_a: Path,
+    scores_b: Path,
+    name_a: str,
+    name_b: str,
+    cost: float,
+    experiment: str,
+    title: str,
+    extra_limits: tuple[str, ...],
+    out: Path,
 ) -> None:
     """Agreement between two LLM judges on the items both graded. Not human calibration (T328)."""
     from arena.lab import judge as jg
@@ -206,8 +218,8 @@ def lab_judge_compare(
             "exact_match_pct": None if exact is None else round(100 * exact, 1),
         }
     result = LabResult(
-        experiment="judge-llm",
-        title="Two LLM judges compared (not human calibration)",
+        experiment=experiment,
+        title=title,
         created_at=obj.clock.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
         why="Checking a judge against a second, independent model is a cheap sanity check "
         "before (and never instead of) calibrating it against human labels.",
@@ -220,8 +232,9 @@ def lab_judge_compare(
         limits=[
             "Two models can share biases, so agreement does not show either is right.",
             "Only the items both judges graded are compared; the sample is small.",
+            *extra_limits,
         ],
-        card="docs/lab/judge-llm.md",
+        card=f"docs/lab/{experiment}.md",
     )
     out.write_text(result.model_dump_json(indent=1) + "\n", encoding="utf-8")
     for name, value in metrics.items():

@@ -39,7 +39,7 @@ class LabResult(BaseModel):
 #: Experiments that are planned and not yet run (shown as such, never with numbers).
 PLANNED: tuple[tuple[str, str], ...] = (
     (
-        "Second LLM judge compared with the first (LLM against LLM, not human)",
+        "Second LLM judge (a different model) compared with the first (LLM against LLM, not human)",
         "approved 2026-11-23; one small paid run (about US$0.2, 30 items) follows the merge",
     ),
     (

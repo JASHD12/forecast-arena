@@ -1,0 +1,40 @@
+{
+ "kind": "evaluation",
+ "experiment": "judge-agent",
+ "title": "LLM judge against the agent's own ratings (not human calibration)",
+ "created_at": "2026-11-23T19:27:33Z",
+ "why": "Checking a judge against a second, independent model is a cheap sanity check before (and never instead of) calibrating it against human labels.",
+ "prereg_sha256": null,
+ "dataset_sha256": {},
+ "artefacts": {},
+ "metrics": {
+  "agreement / data_use": {
+   "n": 30,
+   "weighted_kappa": 0.771,
+   "exact_match_pct": 43.3
+  },
+  "agreement / direction": {
+   "n": 30,
+   "weighted_kappa": 0.767,
+   "exact_match_pct": 66.7
+  },
+  "agreement / hedging": {
+   "n": 30,
+   "weighted_kappa": 0.723,
+   "exact_match_pct": 66.7
+  }
+ },
+ "paired": [],
+ "cost_usd": 0.0,
+ "notes": [
+  "Claude Haiku judge (the live judge run) against agent rater (the coding assistant, ratings written by reading each card; not a human) on 30 rationales both graded.",
+  "Both are language models; this is not agreement with a human."
+ ],
+ "limits": [
+  "Two models can share biases, so agreement does not show either is right.",
+  "Only the items both judges graded are compared; the sample is small.",
+  "The rater is the same AI coding assistant that built this project and is in the same model family as the forecasters, so its ratings carry the same blind spots; it was not blind to the judge, because it had seen some of the judge's scores earlier in the session.",
+  "These ratings do not replace the owner's 30 human labels (HUMAN_TODO H29), which stay open."
+ ],
+ "card": "docs/lab/judge-agent.md"
+}

@@ -146,6 +146,22 @@ def test_label_cards_cover_exactly_the_label_sheet_and_prefill_nothing() -> None
     assert ",_,_,_`" in text and "forecaster_id" not in text
 
 
+def test_agent_ratings_cover_the_label_items_and_are_valid_scores() -> None:
+    import csv
+
+    ratings = json.loads((ROOT / "lab/judge/ratings-agent.json").read_text(encoding="utf-8"))
+    ids = [r["id"] for r in csv.DictReader((ROOT / "lab/judge/label-sheet.csv").open())]
+    assert sorted(ratings) == sorted(ids)
+    assert all(
+        len(v) == 3 and all(isinstance(x, int) and 1 <= x <= 5 for x in v) for v in ratings.values()
+    )
+    result = json.loads((ROOT / "evals/results/lab-judge-agent.json").read_text(encoding="utf-8"))
+    assert result["experiment"] == "judge-agent"
+    assert "not a human" in " ".join(result["notes"]) or "not agreement with a human" in " ".join(
+        result["notes"]
+    )
+
+
 def test_the_second_judge_model_has_a_list_price() -> None:
     from arena.site.llm_obs import price_for
 

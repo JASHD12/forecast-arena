@@ -65,6 +65,7 @@ Nothing. See the session summary above and `python scripts/status.py`.
   output, not acted on (S11).
 
 ## Done log
+- T279 first live measurement (2026-11-23 morning run): sealed 08:02 UTC, 21 min run, llm_local_ft 15 forecasts, 199,608 of 300,000 tokens, health all pass, official start 2026-11-23; agent_hybrid still off.
 - T316: Ask the Arena tier 2 (opt-in in-browser model, rewords facts only, grounded check, pinned library hash); untested on a real WebGPU browser, owner check in H41.
 - T326: GitHub profile README draft generated (`docs/profile/PROFILE_README.md`), owner steps in H42.
 - T247 (distillation) evaluated from release `lab-distill-r1`: student Brier 0.2365 vs teacher 0.1802, QLoRA 0.2378, base rate 0.2182; not live.

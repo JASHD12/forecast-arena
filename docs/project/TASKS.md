@@ -841,6 +841,7 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
 - [x] T277 · ONNX export and `/predict/power` parity in the deployed container (deps: T270)
   - Done 2026-11-21: LightGBM families only (the live HGB champion does not convert, see DECISIONS); parity 1e-4; Docker CI checks the route and runtime import.
 - [ ] T279 · Launch checks: dry-run measurement of runner time and tokens, then flags one at a time (deps: T271, T274)
+  - First live measurement 2026-11-23 (morning run 2026-11-23-morning-1, code 8df51ee): `llm_local_ft` live, `agent_hybrid` still off. Open: the `agent_hybrid` launch check (one more flag, one day at a time).
 - [ ] T281a · Mac smoke run: MLX LoRA on 200 rows, measure memory, minutes and Brier; go/no-go against `lab/prereg/qlora-retrain.md` (deps: T246; needs H33)
 - [ ] T281b · `src/arena/lab/retrain.py` and `scripts/retrain_mac.sh`: monthly retrain, held-out comparison, promote-or-keep, asset upload, PR (deps: T281a)
 - [ ] T281c · Status shows the live model's training cut and months since retrain; HUMAN_TODO launchd steps (deps: T281b)

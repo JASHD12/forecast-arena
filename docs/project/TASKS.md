@@ -808,7 +808,8 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
 - [x] T264a · Explainer 06 and the recruiter role mapping (deps: T242)
   - Done 2026-11-21: `docs/explainers/06-experiments-lab.md` (ten interview questions); each role card links a lab page or code path.
 - [x] T264b · Lab numbers in `docs/interview/numbers.md` and a generated README table (deps: T264a)
-- [ ] T265 · Final sweep and redeploy (deps: T264b)
+- [x] T265 · Final sweep and redeploy (deps: T264b)
+  - Done 2026-11-23: `make check` with CI flags, badges check, README, interview numbers and profile README regenerate clean, `make a11y` passes, site rebuilt from a fresh clone of the ledger (link check PASS), redeploy by `resolve.yml` run 45143586866 (deploy and smoke test green).
 
 ## Phase 15 - The lab goes live (owner decision 2026-11-21; design in docs/project/LAB_PLAN.md, Part 2)
 
@@ -882,7 +883,8 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
   - Owner decision 2026-11-22: **no pollen topic**. DWD terms were read (CC BY 4.0, no registration) and are recorded in SOURCES; no other new topic is started. UBA, Autobahn, Eurostat and Bundesbank could not be read (hosts not on the network allowlist, H38) and are only considered if the owner names one.
 - [x] T303 · Crypto domain live: forecasts of price thresholds only, no trading, not-advice notice, CoinGecko attribution (deps: T045d)
   - Done 2026-11-22: topic text states forecasting exercise, no recommendation, no trading; the footer on every page carries the "research project, not advice" notice and, when crypto questions exist, "Data provided by CoinGecko" (existing test); a topic added after the official start joins the overall boards only after 30 days (`settling_rule`, tests in `test_boards.py`).
-- [ ] T280 · Showcase and final sweep for the live lab (deps: T272, T274, T276a, T276b)
+- [x] T280 · Showcase and final sweep for the live lab (deps: T272, T274, T276a, T276b)
+  - Done 2026-11-23: README lab table and Lab page list the real results (router not built, judge, distillation), recruiter skills rows, explainers 06, 09, 10, interview numbers and screenshot regenerated from the real ledger. `agent_hybrid` stays off until its own launch check (T279).
 
 ## Phase 18 - Ask the Arena (owner decision 2026-11-22: a free, browser-only chat over the published record, with tiers and document search)
 

@@ -99,6 +99,59 @@ def test_judge_run_with_a_fake_model(monkeypatch: pytest.MonkeyPatch, tmp_path: 
     assert "JG_SUMMARY=" in res.output
 
 
+def test_judge_run_labels_only_grades_the_30_labelled_items_and_takes_a_model(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    _live(monkeypatch, JUDGE_ANSWER)
+    seen: list[str | None] = []
+    real = __import__("arena.llm.factory", fromlist=["client_from_settings"])
+
+    def fake(settings):  # type: ignore[no-untyped-def]
+        seen.append(settings.llm_model)
+        return _fake(JUDGE_ANSWER)
+
+    monkeypatch.setattr(real, "client_from_settings", fake)
+    res = _run("lab", "judge-run", "--labels-only", "--model", "claude-sonnet-5-5")
+    line = next(x for x in res.output.splitlines() if x.startswith("JG_SCORES="))
+    scores = json.loads(line.removeprefix("JG_SCORES="))
+    items = json.loads((ROOT / "lab/judge/items.json").read_text(encoding="utf-8"))
+    assert sorted(scores) == sorted(i["id"] for i in jg.label_subset(items))
+    assert len(scores) == 30 and seen == ["claude-sonnet-5-5"]
+
+
+def test_judge_compare_is_labelled_as_llm_against_llm(tmp_path: Path) -> None:
+    a = {f"i{n}": [(n % 5) + 1, 3, 4] for n in range(20)}
+    b = {**a, "i0": [5, 3, 4], "i1": None}
+    pa, pb, out = tmp_path / "a.json", tmp_path / "b.json", tmp_path / "out.json"
+    pa.write_text(json.dumps(a), encoding="utf-8")
+    pb.write_text(json.dumps(b), encoding="utf-8")
+    res = _run("lab", "judge-compare", str(pa), str(pb), "--out", str(out))
+    d = json.loads(out.read_text(encoding="utf-8"))
+    m = d["metrics"]["agreement / hedging"]
+    assert res.exit_code == 0 and m["n"] == 19 and m["exact_match_pct"] == 100.0
+    assert "not agreement with a human" in " ".join(d["notes"]) and d["kind"] == "evaluation"
+
+
+def test_label_cards_cover_exactly_the_label_sheet_and_prefill_nothing() -> None:
+    import csv
+    import sys
+
+    sys.path.insert(0, str(ROOT / "scripts"))
+    import judge_cards
+
+    ids = [r["id"] for r in csv.DictReader((ROOT / "lab/judge/label-sheet.csv").open())]
+    text = judge_cards.OUT.read_text(encoding="utf-8")
+    assert text == judge_cards.render()
+    assert all(f"`{i}`" in text for i in ids) and text.count("Your line:") == 30
+    assert ",_,_,_`" in text and "forecaster_id" not in text
+
+
+def test_the_second_judge_model_has_a_list_price() -> None:
+    from arena.site.llm_obs import price_for
+
+    assert price_for("anthropic", "claude-sonnet-5-5") == (2.00, 10.00)
+
+
 def test_judge_eval_reports_agreement(tmp_path: Path) -> None:
     items = json.loads((ROOT / "lab/judge/items.json").read_text(encoding="utf-8"))
     scores = {i["id"]: [(n % 5) + 1, 3, 4] for n, i in enumerate(items)}

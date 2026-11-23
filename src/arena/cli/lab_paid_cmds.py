@@ -134,18 +134,34 @@ def lab_judge_sheet(obj: Ctx, out_dir: Path) -> None:
     default=JUDGE_DIR / "items.json",
 )
 @click.option("--max-tokens", type=int, default=400_000, help="Hard token cap for this run.")
+@click.option("--model", default="", help="Judge model id instead of the configured one (T328).")
+@click.option(
+    "--labels-only", is_flag=True, help="Grade only the 30 items the owner labels (T328)."
+)
 @click.pass_obj
-def lab_judge_run(obj: Ctx, items_path: Path, max_tokens: int) -> None:
+def lab_judge_run(
+    obj: Ctx, items_path: Path, max_tokens: int, model: str, labels_only: bool
+) -> None:
     """Grade the frozen rationales with the judge model (Actions only; capped; T252b)."""
     from arena.lab import judge as jg
     from arena.lab.paid import PaidRun
     from arena.llm.budget import BudgetExhausted
     from arena.llm.client import LLMError
+    from arena.llm.factory import client_from_settings
 
     _refuse_outside_actions()
     items = json.loads(items_path.read_text(encoding="utf-8"))
+    if labels_only:
+        items = jg.label_subset(items)
+    if model:
+        client = client_from_settings(obj.settings.model_copy(update={"llm_model": model}))
+        if client is None:
+            click.echo("model_missing: no LLM configured", err=True)
+            sys.exit(1)
+    else:
+        client = _client(obj)
     run = PaidRun(
-        _client(obj), max_requests=len(items) + 5, max_tokens=max_tokens, max_output_tokens=1000
+        client, max_requests=len(items) + 5, max_tokens=max_tokens, max_output_tokens=1000
     )
     scores: dict[str, list[int] | None] = {}
     skips: dict[str, int] = {}
@@ -158,6 +174,58 @@ def lab_judge_run(obj: Ctx, items_path: Path, max_tokens: int) -> None:
             skips[type(exc).__name__] = skips.get(type(exc).__name__, 0) + 1
     click.echo("JG_SUMMARY=" + json.dumps({**run.summary(), "skips": skips}, sort_keys=True))
     click.echo("JG_SCORES=" + json.dumps(scores, sort_keys=True))
+
+
+@lab.command("judge-compare")
+@click.argument("scores_a", type=click.Path(exists=True, path_type=Path))
+@click.argument("scores_b", type=click.Path(exists=True, path_type=Path))
+@click.option("--name-a", default="judge A")
+@click.option("--name-b", default="judge B")
+@click.option("--cost", type=float, default=0.0, help="US$ of the second judge run (JG_SUMMARY).")
+@click.option(
+    "--out", type=click.Path(path_type=Path), default=Path("evals/results/lab-judge-llm.json")
+)
+@click.pass_obj
+def lab_judge_compare(
+    obj: Ctx, scores_a: Path, scores_b: Path, name_a: str, name_b: str, cost: float, out: Path
+) -> None:
+    """Agreement between two LLM judges on the items both graded. Not human calibration (T328)."""
+    from arena.lab import judge as jg
+    from arena.lab.results import LabResult
+
+    a = json.loads(scores_a.read_text(encoding="utf-8"))
+    b = json.loads(scores_b.read_text(encoding="utf-8"))
+    both = sorted(i for i in a if a[i] is not None and b.get(i) is not None)
+    metrics: dict[str, dict[str, float | int | str | None]] = {}
+    for k, d in enumerate(jg.DIMENSIONS):
+        kappa = jg.weighted_kappa([a[i][k] for i in both], [b[i][k] for i in both])
+        exact = sum(a[i][k] == b[i][k] for i in both) / len(both) if both else None
+        metrics[f"agreement / {d}"] = {
+            "n": len(both),
+            "weighted_kappa": None if kappa is None else round(kappa, 3),
+            "exact_match_pct": None if exact is None else round(100 * exact, 1),
+        }
+    result = LabResult(
+        experiment="judge-llm",
+        title="Two LLM judges compared (not human calibration)",
+        created_at=obj.clock.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+        why="Checking a judge against a second, independent model is a cheap sanity check "
+        "before (and never instead of) calibrating it against human labels.",
+        metrics=metrics,
+        cost_usd=cost,
+        notes=[
+            f"{name_a} against {name_b} on {len(both)} rationales both graded.",
+            "Both are language models; this is not agreement with a human.",
+        ],
+        limits=[
+            "Two models can share biases, so agreement does not show either is right.",
+            "Only the items both judges graded are compared; the sample is small.",
+        ],
+        card="docs/lab/judge-llm.md",
+    )
+    out.write_text(result.model_dump_json(indent=1) + "\n", encoding="utf-8")
+    for name, value in metrics.items():
+        click.echo(f"{name}: {value}")
 
 
 @lab.command("judge-eval")

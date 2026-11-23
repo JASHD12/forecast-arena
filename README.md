@@ -81,6 +81,7 @@ Each technique is tried against the project's baselines on questions it never sa
 | Stacking with a scikit-learn Pipeline on pandas DataFrames | evaluated (not a live score) | [docs/lab/stacking.md](docs/lab/stacking.md) |
 | Unsupervised data-anomaly detection on price windows (Isolation Forest) | evaluated (not a live score) | [docs/lab/anomaly.md](docs/lab/anomaly.md) |
 | Vector database: Qdrant against brute-force dense search | evaluated (not a live score) | [docs/lab/vectordb.md](docs/lab/vectordb.md) |
+| Second LLM judge compared with the first (LLM against LLM, not human) | approved 2026-11-23; one small paid run (about US$0.2, 30 items) follows the merge | - |
 | Agreement of the LLM judge with human labels | waits for the owner's 30 labels; until then the judge scores are an uncalibrated ranking | - |
 | Cost routing with the simpler ml-first rule on fresh days | a proposal only (found after the fact in the routing study); needs a new pre-registration | - |
 | In-browser model tier for Ask the Arena | optional; needs the owner's OK for a download of about 300 MB | - |

@@ -916,3 +916,7 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
 - [!] T327 · Evaluate the `ml`-first routing rule on fresh live days (pre-registration `lab/prereg/routing-ml-only.md`, committed 2026-11-23) (deps: T250) WAIT(until=2026-12-24)
   - Needs the 30 days 2026-11-24 to 2026-12-23 to resolve; the evaluation script and card are written then. No cost, no live change.
 
+
+- [!] T328 · Readable judge labelling cards and a second LLM judge (LLM against LLM, labelled as such) (deps: T252b) WAIT(until=2026-11-24)
+  - Done 2026-11-23: `scripts/judge_cards.py` -> `lab/judge/label-cards.md` (30 cards, nothing pre-filled); `arena lab judge-run --model --labels-only`, workflow inputs `model` and `labels_only`; `arena lab judge-compare`; Sonnet 5.5 list price added; first judge's scores kept as `lab/judge/scores-claude-haiku-5-5.json`. Open: after the merge, one dispatch of `lab-judge.yml` from main with `model=claude-sonnet-5-5`, `labels_only=true`, `max_tokens=100000` (estimate about US$0.22, ceiling about US$0.64; budget US$0.96 of 2.00 used), then `judge-compare` and the card.
+

@@ -18,7 +18,10 @@ from arena.ledger import Ledger, layout
 
 #: model id prefix -> (input USD per 1M tokens, output USD per 1M tokens), for prompts up
 #: to 100K tokens (ours are far smaller). Source and date are shown with every figure.
-PRICES: dict[str, tuple[float, float]] = {"claude-haiku-5-5": (0.10, 0.50)}
+PRICES: dict[str, tuple[float, float]] = {
+    "claude-haiku-5-5": (0.10, 0.50),
+    "claude-sonnet-5-5": (2.00, 10.00),  # second judge model (T328); docs/SOURCES.md
+}
 PRICE_SOURCE = "Anthropic list prices for Claude Haiku 5.5 as of 2026-11-03 (docs/SOURCES.md)"
 #: T190: prompt-cache reads and 5-minute cache writes, as multiples of the input price
 #: (Claude Haiku 5.5; docs/SOURCES.md).

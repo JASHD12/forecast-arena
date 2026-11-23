@@ -88,6 +88,55 @@ def user_prompt(item: Mapping[str, Any]) -> str:
     )
 
 
+def compact_excerpt(text: str, limit: int = CONTEXT_CHARS) -> str:
+    """The data excerpt without JSON punctuation, so a person can read it (labelling cards)."""
+    flat = re.sub(r'"day":\s*"([^"]+)",\s*"(\w+)":\s*(-?[\d.]+|null)', r"\1 = \3", text)
+    flat = re.sub(r'[{}\[\]"]', " ", flat)
+    flat = re.sub(r"\s*,\s*", ", ", flat)
+    flat = re.sub(r"\s+", " ", flat).strip()
+    return flat if len(flat) <= limit else flat[:limit].rstrip() + " ... (cut off)"
+
+
+def cards_markdown(items: Sequence[Mapping[str, Any]]) -> str:
+    """One readable card per item for the owner's labels (HUMAN_TODO H29); no forecaster names."""
+    lines = [
+        "# Judge labelling cards (30 items)",
+        "",
+        "Read each card, then rate the rationale on three scales from 1 (poor) to 5 (excellent). "
+        "Do not guess the outcome. The data excerpt is the one the judge sees, with JSON "
+        "punctuation removed; it can end mid-sentence because it is cut off.",
+        "",
+        "- **data_use**: are the numbers in the rationale used correctly, none invented or "
+        "misquoted?",
+        "- **direction**: does the probability follow from the rationale (an argument for YES "
+        "should not end with a low probability, and the reverse)?",
+        "- **hedging**: is the confidence right for the evidence (no certainty from thin data, no "
+        "needless vagueness)?",
+        "",
+        "Send back 30 lines in the form `id,data_use,direction,hedging`, for example "
+        "`9dcceff67a,4,5,3`.",
+        "",
+    ]
+    for n, it in enumerate(items, start=1):
+        lines += [
+            f"## {n}. `{it['id']}`",
+            "",
+            f"**Question:** {it['question']}",
+            "",
+            f"**Resolves YES if:** {it['rule']}",
+            "",
+            f"**Data the forecaster had:** {compact_excerpt(str(it['context']))}",
+            "",
+            f"**Probability of YES:** {float(it['probability']):.0%}",
+            "",
+            f"**Rationale:** {it['rationale']}",
+            "",
+            f"Your line: `{it['id']},_,_,_`",
+            "",
+        ]
+    return "\n".join(lines)
+
+
 def parse_judgement(text: str) -> dict[str, Any]:
     """The three scores (ints 1-5) and the reasoning; anything else is rejected, never guessed."""
     s = text.strip()

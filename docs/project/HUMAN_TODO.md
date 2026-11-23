@@ -259,10 +259,11 @@ curl -X POST -H "Authorization: Bearer TOKEN" -H "Accept: application/vnd.github
     (adapter, GGUF, logs; the training data is already in the repository, nothing to upload for it), publish.
     Paste the printed SHA-256 values and the release URL into the chat. The agent then pins them in code.
 - [ ] H29 · Label 30 model rationales for the judge calibration (needed for T252b)
-  - Open `lab/judge/label-sheet.csv` (GitHub > the file > "Raw", or download it; 30 rationales, no forecaster names; it is on `main` after
-    the next PR). For each row read the question, the data excerpt, the probability and the rationale, then give three whole numbers
+  - Easiest: open `lab/judge/label-cards.md` on GitHub (one readable card per item, nothing pre-filled, same 30 items as the sheet below) and
+    note your three numbers per card. The raw table is `lab/judge/label-sheet.csv` (GitHub > the file > "Raw", or download it; 30 rationales, no forecaster names). For each row read the question, the data excerpt, the probability and the rationale, then give three whole numbers
     from 1 (poor) to 5 (excellent): **data_use** (are the numbers used correctly, none invented), **direction** (does the probability
     follow from the rationale), **hedging** (is the confidence right for the evidence). Do not guess the outcome.
+  - The agent rated the same 30 cards itself (`lab/judge/ratings-agent.json`, card `docs/lab/judge-agent.md`); that is labelled as an LLM rater and does not replace your labels. If you still prefer not to label, say so and H29 stays open as "uncalibrated against humans".
   - Send me 30 lines in the chat, nothing else: `id,data_use,direction,hedging` (for example `9dcceff67a,4,5,3`). The agent writes
     the labels file and computes the agreement with the judge.
 - [x] H30 · Decision: allow shadow forecasting (no longer needed: the lab techniques run live as normal forecasters, Phase 15)

@@ -16,8 +16,8 @@ move older "Done log" lines to `docs/progress-archive.md`.
 - **Waiting on you:** H41 (test the in-browser model in Chrome/Edge), H42 (paste the profile README), H40 (CV, contact, About text, pilot), H29 (30 judge
   labels), H33 (Mac smoke), H06/H15 (panel, players), H14 (Impressum). Waiting on dates: T222b (2026-11-27), T093 and T301b (2026-11-30).
   Blocked host: T255b (Phoenix docs). T325 is deferred until a role is chosen.
-- **Next agent steps:** the `agent_hybrid` launch check (one flag, one day; a dry run of `morning.yml` with `experimental=true`), then each
-  WAIT task when its date passes. A pre-registration for the `ml`-first routing rule on fresh days is a proposal in DECISIONS, not a task.
+- **Next agent steps:** the `agent_hybrid` launch check (dry run of `morning.yml` with `experimental=true`, scheduled for 2026-11-24 00:05 UTC because today's batch is sealed), then each
+  WAIT task when its date passes (T327, the `ml`-first routing evaluation, waits until 2026-12-24). The pre-registration for the `ml`-first routing rule is committed (`lab/prereg/routing-ml-only.md`).
 - **Open risks:** tier 2 of the chat was tested only with a fake engine (no real WebGPU here); GitHub starts scheduled runs hours late (H20).
 
 ## In progress

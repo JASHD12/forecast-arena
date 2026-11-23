@@ -39,6 +39,10 @@ class LabResult(BaseModel):
 #: Experiments that are planned and not yet run (shown as such, never with numbers).
 PLANNED: tuple[tuple[str, str], ...] = (
     (
+        "Second LLM judge (a different model) compared with the first (LLM against LLM, not human)",
+        "approved 2026-11-23; one small paid run (about US$0.2, 30 items) follows the merge",
+    ),
+    (
         "Agreement of the LLM judge with human labels",
         "waits for the owner's 30 labels; until then the judge scores are an uncalibrated ranking",
     ),
@@ -99,6 +103,8 @@ COLUMNS: dict[str, str] = {
     "hit_pct": "Hit %",
     "false_refusal_pct": "False refusals %",
     "no_invented_pct": "No invented numbers %",
+    "weighted_kappa": "Weighted kappa",
+    "exact_match_pct": "Exact match %",
     "out_of_scope": "Out of scope",
     "correct_refusal_pct": "Correct refusals %",
     "not_in_prompt_pct": "Numbers not in the prompt %",

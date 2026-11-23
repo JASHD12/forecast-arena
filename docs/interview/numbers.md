@@ -352,6 +352,16 @@ Source: `evals/results/lab-guardrails.json`; card `docs/lab/guardrails.md`
 | tool_spoof | 3 | 3 | 100.0 | - |
 | url | 2 | 2 | 100.0 | - |
 
+### LLM judge against the agent's own ratings (not human calibration)
+
+Source: `evals/results/lab-judge-agent.json`; card `docs/lab/judge-agent.md`
+
+| Arm | Questions | Weighted kappa | Exact match % |
+|---|---|---|---|
+| agreement / data_use | 30 | 0.771 | 43.3 |
+| agreement / direction | 30 | 0.767 | 66.7 |
+| agreement / hedging | 30 | 0.723 | 66.7 |
+
 ### LLM-as-judge for stored rationales
 
 Source: `evals/results/lab-judge.json`; card `docs/lab/judge.md`

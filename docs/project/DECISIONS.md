@@ -1332,3 +1332,17 @@ and evidence requirements. Do not backfill historical ML forecasts.
 - LLM tokens 199,608 (169,200 in, 30,408 out, 66 requests) against the 300,000 cap, so about 100,000 tokens of room before `agent_hybrid` is switched on.
 - The first crypto day: all 10 crypto questions have base rate, persistence and `ml`; 3 have LLM forecasts, 1 the LangGraph agent. The official start file now reads 2026-11-23 (not-before date used correctly, not 2099).
 - Decision: no cap or budget change. `agent_hybrid` stays off until its own launch check; one flag per day.
+
+## 2026-11-23 The `ml`-first routing rule gets a pre-registration for fresh days (T327)
+- Context: the routing study's pre-registered rule saved no paid calls and the live router was closed; a simpler `ml`-first rule looked good but was picked from a grid after the fact.
+- Decision: `lab/prereg/routing-ml-only.md` fixes the rule (delta 0.15), the 30 evaluation days (2026-11-24 to 2026-12-23), the hypotheses and the decision rule before any of those days exist. The evaluation waits until 2026-12-24 (T327). No live change (I8).
+- `agent_hybrid` (T279): a dry run of `morning.yml` needs an unsealed batch day, so it was scheduled for the early hours of the next batch day instead of being run against today's sealed batch; the flag stays off until that measurement is clean.
+
+## 2026-11-23 A second LLM judge is an LLM-against-LLM check, never a substitute for the owner's labels (T328)
+- Context: the owner asked the agent to label the 30 judge items. Refused: the labels are meant to be human, so an agent's ratings would be another language model's, and calling the result human agreement would be a fabricated number (I5).
+- Decision: (1) readable labelling cards (`lab/judge/label-cards.md`) make the owner's 30 labels faster; (2) with the owner's yes (chat, 2026-11-23) one small paid run lets Claude Sonnet 5.5 grade the same 30 items; `arena lab judge-compare` reports weighted kappa and exact match between the two models, labelled "not agreement with a human". Same-family bias is a stated limit. Cost estimate about US$0.22 at the list price read on 2026-11-23, hard token cap 100,000, budget after the run about US$1.2 of 2.00. H29 stays open.
+
+## 2026-11-23 Agent ratings of the 30 judge items: a labelled third rater, not the owner's labels (T328)
+- Context: the owner asked the agent to fill the 30 labels with assumptions because they would not label them. Filling the human-label file with invented numbers was refused (I5); instead the agent read each of the 30 cards and rated them on the three scales, saved as `lab/judge/ratings-agent.json`.
+- Result (`evals/results/lab-judge-agent.json`, card `docs/lab/judge-agent.md`): weighted kappa between the Haiku judge and the agent rater 0.771 (data_use), 0.767 (direction), 0.723 (hedging); exact match 43% / 67% / 67%, on 30 rationales. Labelled "not a human" everywhere; limits: same model family, not blind to the judge, small sample.
+- The agent's ratings are never written into the owner-label path (`labels.csv` for `judge-eval`); H29 stays open and the judge on the Lab page stays "uncalibrated against humans".

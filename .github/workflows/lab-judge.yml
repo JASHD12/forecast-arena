@@ -10,6 +10,13 @@ on:
       max_tokens:
         description: "Hard token cap for this run"
         default: "400000"
+      model:
+        description: "Judge model id instead of the configured one (T328, second judge); empty = configured"
+        default: ""
+      labels_only:
+        description: "Grade only the 30 items the owner labels (T328)"
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -44,7 +51,12 @@ jobs:
       - name: Run
         env:
           MAX_TOKENS: ${{ inputs.max_tokens }}
+          JUDGE_MODEL: ${{ inputs.model }}
+          LABELS_ONLY: ${{ inputs.labels_only }}
         run: |
           set -o pipefail
-          .venv/bin/arena lab judge-run --max-tokens "$MAX_TOKENS" | tee run.log
+          ARGS=(--max-tokens "$MAX_TOKENS")
+          if [ -n "$JUDGE_MODEL" ]; then ARGS+=(--model "$JUDGE_MODEL"); fi
+          if [ "$LABELS_ONLY" = "true" ]; then ARGS+=(--labels-only); fi
+          .venv/bin/arena lab judge-run "${ARGS[@]}" | tee run.log
           { echo "## lab-judge (not the live record)"; echo '```'; grep -v "^JG_SCORES=" run.log | head -40; echo '```'; } >> "$GITHUB_STEP_SUMMARY"

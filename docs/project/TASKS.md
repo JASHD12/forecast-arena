@@ -842,7 +842,7 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
 - [x] T277 · ONNX export and `/predict/power` parity in the deployed container (deps: T270)
   - Done 2026-11-21: LightGBM families only (the live HGB champion does not convert, see DECISIONS); parity 1e-4; Docker CI checks the route and runtime import.
 - [ ] T279 · Launch checks: dry-run measurement of runner time and tokens, then flags one at a time (deps: T271, T274)
-  - First live measurement 2026-11-23 (morning run 2026-11-23-morning-1, code 8df51ee): `llm_local_ft` live, `agent_hybrid` still off. Open: the `agent_hybrid` launch check (one more flag, one day at a time).
+  - First live measurement 2026-11-23 (morning run 2026-11-23-morning-1, code 8df51ee): `llm_local_ft` live, `agent_hybrid` still off. Open: the `agent_hybrid` launch check (one more flag, one day at a time). A dry run needs an unsealed batch day, so it is scheduled for 2026-11-24 00:05 UTC; the flag stays off until it is clean.
 - [ ] T281a · Mac smoke run: MLX LoRA on 200 rows, measure memory, minutes and Brier; go/no-go against `lab/prereg/qlora-retrain.md` (deps: T246; needs H33)
 - [ ] T281b · `src/arena/lab/retrain.py` and `scripts/retrain_mac.sh`: monthly retrain, held-out comparison, promote-or-keep, asset upload, PR (deps: T281a)
 - [ ] T281c · Status shows the live model's training cut and months since retrain; HUMAN_TODO launchd steps (deps: T281b)
@@ -913,3 +913,10 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
 - [x] T324 · Owner path and docs: pilot script, upstream candidate note, starter issues, explainer 09, HUMAN_TODO items (deps: T322)
 - [ ] T325 · One role-specific follow-up chosen by role fit or pilot feedback (deferred until selected; owner decision)
 - [x] T326 · GitHub profile README draft that features Forecast Arena (generated `docs/profile/PROFILE_README.md`, test, owner steps H42) (deps: T322)
+- [!] T327 · Evaluate the `ml`-first routing rule on fresh live days (pre-registration `lab/prereg/routing-ml-only.md`, committed 2026-11-23) (deps: T250) WAIT(until=2026-12-24)
+  - Needs the 30 days 2026-11-24 to 2026-12-23 to resolve; the evaluation script and card are written then. No cost, no live change.
+
+
+- [!] T328 · Readable judge labelling cards and a second LLM judge (LLM against LLM, labelled as such) (deps: T252b) WAIT(until=2026-11-24)
+  - Done 2026-11-23: `scripts/judge_cards.py` -> `lab/judge/label-cards.md` (30 cards, nothing pre-filled); `arena lab judge-run --model --labels-only`, workflow inputs `model` and `labels_only`; `arena lab judge-compare`; Sonnet 5.5 list price added; first judge's scores kept as `lab/judge/scores-claude-haiku-5-5.json`. Open: after the merge, one dispatch of `lab-judge.yml` from main with `model=claude-sonnet-5-5`, `labels_only=true`, `max_tokens=100000` (estimate about US$0.22, ceiling about US$0.64; budget US$0.96 of 2.00 used), then `judge-compare` and the card. Also done 2026-11-23 (owner asked the agent to fill labels): `lab/judge/ratings-agent.json`, the agent's own ratings of the 30 items, compared with the judge in `evals/results/lab-judge-agent.json` (labelled not human; H29 stays open).
+

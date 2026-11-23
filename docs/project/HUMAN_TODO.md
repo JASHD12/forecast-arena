@@ -316,3 +316,10 @@ curl -X POST -H "Authorization: Bearer TOKEN" -H "Accept: application/vnd.github
 - [ ] H41 · Optional: decide on the in-browser model tier for Ask the Arena (T316)
   - Today the chat answers from lookups and document search only; nothing is downloaded. A third tier could rephrase retrieved facts with a small model that runs in the visitor's browser (about 300 MB, loaded only after a click, from a third-party host). It needs your OK because it changes the privacy page and adds an outside download. Reply "yes tier 2" or leave it as is.
 
+- [ ] H42 · Put Forecast Arena on your GitHub profile (T326)
+  - The agent cannot do this: the profile page is the README of a separate repository (`JASHD12/JASHD12`), and About text, topics and pinning are repository settings.
+  - Profile README: GitHub > New repository, name exactly `JASHD12` (public), tick "Add a README file", create. Open its `README.md`, replace everything with the contents of `docs/profile/PROFILE_README.md` from this repository (regenerate first with `python scripts/profile_readme.py` after the latest merge), commit. It then shows on https://github.com/JASHD12.
+  - Pin: your profile > "Customize your pins" > tick `forecast-arena` (and `JASHD12` is not needed).
+  - About box of `forecast-arena` (gear icon next to "About"): description "Live public benchmark: classical ML vs LLM agents forecasting tomorrow, with forecasts locked in a hash-chained ledger before the answer exists." Website `https://jashd12.github.io/forecast-arena/`. Topics: forecasting, machine-learning, llm, llm-agents, mlops, time-series, data-science, python, github-actions, langgraph. Tick "Use the topics..." as you like; untick Releases/Packages if empty.
+  - Check the wording "Specified and directed by me; implemented with AI coding agents" is how you want to describe your role; add your CV/LinkedIn/email to `site_content/recruiter_facts.json` (H16) so the profile shows a contact line.
+

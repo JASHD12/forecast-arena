@@ -908,4 +908,4 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
 - [x] T323 · Contributor and release path: CONTRIBUTING, issue form, focused test command, release note, archive test, data licence file (deps: T321)
 - [x] T324 · Owner path and docs: pilot script, upstream candidate note, starter issues, explainer 09, HUMAN_TODO items (deps: T322)
 - [ ] T325 · One role-specific follow-up chosen by role fit or pilot feedback (deferred until selected; owner decision)
-
+- [x] T326 · GitHub profile README draft that features Forecast Arena (generated `docs/profile/PROFILE_README.md`, test, owner steps H42) (deps: T322)

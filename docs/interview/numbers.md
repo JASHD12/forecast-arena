@@ -305,6 +305,31 @@ Source: `evals/results/lab-dpo-r1.json`; card `docs/lab/dpo-r1.md`
 | qlora_1_5b / test_nov | 90 | 0.233 | 0.6586 | 0.1175 |
 | qlora_1_5b / test_oct | 186 | 0.24 | 0.6729 | 0.0902 |
 
+### Distillation from Claude into Qwen2.5-1.5B (soft-label QLoRA)
+
+Source: `evals/results/lab-distill-r1.json`; card `docs/lab/distill-r1.md`
+
+| Arm | Questions | Brier | Log score | ECE |
+|---|---|---|---|---|
+| base_1_5b / test_all | 276 | 0.2486 | 0.6904 | 0.0585 |
+| base_1_5b / test_nov | 90 | 0.2477 | 0.6886 | 0.0491 |
+| base_1_5b / test_oct | 186 | 0.249 | 0.6912 | 0.0817 |
+| base_rate / test_all | 276 | 0.2182 | 0.6235 | 0.0591 |
+| base_rate / test_nov | 90 | 0.203 | 0.588 | 0.0564 |
+| base_rate / test_oct | 186 | 0.2255 | 0.6406 | 0.0851 |
+| claude_teacher / test_all | 276 | 0.1802 | 0.5318 | 0.05 |
+| claude_teacher / test_nov | 90 | 0.1374 | 0.4351 | 0.094 |
+| claude_teacher / test_oct | 186 | 0.201 | 0.5787 | 0.0665 |
+| distill_1_5b / test_all | 276 | 0.2365 | 0.6658 | 0.0522 |
+| distill_1_5b / test_nov | 90 | 0.237 | 0.6668 | 0.0826 |
+| distill_1_5b / test_oct | 186 | 0.2363 | 0.6654 | 0.0759 |
+| ml / test_all | 276 | 0.1663 | 0.4944 | 0.0673 |
+| ml / test_nov | 90 | 0.1352 | 0.4376 | 0.1741 |
+| ml / test_oct | 186 | 0.1814 | 0.5219 | 0.1177 |
+| qlora_1_5b / test_all | 276 | 0.2378 | 0.6683 | 0.0687 |
+| qlora_1_5b / test_nov | 90 | 0.233 | 0.6586 | 0.1175 |
+| qlora_1_5b / test_oct | 186 | 0.24 | 0.6729 | 0.0902 |
+
 ### Guardrails and red-team suite for untrusted tool and news text
 
 Source: `evals/results/lab-guardrails.json`; card `docs/lab/guardrails.md`

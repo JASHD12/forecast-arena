@@ -37,12 +37,7 @@ class LabResult(BaseModel):
 
 
 #: Experiments that are planned and not yet run (shown as such, never with numbers).
-PLANNED: tuple[tuple[str, str], ...] = (
-    (
-        "Distillation from Claude",
-        "approved 2026-11-22; pre-registered, label workflow built; the paid run follows",
-    ),
-)
+PLANNED: tuple[tuple[str, str], ...] = ()
 
 
 def load_lab_results(results_dir: Path | None) -> list[LabResult]:

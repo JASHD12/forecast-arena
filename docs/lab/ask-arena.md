@@ -2,7 +2,7 @@
 
 **EVALUATION: an experiment of the lab, not the live record (SPEC 17).**
 
-Result file: `evals/results/lab-ask-arena.json`, created 2026-11-22T23:10:25Z.
+Result file: `evals/results/lab-ask-arena.json`, created 2026-11-23T01:30:17Z.
 
 Why companies use it: Retrieval-grounded assistants with refusals and tiered routing are the standard pattern for answering questions over a company's own data without inventing facts.
 
@@ -22,10 +22,10 @@ Why companies use it: Retrieval-grounded assistants with refusals and tiered rou
 | all answers | 115 | - | - | 100 | - |
 
 
-- 115 questions on the offline fixture pack (30 questions, 263 document chunks, 227450 bytes).
+- 115 questions on the offline fixture pack (30 questions, 276 document chunks, 238131 bytes).
 - Answers by tier: lookup 69, documents 13, declined or refused 33.
-- Latency in Node: median 0.7 ms, 95th percentile 8.93 ms.
-- Missed in the golden set: 2 question(s); see the failure list in the run output.
+- Latency in Node: median 0.8 ms, 95th percentile 13.51 ms.
+- Missed questions: method: What does leakage mean and how is it prevented?; method: Which forecasters take part?.
 
 ## What this does and does not show
 

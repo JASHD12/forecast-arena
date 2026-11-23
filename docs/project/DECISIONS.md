@@ -1332,3 +1332,8 @@ and evidence requirements. Do not backfill historical ML forecasts.
 - LLM tokens 199,608 (169,200 in, 30,408 out, 66 requests) against the 300,000 cap, so about 100,000 tokens of room before `agent_hybrid` is switched on.
 - The first crypto day: all 10 crypto questions have base rate, persistence and `ml`; 3 have LLM forecasts, 1 the LangGraph agent. The official start file now reads 2026-11-23 (not-before date used correctly, not 2099).
 - Decision: no cap or budget change. `agent_hybrid` stays off until its own launch check; one flag per day.
+
+## 2026-11-23 The `ml`-first routing rule gets a pre-registration for fresh days (T327)
+- Context: the routing study's pre-registered rule saved no paid calls and the live router was closed; a simpler `ml`-first rule looked good but was picked from a grid after the fact.
+- Decision: `lab/prereg/routing-ml-only.md` fixes the rule (delta 0.15), the 30 evaluation days (2026-11-24 to 2026-12-23), the hypotheses and the decision rule before any of those days exist. The evaluation waits until 2026-12-24 (T327). No live change (I8).
+- `agent_hybrid` (T279): a dry run of `morning.yml` needs an unsealed batch day, so it was scheduled for the early hours of the next batch day instead of being run against today's sealed batch; the flag stays off until that measurement is clean.

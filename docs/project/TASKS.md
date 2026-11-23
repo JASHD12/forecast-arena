@@ -917,6 +917,6 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
   - Needs the 30 days 2026-11-24 to 2026-12-23 to resolve; the evaluation script and card are written then. No cost, no live change.
 
 
-- [!] T328 · Readable judge labelling cards and a second LLM judge (LLM against LLM, labelled as such) (deps: T252b) WAIT(until=2026-11-24)
+- [x] T328 · Readable judge labelling cards and a second LLM judge (LLM against LLM, labelled as such) (deps: T252b)
   - Done 2026-11-23: `scripts/judge_cards.py` -> `lab/judge/label-cards.md` (30 cards, nothing pre-filled); `arena lab judge-run --model --labels-only`, workflow inputs `model` and `labels_only`; `arena lab judge-compare`; Sonnet 5.5 list price added; first judge's scores kept as `lab/judge/scores-claude-haiku-5-5.json`. Open: after the merge, one dispatch of `lab-judge.yml` from main with `model=claude-sonnet-5-5`, `labels_only=true`, `max_tokens=100000` (estimate about US$0.22, ceiling about US$0.64; budget US$0.96 of 2.00 used), then `judge-compare` and the card. Also done 2026-11-23 (owner asked the agent to fill labels): `lab/judge/ratings-agent.json`, the agent's own ratings of the 30 items, compared with the judge in `evals/results/lab-judge-agent.json` (labelled not human; H29 stays open).
-
+  - Second judge run done 2026-11-23 (`lab-judge` run 45258529928, US$0.134, 30 of 30 scored): Haiku against Sonnet weighted kappa 0.80 (data_use), 0.75 (direction), 0.76 (hedging); exact match 50% / 50% / 77%. `evals/results/lab-judge-llm.json`, `docs/lab/judge-llm.md`. Still LLM against LLM; H29 stays open.

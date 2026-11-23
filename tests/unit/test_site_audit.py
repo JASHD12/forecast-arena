@@ -129,3 +129,21 @@ def test_lineage_reads_the_ledger_record() -> None:
     got = fa.lineage(rec, "q")
     assert got["ml"] == 0.19 and got["persistence"] is None and got["outcome"] == 0
     assert got["skips"] == {"agent_graph": "not_sampled"} and fa.lineage(rec, "zz") is None
+
+
+def test_home_and_guide_say_the_official_record_started_when_the_start_file_exists(
+    tmp_path: Path,
+) -> None:
+    import json
+
+    from arena.ledger import layout
+
+    plain = _site(tmp_path / "a")
+    assert "The official record started on" not in _text((plain.out_dir / "index.html").read_text())
+    led = Ledger(tmp_path / "b" / "l")
+    led.write_raw(layout.OFFICIAL_START_PATH, json.dumps({"official_start": "2026-11-23"}).encode())
+    res = build_site(led, tmp_path / "b" / "site", CLOCK, tmp_path / "none")
+    assert "The official record started on 2026-11-23" in _text(
+        (res.out_dir / "index.html").read_text()
+    )
+    assert "It started on 2026-11-23" in _text((res.out_dir / "guide.html").read_text())

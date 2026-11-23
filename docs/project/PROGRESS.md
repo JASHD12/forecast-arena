@@ -45,6 +45,7 @@ Nothing. See the session summary above and `python scripts/status.py`.
   output, not acted on (S11).
 
 ## Done log
+- T328 second judge (Sonnet, US$0.134): kappa 0.75-0.80 with the first judge; stale README/site text refreshed (official record started 2026-11-23); branch `claude/judge-second` waits for the agent_hybrid dry run (2026-11-24 00:05 UTC) before the single PR is opened.
 - T279 first live measurement (2026-11-23 morning run): sealed 08:02 UTC, 21 min run, llm_local_ft 15 forecasts, 199,608 of 300,000 tokens, health all pass, official start 2026-11-23; agent_hybrid still off.
 - T316: Ask the Arena tier 2 (opt-in in-browser model, rewords facts only, grounded check, pinned library hash); untested on a real WebGPU browser, owner check in H41.
 - T326: GitHub profile README draft generated (`docs/profile/PROFILE_README.md`), owner steps in H42.

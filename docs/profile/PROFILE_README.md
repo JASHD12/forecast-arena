@@ -10,7 +10,7 @@ A live, public benchmark: simple baselines, a classical ML model, and LLM foreca
 
 **Result so far (backtest, not the live record):** over 365 days of German day-ahead electricity, the gradient-boosted model scores Brier 0.1930 against 0.2205 for "same as last time" and 0.2466 for the base rate (lower is better; always saying 50% scores 0.25). Paired difference to persistence: -0.0275 [-0.0378, -0.0162], supported. Caveat: the 2190 questions come from only 365 independent days (about 6 correlated questions per day), so intervals resample whole days.
 
-**Live record:** in a rehearsal phase since the first batch (2026-11-13); the official record starts after five clean days in a row and not before a date fixed in advance. Whether LLM agents beat the classical model is **too early to tell**; the [Status page](https://jashd12.github.io/forecast-arena/status.html) shows the current counts.
+**Live record:** the first batch was 2026-11-13; days before 2026-11-23 are rehearsal and do not count towards the headline scores, and the official record has run since 2026-11-23 (`meta/official_start.json` on the ledger branch). Whether LLM agents beat the classical model is **too early to tell**; the [Status page](https://jashd12.github.io/forecast-arena/status.html) shows the current counts.
 
 ### What it shows
 

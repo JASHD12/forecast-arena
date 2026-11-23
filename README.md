@@ -14,15 +14,15 @@ append-only, hash-chained ledger. When the data arrives, every forecast is score
 
 | | |
 |---|---|
-| **Live since** | 13 November 2026, four topics (electricity, weather, Wikipedia attention, exchange rates), about 30 questions a day; a fifth, crypto prices (forecasting exercise only, no trading, data from CoinGecko), is added on 23 November 2026 and joins the overall boards after 30 days |
-| **Status** | rehearsal phase: results are shown but do not count towards headline scores; the official record starts after five clean days in a row, not before 23 November 2026 |
+| **Live since** | 13 November 2026, about 30 to 43 questions a day on five topics: electricity, weather, Wikipedia attention, exchange rates and, since 23 November 2026, crypto prices (forecasting exercise only, no trading, data from CoinGecko); crypto joins the overall boards after 30 days |
+| **Status** | the **official record started on 23 November 2026** (five clean days in a row, then the owner's fixed start date); days before that are rehearsal and are shown but do not count towards headline scores |
 | **Who forecasts** | base rate, persistence, a gradient-boosted ML model, Claude (plain, with data, with tools, as a LangGraph agent), an open 1.5B model on CPU, and an experimental QLoRA-tuned model |
 | **Honest so far** | the ML model beats the baselines in backtest; whether an LLM agent beats it live is too early to tell; the fine-tuned model is live as an experiment and, measured on 276 frozen test questions, has no edge over its untuned base (the 4-bit export lost the gain; the [evaluation card](docs/lab/qlora-r1.md) says why) |
 
 <!-- headline:start -->
 **Result so far (backtest, not the live record):** over 365 days of German day-ahead electricity, the gradient-boosted model scores Brier 0.1930 against 0.2205 for "same as last time" and 0.2466 for the base rate (lower is better; always saying 50% scores 0.25). Paired difference to persistence: -0.0275 [-0.0378, -0.0162], supported. Caveat: the 2190 questions come from only 365 independent days (about 6 correlated questions per day), so intervals resample whole days.
 
-**Live record:** in a rehearsal phase since the first batch (2026-11-13); the official record starts after five clean days in a row and not before a date fixed in advance. Whether LLM agents beat the classical model is **too early to tell**; the [Status page](https://jashd12.github.io/forecast-arena/status.html) shows the current counts.
+**Live record:** the first batch was 2026-11-13; days before 2026-11-23 are rehearsal and do not count towards the headline scores, and the official record has run since 2026-11-23 (`meta/official_start.json` on the ledger branch). Whether LLM agents beat the classical model is **too early to tell**; the [Status page](https://jashd12.github.io/forecast-arena/status.html) shows the current counts.
 <!-- headline:end -->
 
 **[Live site](https://jashd12.github.io/forecast-arena/)** ·
@@ -80,12 +80,12 @@ Each technique is tried against the project's baselines on questions it never sa
 | QLoRA fine-tune of Qwen2.5-1.5B on replayed power questions | evaluated (not a live score) | [docs/lab/qlora-r1.md](docs/lab/qlora-r1.md) |
 | Retrieval: dense vs BM25 vs hybrid with reranking | evaluated (not a live score) | [docs/lab/retrieval-hybrid.md](docs/lab/retrieval-hybrid.md) |
 | Stacking with a scikit-learn Pipeline on pandas DataFrames | evaluated (not a live score) | [docs/lab/stacking.md](docs/lab/stacking.md) |
+| Two LLM judges compared (not human calibration) | evaluated (not a live score) | [docs/lab/judge-llm.md](docs/lab/judge-llm.md) |
 | Unsupervised data-anomaly detection on price windows (Isolation Forest) | evaluated (not a live score) | [docs/lab/anomaly.md](docs/lab/anomaly.md) |
 | Vector database: Qdrant against brute-force dense search | evaluated (not a live score) | [docs/lab/vectordb.md](docs/lab/vectordb.md) |
-| Second LLM judge (a different model) compared with the first (LLM against LLM, not human) | approved 2026-11-23; one small paid run (about US$0.2, 30 items) follows the merge | - |
 | Agreement of the LLM judge with human labels | waits for the owner's 30 labels; until then the judge scores are an uncalibrated ranking | - |
-| Cost routing with the simpler ml-first rule on fresh days | a proposal only (found after the fact in the routing study); needs a new pre-registration | - |
-| In-browser model tier for Ask the Arena | optional; needs the owner's OK for a download of about 300 MB | - |
+| Cost routing with the simpler ml-first rule on fresh days | pre-registered 2026-11-23 (lab/prereg/routing-ml-only.md); evaluated after 2026-12-24 | - |
+| In-browser model tier for Ask the Arena: real-browser test | built and opt-in; tested with a fake engine only, the owner's browser test (H41) is open | - |
 
 Live experimental forecasters: the QLoRA-tuned model (running since the first morning after 2026-11-22, with its fixed pre-registered expectations) and, once its launch check passes, an agent with hybrid retrieval and guards (still switched off). The cascade router was **not built**: its pre-registered rule saved no paid calls (the routing card has the numbers). None of them enters the headline board. Details: [Lab page](https://jashd12.github.io/forecast-arena/lab.html), [explainer](docs/explainers/06-experiments-lab.md).
 <!-- lab:end -->

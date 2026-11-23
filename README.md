@@ -33,7 +33,7 @@ append-only, hash-chained ledger. When the data arrives, every forecast is score
 
 [![The home page](docs/img/home.png)](https://jashd12.github.io/forecast-arena/)
 
-*Screenshot of the site built from the public ledger on 2026-11-22. Research project, not advice.*
+*Screenshot of the site built from the public ledger on 2026-11-23. Research project, not advice.*
 
 ## What this shows
 
@@ -81,8 +81,11 @@ Each technique is tried against the project's baselines on questions it never sa
 | Stacking with a scikit-learn Pipeline on pandas DataFrames | evaluated (not a live score) | [docs/lab/stacking.md](docs/lab/stacking.md) |
 | Unsupervised data-anomaly detection on price windows (Isolation Forest) | evaluated (not a live score) | [docs/lab/anomaly.md](docs/lab/anomaly.md) |
 | Vector database: Qdrant against brute-force dense search | evaluated (not a live score) | [docs/lab/vectordb.md](docs/lab/vectordb.md) |
+| Agreement of the LLM judge with human labels | waits for the owner's 30 labels; until then the judge scores are an uncalibrated ranking | - |
+| Cost routing with the simpler ml-first rule on fresh days | a proposal only (found after the fact in the routing study); needs a new pre-registration | - |
+| In-browser model tier for Ask the Arena | optional; needs the owner's OK for a download of about 300 MB | - |
 
-Live experimental forecasters: the QLoRA-tuned model (running since the first morning after 2026-11-22, with its fixed pre-registered expectations), an agent with hybrid retrieval and guards, and a cascade router (both still switched off until their launch checks). None of them enters the headline board. Details: [Lab page](https://jashd12.github.io/forecast-arena/lab.html), [explainer](docs/explainers/06-experiments-lab.md).
+Live experimental forecasters: the QLoRA-tuned model (running since the first morning after 2026-11-22, with its fixed pre-registered expectations) and, once its launch check passes, an agent with hybrid retrieval and guards (still switched off). The cascade router was **not built**: its pre-registered rule saved no paid calls (the routing card has the numbers). None of them enters the headline board. Details: [Lab page](https://jashd12.github.io/forecast-arena/lab.html), [explainer](docs/explainers/06-experiments-lab.md).
 <!-- lab:end -->
 
 ## An open-source tool from this project
@@ -101,7 +104,7 @@ make forecast-audit-demo
 <summary><strong>Tech stack</strong></summary>
 
 <!-- stack:start -->
-**Stack:** Python, typing, testing · SQL, DuckDB, Parquet, Polars · dbt · scikit-learn, calibration · LightGBM, Optuna, SHAP · PyTorch · Time-series models · MLOps: MLflow, Evidently, champion/challenger · Statistics · LLM APIs, prompts, structured output · Agents and tool use · RAG, embeddings · LangGraph · Open-weight models (llama.cpp) · LLM fine-tuning (QLoRA, PEFT, GGUF) · Hybrid retrieval and guardrails · ONNX export and serving · Vector database (Qdrant) · Cloud as code (Terraform, AWS, S3) · Observability (Prometheus, Jaeger, OpenTelemetry) · TypeScript · Online learning and unsupervised learning · pandas and scikit-learn Pipelines · LLM evals, tracing, OpenTelemetry · MCP · REST and JSON APIs · Docker, Kubernetes, Airflow · CI/CD on GitHub Actions · Data integrity · Dashboards and frontend
+**Stack:** Python, typing, testing · SQL, DuckDB, Parquet, Polars · dbt · scikit-learn, calibration · LightGBM, Optuna, SHAP · PyTorch · Time-series models · MLOps: MLflow, Evidently, champion/challenger · Statistics · LLM APIs, prompts, structured output · Agents and tool use · RAG, embeddings · LangGraph · Open-weight models (llama.cpp) · LLM fine-tuning (QLoRA, PEFT, GGUF) · Hybrid retrieval and guardrails · ONNX export and serving · Vector database (Qdrant) · Cloud as code (Terraform, AWS, S3) · Observability (Prometheus, Jaeger, OpenTelemetry) · TypeScript · Retrieval-grounded chat with refusals · Decision analysis and an open-source tool · Online learning and unsupervised learning · pandas and scikit-learn Pipelines · LLM evals, tracing, OpenTelemetry · MCP · REST and JSON APIs · Docker, Kubernetes, Airflow · CI/CD on GitHub Actions · Data integrity · Dashboards and frontend
 <!-- stack:end -->
 
 Airflow, kind and dbt are validated in CI; production runs on GitHub Actions.
@@ -172,7 +175,9 @@ All numbers below are **backtests**: past days replayed through the production c
 | Vector database (Qdrant) | Past-question search on Qdrant with the forecast-time rule as a filter inside the store, checked against brute force; tested against a real server in CI | `src/arena/agent/vectorstore.py`<br>`tests/unit/test_vectorstore.py` |
 | Cloud as code (Terraform, AWS, S3) | Terraform for S3 + CloudFront, ECR, ECS Fargate behind a load balancer and a cost alarm, validated in CI (not deployed: no account); S3 upload tested with boto3 | `infra/aws/main.tf`<br>`src/arena/cloud/s3.py` |
 | Observability (Prometheus, Jaeger, OpenTelemetry) | /metrics with bounded-cardinality labels scraped by Prometheus, OTLP traces stored in Jaeger, both real servers in a CI job | `src/arena/api/metrics.py`<br>`scripts/smoke_observability.sh` |
-| TypeScript | The site's script is strict TypeScript compiled to the same single file; CI fails if the committed output is stale | `site_ts/app.ts`<br>`tools/site-ts/tsconfig.json` |
+| TypeScript | The site's scripts are strict TypeScript compiled to single files, including the orchestrator of the Ask the Arena chat; CI fails if the committed output is stale | `site_ts/app.ts`<br>`site_ts/chat.ts`<br>`tools/site-ts/tsconfig.json` |
+| Retrieval-grounded chat with refusals | A free in-browser chat over the published record: guard, exact lookup, BM25 document search with citations, decline with the nearest question; evaluated offline for refusals and invented numbers | `src/arena/site/chatpack.py`<br>`site_ts/chat.ts`<br>`tests/unit/test_chat_orchestrator.py` |
+| Decision analysis and an open-source tool | forecast-audit: an offline, standard-library-only tool that checks whether alerts from a model's probabilities beat a baseline, with a reproducible German electricity case | `examples/forecast-audit/forecast_audit.py`<br>`examples/forecast-audit/SCHEMA.md` |
 | Online learning and unsupervised learning | Hedge expert advice and Thompson sampling to learn which forecaster to trust; Isolation Forest and k-means on price data with their negative results published | `src/arena/forecasters/bandit.py`<br>`src/arena/ops/anomaly.py`<br>`src/arena/lab/regimes.py` |
 | pandas and scikit-learn Pipelines | DataFrame views proved equal to the leaderboard, a ColumnTransformer + LogisticRegression stacking pipeline replayed walk-forward | `src/arena/analytics/frames.py`<br>`src/arena/lab/stacking_study.py` |
 | LLM evals, tracing, OpenTelemetry | Frozen golden set, prompt A/B, JSON validity and cost; one span per model call, exported as OTLP/JSON with the OpenTelemetry GenAI attribute names | `src/arena/evals`<br>`src/arena/llm/tracing.py`<br>`src/arena/llm/otlp.py` |

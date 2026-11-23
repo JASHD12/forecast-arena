@@ -153,10 +153,25 @@ PROOFS: tuple[tuple[str, str, str, tuple[str, ...]], ...] = (
     ),
     (
         "TypeScript",
-        "The site's script is strict TypeScript compiled to the same single file; CI fails if "
-        "the committed output is stale",
+        "The site's scripts are strict TypeScript compiled to single files, including the "
+        "orchestrator of the Ask the Arena chat; CI fails if the committed output is stale",
+        "ask.html",
+        ("site_ts/app.ts", "site_ts/chat.ts", "tools/site-ts/tsconfig.json"),
+    ),
+    (
+        "Retrieval-grounded chat with refusals",
+        "A free in-browser chat over the published record: guard, exact lookup, BM25 document "
+        "search with citations, decline with the nearest question; evaluated offline for "
+        "refusals and invented numbers",
+        "ask.html",
+        ("src/arena/site/chatpack.py", "site_ts/chat.ts", "tests/unit/test_chat_orchestrator.py"),
+    ),
+    (
+        "Decision analysis and an open-source tool",
+        "forecast-audit: an offline, standard-library-only tool that checks whether alerts from "
+        "a model's probabilities beat a baseline, with a reproducible German electricity case",
         "",
-        ("site_ts/app.ts", "tools/site-ts/tsconfig.json"),
+        ("examples/forecast-audit/forecast_audit.py", "examples/forecast-audit/SCHEMA.md"),
     ),
     (
         "Online learning and unsupervised learning",

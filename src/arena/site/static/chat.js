@@ -398,7 +398,24 @@
             return d;
         return nearestReply(m, pack);
     }
-    const api = { tokens, terms, BM25, guard, parseDate, parseDomain, choose, answer, matchQuestions };
+    let rephraser = null;
+    function factsOf(r) {
+        return r.text + ' ' + (r.rows || []).map((x) => x.join(' ')).join(' ');
+    }
+    function numbersOf(t) {
+        return (t.match(/\d+(?:\.\d+)?/g) || []).map(Number);
+    }
+    // The model's wording is used only if every number occurs in the facts and the guard passes it.
+    function grounded(output, facts) {
+        const have = numbersOf(facts);
+        const bad = numbersOf(output).filter((n) => !have.some((h) => Math.abs(h - n) < 1e-9));
+        const clean = output.trim().length > 0 && !guard(output).blocked;
+        return { ok: bad.length === 0 && clean, bad };
+    }
+    const api = {
+        tokens, terms, BM25, guard, parseDate, parseDomain, choose, answer, matchQuestions,
+        grounded, factsOf,
+    };
     // ---- Page --------------------------------------------------------------------------------
     function el(tag, cls, text) {
         const e = document.createElement(tag);
@@ -435,6 +452,25 @@
         box.appendChild(meta);
         log.appendChild(box);
         log.scrollTop = log.scrollHeight;
+        return box;
+    }
+    function addTier2(log, box, reply) {
+        const facts = factsOf(reply);
+        if (!rephraser)
+            return;
+        const note = el('p', 'ask-meta', 'Tier 2: the in-browser model is rewording this answer...');
+        box.insertBefore(note, box.lastChild);
+        rephraser(facts).then((out) => {
+            const g = out === null ? null : grounded(out, facts);
+            if (out !== null && g && g.ok) {
+                note.className = '';
+                note.textContent = 'In plain words (Tier 2, reworded by a model on your device; every number was checked against the facts above): ' + out;
+            }
+            else {
+                note.textContent = 'Tier 2 wording rejected (' + (out === null ? 'no output' : 'a number or word not in the facts') + '); the answer above stands.';
+            }
+            log.scrollTop = log.scrollHeight;
+        }).catch(() => { note.textContent = 'Tier 2 failed; the answer above stands.'; });
     }
     function init(pack) {
         const log = document.getElementById('ask-log');
@@ -446,7 +482,10 @@
         const ask = (text) => {
             const u = el('div', 'ask-msg user', text);
             log.appendChild(u);
-            render(log, answer(text, pack));
+            const reply = answer(text, pack);
+            const box = render(log, reply);
+            if (rephraser && reply.tier >= 0)
+                addTier2(log, box, reply);
         };
         form.addEventListener('submit', (e) => {
             e.preventDefault();
@@ -478,6 +517,9 @@
     }
     if (typeof document === 'undefined')
         return;
+    window.ArenaChat = {
+        setRephraser: (r) => { rephraser = r; },
+    };
     const start = () => {
         fetch('chat/pack.json').then((r) => r.json()).then((p) => { init(p); }).catch(() => {
             const log = document.getElementById('ask-log');

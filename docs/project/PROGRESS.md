@@ -65,6 +65,9 @@ Nothing. See the session summary above and `python scripts/status.py`.
   output, not acted on (S11).
 
 ## Done log
+- T316: Ask the Arena tier 2 (opt-in in-browser model, rewords facts only, grounded check, pinned library hash); untested on a real WebGPU browser, owner check in H41.
+- T326: GitHub profile README draft generated (`docs/profile/PROFILE_README.md`), owner steps in H42.
+- T247 (distillation) evaluated from release `lab-distill-r1`: student Brier 0.2365 vs teacher 0.1802, QLoRA 0.2378, base rate 0.2182; not live.
 - T310-T315 (Ask the Arena): knowledge pack, TypeScript orchestrator, `ask.html`, golden evaluation (refusals 100%, no invented numbers 100%), explainer 10; T252b judge result (US$0.04); T247 labels complete (1,198 of 1,200, US$0.64 total); lab budget US$0.96 of 2.00.
 - T322, T323, T324 (forecast-audit): case page `audit.html`, `recruiters-ml.html`, German proof line, README block, CONTRIBUTING, issue form, release note, archive test, explainer 09, pilot/upstream notes, H40. T325 deferred.
 - 2026-11-22 T320-T321 (forecast-audit, owner brief): standard-library audit engine with contract, golden four-case fixture and error matrix; German electricity case reproduces the planning table exactly (46 cases, 29 YES; base rate 0.2337, GGUF 0.2499, same 46 decisions, loss 17); DuckDB agrees; CI job on a bare Python 3.12.

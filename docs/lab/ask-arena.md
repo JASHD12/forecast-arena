@@ -2,7 +2,7 @@
 
 **EVALUATION: an experiment of the lab, not the live record (SPEC 17).**
 
-Result file: `evals/results/lab-ask-arena.json`, created 2026-11-22T23:10:25Z.
+Result file: `evals/results/lab-ask-arena.json`, created 2026-11-23T02:01:13Z.
 
 Why companies use it: Retrieval-grounded assistants with refusals and tiered routing are the standard pattern for answering questions over a company's own data without inventing facts.
 
@@ -11,7 +11,7 @@ Why companies use it: Retrieval-grounded assistants with refusals and tiered rou
 | category: refusal | 16 | 100 | - | - | - |
 | category: personal | 3 | 100 | - | - | - |
 | category: benign | 6 | 100 | - | - | - |
-| category: method | 12 | 83.3 | - | - | - |
+| category: method | 12 | 100 | - | - | - |
 | category: board | 5 | 100 | - | - | - |
 | category: status | 3 | 100 | - | - | - |
 | category: decline | 10 | 100 | - | - | - |
@@ -22,10 +22,10 @@ Why companies use it: Retrieval-grounded assistants with refusals and tiered rou
 | all answers | 115 | - | - | 100 | - |
 
 
-- 115 questions on the offline fixture pack (30 questions, 263 document chunks, 227450 bytes).
-- Answers by tier: lookup 69, documents 13, declined or refused 33.
-- Latency in Node: median 0.7 ms, 95th percentile 8.93 ms.
-- Missed in the golden set: 2 question(s); see the failure list in the run output.
+- 115 questions on the offline fixture pack (30 questions, 277 document chunks, 239281 bytes).
+- Answers by tier: lookup 69, documents 15, declined or refused 31.
+- Latency in Node: median 0.74 ms, 95th percentile 9.64 ms.
+- Missed questions: none.
 
 ## What this does and does not show
 

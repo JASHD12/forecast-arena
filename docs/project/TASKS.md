@@ -755,11 +755,12 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
   - Done 2026-11-22 without a new workflow: the Colab score files already hold per-question probabilities of all four variants, so `arena lab ft-eval` pairs them with the base rate and the `ml` backtest on identical items (`evals/results/lab-qlora-r1.json`, card `docs/lab/qlora-r1.md`). GGUF parity on 31 rows missed the pre-registered limit (Brier +0.0123 against < 0.005); a full GGUF run and a GGUF-specific calibration are open (H32 options).
 - [x] T246b · Calibrate the GGUF on its own validation margins: dispatch `lab-eval.yml` from main after the merge of its PR, merge the four shard logs with `arena lab ft-calibrate`, pin the new Platt map in a small PR (deps: T246; owner chose option (b) of H32 on 2026-11-22)
   - Done 2026-11-22: `lab-eval` run 45011720244 (4 shards, ~1.0-2.0 h each); Platt refitted on the GGUF's 552 validation margins only: (0.5903, 0.1730), pinned in `lab/artefacts/llm_local_ft.json` (new version string). On 276 test questions the GGUF scores Brier 0.2474 (Colab 4-bit adapter 0.2378, untuned base 0.2486, base rate 0.2182, `ml` 0.1663): H-FT3 not met (loss +0.0076 vs 0.005), no measurable gain over the untuned model.
-- [ ] T247 · Distillation from Claude (deps: T246; needs: H27)
+- [x] T247 · Distillation from Claude (deps: T246; needs: H27)
   - Code and pre-registration done 2026-11-22 (owner approval H27): `lab/prereg/distill.md`, `arena lab distill-labels`, `lab-distill-labels.yml`, `src/arena/lab/distill.py`, tests with a fake teacher. Open: the paid run after the merge (labels committed as `lab/data/distill-labels-v1.json`), then the student's soft-label training on the owner's Colab (a later H item) and the evaluation.
   - Student training code added 2026-11-22: `Spec.soft_labels` in `lab/finetune/run.py` (trains only the labelled rows, binary cross-entropy against the teacher probability), notebook `notebooks/lab/distill_qwen_forecast.ipynb`, tests on a tiny model. Owner step: H39 (after the labels are committed).
   - Label run 1 done 2026-11-22 (run 45071238970, US$0.4117): 773 of 1,200 labelled before the run's own 2.2M token cap stopped it (average 2.8k tokens per question, my estimate was too low); 1 answer failed the format. The labelled rows are the first 774 of the id-sorted sample, i.e. four templates (`lab/data/distill-run1-probs.json`, hash of the sample checked). Fix: `--start` and `distill-merge`, cap 3.6M. Open: run 2 with `start=774` (about US$0.23, after this PR is merged), then `arena lab distill-merge` to write `lab/data/distill-labels-v1.json` with all templates, then H39.
   - Label run 2 done 2026-11-22 (run 45079870076, US$0.2289, rows 774 to 1,199): 425 labelled, 1 parse error; merged with run 1 by `arena lab distill-merge` into `lab/data/distill-labels-v1.json` (1,198 of 1,200 rows, total US$0.6406). Open: the owner's Colab run (H39), then evaluation of the student.
+  - Done 2026-11-23 (release `lab-distill-r1`, hashes verified): student Brier 0.2365 on the 276 test questions; teacher (Claude `llm_context`) 0.1802; hard-label QLoRA 0.2378; untuned 0.2486; base rate 0.2182; `ml` 0.1663. `evals/results/lab-distill-r1.json`, `docs/lab/distill-r1.md`.
 - [x] T248 · Adapter registry and lineage (deps: T246)
   - Done 2026-11-22: `src/arena/lab/lineage.py` + `arena lab lineage` write `docs/lab/runs/qlora-r1.json` (base revision, dataset and pre-registration hashes, Colab code commit and packages, adapter, GGUF and llama.cpp commit, both Platt maps in order); a unit test fails if the pin file, the lineage record and the evaluation result disagree.
 - [x] T249 · Shadow run of the fine-tuned model (deps: T246)
@@ -895,7 +896,8 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
 - [x] T314 · Golden evaluation `evals/golden/chat-v1.jsonl`, Node runner, result `evals/results/lab-ask-arena.json` and card (deps: T312)
   - Done 2026-11-22: refusals 100%, no false refusals, no invented numbers 100%; the misses are listed on the card.
 - [x] T315 · Explainer `docs/explainers/10-ask-the-arena.md` (deps: T314)
-- [ ] T316 · Optional tier 2: an opt-in in-browser model that only rephrases retrieved facts (deps: T314; needs owner OK: a roughly 300 MB third-party download, privacy page and CSP change)
+- [x] T316 · Optional tier 2: an opt-in in-browser model that only rephrases retrieved facts (deps: T314; owner OK 2026-11-23: H41)
+  - Done 2026-11-23: `site_ts/chat-llm.ts` (button after a WebGPU adapter check, library fetched from a pinned URL and refused unless its SHA-256 matches, Qwen2.5-0.5B via WebLLM 0.2.87), grounding check in `chat.ts` (every number must be in the facts, guard on the output), page-specific CSP on `ask.html` only, privacy line, Node tests with a fake engine, browser test of the button. Not run against a real WebGPU browser in this environment (owner check).
 
 ## Phase 19 - forecast-audit: an open-source release that is also the hiring portfolio (owner brief of 2026-11-22)
 
@@ -907,4 +909,4 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
 - [x] T323 · Contributor and release path: CONTRIBUTING, issue form, focused test command, release note, archive test, data licence file (deps: T321)
 - [x] T324 · Owner path and docs: pilot script, upstream candidate note, starter issues, explainer 09, HUMAN_TODO items (deps: T322)
 - [ ] T325 · One role-specific follow-up chosen by role fit or pilot feedback (deferred until selected; owner decision)
-
+- [x] T326 · GitHub profile README draft that features Forecast Arena (generated `docs/profile/PROFILE_README.md`, test, owner steps H42) (deps: T322)

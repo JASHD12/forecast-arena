@@ -22,6 +22,7 @@ CI_COVERED = (
     "scripts",  # smoke_observability.sh runs in the CI job `observability`
     "apps/dashboard",
     "tools/a11y",
+    "examples/forecast-audit",  # CI job `forecast-audit` runs its self-check and report diff
     "Dockerfile",
     "deploy/k8s",
     "orchestration/airflow",

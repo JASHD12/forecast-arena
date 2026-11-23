@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% from "macros.html" import page_head %}
+{% block csp %}<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' blob: 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://cdn.jsdelivr.net https://huggingface.co https://*.hf.co https://raw.githubusercontent.com; worker-src 'self' blob:; object-src 'none'; form-action 'self'">{% endblock %}
 {% block content %}
 {{ page_head("Ask the Arena", "Ask about the forecasts, the results and the methods", "Answers come only from this site's published forecasts and documents, computed in your browser. Nothing you type is sent or stored.") }}
 <p class="note"><strong>Research project, not advice.</strong> This is not a forecasting service: it makes no new predictions, answers nothing about stocks, funds or what to buy or sell, and says so when a question is outside the published record.</p>
@@ -13,6 +14,11 @@
 <div class="ask-row"><input id="ask-input" type="text" maxlength="200" placeholder="e.g. What did the ML model forecast for electricity tomorrow?" required><button class="btn btn-accent" type="submit">Ask</button></div>
 </form>
 <div class="ask-examples" id="ask-examples" role="group" aria-label="Example questions"></div>
+<div id="ask-llm" class="callout" hidden>
+<p><strong>Optional tier 2: a small AI model on your device.</strong> It only rewords an answer that was already looked up, and every number in its wording is checked against the facts; if one is not there, the wording is thrown away. Loading it downloads about 290 MB (library from jsDelivr, model from Hugging Face, runtime files from GitHub), which those hosts can see as a normal download from your IP address, and your browser keeps the files in its cache. Nothing you type leaves your device. It needs a browser with WebGPU.</p>
+<p><button id="ask-llm-load" class="btn btn-accent" type="button">Load the in-browser model</button></p>
+<p id="ask-llm-status" role="status" class="ask-meta"></p>
+</div>
 </section>
 
 <section class="card" aria-labelledby="ask-how"><h2 id="ask-how">How it answers</h2>
@@ -21,7 +27,9 @@
 <li><strong>Tier 0, lookup.</strong> If a published question matches, you get its locked forecasts and, if it has resolved, the result.</li>
 <li><strong>Tier 1, documents.</strong> Otherwise it searches the project documents (BM25) and quotes the best sentences with their source; if nothing matches well it says so.</li>
 <li><strong>Which forecaster leads.</strong> For a forecast answer it leads with the ML model when its forecast is decisive (at least 15 points from 50%), otherwise with the forecaster that has the best track record on that topic. This rule is a hypothesis from the routing study, not a validated result. Every locked forecast is always listed.</li>
+<li><strong>Tier 2 (optional).</strong> If you load the in-browser model, it rewords lookup and document answers; wording with a number that is not in the facts is rejected. Declines and refusals are never reworded.</li>
 </ol>
 </section>
 <script src="{{ root }}static/chat.js" defer></script>
+<script src="{{ root }}static/chat-llm.js" defer></script>
 {% endblock %}

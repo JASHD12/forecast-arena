@@ -301,7 +301,7 @@ curl -X POST -H "Authorization: Bearer TOKEN" -H "Accept: application/vnd.github
 
 - [ ] H38 · Optional, only if you name a new topic: allow more data hosts so the agent can read their terms and record real responses (T302)
   - Blocked by the cloud environment's network allowlist (not by the sources): `www.umweltbundesamt.de`, `luftqualitaet.api.bund.dev` (air quality), `autobahn.api.bund.dev` (roadworks and traffic), `ec.europa.eu` (Eurostat), `www.bundesbank.de`. To allow them: claude.ai > Settings > the environment "forecast-arena" > Network access > add the hosts (exact names), then tell the agent. Nothing is blocked meanwhile. The owner said no to a pollen topic (2026-11-22); this item matters only if you name another topic. Crypto stays off until H12.
-- [ ] H39 · Run the distillation notebook on Colab (needed for the student model of T247; only after the label PR is merged)
+- [x] H39 · Run the distillation notebook on Colab (needed for the student model of T247; only after the label PR is merged)
   - Open `notebooks/lab/distill_qwen_forecast.ipynb` (File > Open notebook > GitHub, `JASHD12/forecast-arena`, branch `main`), Runtime > Change runtime type > **T4 GPU**, Runtime > **Run all** (about 1 to 2 hours). It trains the small model on the teacher's probabilities (`lab/data/distill-labels-v1.json`, already in the repository) and prints the SHA-256 of every output file. No GGUF is needed.
   - Download `outputs.zip`, unzip it, then GitHub > Releases > Draft a new release: tag `lab-distill-r1` (target `main`), tick pre-release, attach `scores_distill_1_5b.jsonl`, `run_summary.json`, `SHA256SUMS.json`, `train_log_distill_1_5b.json` (and the adapter file if you like), publish, and paste the release link into the chat. The agent then evaluates it against the teacher, the QLoRA model and the base rate.
 
@@ -313,6 +313,14 @@ curl -X POST -H "Authorization: Bearer TOKEN" -H "Accept: application/vnd.github
   - Outreach choice (openmod or PyData Berlin) and whether to open an upstream issue (`docs/upstream/scores-candidate.md`): your decision; the agent posts nothing.
   - Tagging a `forecast-audit-v0.1` release from `docs/releases/forecast-audit-v0.1.md` is yours.
 
-- [ ] H41 · Optional: decide on the in-browser model tier for Ask the Arena (T316)
+- [x] H41 · Optional: decide on the in-browser model tier for Ask the Arena (T316)
   - Today the chat answers from lookups and document search only; nothing is downloaded. A third tier could rephrase retrieved facts with a small model that runs in the visitor's browser (about 300 MB, loaded only after a click, from a third-party host). It needs your OK because it changes the privacy page and adds an outside download. Reply "yes tier 2" or leave it as is.
+  - Answered yes 2026-11-23 (chat): tier 2 is built. Please test it once after the redeploy, in a recent desktop Chrome or Edge: open Ask the Arena, click "Load the in-browser model" (about 290 MB), ask "Who is winning?" and tell me what appears. The agent could not run it on a real WebGPU browser or reach jsDelivr, so this is the first real test.
+
+- [ ] H42 · Put Forecast Arena on your GitHub profile (T326)
+  - The agent cannot do this: the profile page is the README of a separate repository (`JASHD12/JASHD12`), and About text, topics and pinning are repository settings.
+  - Profile README: GitHub > New repository, name exactly `JASHD12` (public), tick "Add a README file", create. Open its `README.md`, replace everything with the contents of `docs/profile/PROFILE_README.md` from this repository (regenerate first with `python scripts/profile_readme.py` after the latest merge), commit. It then shows on https://github.com/JASHD12.
+  - Pin: your profile > "Customize your pins" > tick `forecast-arena` (and `JASHD12` is not needed).
+  - About box of `forecast-arena` (gear icon next to "About"): description "Live public benchmark: classical ML vs LLM agents forecasting tomorrow, with forecasts locked in a hash-chained ledger before the answer exists." Website `https://jashd12.github.io/forecast-arena/`. Topics: forecasting, machine-learning, llm, llm-agents, mlops, time-series, data-science, python, github-actions, langgraph. Tick "Use the topics..." as you like; untick Releases/Packages if empty.
+  - Check the wording "Specified and directed by me; implemented with AI coding agents" is how you want to describe your role; add your CV/LinkedIn/email to `site_content/recruiter_facts.json` (H16) so the profile shows a contact line.
 

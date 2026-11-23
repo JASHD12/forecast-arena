@@ -24,7 +24,11 @@ The first request was a chatbot that predicts any question, such as a stock pric
 
 ## What was rejected
 
-- A model behind an API key (cost, abuse, S8). - A server. - Browser embeddings (size). - An in-browser model for now (T316 needs the owner's OK for a download of about 300 MB).
+- A model behind an API key (cost, abuse, S8). - A server. - Browser embeddings (size).
+
+## Tier 2 (added 2026-11-23)
+
+An opt-in button loads Qwen2.5-0.5B through WebLLM (about 290 MB, after a click, WebGPU browsers only). The model never answers questions; it only rewords the facts of a lookup or document answer. The page rejects its wording if any number is not in those facts, and the library is refused unless its SHA-256 matches. A page-specific CSP allows the download hosts; no other page does. It is tested with a fake engine; a real-browser test is the owner's.
 
 ## Honest limits
 
@@ -40,5 +44,5 @@ The golden questions were written by the project, not by visitors; two method qu
 6. What happens on an unforecast question? It declines and shows the nearest published questions.
 7. How is it tested? Node tests, a golden set with generated lookups, and a browser test over http with no outside request.
 8. What does it not do? New predictions, advice, memory of earlier turns.
-9. What would tier 2 add? Rephrasing only, behind a grounding check; opt-in because of the download.
+9. What does tier 2 add? Plain-language rewording only, behind a grounding check that drops any wording with a number not in the facts; opt-in because of the 290 MB download and three outside hosts.
 10. How do you know the refusal list is complete? You do not; it is a rule list with tests, reported as a rate, and the page says it is not advice.

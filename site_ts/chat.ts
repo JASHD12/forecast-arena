@@ -419,7 +419,28 @@ declare const module: { exports: unknown } | undefined;
     return nearestReply(m, pack);
   }
 
-  const api = { tokens, terms, BM25, guard, parseDate, parseDomain, choose, answer, matchQuestions };
+  // ---- Tier 2: an optional in-browser model may only rephrase the facts of a tier 0/1 answer ----
+  type Rephraser = (facts: string) => Promise<string | null>;
+  let rephraser: Rephraser | null = null;
+
+  function factsOf(r: Reply): string {
+    return r.text + ' ' + (r.rows || []).map((x) => x.join(' ')).join(' ');
+  }
+  function numbersOf(t: string): number[] {
+    return (t.match(/\d+(?:\.\d+)?/g) || []).map(Number);
+  }
+  // The model's wording is used only if every number occurs in the facts and the guard passes it.
+  function grounded(output: string, facts: string): { ok: boolean; bad: number[] } {
+    const have = numbersOf(facts);
+    const bad = numbersOf(output).filter((n) => !have.some((h) => Math.abs(h - n) < 1e-9));
+    const clean = output.trim().length > 0 && !guard(output).blocked;
+    return { ok: bad.length === 0 && clean, bad };
+  }
+
+  const api = {
+    tokens, terms, BM25, guard, parseDate, parseDomain, choose, answer, matchQuestions,
+    grounded, factsOf,
+  };
 
   // ---- Page --------------------------------------------------------------------------------
   function el<K extends keyof HTMLElementTagNameMap>(tag: K, cls?: string, text?: string): HTMLElementTagNameMap[K] {
@@ -429,7 +450,7 @@ declare const module: { exports: unknown } | undefined;
     return e;
   }
 
-  function render(log: HTMLElement, reply: Reply): void {
+  function render(log: HTMLElement, reply: Reply): HTMLElement {
     const box = el('div', 'ask-msg bot');
     box.appendChild(el('p', undefined, reply.text));
     if (reply.head && reply.rows) {
@@ -456,6 +477,24 @@ declare const module: { exports: unknown } | undefined;
     box.appendChild(meta);
     log.appendChild(box);
     log.scrollTop = log.scrollHeight;
+    return box;
+  }
+
+  function addTier2(log: HTMLElement, box: HTMLElement, reply: Reply): void {
+    const facts = factsOf(reply);
+    if (!rephraser) return;
+    const note = el('p', 'ask-meta', 'Tier 2: the in-browser model is rewording this answer...');
+    box.insertBefore(note, box.lastChild);
+    rephraser(facts).then((out) => {
+      const g = out === null ? null : grounded(out, facts);
+      if (out !== null && g && g.ok) {
+        note.className = '';
+        note.textContent = 'In plain words (Tier 2, reworded by a model on your device; every number was checked against the facts above): ' + out;
+      } else {
+        note.textContent = 'Tier 2 wording rejected (' + (out === null ? 'no output' : 'a number or word not in the facts') + '); the answer above stands.';
+      }
+      log.scrollTop = log.scrollHeight;
+    }).catch(() => { note.textContent = 'Tier 2 failed; the answer above stands.'; });
   }
 
   function init(pack: Pack): void {
@@ -467,7 +506,9 @@ declare const module: { exports: unknown } | undefined;
     const ask = (text: string): void => {
       const u = el('div', 'ask-msg user', text);
       log.appendChild(u);
-      render(log, answer(text, pack));
+      const reply = answer(text, pack);
+      const box = render(log, reply);
+      if (rephraser && reply.tier >= 0) addTier2(log, box, reply);
     };
     form.addEventListener('submit', (e: Event) => {
       e.preventDefault();
@@ -495,6 +536,9 @@ declare const module: { exports: unknown } | undefined;
     return;
   }
   if (typeof document === 'undefined') return;
+  (window as unknown as { ArenaChat: { setRephraser: (r: Rephraser | null) => void } }).ArenaChat = {
+    setRephraser: (r: Rephraser | null) => { rephraser = r; },
+  };
   const start = (): void => {
     fetch('chat/pack.json').then((r) => r.json()).then((p: Pack) => { init(p); }).catch(() => {
       const log = document.getElementById('ask-log');

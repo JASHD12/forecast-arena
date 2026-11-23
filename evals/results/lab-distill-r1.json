@@ -1,0 +1,415 @@
+{
+ "kind": "evaluation",
+ "experiment": "distill-r1",
+ "title": "Distillation from Claude into Qwen2.5-1.5B (soft-label QLoRA)",
+ "created_at": "2026-11-23T01:29:47Z",
+ "why": "Distilling a large model's probabilities into a small one is the standard way to cut inference cost; the comparison with the teacher and a classical model shows what is kept.",
+ "prereg_sha256": "2e9494a739c7453f530cbfdd4d83208d184e2db661c1c20f9f94d0304a431844",
+ "dataset_sha256": {
+  "test_nov": "b45e6a5440f9a1857e01abd82c6a6520054f994bfa261c2b2e8a2fb3a75d5eae",
+  "test_oct": "f120884a109778ea0be0674f8649a50548f2668417fadd7a6ce61401ed03c4f8",
+  "train": "63d387c583ecdaaf61d1df1a9158e576ab0341f274638411e2fd857923266f7f",
+  "val": "ffb1d23a2240f4e0de6209775406062d79c6022ebf669eb20a7229aa0a880ee5"
+ },
+ "artefacts": {
+  "adapter": "f2cf41fd8e641bdf86eacaf021cef4cc74b6f40aa1aa3e9679d8e7d65d5b013f",
+  "labels": "35951fd9faf547c678538f381a359b435cd9baa2d47f553562c9eede8255f667",
+  "release": "https://github.com/JASHD12/forecast-arena/releases/tag/lab-distill-r1"
+ },
+ "metrics": {
+  "base_1_5b / test_oct": {
+   "n": 186,
+   "brier": 0.249,
+   "log_score": 0.6912,
+   "ece": 0.0817
+  },
+  "distill_1_5b / test_oct": {
+   "n": 186,
+   "brier": 0.2363,
+   "log_score": 0.6654,
+   "ece": 0.0759
+  },
+  "qlora_1_5b / test_oct": {
+   "n": 186,
+   "brier": 0.24,
+   "log_score": 0.6729,
+   "ece": 0.0902
+  },
+  "claude_teacher / test_oct": {
+   "n": 186,
+   "brier": 0.201,
+   "log_score": 0.5787,
+   "ece": 0.0665
+  },
+  "base_rate / test_oct": {
+   "n": 186,
+   "brier": 0.2255,
+   "log_score": 0.6406,
+   "ece": 0.0851
+  },
+  "ml / test_oct": {
+   "n": 186,
+   "brier": 0.1814,
+   "log_score": 0.5219,
+   "ece": 0.1177
+  },
+  "base_1_5b / test_nov": {
+   "n": 90,
+   "brier": 0.2477,
+   "log_score": 0.6886,
+   "ece": 0.0491
+  },
+  "distill_1_5b / test_nov": {
+   "n": 90,
+   "brier": 0.237,
+   "log_score": 0.6668,
+   "ece": 0.0826
+  },
+  "qlora_1_5b / test_nov": {
+   "n": 90,
+   "brier": 0.233,
+   "log_score": 0.6586,
+   "ece": 0.1175
+  },
+  "claude_teacher / test_nov": {
+   "n": 90,
+   "brier": 0.1374,
+   "log_score": 0.4351,
+   "ece": 0.094
+  },
+  "base_rate / test_nov": {
+   "n": 90,
+   "brier": 0.203,
+   "log_score": 0.588,
+   "ece": 0.0564
+  },
+  "ml / test_nov": {
+   "n": 90,
+   "brier": 0.1352,
+   "log_score": 0.4376,
+   "ece": 0.1741
+  },
+  "base_1_5b / test_all": {
+   "n": 276,
+   "brier": 0.2486,
+   "log_score": 0.6904,
+   "ece": 0.0585
+  },
+  "distill_1_5b / test_all": {
+   "n": 276,
+   "brier": 0.2365,
+   "log_score": 0.6658,
+   "ece": 0.0522
+  },
+  "qlora_1_5b / test_all": {
+   "n": 276,
+   "brier": 0.2378,
+   "log_score": 0.6683,
+   "ece": 0.0687
+  },
+  "claude_teacher / test_all": {
+   "n": 276,
+   "brier": 0.1802,
+   "log_score": 0.5318,
+   "ece": 0.05
+  },
+  "base_rate / test_all": {
+   "n": 276,
+   "brier": 0.2182,
+   "log_score": 0.6235,
+   "ece": 0.0591
+  },
+  "ml / test_all": {
+   "n": 276,
+   "brier": 0.1663,
+   "log_score": 0.4944,
+   "ece": 0.0673
+  }
+ },
+ "paired": [
+  {
+   "a": "distill_1_5b",
+   "b": "base_1_5b",
+   "split": "test_oct",
+   "diff": -0.012753474590151616,
+   "lo": -0.017685585200176338,
+   "hi": -0.007499792111465332,
+   "n": 186,
+   "days": 31
+  },
+  {
+   "a": "distill_1_5b",
+   "b": "qlora_1_5b",
+   "split": "test_oct",
+   "diff": -0.0037452655125161578,
+   "lo": -0.007750309117227036,
+   "hi": 0.0002582577399457542,
+   "n": 186,
+   "days": 31
+  },
+  {
+   "a": "distill_1_5b",
+   "b": "claude_teacher",
+   "split": "test_oct",
+   "diff": 0.035331766534228995,
+   "lo": 0.014991968912976647,
+   "hi": 0.05456779043801319,
+   "n": 186,
+   "days": 31
+  },
+  {
+   "a": "distill_1_5b",
+   "b": "base_rate",
+   "split": "test_oct",
+   "diff": 0.010775036449061203,
+   "lo": -0.0015248281219213422,
+   "hi": 0.022838295253871033,
+   "n": 186,
+   "days": 31
+  },
+  {
+   "a": "distill_1_5b",
+   "b": "ml",
+   "split": "test_oct",
+   "diff": 0.05487969046258231,
+   "lo": 0.008764625428636437,
+   "hi": 0.09620729361354645,
+   "n": 186,
+   "days": 31
+  },
+  {
+   "a": "claude_teacher",
+   "b": "base_rate",
+   "split": "test_oct",
+   "diff": -0.024556730085167785,
+   "lo": -0.04929628277638878,
+   "hi": 0.0012310892686546063,
+   "n": 186,
+   "days": 31
+  },
+  {
+   "a": "claude_teacher",
+   "b": "ml",
+   "split": "test_oct",
+   "diff": 0.01954792392835332,
+   "lo": -0.02132629230672317,
+   "hi": 0.060360868879577936,
+   "n": 186,
+   "days": 31
+  },
+  {
+   "a": "qlora_1_5b",
+   "b": "base_rate",
+   "split": "test_oct",
+   "diff": 0.01452030196157736,
+   "lo": 0.0020803312362190156,
+   "hi": 0.026190544304398294,
+   "n": 186,
+   "days": 31
+  },
+  {
+   "a": "ml",
+   "b": "base_rate",
+   "split": "test_oct",
+   "diff": -0.0441046540135211,
+   "lo": -0.08781837471920845,
+   "hi": 0.0019249568761598175,
+   "n": 186,
+   "days": 31
+  },
+  {
+   "a": "distill_1_5b",
+   "b": "base_1_5b",
+   "split": "test_nov",
+   "diff": -0.010693301139020596,
+   "lo": -0.01656148015153051,
+   "hi": -0.00517515556951479,
+   "n": 90,
+   "days": 15
+  },
+  {
+   "a": "distill_1_5b",
+   "b": "qlora_1_5b",
+   "split": "test_nov",
+   "diff": 0.004010866494681075,
+   "lo": -0.00015084715632231974,
+   "hi": 0.008441501333333514,
+   "n": 90,
+   "days": 15
+  },
+  {
+   "a": "distill_1_5b",
+   "b": "claude_teacher",
+   "split": "test_nov",
+   "diff": 0.09966839020901985,
+   "lo": 0.05398653207389752,
+   "hi": 0.1357169089139663,
+   "n": 90,
+   "days": 15
+  },
+  {
+   "a": "distill_1_5b",
+   "b": "base_rate",
+   "split": "test_nov",
+   "diff": 0.03406167943397261,
+   "lo": 0.00024084952316936803,
+   "hi": 0.06466364608077173,
+   "n": 90,
+   "days": 15
+  },
+  {
+   "a": "distill_1_5b",
+   "b": "ml",
+   "split": "test_nov",
+   "diff": 0.10188186927613523,
+   "lo": 0.028748675573615358,
+   "hi": 0.1527420176761786,
+   "n": 90,
+   "days": 15
+  },
+  {
+   "a": "claude_teacher",
+   "b": "base_rate",
+   "split": "test_nov",
+   "diff": -0.06560671077504723,
+   "lo": -0.09950944087376601,
+   "hi": -0.030298231463978153,
+   "n": 90,
+   "days": 15
+  },
+  {
+   "a": "claude_teacher",
+   "b": "ml",
+   "split": "test_nov",
+   "diff": 0.00221347906711538,
+   "lo": -0.041660182703231984,
+   "hi": 0.04903757685761675,
+   "n": 90,
+   "days": 15
+  },
+  {
+   "a": "qlora_1_5b",
+   "b": "base_rate",
+   "split": "test_nov",
+   "diff": 0.030050812939291547,
+   "lo": -0.003949891975192599,
+   "hi": 0.06026130898623906,
+   "n": 90,
+   "days": 15
+  },
+  {
+   "a": "ml",
+   "b": "base_rate",
+   "split": "test_nov",
+   "diff": -0.0678201898421626,
+   "lo": -0.11616126605348515,
+   "hi": -0.00221683811324369,
+   "n": 90,
+   "days": 15
+  },
+  {
+   "a": "distill_1_5b",
+   "b": "base_1_5b",
+   "split": "test_all",
+   "diff": -0.012081678899565414,
+   "lo": -0.015628619190174064,
+   "hi": -0.008430741803964428,
+   "n": 276,
+   "days": 46
+  },
+  {
+   "a": "distill_1_5b",
+   "b": "qlora_1_5b",
+   "split": "test_all",
+   "diff": -0.0012160920319083642,
+   "lo": -0.004587062369102648,
+   "hi": 0.0018723121570048378,
+   "n": 276,
+   "days": 46
+  },
+  {
+   "a": "distill_1_5b",
+   "b": "claude_teacher",
+   "split": "test_all",
+   "diff": 0.05631110034122601,
+   "lo": 0.03522306741439282,
+   "hi": 0.07661334380898101,
+   "n": 276,
+   "days": 46
+  },
+  {
+   "a": "distill_1_5b",
+   "b": "base_rate",
+   "split": "test_all",
+   "diff": 0.01836850698761927,
+   "lo": 0.0054500784203511754,
+   "hi": 0.03214665375250637,
+   "n": 276,
+   "days": 46
+  },
+  {
+   "a": "distill_1_5b",
+   "b": "ml",
+   "split": "test_all",
+   "diff": 0.07020648790178435,
+   "lo": 0.03391466164102168,
+   "hi": 0.1047787098644796,
+   "n": 276,
+   "days": 46
+  },
+  {
+   "a": "claude_teacher",
+   "b": "base_rate",
+   "split": "test_all",
+   "diff": -0.03794259335360674,
+   "lo": -0.05902609067217336,
+   "hi": -0.015752533235390807,
+   "n": 276,
+   "days": 46
+  },
+  {
+   "a": "claude_teacher",
+   "b": "ml",
+   "split": "test_all",
+   "diff": 0.013895387560558341,
+   "lo": -0.016640629491824363,
+   "hi": 0.04333932885958302,
+   "n": 276,
+   "days": 46
+  },
+  {
+   "a": "qlora_1_5b",
+   "b": "base_rate",
+   "split": "test_all",
+   "diff": 0.019584599019527638,
+   "lo": 0.006853155146246655,
+   "hi": 0.03319929617225501,
+   "n": 276,
+   "days": 46
+  },
+  {
+   "a": "ml",
+   "b": "base_rate",
+   "split": "test_all",
+   "diff": -0.05183798091416508,
+   "lo": -0.08507714829535078,
+   "hi": -0.01659979078276073,
+   "n": 276,
+   "days": 46
+  }
+ ],
+ "cost_usd": 0.0,
+ "notes": [
+  "All probabilities are the Colab scores (4-bit model plus adapter, Platt map fitted on the validation split only). The student was trained on Claude's probabilities for 1,198 training-split questions (soft labels); no GGUF was exported and it is not a live forecaster. The `claude_teacher` arm is Claude Haiku with the live prompt on the same test questions (routing study).",
+  "Test sets: 186 questions (October 2026) and 90 (1 to 15 November 2026); the six questions of a day are correlated, so intervals are day-block bootstrap intervals.",
+  "Mean absolute difference of probabilities to the teacher (Claude `llm_context`, the routing-study answers): student 0.1688, hard-label QLoRA 0.1737, untuned 0.1826 (over 276 test questions).",
+  "The `ml` champion covers 2280 of these questions (backtest rows)."
+ ],
+ "limits": [
+  "Electricity only; 276 test questions from about 45 days; intervals are wide.",
+  "One training run, one seed: a different seed could change the ranking of the two tuned models.",
+  "Colab ran transformers 5.22.2, not the pinned version.",
+  "The untuned arms use their own Platt map fitted on validation, so they are not raw model probabilities."
+ ],
+ "card": "docs/lab/distill-r1.md"
+}

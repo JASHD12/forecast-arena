@@ -208,6 +208,23 @@ function fail(msg) { console.error('FAIL ' + msg); process.exitCode = 1; }
     const docs = await ask('How is the Brier score computed?');
     if (!/Tier 1/.test(docs) || !/\[docs\//.test(docs)) fail('chat did not answer from the documents with a citation: ' + docs.slice(0, 120));
     else console.log('ok   chat answers a method question with a citation');
+    // tier 2 box: hidden without WebGPU, shown with it; nothing is fetched before the click
+    await cp.waitForTimeout(500);
+    if (await cp.locator('#ask-llm').isVisible()) fail('tier 2 box is visible without a WebGPU adapter');
+    else console.log('ok   tier 2 box stays hidden without WebGPU');
+    const gctx = await browser.newContext({ viewport: { width: 390, height: 900 } });
+    await gctx.addInitScript(() => { Object.defineProperty(navigator, 'gpu', { value: { requestAdapter: async () => ({}) }, configurable: true }); });
+    const gp = await gctx.newPage();
+    const gforeign = [];
+    gp.on('request', (r) => { if (!r.url().startsWith(base)) gforeign.push(r.url()); });
+    await gp.goto(base + '/ask.html');
+    await gp.waitForSelector('#ask-examples button');
+    await gp.waitForSelector('#ask-llm-load', { state: 'visible', timeout: 3000 }).catch(() => undefined);
+    if (!(await gp.locator('#ask-llm-load').isVisible())) fail('tier 2 button not shown with WebGPU');
+    else console.log('ok   tier 2 button shown with WebGPU');
+    if (gforeign.length) fail('tier 2 fetched before the click: ' + gforeign.join(', '));
+    else console.log('ok   tier 2 downloads nothing before the click');
+    await gctx.close();
     if (foreign.length) fail('chat made requests outside the site: ' + foreign.join(', '));
     else console.log('ok   chat makes no request outside the site');
     if (cerrors.length) fail('chat page errors: ' + cerrors.join(' | '));

@@ -77,3 +77,5 @@ Nothing. See the session summary above and `python scripts/status.py`.
 - 2026-11-21 T260: occlusion-based explanations and card (three replayed questions, effects about 1 point).
 - 2026-11-21 T284: CI check job timeout raised to 25 min after the post-merge run hit the 15 min limit (promote was skipped).
 - 2026-11-21 T259/T275b: Chronos-2 backtest: Brier 0.2073, better than Chronos-Bolt and persistence but worse than the champion (+0.0143); not made a live challenger.
+- 2026-11-24 · T325 `llm-engineering.html` built from result files, T255b dropped, H11 steps written, profile README accepts the owner's work-experience file (H42).
+- 2026-11-24 · Checked the red runs (morning #35, resolve #56/#57, evening #22): real cause is the missed 2026-11-24 batch; fixed two misleading health results (evening before 16:00 UTC, coverage message). The day stays failed and unclean by rule.

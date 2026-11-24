@@ -87,7 +87,7 @@ Each technique is tried against the project's baselines on questions it never sa
 | Cost routing with the simpler ml-first rule on fresh days | pre-registered 2026-11-23 (lab/prereg/routing-ml-only.md); evaluated after 2026-12-24 | - |
 | In-browser model tier for Ask the Arena: real-browser test | built and opt-in; tested with a fake engine only, the owner's browser test (H41) is open | - |
 
-Live experimental forecasters: the QLoRA-tuned model (running since the first morning after 2026-11-22, with its fixed pre-registered expectations) and, once its launch check passes, an agent with hybrid retrieval and guards (still switched off). The cascade router was **not built**: its pre-registered rule saved no paid calls (the routing card has the numbers). None of them enters the headline board. Details: [Lab page](https://jashd12.github.io/forecast-arena/lab.html), [explainer](docs/explainers/06-experiments-lab.md).
+Live experimental forecasters: the QLoRA-tuned model (running since the first morning after 2026-11-22, with its fixed pre-registered expectations) and, once its launch check passes, an agent with hybrid retrieval and guards (still switched off). The cascade router was **not built**: its pre-registered rule saved no paid calls (the routing card has the numbers). None of them enters the headline board. Details: [Lab page](https://jashd12.github.io/forecast-arena/lab.html), [what I measured about LLMs](https://jashd12.github.io/forecast-arena/llm-engineering.html), [explainer](docs/explainers/06-experiments-lab.md).
 <!-- lab:end -->
 
 ## An open-source tool from this project

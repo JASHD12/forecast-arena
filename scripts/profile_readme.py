@@ -36,6 +36,8 @@ def render() -> str:
         contact.append(f"[LinkedIn]({facts['linkedin']})")
     if facts.get("email"):
         contact.append(f"[Email]({facts['email']})")
+    exp_file = ROOT / "site_content" / "profile_experience.md"
+    experience = exp_file.read_text(encoding="utf-8").strip() if exp_file.is_file() else ""
     skills = " · ".join(skill for skill, _, _, _ in PROOFS)
     lines = [
         "# Jashdeep Singh",
@@ -46,6 +48,8 @@ def render() -> str:
     ]
     if contact:
         lines += [" · ".join(contact), ""]
+    if experience:  # the owner's own text, pasted verbatim; never written by the agent (I5)
+        lines += ["## Work experience", "", experience, ""]
     lines += [
         "## Featured project: Forecast Arena",
         "",

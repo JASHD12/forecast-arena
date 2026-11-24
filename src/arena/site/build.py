@@ -52,6 +52,7 @@ from arena.site.content import (
 from arena.site.forecast_audit import CHART_CLASS, lineage, load_case
 from arena.site.forecast_audit import NAMES as AUDIT_NAMES
 from arena.site.game import live_deck, practice_deck
+from arena.site.llm_engineering import load_page as load_llm_page
 from arena.site.llm_obs import (
     CACHE_READ_MULT,
     PRICE_SOURCE,
@@ -202,9 +203,15 @@ def build_site(
     domains = sorted({q.domain for q in rec.questions.values()})
     headline = all_boards(off, domains, off_days, settling_rule(rec.scored, start))
     rehearsal_boards = all_boards(rehearsal, domains)
+    llm_page = load_llm_page(evals_dir, None)
     common = {
         "nav": NAV,
-        "nav_more": NAV_MORE if audit_case else tuple(x for x in NAV_MORE if x[0] != "audit.html"),
+        "llm_page_available": llm_page is not None,
+        "nav_more": tuple(
+            x
+            for x in NAV_MORE
+            if (audit_case or x[0] != "audit.html") and (llm_page or x[0] != "llm-engineering.html")
+        ),
         "root": "",
         "attributions": ATTRIBUTIONS,
         "built_at": clock.now().strftime("%Y-%m-%d %H:%M UTC"),
@@ -463,6 +470,8 @@ def build_site(
         ml_ctx = {**pages["recruiters.html"][1], "audience": "engineer"}
         pages["recruiters-ml.html"] = ("For recruiters: ML engineering", ml_ctx)
     pages["ask.html"] = ("Ask the Arena", {})
+    if llm_page is not None:
+        pages["llm-engineering.html"] = ("LLM engineering", {"llm": llm_page})
     for name, (title, ctx) in pages.items():
         root = "../" if "/" in name else ""
         nav_page = "questions/index.html" if name == "questions/index.html" else name

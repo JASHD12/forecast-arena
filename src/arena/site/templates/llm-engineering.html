@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% from "macros.html" import page_head %}
+{% block content %}
+{{ page_head("AI / LLM engineering", "What I measured about LLMs", "Eight experiments on adapting, shrinking, routing and judging language models for forecasting, each with its cost and the decision it led to. Negative results are kept.") }}
+<p class="note"><strong>Evaluation, not live results.</strong> Every figure on this page is read from the committed result files by code. The open-model rows are scored on the same {{ llm.n }} frozen test questions (October and early November 2026, power and markets); lower Brier is better and 0.25 is what always saying 50% scores. Total paid spend for the paid runs listed here: US${{ "%.2f"|format(llm.total_cost) }}. Research project, not advice.</p>
+
+<section class="card" aria-labelledby="l-chart"><h2 id="l-chart">Where the models land</h2>
+<figure class="chart-fig">{{ llm.chart }}
+<ul class="audit-key" aria-label="Colour key">{% for c, name in llm.classes.items() %}<li><span class="dot-key {{ c }}" aria-hidden="true"></span>{{ name }}</li>{% endfor %}</ul>
+<figcaption>Brier score on the same {{ llm.n }} test questions, best first. The classical model and the paid model sit clearly ahead of every small open model I adapted.</figcaption></figure>
+</section>
+
+<h2 id="l-table">The experiments</h2>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Experiments, results, costs and decisions"><table class="proof">
+<caption>One row per experiment, in the order they were run</caption>
+<thead><tr><th scope="col">Experiment</th><th scope="col">Result</th><th scope="col">Cost</th><th scope="col">Decision</th></tr></thead>
+<tbody>{% for r in llm.rows %}<tr><th scope="row">{{ r.title }}</th><td>{{ r.result }}</td><td>{{ "US$%.2f"|format(r.cost) if r.cost else "free" }}</td><td>{{ r.decision }}</td></tr>{% endfor %}</tbody></table></div>
+<p>More detail, intervals and the pre-registered rules are on the <a href="lab.html">Experiments lab</a> page.</p>
+
+<section class="card" aria-labelledby="l-next"><h2 id="l-next">What I would do next</h2>
+<ul>{% for n in llm.next %}<li>{{ n }}</li>{% endfor %}</ul></section>
+{% endblock %}

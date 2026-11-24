@@ -861,3 +861,10 @@ main summary { min-height: 1.5rem; }
 .ask-examples button { font: inherit; margin: .2rem .3rem .2rem 0; padding: .3rem .7rem; border-radius: 999px; border: 1px solid var(--line); background: transparent; color: inherit; cursor: pointer; }
 .ask-msg table { border-collapse: collapse; margin-top: .4rem; font-size: .92rem; }
 .ask-msg th, .ask-msg td { padding: .2rem .6rem; border-bottom: 1px solid var(--line); text-align: left; }
+
+/* LLM engineering page (T325): bars of Brier per arm; text kept at 12 px in a 360-wide viewBox. */
+.llm-chart { width: 100%; max-width: 40rem; height: auto; display: block; }
+.llm-chart .lc-bar { fill: var(--c, var(--accent)); }
+.llm-chart .lc-name, .llm-chart .lc-val, .llm-chart .lc-tick { fill: var(--text, currentColor); font-size: 12px; }
+.llm-chart .lc-tick { fill: var(--muted); }
+.llm-chart .lc-coin { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 4 3; }

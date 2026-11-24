@@ -215,7 +215,9 @@ def lab() -> str:
         "cascade router was **not built**: its pre-registered rule saved no paid calls (the "
         "routing card has the numbers). None of them enters the headline board. Details: "
         "[Lab page](https://jashd12.github.io/"
-        "forecast-arena/lab.html), [explainer](docs/explainers/06-experiments-lab.md)."
+        "forecast-arena/lab.html), [what I measured about LLMs]"
+        "(https://jashd12.github.io/forecast-arena/llm-engineering.html), "
+        "[explainer](docs/explainers/06-experiments-lab.md)."
     )
     return "\n".join(rows)
 

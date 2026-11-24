@@ -103,6 +103,7 @@ from arena.site.shaping import (
     live_versions,
     model_timeline,
     official_start,
+    pending_official,
     phase_line,
     pick_cards,
     question_href,
@@ -276,6 +277,9 @@ def build_site(
                 "verify_ok": rep.ok,
                 "verify_summary": rep.summary(),
                 "latest_batch": latest_b,
+                "pending": pending_official(
+                    rec, start, clock.now(), {d: domain_name(d) for d in domains}
+                ),
                 "no_batch_today": bool(
                     latest_b and latest_b < clock.now().date() and clock.now().time() >= LOCK_TIME
                 ),
@@ -296,6 +300,9 @@ def build_site(
                 "headline": headline,
                 "rehearsal": rehearsal_boards,
                 "official_days": off_days,
+                "pending": pending_official(
+                    rec, start, clock.now(), {d: domain_name(d) for d in domains}
+                ),
                 "heat": heatmap(off if off else rehearsal, mfids, domains),
                 "h2h": head_to_head(off if off else rehearsal, mfids),
                 "matrix_scope": "official record" if off else "rehearsal days",

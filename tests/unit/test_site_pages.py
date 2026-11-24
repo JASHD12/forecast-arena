@@ -266,3 +266,33 @@ def test_chat_tier2_script_names_only_its_pinned_hosts(tmp_path) -> None:
         text = page.read_text()
         outside = "cdn.jsdelivr.net" in text.split("</head>")[0]
         assert outside == (page.name == "ask.html"), page
+
+
+def test_pending_official_lists_open_official_questions_by_due_time(tmp_path) -> None:
+    from datetime import timedelta
+
+    from factories import B, question
+
+    from arena.ledger import Ledger, layout
+    from arena.scoring.core import load
+    from arena.site.shaping import pending_official
+
+    led = Ledger(tmp_path)
+    old, new = question(batch=B - timedelta(days=3)), question(batch=B, template="max_gt")
+    led.append(layout.questions_path(old.batch_date), [old])
+    led.append(layout.questions_path(new.batch_date), [new])
+    rec = load(led)
+    now = new.resolve_after + timedelta(hours=1)
+    got = pending_official(rec, B, now, {"power": "Electricity"})
+    assert got == [
+        {
+            "name": "Electricity",
+            "n": 1,  # the rehearsal question before the official start is not listed
+            "due": new.resolve_after.strftime("%a %d %b %H:%M UTC"),
+            "overdue": True,
+        }
+    ]
+    assert (
+        pending_official(rec, B, new.resolve_after - timedelta(hours=1), {})[0]["overdue"] is False
+    )
+    assert pending_official(rec, None, now, {}) == []

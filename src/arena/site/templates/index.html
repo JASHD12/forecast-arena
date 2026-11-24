@@ -23,7 +23,7 @@
 <div class="hero-side">
 <aside class="standings" aria-labelledby="st-title">
 <h2 id="st-title">Standings <span class="st-scope">{{ "official" if official_ready else "rehearsal" }}</span></h2>
-{% if official_start and not official_ready %}<p class="st-note st-hint">The official record started on {{ official_start }}; none of its questions has resolved yet, so these are the rehearsal standings and they do not count towards the headline. Official standings appear as its questions resolve.</p>{% endif %}
+{% if official_start and not official_ready %}<p class="st-note st-hint">The official record started on {{ official_start }}; none of its questions has resolved yet, so these are the rehearsal standings and they do not count towards the headline. Official standings appear as its questions resolve.{% if pending %} Next answers: {% for g in pending[:2] %}{{ g.name }} {% if g.overdue %}(past due){% else %}{{ g.due }}{% endif %}{% if not loop.last %}, {% endif %}{% endfor %}.{% endif %}</p>{% endif %}
 {% if board.rows %}
 <p class="st-note">Average Brier score on the same questions, lower is better. <span class="st-n">{{ board.questions }} questions · {{ board.days }} day{{ "" if board.days == 1 else "s" }}</span>{% if board.label %} <span class="label">{{ board.label }}</span>{% endif %}</p>
 <ol class="st-list">

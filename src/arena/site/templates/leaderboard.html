@@ -5,7 +5,8 @@
 {% if not official_start %}<p class="rehearsal-note" role="note"><strong>Rehearsal phase.</strong> {{ start_rule }}</p>{% endif %}
 {% set official_ready = official_start and headline[0] and headline[0].rows %}
 {% set main = headline[0] if official_ready else rehearsal[0] %}
-{% if official_start and not official_ready %}<p class="rehearsal-note" role="note"><strong>The official record started on {{ official_start }}</strong>, but none of its questions has resolved yet. The standings below are rehearsal results and do not count towards the headline; official standings appear here as its questions resolve.</p>{% endif %}
+{% if official_start and not official_ready %}<p class="rehearsal-note" role="note"><strong>The official record started on {{ official_start }}</strong>, but none of its questions has resolved yet. The standings below are rehearsal results and do not count towards the headline; official standings appear here as its questions resolve.</p>
+{% if pending %}<p class="note">Still waiting for answers: {% for g in pending %}<strong>{{ g.name }}</strong> ({{ g.n }} question{{ "s" if g.n != 1 }}, {% if g.overdue %}past due since {{ g.due }}, resolved at the next run once the source has published{% else %}due {{ g.due }}{% endif %}){% if not loop.last %}; {% endif %}{% endfor %}.</p>{% endif %}{% endif %}
 {% if main and main.rows %}
 {% set ranked = main.rows|sort(attribute="brier.estimate") %}
 <section class="lb-hero" aria-labelledby="lb-top">

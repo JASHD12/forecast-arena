@@ -123,6 +123,36 @@ def split_outcomes(rows: Sequence[dict[str, Any]], limit: int = 8) -> dict[str, 
     }
 
 
+def pending_official(
+    rec: Any, start: date | None, now: datetime, names: dict[str, str]
+) -> list[dict[str, Any]]:
+    """Open questions of the official record, grouped by topic, earliest due time first.
+
+    Used to explain an empty official board: which topic resolves when, and which is overdue
+    (the data source has not published yet). Computed from the ledger only.
+    """
+    if start is None:
+        return []
+    groups: dict[str, dict[str, Any]] = {}
+    for q in rec.questions.values():
+        if q.batch_date < start or q.question_id in rec.resolutions or excluded(rec, q.question_id):
+            continue
+        g = groups.setdefault(q.domain, {"domain": q.domain, "n": 0, "due": q.resolve_after})
+        g["n"] += 1
+        g["due"] = min(g["due"], q.resolve_after)
+    out = []
+    for g in sorted(groups.values(), key=lambda x: x["due"]):
+        out.append(
+            {
+                "name": names.get(g["domain"], g["domain"]),
+                "n": g["n"],
+                "due": g["due"].strftime("%a %d %b %H:%M UTC"),
+                "overdue": g["due"] < now,
+            }
+        )
+    return out
+
+
 def featured_row(rows: Sequence[dict[str, Any]]) -> dict[str, Any] | None:
     """The latest question on which the forecasters disagree most (display only)."""
     best, spread = None, -1.0

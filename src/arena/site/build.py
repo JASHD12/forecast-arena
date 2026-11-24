@@ -25,11 +25,19 @@ from arena.analytics.sql import (
 from arena.analytics.sql import connect as sql_connect
 from arena.clock import Clock
 from arena.config import DEFAULT_REPO_URL, DEFAULT_SITE_URL
-from arena.lab.results import COLUMNS, PLANNED, lab_cards, load_lab_results, total_cost
+from arena.lab.results import (
+    COLUMNS,
+    PLANNED,
+    budget_spent,
+    lab_cards,
+    load_lab_results,
+    total_cost,
+)
 from arena.ledger import Ledger
 from arena.ledger.verify import verify
 from arena.llm.otlp import otlp_names, write_otlp
 from arena.models import Question
+from arena.ops.jobs import LOCK as LOCK_TIME
 from arena.ops.official import STREAK, update_official_start
 from arena.ops.weekly import summaries as weekly_summaries
 from arena.scoring.boards import MIN_DAYS, all_boards, official, settling_rule
@@ -64,6 +72,7 @@ from arena.site.llm_obs import (
 from arena.site.matrices import MIN_N, head_to_head, heatmap
 from arena.site.methods_content import LIMITATIONS, PRINCIPLES
 from arena.site.ops_status import (
+    latest_health,
     llm_usage,
     missed_days,
     parse_failures,
@@ -176,12 +185,14 @@ def build_site(
     latest_b = batches[-1] if batches else None
     prev_b = batches[-2] if len(batches) > 1 else None
     latest, fids = (
-        _rows(sorted(by_batch[latest_b], key=lambda q: q.question_id), rec)
+        _rows(sorted(by_batch[latest_b], key=lambda q: q.question_id), rec, clock.now())
         if latest_b
         else ([], [])
     )
     previous, _ = (
-        _rows(sorted(by_batch[prev_b], key=lambda q: q.question_id), rec) if prev_b else ([], [])
+        _rows(sorted(by_batch[prev_b], key=lambda q: q.question_id), rec, clock.now())
+        if prev_b
+        else ([], [])
     )
     content = content_dir or Path("site_content")
 
@@ -265,6 +276,9 @@ def build_site(
                 "verify_ok": rep.ok,
                 "verify_summary": rep.summary(),
                 "latest_batch": latest_b,
+                "no_batch_today": bool(
+                    latest_b and latest_b < clock.now().date() and clock.now().time() >= LOCK_TIME
+                ),
                 "latest": latest,
                 "cards": pick_cards(latest),
                 "outcomes": split_outcomes(previous),
@@ -351,7 +365,10 @@ def build_site(
                 "skip_help": SKIP_HELP,
                 "streak": decision,
                 "streak_needed": STREAK,
-                "missed": missed_days(ledger, clock.now().date()),
+                "missed": missed_days(
+                    ledger, clock.now().date(), after_lock=clock.now().time() >= LOCK_TIME
+                ),
+                "health": latest_health(ledger),
                 "usage": llm_usage(ledger, clock.now().date()),
                 "token_cap": llm_token_cap,
                 "parse": parse_failures(rec),
@@ -382,7 +399,8 @@ def build_site(
             {
                 "results": lab_cards(lab_all),
                 "planned": PLANNED,
-                "spent": total_cost(lab_all),
+                "spent": budget_spent(REPO_ROOT / "docs" / "project" / "LAB_BUDGET.md")
+                or total_cost(lab_all),
                 "colnames": COLUMNS,
                 "live": experimental_live(rec, FORECASTER_NAMES),
             },

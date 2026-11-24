@@ -95,3 +95,16 @@ def test_empty_lab_page_says_so(tmp_path) -> None:
         Ledger(tmp_path / "l"), tmp_path / "site", clock, ROOT / "site_content"
     ).out_dir
     assert "No experiment has finished yet" in (out / "lab.html").read_text()
+
+
+def test_budget_spent_sums_the_table_and_tolerates_a_missing_file(tmp_path) -> None:
+    from arena.lab.results import budget_spent
+
+    f = tmp_path / "b.md"
+    f.write_text(
+        "| Run | Date | id | Tokens | US$ | Total |\n|---|---|---|---|---|---|\n"
+        "| a | d | 1 | 10 | 0.04 | 0.04 |\n| b | d | 2 | 20 | 0.15 | 0.19 |\n",
+        encoding="utf-8",
+    )
+    assert budget_spent(f) == 0.19
+    assert budget_spent(tmp_path / "none.md") is None

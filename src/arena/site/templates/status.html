@@ -3,8 +3,10 @@
 {% block content %}
 {{ page_head("Operations", "Status", "Is the system running? Every run, every void and every skipped forecast is recorded and shown here.") }}
 {% if runs %}{% set bad = runs[:8]|selectattr("status", "ne", "ok")|list %}
-<div class="health {{ 'health-ok' if not bad else 'health-bad' }}" role="status">
-<span class="health-big">{{ "✓ All recent runs succeeded" if not bad else "✗ " ~ bad|length ~ " of the last 8 runs failed" }}</span>
+{% set hbad = health and not health.ok %}
+<div class="health {{ 'health-ok' if not bad and not hbad else 'health-bad' }}" role="status">
+<span class="health-big">{% if bad %}✗ {{ bad|length }} of the last 8 runs failed{% elif hbad %}✗ Runs finished, but the latest health check failed{% else %}✓ All recent runs succeeded{% endif %}</span>
+{% if hbad %}<span><strong>Health check</strong> ({{ health.job }} run, {{ health.at[:16]|replace("T", " ") }} UTC): {{ health.failed|join(", ") }}. A run can finish without errors and still fail a check, for example when a day's batch was never created.</span>{% endif %}
 <span>Last run: <code>{{ runs[0].run_id }}</code> at {{ runs[0].started_at.strftime("%Y-%m-%d %H:%M UTC") }}.</span>
 </div>
 {% else %}<div class="health" role="status"><span class="health-big">No runs recorded yet</span><span>The first scheduled run writes its manifest here.</span></div>{% endif %}
@@ -30,8 +32,8 @@
 <h2>Daily schedule (UTC)</h2>
 <p class="note">GitHub often starts scheduled jobs hours late, so each job is scheduled many times and a small gate lets the first run that has work do it. The lock at 09:30 UTC never moves.</p>
 <ol class="timeline">
-<li><time>From 16:00 (day before)</time><span><strong>Evening job</strong>: the next batch's questions are published so people can answer before the lock. It tries hourly until 23:00 and does its work once.</span></li>
-<li><time>Before 09:30</time><span><strong>Morning job</strong>: questions the evening job missed are created, every forecaster answers, the batch is sealed. It tries hourly from 00:15 until the lock.</span></li>
+<li><time>From 16:00 (day before)</time><span><strong>Evening job</strong>: the next batch's questions are published so people can answer before the lock. It is attempted several times an hour until 23:59 and does its work once.</span></li>
+<li><time>Before 09:30</time><span><strong>Morning job</strong>: questions the evening job missed are created, every forecaster answers, the batch is sealed. It is attempted several times an hour from 19:00 until the lock; a run after the lock cannot create the batch.</span></li>
 <li><time>09:30</time><span><strong>Lock</strong>: nothing can be added for the day after this.</span></li>
 <li><time>Every 3 hours</time><span><strong>Resolve job</strong>: answers collected from the official sources, finished days sealed into the hash chain, site rebuilt.</span></li>
 <li><time>Sunday 02:00</time><span><strong>Weekly job</strong>: models retrained, promoted only by a written rule, drift and feature importance published on <a href="experiments.html">Experiments</a>.</span></li>

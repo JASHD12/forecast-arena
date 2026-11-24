@@ -21,6 +21,6 @@ Why companies use it: Checking a judge against a second, independent model is a 
 - Two models can share biases, so agreement does not show either is right.
 - Only the items both judges graded are compared; the sample is small.
 - The rater is the same AI coding assistant that built this project and is in the same model family as the forecasters, so its ratings carry the same blind spots; it was not blind to the judge, because it had seen some of the judge's scores earlier in the session.
-- These ratings do not replace the owner's 30 human labels (HUMAN_TODO H29), which stay open.
+- These ratings do not replace the 30 human labels, which stay open.
 
 Paid-call cost: US$0.00.

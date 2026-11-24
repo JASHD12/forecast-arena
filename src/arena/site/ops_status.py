@@ -3,9 +3,11 @@ and source freshness. Everything is computed from the ledger alone."""
 
 from __future__ import annotations
 
+import json
 from collections import Counter
 from dataclasses import dataclass
 from datetime import date, datetime, time, timedelta
+from typing import Any
 
 from arena.ledger import Ledger, layout
 from arena.ledger.manifest import manifests_for_day
@@ -27,19 +29,50 @@ LLM_FORECASTERS = (
 )
 
 
-def missed_days(ledger: Ledger, today: date) -> list[date]:
+def missed_days(ledger: Ledger, today: date, *, after_lock: bool = False) -> list[date]:
     """Batch days from the first ledger day up to yesterday that have no batch seal
-    (no forecasts were locked in for them)."""
+    (no forecasts were locked in for them). With `after_lock`, today counts too: once
+    the 09:30 UTC lock has passed, an unsealed batch for today can no longer be made."""
     first = first_day(ledger)
     out: list[date] = []
     if first is None:
         return out
     d = first
-    while d < today:
+    end = today + timedelta(days=1) if after_lock else today
+    while d < end:
         if not ledger.exists(layout.batch_seal_path(d)):
             out.append(d)
         d += timedelta(days=1)
     return out
+
+
+def latest_health(ledger: Ledger) -> dict[str, Any] | None:
+    """The newest recorded health report: when, which job, and the failing checks (or None)."""
+    reports = [f for f in ledger.list_files("health/") if f.endswith(".json")]
+    if not reports:
+        return None
+
+    def day_key(rel: str) -> str:  # health/YYYY/MM/DD-job-n.json -> YYYYMMDD
+        parts = rel.split("/")
+        return parts[-3] + parts[-2] + parts[-1][:2]
+
+    latest_day = max(day_key(f) for f in reports)
+    best: dict[str, Any] | None = None
+    for f in reports:
+        if day_key(f) != latest_day:
+            continue
+        rec = json.loads(ledger.read_bytes(f))
+        if best is None or str(rec.get("at", "")) > str(best.get("at", "")):
+            best = rec
+    if best is None:
+        return None
+    failed = [str(c.get("name")) for c in best.get("checks", []) if not c.get("ok")]
+    return {
+        "at": best.get("at"),
+        "job": best.get("job"),
+        "ok": bool(best.get("ok")),
+        "failed": failed,
+    }
 
 
 @dataclass(frozen=True)

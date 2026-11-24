@@ -25,8 +25,11 @@ def test_draft_leads_with_the_project_and_keeps_the_caveats() -> None:
 
 def test_contact_lines_appear_only_when_the_owner_supplied_them() -> None:
     text = pr.render()
-    facts = (ROOT / "site_content" / "recruiter_facts.json").exists()
-    assert ("[CV (PDF)]" in text or "[LinkedIn]" in text or "[Email]" in text) == facts
+    from arena.site.recruiters import load_facts
+
+    facts = load_facts(ROOT / "site_content")
+    has_contact = any(k in facts for k in ("cv_url", "linkedin", "email"))
+    assert ("[CV (PDF)]" in text or "[LinkedIn]" in text or "[Email]" in text) == has_contact
 
 
 def test_every_link_to_the_site_names_an_existing_page() -> None:

@@ -12,7 +12,7 @@ import json
 import re
 import urllib.parse
 from collections.abc import Mapping, Sequence
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -179,7 +179,9 @@ def _fmt_p(p: float) -> str:
     return f"{p:.2f}"
 
 
-def _rows(questions: Sequence[Question], rec: Any) -> tuple[list[dict[str, Any]], list[str]]:
+def _rows(
+    questions: Sequence[Question], rec: Any, now: datetime | None = None
+) -> tuple[list[dict[str, Any]], list[str]]:
     by_q: dict[str, dict[str, str]] = {}
     pn: dict[str, dict[str, float]] = {}
     fids: set[str] = set()
@@ -206,6 +208,7 @@ def _rows(questions: Sequence[Question], rec: Any) -> tuple[list[dict[str, Any]]
                 "observed": None if r is None else r.observed_value,
                 "state": state,
                 "due": q.resolve_after.strftime("%a %d %b"),
+                "overdue": now is not None and q.resolve_after < now,
             }
         )
     order = [

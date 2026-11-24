@@ -143,7 +143,9 @@ def test_home_and_guide_say_the_official_record_started_when_the_start_file_exis
     led = Ledger(tmp_path / "b" / "l")
     led.write_raw(layout.OFFICIAL_START_PATH, json.dumps({"official_start": "2026-11-23"}).encode())
     res = build_site(led, tmp_path / "b" / "site", CLOCK, tmp_path / "none")
-    assert "The official record started on 2026-11-23" in _text(
-        (res.out_dir / "index.html").read_text()
-    )
+    home = _text((res.out_dir / "index.html").read_text())
+    assert "The official record started on 2026-11-23" in home
+    assert "none of its questions has resolved yet" in home and "Standings rehearsal" in home
+    board = _text((res.out_dir / "leaderboard.html").read_text())
+    assert "none of its questions has resolved yet" in board
     assert "It started on 2026-11-23" in _text((res.out_dir / "guide.html").read_text())

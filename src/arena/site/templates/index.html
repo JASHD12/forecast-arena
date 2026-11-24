@@ -9,7 +9,8 @@
 {% endfor %}</ul>{% set rest = forecasters|length - answered|length %}{% if rest %}<p class="note bars-rest">{{ rest }} more forecaster{{ "s" if rest != 1 }} did not answer this one (the LLMs answer a daily sample; see <a href="{{ root }}status.html">Status</a>).</p>{% endif %}{% endmacro %}
 {% macro icon(name) %}<svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">{% if name == "power" %}<path d="M13 2 4 14h7l-1 8 9-12h-7z"/>{% elif name == "weather" %}<path d="M17.5 19a4.5 4.5 0 1 0-1.4-8.8A6 6 0 0 0 4 12a4 4 0 0 0 1 7.9z"/>{% elif name == "attention" %}<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>{% elif name == "markets" %}<path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/>{% elif name == "crypto" %}<circle cx="12" cy="12" r="9"/><path d="M9.5 8h4a2 2 0 0 1 0 4h-4h4.5a2 2 0 0 1 0 4h-4.5zM11 6.5v1.5M11 16v1.5"/>{% elif name == "lock" %}<rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>{% elif name == "target" %}<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>{% elif name == "open" %}<path d="M4 4h16v16H4z"/><path d="M9 9h6M9 13h6M9 17h3"/>{% elif name == "github" %}<path d="M9 19c-4 1.5-4-2-6-2m12 4v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2 4.2 4.2 0 0 0-.1-3.2s-1.1-.3-3.5 1.3a12 12 0 0 0-6.2 0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2 0 0 0-.1 3.2A4.6 4.6 0 0 0 4 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/>{% endif %}</svg>{% endmacro %}
 {% block content %}
-{% set board = headline if official_start else rehearsal_board %}
+{% set official_ready = official_start and headline.rows %}
+{% set board = headline if official_ready else rehearsal_board %}
 <section class="hero hero-home" aria-labelledby="hero-title">
 <div class="hero-copy">
 <p class="kicker"><span class="pulse" aria-hidden="true"></span> Live benchmark · AI vs classical ML vs baselines</p>
@@ -21,7 +22,8 @@
 </div>
 <div class="hero-side">
 <aside class="standings" aria-labelledby="st-title">
-<h2 id="st-title">Standings <span class="st-scope">{{ "official" if official_start else "rehearsal" }}</span></h2>
+<h2 id="st-title">Standings <span class="st-scope">{{ "official" if official_ready else "rehearsal" }}</span></h2>
+{% if official_start and not official_ready %}<p class="st-note st-hint">The official record started on {{ official_start }}; none of its questions has resolved yet, so these are the rehearsal standings and they do not count towards the headline. Official standings appear as its questions resolve.</p>{% endif %}
 {% if board.rows %}
 <p class="st-note">Average Brier score on the same questions, lower is better. <span class="st-n">{{ board.questions }} questions · {{ board.days }} day{{ "" if board.days == 1 else "s" }}</span>{% if board.label %} <span class="label">{{ board.label }}</span>{% endif %}</p>
 <ol class="st-list">
@@ -29,7 +31,6 @@
 {% endfor %}</ol>
 <p class="st-foot"><a href="leaderboard.html">Intervals and details →</a></p>
 {% else %}
-{% if official_start %}<p class="st-note">The official record started on {{ official_start }}. Its first questions resolve on the following days, so this table fills in then; until it does, the <a href="leaderboard.html">leaderboard</a> shows the rehearsal results, which do not count towards the headline.</p>{% endif %}
 <p class="st-note">Standings require resolved questions answered by every registered headline forecaster.{% if board.missing_forecasters %} Still missing scored forecasts from {% for fid in board.missing_forecasters %}{{ fname(fid) }}{% if not loop.last %}, {% endif %}{% endfor %}.{% else %} No questions in this scope have complete coverage yet.{% endif %}</p>
 <ul class="lineup">
 {% for fid in ("base_rate", "persistence", "ml", "llm_plain", "llm_context", "agent") %}<li><span class="dot-key {{ series_class(fid) }}" aria-hidden="true"></span>{{ fname(fid) }}{% if is_ai(fid) %} <span class="label">AI</span>{% endif %}{% if fid == "ml" and not ml_live %} <span class="label">backtest only</span>{% endif %}</li>{% endfor %}

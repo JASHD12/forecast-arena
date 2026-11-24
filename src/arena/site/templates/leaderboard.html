@@ -3,11 +3,13 @@
 {% block content %}
 {{ page_head("Who forecasts best?", "Leaderboard", "Lower is better. A forecaster that always says 50% scores 0.25 (the line on each bar). The base rate is the yardstick to beat.") }}
 {% if not official_start %}<p class="rehearsal-note" role="note"><strong>Rehearsal phase.</strong> {{ start_rule }}</p>{% endif %}
-{% set main = headline[0] if official_start else rehearsal[0] %}
+{% set official_ready = official_start and headline[0] and headline[0].rows %}
+{% set main = headline[0] if official_ready else rehearsal[0] %}
+{% if official_start and not official_ready %}<p class="rehearsal-note" role="note"><strong>The official record started on {{ official_start }}</strong>, but none of its questions has resolved yet. The standings below are rehearsal results and do not count towards the headline; official standings appear here as its questions resolve.</p>{% endif %}
 {% if main and main.rows %}
 {% set ranked = main.rows|sort(attribute="brier.estimate") %}
 <section class="lb-hero" aria-labelledby="lb-top">
-<div class="section-head"><h2 id="lb-top">{{ "Official standings" if official_start else "Rehearsal standings" }}</h2>{% if main.label %}<span class="label">{{ main.label }}</span>{% endif %}</div>
+<div class="section-head"><h2 id="lb-top">{{ "Official standings" if official_ready else "Rehearsal standings" }}</h2>{% if main.label %}<span class="label">{{ main.label }}</span>{% endif %}</div>
 <ol class="podium">
 {% for r in ranked[:3] %}<li class="podium-{{ loop.index }}"><span class="medal-n" aria-hidden="true">{{ loop.index }}</span><span class="podium-name"><span class="dot-key {{ series_class(r.forecaster_id) }}" aria-hidden="true"></span><strong>{{ fname(r.forecaster_id) }}</strong>{% if is_ai(r.forecaster_id) %} <span class="label">AI</span>{% endif %}</span><span class="podium-score">{{ "%.3f"|format(r.brier.estimate) }}</span><span class="note">95% interval {{ "%.3f"|format(r.brier.low) }}–{{ "%.3f"|format(r.brier.high) }}</span></li>
 {% endfor %}</ol>

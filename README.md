@@ -33,7 +33,7 @@ append-only, hash-chained ledger. When the data arrives, every forecast is score
 
 [![The home page](docs/img/home.png)](https://jashd12.github.io/forecast-arena/)
 
-*Screenshot of the site built from the public ledger on 2026-11-23. Research project, not advice.*
+*Screenshot of the site built from the public ledger on 2026-11-24. Research project, not advice.*
 
 ## What this shows
 

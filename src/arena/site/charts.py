@@ -127,8 +127,8 @@ def _race_one(
     highlight: set[str],
     narrow: bool,
 ) -> str:
-    """One layout of the race chart. Highlighted lines are coloured and (wide layout only) get
-    a direct end label with a leader line; the others are light grey and live in the legend."""
+    """One layout of the race chart. Every line has its own colour; highlighted lines are
+    thicker; in the wide layout every line gets a direct end label with a coloured leader line."""
     width, height, (top, right, bottom, left) = layout
     w, h = width - left - right, height - top - bottom
     vals = [v for pts in series.values() for _, v in pts] + [0.25]
@@ -184,20 +184,21 @@ def _race_one(
         if not pts:
             continue
         hot = fid in highlight
-        c = series_class(fid) if hot else "s-muted"
+        c = series_class(fid)  # every forecaster keeps its own colour (identity, never rank)
+        thin = "" if hot else " thin"
         path = " ".join(
             f"{'M' if i == 0 else 'L'}{x(d):.1f},{y(v):.1f}" for i, (d, v) in enumerate(pts)
         )
-        p.append(f'<path class="line {c}" d="{path}"/>')
+        p.append(f'<path class="line {c}{thin}" d="{path}"/>')
         for d, v in pts:
             tip = escape(f"{names.get(fid, fid)}: {v:.3f} after {d}")
-            r = 3.5 if hot else 2.5
+            r = 3.5 if hot else 3
             p.append(
                 f'<g class="pt"><circle class="hit" cx="{x(d):.1f}" cy="{y(v):.1f}" r="10">'
                 f"<title>{tip}</title></circle>"
                 f'<circle class="dot {c}" cx="{x(d):.1f}" cy="{y(v):.1f}" r="{r}"/></g>'
             )
-        if hot and not narrow:
+        if not narrow:  # every line is labelled at its end (spread so the labels never overlap)
             d_last, v_last = pts[-1]
             ends.append([y(v_last), x(d_last), fid, v_last])
     ends.sort()
@@ -207,15 +208,18 @@ def _race_one(
         name = names.get(fid, fid)
         name = name if len(name) <= RACE_LABEL_CHARS else name[: RACE_LABEL_CHARS - 1] + "…"
         label = f"{name} {v:.3f}"
-        p.append(f'<line class="leader" x1="{lx + 5:.1f}" y1="{y(series[fid][-1][1]):.1f}" '
-                 f'x2="{left + w + 8}" y2="{ly:.1f}"/>')  # fmt: skip
+        p.append(
+            f'<line class="leader {series_class(fid)}" x1="{lx + 5:.1f}" '
+            f'y1="{y(series[fid][-1][1]):.1f}" x2="{left + w + 8}" y2="{ly:.1f}"/>'
+        )
         p.append(
             f'<text class="endlabel {series_class(fid)}" x="{left + w + 12}" y="{ly + 4:.1f}">'
             f"{escape(label)}</text>"
         )
     if not narrow:  # right margin, level with the dashed line, clear of the end labels
         taken = [ly for ly, *_ in ends]
-        for dy in (0, -16, 16, -32, 32):
+        ly = yc
+        for dy in sorted(range(-240, 241, 4), key=abs):  # the nearest free spot to the line
             ly = yc + dy
             if all(abs(ly - t) >= 15 for t in taken):
                 break
@@ -241,8 +245,10 @@ def race_svg(
     layouts (wide, and a phone layout the CSS switches to), plus a legend sorted by the latest
     score. With fewer than `RACE_MIN_DAYS` days it shows a short note instead of a chart.
 
-    One y-axis (Brier, lower is better), a reference at 0.25 (always saying 50%), end labels
-    only for the highlighted lines, and a native tooltip on every point."""
+    Every forecaster keeps its own colour (three similar hues also get a dash pattern); the ML
+    model, the base rate and the best AI forecaster are drawn thicker. One y-axis (Brier, lower
+    is better), a reference at 0.25 (always saying 50%), an end label on every line (wide
+    layout) and a native tooltip on every point."""
     if len(days) < RACE_MIN_DAYS:
         return Markup(
             f'<p class="empty race-wait">The race chart appears after {RACE_MIN_DAYS} days of '
@@ -252,7 +258,7 @@ def race_svg(
     hot = race_highlights(series)
     ranked = sorted((f for f in series if series[f]), key=lambda f: series[f][-1][1])
     legend = "".join(
-        f'<li><span class="dot-key {series_class(f) if f in hot else "s-muted"}" '
+        f'<li><span class="dot-key {series_class(f)}" '
         f'aria-hidden="true"></span><span class="lg-name">{escape(names.get(f, f))}</span> '
         f'<span class="lg-val">{series[f][-1][1]:.3f}</span></li>'
         for f in ranked

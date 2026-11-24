@@ -40,12 +40,16 @@ def test_chart_has_two_layouts_a_sorted_legend_and_a_coin_reference() -> None:
     assert "<title>ML model: " in out  # tooltips kept
 
 
-def test_only_the_important_lines_are_coloured() -> None:
+def test_every_forecaster_keeps_its_own_colour_and_the_important_ones_are_thicker() -> None:
     series, ds = _series(8)
     assert race_highlights(series) == {"ml", "base_rate", "agent"}  # best AI = lowest final Brier
     out = race_svg(series, FORECASTER_NAMES, ds)
-    assert out.count('class="line s-muted"') == 2 * (len(series) - 3)  # wide and phone layout
-    assert 'class="line s-ref"' in out or 'class="line s-1"' in out
+    assert "s-muted" not in out  # nothing is greyed out any more
+    classes = re.findall(r'<path class="line (s-[a-z0-9]+)( thin)?"', out)
+    wide = classes[: len(classes) // 2]
+    assert len({c for c, _ in wide}) == len(series)  # one distinct colour class per forecaster
+    assert sum(1 for _, t in wide if t) == len(series) - 3  # only the three others are thinner
+    assert out.count('class="endlabel') == len(series)  # every line labelled (wide layout only)
 
 
 def test_end_labels_fit_inside_the_wide_viewbox_and_the_phone_layout_has_none() -> None:
@@ -54,7 +58,7 @@ def test_end_labels_fit_inside_the_wide_viewbox_and_the_phone_layout_has_none() 
     out = race_svg(series, names, ds)
     wide_w = RACE_WIDE[0]
     labels = re.findall(r'<text class="endlabel[^"]*" x="([\d.]+)"[^>]*>([^<]+)</text>', out)
-    assert len(labels) == 3  # ML model, base rate and the best AI forecaster
+    assert len(labels) == len(series)  # every line is labelled at its end (wide layout)
     for x, text in labels:
         # 13px bold text is about 7.6 viewBox units per character; it must end inside the box
         assert float(x) + 7.6 * len(text) <= wide_w, text

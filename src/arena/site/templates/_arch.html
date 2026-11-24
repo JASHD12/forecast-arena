@@ -7,6 +7,6 @@
 <li class="arch-step"><span class="arch-k">5 · Scoring</span><strong>Proper scores + uncertainty</strong><span>Brier, log, calibration, bootstrap CIs, DuckDB SQL</span></li>
 <li class="arch-step"><span class="arch-k">6 · Publish</span><strong>Static site + open data</strong><span>GitHub Pages, Parquet, Atom feed</span></li>
 </ol>
-<div class="arch-ops"><strong>Orchestration:</strong> GitHub Actions (morning, 4× resolve, weekly retraining with MLflow and Evidently) · CI gate: ruff, mypy, pytest, end-to-end run, axe-core · production runs only code that passed CI</div>
+<div class="arch-ops"><strong>Orchestration:</strong> GitHub Actions (evening, morning, resolve every three hours, weekly retraining with MLflow and Evidently) · CI gate: ruff, mypy, pytest, end-to-end run, axe-core · production runs only code that passed CI</div>
 <figcaption id="arch-cap" class="note">How a forecast travels from raw data to a score.</figcaption>
 </figure>

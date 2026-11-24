@@ -7,6 +7,7 @@ Every lab result is an evaluation, never part of the live record (rule L1). Resu
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 from typing import Any, Literal
 
@@ -40,7 +41,7 @@ class LabResult(BaseModel):
 PLANNED: tuple[tuple[str, str], ...] = (
     (
         "Agreement of the LLM judge with human labels",
-        "waits for the owner's 30 labels; until then the judge scores are an uncalibrated ranking",
+        "waits for 30 human labels; until then the judge scores are an uncalibrated ranking",
     ),
     (
         "Cost routing with the simpler ml-first rule on fresh days",
@@ -48,7 +49,7 @@ PLANNED: tuple[tuple[str, str], ...] = (
     ),
     (
         "In-browser model tier for Ask the Arena: real-browser test",
-        "built and opt-in; tested with a fake engine only, the owner's browser test (H41) is open",
+        "built and opt-in; tested with a fake engine only, a real-browser test is still open",
     ),
 )
 
@@ -151,3 +152,22 @@ def card_markdown(r: LabResult) -> str:
         lines += ["", "## What this does and does not show", ""] + [f"- {x}" for x in r.limits]
     lines += ["", f"Paid-call cost: US${r.cost_usd:.2f}.", ""]
     return "\n".join(lines)
+
+
+def budget_spent(path: Path) -> float | None:
+    """Total US$ of paid lab runs from the `LAB_BUDGET.md` table (the record of spend).
+
+    Sums the "US$" column of the table; None when the file is missing. The per-result `cost_usd`
+    fields do not cover every paid run (for example the distillation labels), so the page total is
+    taken from here.
+    """
+    try:
+        lines = path.read_text(encoding="utf-8").splitlines()
+    except OSError:
+        return None
+    total = 0.0
+    for line in lines:
+        cells = [c.strip() for c in line.strip().strip("|").split("|")]
+        if len(cells) == 6 and re.fullmatch(r"\d+\.\d+", cells[4]):
+            total += float(cells[4])
+    return round(total, 6)

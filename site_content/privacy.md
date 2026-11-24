@@ -33,4 +33,4 @@ You also have the right to lodge a complaint with a data protection supervisory 
 
 # Changes
 
-This notice is updated when the website changes, for example if a forecasting panel for the public is introduced. Last updated: 12 November 2026.
+This notice is updated when the website changes, for example if a forecasting panel for the public is introduced. Last updated: 24 November 2026 (crypto prices from CoinGecko added to the data sources; the optional in-browser model on Ask the Arena added).

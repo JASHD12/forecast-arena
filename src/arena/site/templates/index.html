@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% macro outcome_badge(row) %}{% if row.outcome is none %}<span class="label">{% if row.state == "open" and row.due %}answer due {{ row.due }}{% else %}{{ row.state }}{% endif %}</span>{% elif row.outcome == 1 %}<span class="outcome yes-badge">✓ YES</span>{% else %}<span class="outcome no-badge">✗ NO</span>{% endif %}{% endmacro %}
+{% macro outcome_badge(row) %}{% if row.outcome is none %}<span class="label">{% if row.state == "open" and row.due %}{% if row.overdue %}waiting for the data source (due {{ row.due }}){% else %}answer due {{ row.due }}{% endif %}{% else %}{{ row.state }}{% endif %}</span>{% elif row.outcome == 1 %}<span class="outcome yes-badge">✓ YES</span>{% else %}<span class="outcome no-badge">✗ NO</span>{% endif %}{% endmacro %}
 {% macro bar_class(f) %}{% if f in ("llm_plain", "llm_context", "agent") %}ai{% elif f in ("base_rate", "persistence") %}base{% endif %}{% endmacro %}
 {% macro bars(row, forecasters) %}<ul class="bars" aria-label="Forecasts">
 {% for f in forecasters %}{% set p = row.pn.get(f) %}<li class="{{ bar_class(f) }}{% if p is none %} none{% endif %}"><span class="who" title="{{ f }}">{{ fname(f) }}</span><span class="track" aria-hidden="true">{% if p is not none %}<span class="fill" style="width: {{ '%.1f'|format(p * 100) }}%"></span>{% endif %}</span><span class="val">{% if p is not none %}{{ '%.0f'|format(p * 100) }}%{% else %}<abbr title="no forecast (see Status for skips)">–</abbr>{% endif %}</span></li>
@@ -16,7 +16,7 @@
 <p class="kicker"><span class="pulse" aria-hidden="true"></span> Live benchmark · AI vs classical ML vs baselines</p>
 <h1 id="hero-title">Can AI predict tomorrow better than a simple model?</h1>
 <p>Every day, statistical baselines{% if ml_live %}, a gradient-boosted ML model{% endif %} and Claude-based forecasters, including tool-using agents, each publish a probability on real questions about tomorrow. The answers are locked in a tamper-evident public ledger <strong>before</strong> the facts exist, then scored against reality.{% if not ml_live and backtest %} The ML model is proven in a one-year backtest first (right) and then joins the live board.{% endif %}</p>
-<p class="actions"><a class="btn" href="#today">See today's forecasts</a> <a class="btn btn-ghost" href="leaderboard.html">Leaderboard</a> <a class="btn btn-ghost" href="stack.html">Tech stack</a> <a class="btn btn-ghost" href="{{ repo_url }}">{{ icon("github") }} Code</a></p>
+<p class="actions"><a class="btn" href="#today">See the latest forecasts</a> <a class="btn btn-ghost" href="leaderboard.html">Leaderboard</a> <a class="btn btn-ghost" href="stack.html">Tech stack</a> <a class="btn btn-ghost" href="{{ repo_url }}">{{ icon("github") }} Code</a></p>
 <p class="gloss" id="glossary"><strong>New here?</strong> <dfn>Brier score</dfn>: the average squared miss of a probability, 0 is perfect and 0.25 is what saying 50% every time scores. <dfn>Base rate</dfn>: how often the answer was YES before. <dfn>Too early to tell</dfn>: too few days of results to rank anyone reliably.</p>
 <p class="trust">{{ "✓ Ledger verified" if verify_ok else "✗ Ledger check failed" }} · {{ forecast_count }} forecasts published · {{ days_live }} days with questions · {% if official_start %}official since {{ official_start }}{% else %}rehearsal phase{% endif %}</p>
 </div>
@@ -59,7 +59,7 @@
 
 {% if featured %}
 <section class="spotlight" aria-labelledby="spot-title">
-<div class="spot-head"><p class="kicker-dark">Biggest disagreement today</p><span class="chip chip-{{ featured.domain }}">{{ dname(featured.domain) }}</span>{{ outcome_badge(featured) }}</div>
+<div class="spot-head"><p class="kicker-dark">Biggest disagreement in the latest batch</p><span class="chip chip-{{ featured.domain }}">{{ dname(featured.domain) }}</span>{{ outcome_badge(featured) }}</div>
 <h2 id="spot-title"><a href="{{ qhref(featured.qid) }}">{{ featured.title }}</a></h2>
 <p class="note">The forecasters are {{ '%.0f'|format(featured.spread * 100) }} percentage points apart. Locks {{ featured.lock }}.</p>
 {{ bars(featured, forecasters) }}
@@ -67,6 +67,7 @@
 {% endif %}
 
 <p class="lock-line"><span class="lock-countdown" data-lock-utc="09:30">Forecasts lock at 09:30 UTC every day; after that nothing can be added for the day.</span></p>
+{% if no_batch_today %}<p class="note st-note st-hint" role="note">No batch was locked for today, so this is the latest one ({{ latest_batch }}). See <a href="status.html">Status</a> for what happened.</p>{% endif %}
 <div class="section-head" id="today"><h2>{% if latest_batch %}Questions for {{ latest_batch }}{% else %}Today's questions{% endif %}</h2>
 <span class="note">Each bar is one forecaster's probability of YES, published before the lock.</span></div>
 {% if latest %}

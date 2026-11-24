@@ -52,7 +52,7 @@ append-only, hash-chained ledger. When the data arrives, every forecast is score
 
 | If you hire for | Start here | What it shows |
 |---|---|---|
-| **AI / LLM engineering** | [Evals](https://jashd12.github.io/forecast-arena/evals.html), [LLM page](https://jashd12.github.io/forecast-arena/llm.html), [Lab](https://jashd12.github.io/forecast-arena/lab.html) | frozen golden-set evals that caught a truncation bug, tool-using and LangGraph agents, hybrid retrieval with reranking, prompt-injection guards, a QLoRA fine-tune (notebook and pre-registration ready) |
+| **AI / LLM engineering** | [Evals](https://jashd12.github.io/forecast-arena/evals.html), [LLM page](https://jashd12.github.io/forecast-arena/llm.html), [What I measured about LLMs](https://jashd12.github.io/forecast-arena/llm-engineering.html), [Lab](https://jashd12.github.io/forecast-arena/lab.html) | frozen golden-set evals that caught a truncation bug, tool-using and LangGraph agents, hybrid retrieval with reranking, prompt-injection guards, a QLoRA fine-tune (notebook and pre-registration ready) |
 | **ML / MLOps** | [Backtests](https://jashd12.github.io/forecast-arena/backtests.html), [`registry.py`](src/arena/forecasters/registry.py), [`onnx_power.py`](src/arena/forecasters/onnx_power.py) | champion/challenger promotion by a written rule, artefact hashes, ONNX serving with parity tests, CI with Docker, Kubernetes (kind), dbt and Airflow |
 | **Data science** | [Leaderboard](https://jashd12.github.io/forecast-arena/leaderboard.html), [Findings](https://jashd12.github.io/forecast-arena/findings.html), [Methods](https://jashd12.github.io/forecast-arena/methods.html) | proper scoring rules, day-block bootstrap intervals, calibration and conformal studies, honest negative results |
 
@@ -83,9 +83,9 @@ Each technique is tried against the project's baselines on questions it never sa
 | Two LLM judges compared (not human calibration) | evaluated (not a live score) | [docs/lab/judge-llm.md](docs/lab/judge-llm.md) |
 | Unsupervised data-anomaly detection on price windows (Isolation Forest) | evaluated (not a live score) | [docs/lab/anomaly.md](docs/lab/anomaly.md) |
 | Vector database: Qdrant against brute-force dense search | evaluated (not a live score) | [docs/lab/vectordb.md](docs/lab/vectordb.md) |
-| Agreement of the LLM judge with human labels | waits for the owner's 30 labels; until then the judge scores are an uncalibrated ranking | - |
+| Agreement of the LLM judge with human labels | waits for 30 human labels; until then the judge scores are an uncalibrated ranking | - |
 | Cost routing with the simpler ml-first rule on fresh days | pre-registered 2026-11-23 (lab/prereg/routing-ml-only.md); evaluated after 2026-12-24 | - |
-| In-browser model tier for Ask the Arena: real-browser test | built and opt-in; tested with a fake engine only, the owner's browser test (H41) is open | - |
+| In-browser model tier for Ask the Arena: real-browser test | built and opt-in; tested with a fake engine only, a real-browser test is still open | - |
 
 Live experimental forecasters: the QLoRA-tuned model (running since the first morning after 2026-11-22, with its fixed pre-registered expectations) and, once its launch check passes, an agent with hybrid retrieval and guards (still switched off). The cascade router was **not built**: its pre-registered rule saved no paid calls (the routing card has the numbers). None of them enters the headline board. Details: [Lab page](https://jashd12.github.io/forecast-arena/lab.html), [what I measured about LLMs](https://jashd12.github.io/forecast-arena/llm-engineering.html), [explainer](docs/explainers/06-experiments-lab.md).
 <!-- lab:end -->
@@ -269,7 +269,7 @@ many times and a gate lets the first run with work do it (`src/arena/ops/schedul
 
 1. **Evening (from 16:00 UTC, the day before).** Yes/no questions are generated from live
    public data: German day-ahead electricity prices, the weather at four DWD stations,
-   attention to Wikipedia articles and ECB exchange rates. Questions are public from then
+   attention to Wikipedia articles, ECB exchange rates and (since 23 November 2026) crypto price moves from CoinGecko. Questions are public from then
    on, so people can answer too.
 2. **Morning (before the 09:30 UTC lock).** Every forecaster publishes a probability (and
    any topic the evening missed gets its questions now). The batch is written to the

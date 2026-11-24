@@ -15,6 +15,8 @@ from typing import Any
 
 from markupsafe import Markup, escape
 
+from arena.lab.results import budget_spent
+
 ROOT = Path(__file__).resolve().parents[3]
 DEFAULT_RESULTS = ROOT / "evals" / "results"
 DEFAULT_BUDGET = ROOT / "docs" / "project" / "LAB_BUDGET.md"
@@ -151,7 +153,7 @@ def _rows(res: Path, cost: dict[str, float]) -> list[dict[str, Any]]:
         }
         if all(v is not None for v in k.values()):
             add("judge", "LLM-as-judge on 100 stored rationales",
-                f"Two judge models agree at weighted kappa {k['data_use']:.2f} (data use), {k['direction']:.2f} (direction) and {k['hedging']:.2f} (hedging) on 30 items; this is not agreement with a human.", cost.get("judge", 0.0) + float(jl.get("cost_usd") or 0))  # fmt: skip
+                f"Two judge models agree at weighted kappa {k['data_use']:.2f} (data use), {k['direction']:.2f} (direction) and {k['hedging']:.2f} (hedging) on 30 items; this is not agreement with a human.", cost.get("judge", 0.0))  # fmt: skip
     if ar:
         m = ar["metrics"]
         ref = m.get("finance and personal refusals", {}).get("correct_refusal_pct")
@@ -228,7 +230,7 @@ def load_page(results_dir: Path | None = None, budget: Path | None = None) -> di
     arms, n = _chart(res)
     if not rows or len(arms) < 3:
         return None
-    total = sum(r["cost"] or 0.0 for r in rows)
+    total = budget_spent(budget or DEFAULT_BUDGET) or sum(r["cost"] or 0.0 for r in rows)
     return {
         "rows": rows, "chart": chart_svg(arms), "arms": arms, "n": n, "classes": GROUP_NAMES,
         "total_cost": total, "next": NEXT,

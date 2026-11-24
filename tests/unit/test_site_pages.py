@@ -192,7 +192,7 @@ def test_home_race_spotlight_and_honest_ml_status(tmp_path) -> None:
 
     _, res = _site(tmp_path)
     home = (res.out_dir / "index.html").read_text()
-    assert "Biggest disagreement today" in home
+    assert "Biggest disagreement in the latest batch" in home
     # honest ML status (T186): no ML forecasts in this ledger, so the hero does not claim one
     assert "a gradient-boosted ML model" not in home and "joining soon" not in home
     rows = [{"pn": {"a": 0.1, "b": 0.9}, "q": 1}, {"pn": {"a": 0.5, "b": 0.6}, "q": 2}]

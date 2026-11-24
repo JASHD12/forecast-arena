@@ -128,3 +128,31 @@ def test_usage_status_matches_guard_including_cache_and_reservations(tmp_path) -
     row = llm_usage(led, B, days=1)[0]
     assert row.total == usage_from_manifests(led, B).total_tokens == 185
     assert row.cached_tokens == 120 and row.reserved_tokens == 50 and row.unreported_requests == 1
+
+
+def test_missed_days_counts_today_once_the_lock_has_passed(tmp_path) -> None:
+    led = _led(tmp_path)
+    led.write_raw(layout.batch_seal_path(B), b"{}\n")
+    today = B + timedelta(days=1)
+    assert missed_days(led, today) == []  # before the lock the batch may still come
+    assert missed_days(led, today, after_lock=True) == [today]  # after it, it never can
+
+
+def test_latest_health_reports_the_newest_report_and_its_failing_checks(tmp_path) -> None:
+    import json
+
+    from arena.site.ops_status import latest_health
+
+    led = Ledger(tmp_path / "h")
+    assert latest_health(led) is None
+    old = {"job": "morning", "at": "2026-11-23T07:00:00+00:00", "ok": True, "checks": []}
+    new = {
+        "job": "resolve",
+        "at": "2026-11-24T14:03:19+00:00",
+        "ok": False,
+        "checks": [{"name": "batch_sealed", "ok": False}, {"name": "ledger_verify", "ok": True}],
+    }
+    led.write_raw("health/2026/11/23-morning-1.json", json.dumps(old).encode())
+    led.write_raw("health/2026/11/24-resolve-5.json", json.dumps(new).encode())
+    got = latest_health(led)
+    assert got == {"at": new["at"], "job": "resolve", "ok": False, "failed": ["batch_sealed"]}

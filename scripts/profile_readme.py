@@ -36,8 +36,9 @@ def render() -> str:
         contact.append(f"[LinkedIn]({facts['linkedin']})")
     if facts.get("email"):
         contact.append(f"[Email]({facts['email']})")
-    exp_file = ROOT / "site_content" / "profile_experience.md"
-    experience = exp_file.read_text(encoding="utf-8").strip() if exp_file.is_file() else ""
+    cv_file = ROOT / "site_content" / "profile_cv.md"
+    cv = cv_file.read_text(encoding="utf-8").strip() if cv_file.is_file() else ""
+    cv_top, _, cv_more = cv.partition("<!-- featured-project -->")
     skills = " · ".join(skill for skill, _, _, _ in PROOFS)
     lines = [
         "# Jashdeep Singh",
@@ -48,8 +49,8 @@ def render() -> str:
     ]
     if contact:
         lines += [" · ".join(contact), ""]
-    if experience:  # the owner's own text, pasted verbatim; never written by the agent (I5)
-        lines += ["## Work experience", "", experience, ""]
+    if cv_top.strip():  # the owner's own CV text, copied verbatim; never written by the agent (I5)
+        lines += [cv_top.strip(), ""]
     lines += [
         "## Featured project: Forecast Arena",
         "",
@@ -82,6 +83,8 @@ def render() -> str:
         "any kind.",
         "",
     ]
+    if cv_more.strip():
+        lines += [cv_more.strip(), ""]
     return "\n".join(lines)
 
 

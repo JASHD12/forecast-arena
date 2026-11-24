@@ -2,6 +2,22 @@
 
 **Werkstudent AI / Machine Learning / Data Science (Germany)**, also open to full-time applied ML engineering roles.
 
+## Work experience
+
+**Software Engineer, Paytm Money** · India · Jan 2025 – Sep 2026
+- Built Java/Spring Boot services for 100K+ monthly portfolio syncs and 50K+ monthly sell and switch orders. Added retry handling to prevent duplicate orders.
+- Built Kafka ingestion and validation across 5M accounts. Investigated production issues with AWS logs and metrics.
+
+**Software Engineer 1, MAQ Software** · India · Nov 2023 – Nov 2024
+- Developed a Python/FastAPI service for a LangChain document assistant and evaluated its answers against the passages it retrieved.
+- Automated SQL Server-to-Power BI reporting with Azure and Databricks, saving about 15 hours per week.
+
+**Software Developer (Full-time), Advantage Club** · India · Jul 2023 – Sep 2023
+- Built React survey forms for a planned 1M+ user rollout and improved performance on lower-end devices.
+
+**Software Development Intern, Advantage Club** · India · Jan 2023 – Jun 2023
+- Integrated an HR dashboard with third-party systems and cut award email processing time by 60%.
+
 ## Featured project: Forecast Arena
 
 A live, public benchmark: simple baselines, a classical ML model, and LLM forecasters publish probabilities for about 30 yes/no questions a day (electricity, weather, Wikipedia attention, exchange rates, crypto thresholds) **before the answer exists**, into an append-only, hash-chained ledger. The research question: when does an LLM agent beat a classical model, and when does it not? An honest "it does not" is a valid result.

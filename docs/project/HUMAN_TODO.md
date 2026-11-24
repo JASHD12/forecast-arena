@@ -165,7 +165,7 @@ Keep the first line of each item in exactly this shape; the status script parses
   - After T143: create a free Streamlit Community Cloud account, deploy
     `apps/dashboard/streamlit_app.py` from this repo, and set the Actions variable
     `ARENA_DASHBOARD_URL` to its address.
-- [ ] H20 · External scheduler for the lock-critical jobs (optional, recommended)
+- [ ] H20 · External scheduler for the lock-critical jobs (optional, recommended; since 2026-11-24 the workflows also have many more scheduled slots, T329, which helps but cannot guarantee a start before the lock)
   - Why: GitHub starts scheduled runs hours late on this repository (morning slot 00:15 started
     06:20 to 07:53 UTC; evening runs 22:52 to 04:00; players runs 17:31 to 19:37, after the
     lock). The lock is 09:30 UTC, so one very late day loses a batch.

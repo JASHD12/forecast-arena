@@ -30,8 +30,8 @@ def test_schedules_match_the_intended_times() -> None:
     ):
         assert f'"arena_{job}",\n    schedule="{cron}"' in DAG
     wf = ROOT / ".github" / "workflows"
-    assert '"15 0-8 * * *"' in (wf / "morning.yml").read_text()  # covers 05:30 and earlier
-    assert '"0 16-23 * * *"' in (wf / "evening.yml").read_text()  # covers 18:00
+    assert '"7,27,47 19-23,0-8 * * *"' in (wf / "morning.yml").read_text()  # T329: many slots
+    assert '"7,37 16-23 * * *"' in (wf / "evening.yml").read_text()  # covers 18:00
     assert '"30 */3 * * *"' in (wf / "resolve.yml").read_text()  # includes 03:30 ... 21:30
     for job in ("morning", "evening", "players"):
         assert f"arena schedule due --job {job} --sync" in (wf / f"{job}.yml").read_text()

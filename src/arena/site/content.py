@@ -32,6 +32,7 @@ NAV_MORE: tuple[tuple[str, str], ...] = (
     ("experiments.html", "Experiments"),
     ("evals.html", "LLM evals"),
     ("lab.html", "Experiments lab"),
+    ("llm-engineering.html", "LLM engineering"),
     ("ask.html", "Ask the Arena"),
     ("audit.html", "Forecast audit"),
     ("llm.html", "LLM observability"),

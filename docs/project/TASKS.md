@@ -787,7 +787,7 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
   - Done 2026-11-21: extractive cited answers (`lab/docs_assistant.py`, `arena lab ask`), 26 hand-written questions, result and card; MCP tool not added.
 - [x] T255a · GenAI-convention trace export (deps: T242)
   - Done: `llm/otlp.py` already writes `gen_ai.*` attributes (operation, provider, model, token usage, finish reasons, prompt version); nothing to add without a Phoenix check.
-- [!] T255b · Phoenix smoke target and screenshot (deps: T255a) BLOCKED(permission: fetching https://arize.com/docs/phoenix/self-hosting/deployment-options/docker - the host does not resolve from this environment; image, ports and licence could not be verified)
+- [x] T255b · Phoenix smoke target and screenshot (deps: T255a) DROPPED by the owner 2026-11-24: tracing is already verified against Jaeger in CI (T295)
 - [x] T256 · Calibration methods compared in the power backtest (deps: T242)
   - Done 2026-11-21: `lab/calibration_study.py`; walk-forward re-calibration of the `ml` backtest probabilities (1,470 scored questions): ECE 0.070
     (identity) to 0.055 (Platt, beta), Brier differences vs identity -0.0015 [-0.0034, +0.0005] (Platt), all intervals include zero: no live change.
@@ -911,7 +911,7 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
 - [x] T322 · Case and application pages: generated case page, neutral full-time recruiter entry beside the Werkstudent one, German proof line, README block (deps: T321)
 - [x] T323 · Contributor and release path: CONTRIBUTING, issue form, focused test command, release note, archive test, data licence file (deps: T321)
 - [x] T324 · Owner path and docs: pilot script, upstream candidate note, starter issues, explainer 09, HUMAN_TODO items (deps: T322)
-- [ ] T325 · One role-specific follow-up chosen by role fit or pilot feedback (deferred until selected; owner decision)
+- [x] T325 · AI / LLM engineering page `llm-engineering.html` generated from the lab result files (owner chose the role 2026-11-24): table of experiments with result, cost and decision, Brier bar chart, next steps; omitted without result files
 - [x] T326 · GitHub profile README draft that features Forecast Arena (generated `docs/profile/PROFILE_README.md`, test, owner steps H42) (deps: T322)
 - [!] T327 · Evaluate the `ml`-first routing rule on fresh live days (pre-registration `lab/prereg/routing-ml-only.md`, committed 2026-11-23) (deps: T250) WAIT(until=2026-12-24)
   - Needs the 30 days 2026-11-24 to 2026-12-23 to resolve; the evaluation script and card are written then. No cost, no live change.

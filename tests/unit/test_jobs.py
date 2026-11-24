@@ -179,3 +179,22 @@ def test_evening_dry_run_writes_nothing(tmp_path) -> None:
     r = evening(led, B, clock, doms, dry_run=True)
     assert r.written["questions"] > 0
     assert not led.exists(layout.questions_path(B))
+
+
+def test_evening_health_does_not_fail_a_run_before_the_publishing_window(tmp_path) -> None:
+    led, clock, doms, _fcs = setup(tmp_path, datetime(2026, 11, 1, 12, tzinfo=UTC))
+    assert "too early" in evening(led, B, clock, doms).warnings[0]
+    early = run_checks(led, "evening", datetime(2026, 11, 1, 12, 40, tzinfo=UTC))
+    chk = next(c for c in early.checks if c.name == "next_batch_published")
+    assert chk.ok and "not due before 16:00 UTC" in chk.detail
+    late = run_checks(led, "evening", datetime(2026, 11, 1, 16, 1, tzinfo=UTC))
+    assert not next(c for c in late.checks if c.name == "next_batch_published").ok
+
+
+def test_coverage_detail_explains_a_missing_batch(tmp_path) -> None:
+    led = Ledger(tmp_path)
+    rep = run_checks(led, "resolve", datetime(2026, 11, 24, 12, 40, tzinfo=UTC))
+    cov = next(c for c in rep.checks if c.name == "forecaster_coverage")
+    assert not cov.ok and "no batch for 2026-11-24" in cov.detail and "complete" not in cov.detail
+    seal = next(c for c in rep.checks if c.name == "batch_sealed")
+    assert not seal.ok  # the lost day is still reported, once and truthfully

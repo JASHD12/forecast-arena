@@ -86,7 +86,9 @@ Keep the first line of each item in exactly this shape; the status script parses
     "8. Committing a workflow that opens and updates one issue labelled `dependencies`
     listing outdated pins", and tick this item. Until then the report goes to the job
     summary of the `deps` workflow.
-  - Needed for T084b.
+  - Needed for T084b. Exact steps: open `CLAUDE.md` on GitHub > pencil icon, add under "Standing approvals" the line
+    `8. Committing a workflow that opens and updates one issue labelled \`dependencies\` listing outdated dependency pins.`
+    Commit it (a PR is fine), tell the agent "H11 done", and tick this box. The agent may not add this line itself.
 - [x] H12 · Crypto: confirm CoinGecko terms, add the key, approve the workflow secret  (2026-11-22: Demo key created and stored as the secret `ARENA_COINGECKO_API_KEY`; crypto switched on by default in the workflows at the owner's request. Still on you: read https://www.coingecko.com/en/api_terms once and keep the credit link; add standing approval 7 to CLAUDE.md (done by the agent at your instruction on 2026-11-22); if the repository variable `ARENA_DOMAINS` exists, edit it to end with `,crypto` or delete it so the new default applies.)
   - Read the CoinGecko API Terms of Service in your browser:
     https://www.coingecko.com/en/api_terms . Check that a free Demo key may be used to show
@@ -319,6 +321,7 @@ curl -X POST -H "Authorization: Bearer TOKEN" -H "Accept: application/vnd.github
   - Answered yes 2026-11-23 (chat): tier 2 is built. Please test it once after the redeploy, in a recent desktop Chrome or Edge: open Ask the Arena, click "Load the in-browser model" (about 290 MB), ask "Who is winning?" and tell me what appears. The agent could not run it on a real WebGPU browser or reach jsDelivr, so this is the first real test.
 
 - [ ] H42 · Put Forecast Arena on your GitHub profile (T326)
+  - Work experience: added from your CV (2026-11-24) as `site_content/profile_cv.md` (four roles, wording copied from the CV, no phone or email). Edit that file and run `python scripts/profile_readme.py` to change it; `docs/profile/PROFILE_README.md` is the text to paste.
   - The agent cannot do this: the profile page is the README of a separate repository (`JASHD12/JASHD12`), and About text, topics and pinning are repository settings.
   - Profile README: GitHub > New repository, name exactly `JASHD12` (public), tick "Add a README file", create. Open its `README.md`, replace everything with the contents of `docs/profile/PROFILE_README.md` from this repository (regenerate first with `python scripts/profile_readme.py` after the latest merge), commit. It then shows on https://github.com/JASHD12.
   - Pin: your profile > "Customize your pins" > tick `forecast-arena` (and `JASHD12` is not needed).

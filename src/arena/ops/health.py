@@ -32,6 +32,7 @@ from arena.config import Settings
 from arena.ledger import Ledger, layout
 from arena.ledger.verify import verify
 from arena.models import BatchSeal, Forecast, Skip
+from arena.ops.jobs import EVENING_EARLIEST
 
 LOCK = time(9, 30)
 OVERDUE_AFTER = timedelta(days=5)
@@ -170,7 +171,14 @@ def run_checks(
         nxt = today + timedelta(days=1)
         n = sum(q.batch_date == nxt for q in rec.questions.values())
         detail = f"{n} questions for {nxt}" if n else f"no questions for {nxt}"
-        rep.checks.append(Check("next_batch_published", n > 0, detail))
+        if not n and now.time() < EVENING_EARLIEST:
+            # A manual or test run before the publishing window does nothing by design
+            # (jobs.evening refuses it), so it must not fail the run for "not published yet".
+            rep.checks.append(
+                Check("next_batch_published", True, f"not due before {EVENING_EARLIEST:%H:%M} UTC")
+            )
+        else:
+            rep.checks.append(Check("next_batch_published", n > 0, detail))
 
     overdue = sorted(
         q.question_id
@@ -219,7 +227,13 @@ def run_checks(
                 "forecaster_coverage",
                 bool(todays_ids) and not bad,
                 f"expected {len(todays_ids) * len(roster)} forecast-or-skip pairs; "
-                + (f"missing/duplicate: {', '.join(bad[:5])}" if bad else "complete"),
+                + (
+                    f"missing/duplicate: {', '.join(bad[:5])}"
+                    if bad
+                    else "complete"
+                    if todays_ids
+                    else f"no batch for {today}, so nothing could be covered (see batch_sealed)"
+                ),
             )
         )
         unavailable = [

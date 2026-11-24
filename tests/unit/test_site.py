@@ -31,6 +31,7 @@ def test_empty_ledger_builds_every_page(tmp_path) -> None:
         "index.html",
         "lab.html",
         "leaderboard.html",
+        "llm-engineering.html",
         "llm.html",
         "methods.html",
         "play.html",

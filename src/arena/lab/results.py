@@ -39,20 +39,16 @@ class LabResult(BaseModel):
 #: Experiments that are planned and not yet run (shown as such, never with numbers).
 PLANNED: tuple[tuple[str, str], ...] = (
     (
-        "Second LLM judge (a different model) compared with the first (LLM against LLM, not human)",
-        "approved 2026-11-23; one small paid run (about US$0.2, 30 items) follows the merge",
-    ),
-    (
         "Agreement of the LLM judge with human labels",
         "waits for the owner's 30 labels; until then the judge scores are an uncalibrated ranking",
     ),
     (
         "Cost routing with the simpler ml-first rule on fresh days",
-        "a proposal only (found after the fact in the routing study); needs a new pre-registration",
+        "pre-registered 2026-11-23 (lab/prereg/routing-ml-only.md); evaluated after 2026-12-24",
     ),
     (
-        "In-browser model tier for Ask the Arena",
-        "optional; needs the owner's OK for a download of about 300 MB",
+        "In-browser model tier for Ask the Arena: real-browser test",
+        "built and opt-in; tested with a fake engine only, the owner's browser test (H41) is open",
     ),
 )
 

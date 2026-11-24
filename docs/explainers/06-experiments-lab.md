@@ -44,7 +44,7 @@ backtest first, then freeze the version, then write forecasts before the lock li
 | Forecaster | What it is | Switch |
 |---|---|---|
 | `llm_local_ft` | the QLoRA-tuned Qwen, scored by one forward pass (YES/NO logit margin, Platt calibrated); frozen artefact pinned by SHA-256 | `ARENA_LLM_LOCAL_FT`, on by default since 2026-11-22 (variable `0` switches off) |
-| `agent_hybrid` | the LangGraph agent with hybrid retrieval (BM25 + dense + RRF + cross-encoder) and harness guards | `ARENA_AGENT_HYBRID`, off until a launch dry run |
+| `agent_hybrid` | the tool-using agent (not the LangGraph one) with hybrid retrieval (BM25 + dense + RRF + cross-encoder) and harness guards | `ARENA_AGENT_HYBRID`, off until a launch dry run |
 | `llm_router` | cascade over peers: cheap pair when decisive and in agreement, otherwise `llm_context`. **Not built**: its pre-registered build condition (at least 30% of paid calls saved) was not met in the routing study | none (no thresholds file) |
 | `glgbm` | global LightGBM challenger, promoted only by the weekly 28-day rule | weekly job |
 
@@ -141,6 +141,7 @@ All numbers below are from the committed result files in `evals/results/` and th
   a simpler `ml`-first cascade looks promising (about three quarters of paid calls avoided at a better Brier) but it was picked from
   a grid after the fact, so it is a hypothesis for new days, not a result.
 - **The LLM judge ranks the forecasters' rationales** (100 rationales, US$0.04): Claude with data and the agents score about 3.1 to 3.4 of 5 on data use, the plain Claude 1.85, the open 1.5B model 1.4. It is an uncalibrated ranking (same model family as the forecasters, no human agreement yet) until the owner's 30 labels exist.
+- **Three LLM raters agree with each other, which is not calibration.** Claude Haiku and Claude Sonnet as judges on the same 30 rationales reach weighted kappa 0.75 to 0.80; the agent's own ratings of the same items agree with the judge at 0.72 to 0.77. They share a model family, so it shows the rubric is reproducible, not that it matches a human; the owner's 30 labels (H29) are still open.
 - **Distillation kept little of the teacher.** A student trained on Claude's probabilities for 1,198 questions scored 0.2365, no better than hard-label QLoRA (0.2378), worse than the base rate (0.2182) and far from the teacher (0.1802). The teacher does beat the base rate, which the pre-registration expected it not to.
 - **Ask the Arena** (page `ask.html`) is not an experiment but an application of the same pieces: refusals, lookups and a BM25 document search over the published record, evaluated offline (refusals 100%, no invented numbers 100%).
 - **Self-consistency (five samples averaged) did not help** (-0.002, interval includes zero) and cost 5.2 times as much.

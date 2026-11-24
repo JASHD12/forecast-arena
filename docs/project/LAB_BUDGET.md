@@ -12,3 +12,4 @@ sums the `cost_usd` of `evals/results/lab-*.json` and fails `make check` if the 
 
 | lab-judge (second run, 100 rationales, all scored, no skips) | 2026-11-22 | 45079867618 | 194,536 | 0.04 | 0.73 |
 | lab-distill-labels second run (rows 774 to 1,199; 425 labelled, 1 parse error) | 2026-11-22 | 45079870076 | 1,217,859 | 0.23 | 0.96 |
+| lab-judge second judge (Claude Sonnet 5.5, the 30 labelled items, 30 of 30 scored; estimate was 0.22) | 2026-11-23 | 45258529928 | 49,479 | 0.13 | 1.09 |

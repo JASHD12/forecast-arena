@@ -479,6 +479,16 @@ Source: `evals/results/lab-stacking.json`; card `docs/lab/stacking.md`
 | ml | 32 | 0.1077 |
 | stacking | 32 | 0.0987 |
 
+### Two LLM judges compared (not human calibration)
+
+Source: `evals/results/lab-judge-llm.json`; card `docs/lab/judge-llm.md`
+
+| Arm | Questions | Weighted kappa | Exact match % |
+|---|---|---|---|
+| agreement / data_use | 30 | 0.796 | 50.0 |
+| agreement / direction | 30 | 0.75 | 50.0 |
+| agreement / hedging | 30 | 0.756 | 76.7 |
+
 ### Unsupervised data-anomaly detection on price windows (Isolation Forest)
 
 Source: `evals/results/lab-anomaly.json`; card `docs/lab/anomaly.md`

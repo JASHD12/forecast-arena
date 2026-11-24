@@ -8,9 +8,12 @@ run-name: "morning / ${{ github.event_name == 'workflow_dispatch' && inputs.dry_
 
 on:
   schedule:
-    # T180: hourly from 00:15 to 08:15 UTC; the gate lets only the first run before the
-    # 09:30 lock do the work (GitHub has started these runs up to 8 hours late).
-    - cron: "15 0-8 * * *"
+    # T180 / T329: three slots an hour from 19:07 UTC the evening before to 08:47 UTC. GitHub fires
+    # only a few of them, hours late (about 07:00 UTC on most days, 09:52 on 2026-11-24, after
+    # the lock), so the more slots there are, the likelier one lands before the 09:30 UTC lock.
+    # The gate decides at the time a run actually starts: a slot that fires early the evening
+    # before finds yesterday's batch sealed and stops; one that fires late enough does the work.
+    - cron: "7,27,47 19-23,0-8 * * *"
   workflow_dispatch:
     inputs:
       dry_run:

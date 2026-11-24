@@ -8,8 +8,9 @@ run-name: "evening / ${{ github.event_name == 'workflow_dispatch' && inputs.dry_
 
 on:
   schedule:
-    # T180: hourly from 16:00 to 23:00 UTC; the gate lets only the first run publish.
-    - cron: "0 16-23 * * *"
+    # T180 / T329: two slots an hour from 16:07 to 23:37 UTC (not on the hour, when GitHub is busiest);
+    # the gate lets only the first run publish.
+    - cron: "7,37 16-23 * * *"
   workflow_dispatch:
     inputs:
       dry_run:

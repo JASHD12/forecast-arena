@@ -42,3 +42,22 @@ def test_budget_costs_parse() -> None:
 def test_chart_svg_has_accessible_title_and_every_arm() -> None:
     svg = str(le.chart_svg([("A", 0.2, "s-1"), ("B", 0.25, "s-5")]))
     assert "<title" in svg and "A" in svg and "0.2000" in svg and "0.2500" in svg
+
+
+def test_site_without_result_files_has_no_dead_link_to_the_page(tmp_path) -> None:
+    """The image has no evals/ directory: the page is omitted and nothing may link to it."""
+    from datetime import UTC, datetime
+
+    from arena.clock import FixedClock
+    from arena.ledger import Ledger
+    from arena.site.build import build_site
+    from arena.site.linkcheck import check_site
+
+    empty = tmp_path / "evals"
+    empty.mkdir()
+    clock = FixedClock(datetime(2026, 11, 13, tzinfo=UTC))
+    res = build_site(Ledger(tmp_path / "l"), tmp_path / "site", clock, evals_dir=empty)
+    assert "llm-engineering.html" not in res.pages
+    assert check_site(res.out_dir) == []
+    for page in ("stack.html", "recruiters.html"):
+        assert "llm-engineering.html" not in (res.out_dir / page).read_text(encoding="utf-8")

@@ -10,7 +10,7 @@
 <p class="actions">{% if audit %}<a class="btn" href="audit.html">Explore the electricity case</a> {% endif %}{% if facts.cv_url %}<a class="btn" href="{{ facts.cv_url }}">Download CV (PDF)</a>{% elif facts.linkedin %}<a class="btn" href="{{ facts.linkedin }}">Contact on LinkedIn</a>{% elif facts.email %}<a class="btn" href="mailto:{{ facts.email }}">Contact by email</a>{% else %}<a class="btn btn-ghost" href="#r-five">60-second evidence tour</a>{% endif %} {% if facts.cv_url or facts.linkedin or facts.email %}<a class="btn btn-ghost" href="#r-five">60-second evidence tour</a> {% endif %}<a class="btn btn-ghost" href="{{ repo_url }}">Read the code</a></p>
 {% if engineer %}
 <p class="note">This is the full-time ML engineering version of this page; <a href="recruiters.html">the working-student (Werkstudent) version is here</a>.{% if llm_page_available %} For LLM engineering work, see <a href="llm-engineering.html">what I measured about LLMs</a>.{% endif %}</p>
-<p class="note">AI-assisted development: specified and directed by Jashdeep Singh, implemented with AI coding agents. Every figure on this site is computed from the public record.{% if facts.languages %} Languages: {{ facts.languages }}.{% endif %}{% if facts.linkedin and facts.cv_url %} <a href="{{ facts.linkedin }}">LinkedIn</a>.{% endif %}</p>
+{% if facts.linkedin and facts.cv_url %}<p class="note"><a href="{{ facts.linkedin }}">LinkedIn</a></p>{% endif %}
 {% endif %}
 </section>
 <section class="roles" aria-label="Where to look, by role">
@@ -25,7 +25,7 @@
 <div class="duo">
 <section class="card" aria-labelledby="r-what"><h2 id="r-what">What it is</h2>
 <p>Every day the system publishes yes/no questions about the near future from public data (electricity prices first), the evening before they lock. Baselines, a gradient-boosting model, LLM forecasters and two LLM agents each publish a probability <strong>before</strong> the answer exists, into an append-only, hash-chained public record. The next day the answers arrive and every forecast is scored with proper scoring rules. It runs entirely on GitHub Actions and Pages under hard token and request caps; recorded usage and list-price estimates appear on the LLM observability page.</p>
-<p><strong>Measured so far:</strong> see the <a href="backtests.html">backtests</a> (a year of replayed past days, clearly labelled as not live), the <a href="evals.html">LLM evaluation</a> (it found and fixed a real bug) and the <a href="leaderboard.html">live leaderboard</a>, which says "too early to tell" until the statistics can decide.{% if not engineer %}{% if audit %} <a href="recruiters-ml.html">Full-time ML engineering</a>.{% endif %}{% if llm_page_available %} <a href="llm-engineering.html">LLM engineering</a>.{% endif %}{% endif %}</p>
+<p><strong>Measured so far:</strong> see the <a href="backtests.html">backtests</a> (a year of replayed past days, clearly labelled as not live), the <a href="evals.html">LLM evaluation</a> (it found and fixed a real bug) and the <a href="leaderboard.html">live leaderboard</a>, which says "too early to tell" until the statistics can decide.{% if not engineer and llm_page_available %} <a href="llm-engineering.html">LLM engineering</a>.{% endif %}</p>
 </section>
 <section class="card" aria-labelledby="r-five"><h2 id="r-five">Five things worth 30 seconds</h2>
 <ol class="five">

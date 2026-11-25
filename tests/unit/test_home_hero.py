@@ -40,8 +40,14 @@ def test_backtest_card_matches_the_model_card(tmp_path) -> None:
 
 
 def test_recruiter_page_is_honest_and_computed(tmp_path) -> None:
-    page = (_site(tmp_path) / "recruiters.html").read_text()
-    assert "by one person" not in page and "AI coding agent" in page
+    out = _site(tmp_path)
+    page = (out / "recruiters.html").read_text()
+    hero = page.split('<section class="hero recruiter-hero">', 1)[1].split("</section>", 1)[0]
+    assert "Open to relocating anywhere in Germany" in hero
+    assert "This is the working-student version" not in hero
+    assert "AI-assisted development" not in hero and "Languages:" not in hero
+    assert "by one person" not in page
+    assert "built with an AI coding agent" in (out / "about.html").read_text()
     assert "Five things worth 30 seconds" in page and 'href="guide.html#verify"' in page
     runs = [json.loads(p.read_text()) for p in EVALS.glob("eval-*.json")]
     ch = json_validity_change(runs)

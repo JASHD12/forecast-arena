@@ -1,6 +1,6 @@
 M.Sc. Data Science student with three years of software engineering experience. I use Python to compare forecasts and text classifiers on fixed test sets and document how to repeat the experiments.
 
-📍 Gießen, Germany · open to relocating to Berlin or Munich
+📍 Gießen, Germany · open to relocating anywhere in Germany
 
 ## Education
 

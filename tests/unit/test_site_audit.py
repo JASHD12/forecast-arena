@@ -77,13 +77,18 @@ def test_page_states_scope_and_links_to_the_contract(tmp_path: Path) -> None:
 def test_recruiter_entries_and_the_german_line(tmp_path: Path) -> None:
     res = _site(tmp_path)
     student = _text((res.out_dir / "recruiters.html").read_text())
-    engineer = _text((res.out_dir / "recruiters-ml.html").read_text())
+    engineer_html = (res.out_dir / "recruiters-ml.html").read_text()
+    engineer = _text(engineer_html)
     assert "Werkstudent AI / Machine Learning" in student and "Backend engineer" not in student
-    assert "Backend engineer targeting applied ML roles in Germany" in engineer
+    assert "Jashdeep Singh" in engineer and "Backend engineer" not in engineer
     assert "Explore the electricity case" in student and "Explore the electricity case" in engineer
-    assert "recruiters-ml.html" in (res.out_dir / "recruiters.html").read_text()
-    assert "recruiters.html" in (res.out_dir / "recruiters-ml.html").read_text()
-    assert "AI-assisted development" in engineer  # the disclosure stays
+    assert 'href="recruiters-ml.html"' not in (res.out_dir / "recruiters.html").read_text()
+    _, _, after_hero_start = engineer_html.partition('<section class="hero recruiter-hero">')
+    hero = after_hero_start.partition("</section>")[0]
+    assert hero
+    assert "This is the full-time ML engineering version" not in engineer
+    assert 'href="recruiters.html"' not in hero
+    assert "AI-assisted development" not in student and "AI-assisted development" not in engineer
     assert (
         "Download CV" not in engineer and "Contact on LinkedIn" not in engineer
     )  # no owner facts given

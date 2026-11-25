@@ -79,7 +79,7 @@ def test_recruiter_entries_and_the_german_line(tmp_path: Path) -> None:
     student = _text((res.out_dir / "recruiters.html").read_text())
     engineer = _text((res.out_dir / "recruiters-ml.html").read_text())
     assert "Werkstudent AI / Machine Learning" in student and "Backend engineer" not in student
-    assert "Backend engineer targeting applied ML roles in Germany" in engineer
+    assert "Jashdeep Singh" in engineer and "Backend engineer" not in engineer
     assert "Explore the electricity case" in student and "Explore the electricity case" in engineer
     assert 'href="recruiters-ml.html"' not in (res.out_dir / "recruiters.html").read_text()
     assert "recruiters.html" in (res.out_dir / "recruiters-ml.html").read_text()

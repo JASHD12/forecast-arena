@@ -2,7 +2,7 @@
 {% from "macros.html" import page_head %}
 {% block content %}
 {% set engineer = audience|default("student") == "engineer" %}
-<section class="hero recruiter-hero"><p class="kicker">{% if engineer %}Jashdeep Singh · Backend engineer targeting applied ML roles in Germany{% else %}Jashdeep Singh · Werkstudent AI / Machine Learning / Data Science{% endif %}{% for k in ("city", "availability") %}{% if facts[k] %} · {{ facts[k] }}{% endif %}{% endfor %}</p>
+<section class="hero recruiter-hero"><p class="kicker">Jashdeep Singh{% if not engineer %} · Werkstudent AI / Machine Learning / Data Science{% endif %}{% for k in ("city", "availability") %}{% if facts[k] %} · {{ facts[k] }}{% endif %}{% endfor %}</p>
 <h1>I build forecasting systems and test them honestly.</h1>
 {% if hero %}<p class="hero-result"><strong>A gradient-boosted model beats "same as last time" on German day-ahead electricity:</strong> Brier {{ hero.ml }} vs {{ hero.persistence }} over {{ hero.days }} backtest days (paired difference {{ hero.diff }} {{ hero.interval }}{% if hero.supported == "yes" %}, excludes zero{% else %}, includes zero{% endif %}). The live comparison with LLM agents is still <em>too early to tell</em>. <a href="backtests.html#card-power">Scores, intervals and limits</a>.</p>
 {% else %}<p class="hero-result">Forecast Arena compares classical models and LLM agents on forecasts published before the outcome is known.</p>{% endif %}

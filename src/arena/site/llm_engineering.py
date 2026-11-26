@@ -32,7 +32,7 @@ DECISIONS = {
     "selfcons": "Not added to any forecaster: more cost, no gain.",
     "judge": "Used as a ranking only; agreement with a human waits for the owner's labels.",
     "arena": "Shipped: refusals and lookups are rule-based, so nothing can be invented.",
-}
+}  # the skills and committee decisions are generated from the pre-registered rule (agent_eval)
 NEXT = (
     "Replicate the routing result on fresh live days before any change (pre-registered, evaluated after 24 December).",
     "Calibrate the judge against the owner's 30 human labels and report the agreement honestly.",
@@ -160,7 +160,41 @@ def _rows(res: Path, cost: dict[str, float]) -> list[dict[str, Any]]:
         inv = m.get("all answers", {}).get("no_invented_pct")
         if ref is not None and inv is not None:
             add("arena", "Ask the Arena: refusals and grounding", f"On the golden questions {ref}% of stock, advice and personal-data questions were refused and {inv}% of answers contained only numbers from the data.", 0.0)  # fmt: skip
+    rows += _agent_rows(res)
     return rows
+
+
+def _agent_rows(res: Path) -> list[dict[str, Any]]:
+    """Skills and committee rows, only when their result files exist; decisions come from the rule."""
+    from arena.lab import agent_eval as ae
+    from arena.lab.results import LabResult
+
+    out: list[dict[str, Any]] = []
+    for key, title in (
+        ("agent-skills", "Skills for the tool-using agent"),
+        ("agent-committee", "A committee of specialist agents over A2A"),
+    ):
+        path = res / f"lab-{key}.json"
+        if not path.is_file():
+            continue
+        r = LabResult.model_validate(json.loads(path.read_text(encoding="utf-8")))
+        e = ae.EXPERIMENTS[key]
+        new, ref = r.metrics[f"{e.new} / eval"], r.metrics[f"{e.ref} / eval"]
+        base = r.metrics["base_rate / eval"]
+        rules = " ".join(
+            f"{v['rule']}: {'met' if v['passed'] else 'not met' if v['passed'] is False else 'n/a'}."
+            for v in ae.verdicts(r)
+        )
+        out.append(
+            {
+                "key": key,
+                "title": title,
+                "result": f"Brier {new['brier']:.4f} for {e.new}, {ref['brier']:.4f} for {e.ref}, {base['brier']:.4f} for the base rate ({new['n']} questions; replay, lower is better). {rules}",
+                "cost": r.cost_usd,
+                "decision": ae.decision_sentence(r),
+            }
+        )
+    return out
 
 
 def _chart(res: Path) -> tuple[list[tuple[str, float, str]], int]:
@@ -223,6 +257,55 @@ def chart_svg(arms: list[tuple[str, float, str]]) -> Markup:
     return Markup("".join(out))
 
 
+def committee_flow_svg() -> Markup:
+    """The committee's fixed message flow as a sequence diagram (no figures; 12 px text)."""
+    lanes = ["Chair", "Quant", "History", "Scout", "Skeptic"]
+    w, top, step = 360, 34, 30
+    xs = [36 + i * 72 for i in range(5)]
+    steps = [
+        (0, 1, "task"),
+        (0, 2, "task"),
+        (0, 3, "task"),
+        (1, 0, "estimate"),
+        (2, 0, "base rate"),
+        (3, 0, "evidence"),
+        (0, 4, "draft + reports"),
+        (4, 0, "critique"),
+    ]
+    h = top + step * (len(steps) + 1) + 24
+    out = [
+        f'<svg class="llm-chart" viewBox="0 0 {w} {h}" role="img" aria-labelledby="cf-t cf-d">',
+        '<title id="cf-t">Message flow of the forecasting committee</title>',
+        '<desc id="cf-d">The chair sends a task to the quant analyst, the historian and the news scout, gets their reports, sends its draft and the reports to the skeptic, receives the critique and writes the final answer. The same flow is listed below.</desc>',
+        '<defs><marker id="cf-a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L8 4 L0 8 z" fill="currentColor"/></marker></defs>',
+    ]
+    for x, name in zip(xs, lanes, strict=True):
+        out.append(f'<text class="lc-name" x="{x}" y="16" text-anchor="middle">{name}</text>')
+        out.append(f'<line class="lc-coin" x1="{x}" x2="{x}" y1="24" y2="{h - 8}"/>')
+    for i, (a, b, label) in enumerate(steps):
+        y = top + 8 + i * step
+        mid = (xs[a] + xs[b]) / 2
+        out.append(
+            f'<line x1="{xs[a]}" x2="{xs[b]}" y1="{y + 10}" y2="{y + 10}" stroke="currentColor" stroke-width="1.5" marker-end="url(#cf-a)"/>'
+        )
+        out.append(
+            f'<text class="lc-tick" x="{mid:.0f}" y="{y + 6}" text-anchor="middle">{escape(label)}</text>'
+        )
+    out.append("</svg>")
+    return Markup("".join(out))
+
+
+def _committee(res: Path) -> dict[str, Any] | None:
+    from arena.lab import agent_eval as ae
+    from arena.lab.results import LabResult
+
+    path = res / "lab-agent-committee.json"
+    if not path.is_file():
+        return None
+    r = LabResult.model_validate(json.loads(path.read_text(encoding="utf-8")))
+    return {"svg": committee_flow_svg(), "verdicts": ae.verdicts(r), "note": r.notes[1]}
+
+
 def load_page(results_dir: Path | None = None, budget: Path | None = None) -> dict[str, Any] | None:
     """The page data, or None when the result files are not there (the page is then omitted)."""
     res = results_dir or DEFAULT_RESULTS
@@ -232,6 +315,7 @@ def load_page(results_dir: Path | None = None, budget: Path | None = None) -> di
         return None
     total = budget_spent(budget or DEFAULT_BUDGET) or sum(r["cost"] or 0.0 for r in rows)
     return {
+        "committee": _committee(res),
         "rows": rows, "chart": chart_svg(arms), "arms": arms, "n": n, "classes": GROUP_NAMES,
         "total_cost": total, "next": NEXT,
     }  # fmt: skip

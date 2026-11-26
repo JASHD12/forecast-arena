@@ -144,7 +144,23 @@ def _lab_bullets() -> list[str]:
     conf = json.loads((res / "lab-conformal.json").read_text(encoding="utf-8"))["metrics"]["mean"]
     docs = json.loads((res / "lab-docs-assistant.json").read_text(encoding="utf-8"))
     dm = docs["metrics"]["docs_assistant"]
+    sk = json.loads((res / "lab-agent-skills.json").read_text(encoding="utf-8"))
+    cm = json.loads((res / "lab-agent-committee.json").read_text(encoding="utf-8"))
+    skp = sk["paired"][0]
+    cmp_ = cm["paired"][0]
+    cm_new = cm["metrics"]["agent_committee / eval"]
+    agents_bullet = (
+        "- **Agent experiments, pre-registered, negative results published:** forecasting skills "
+        f"loaded on demand gave a Brier difference of {skp['diff']:+.4f} "
+        f"[{skp['lo']:+.4f}, {skp['hi']:+.4f}] against the calculator-only agent on "
+        f"{skp['n']} questions (interval includes zero, cost just over its limit: not launched); a "
+        f"committee of specialist agents over the A2A protocol answered {cm_new['n']} of "
+        f"{cm_new['asked']} questions (a format defect in one member) and was "
+        f"{cmp_['diff']:+.4f} [{cmp_['lo']:+.4f}, {cmp_['hi']:+.4f}] worse than one agent with "
+        "skills on those; it stays off and a fixed version is pre-registered."
+    )
     return [
+        agents_bullet,
         "- **LLM fine-tuning, measured honestly:** a QLoRA fine-tune of Qwen2.5-1.5B on replayed "
         f"questions beat its untuned self ({fmt('qlora_1_5b', 'base_1_5b')}) but not the base "
         f"rate ({fmt('qlora_1_5b', 'base_rate')}) and not the ML model "

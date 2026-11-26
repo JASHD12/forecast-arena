@@ -266,3 +266,17 @@ def test_chat_tier2_script_names_only_its_pinned_hosts(tmp_path) -> None:
         text = page.read_text()
         outside = "cdn.jsdelivr.net" in text.split("</head>")[0]
         assert outside == (page.name == "ask.html"), page
+
+
+def test_empty_boards_are_one_sentence_and_methods_blanks_are_labelled(tmp_path) -> None:
+    led = Ledger(tmp_path / "l")
+    q = question()
+    led.append(layout.questions_path(q.batch_date), [q])
+    led.append(layout.forecasts_path(q.batch_date), [forecast(q, "base_rate", 0.61)])
+    res = build_site(led, tmp_path / "site", CLOCK, tmp_path / "none")
+    lb = re.sub(r"<[^>]+>", " ", (res.out_dir / "leaderboard.html").read_text())
+    assert "0 questions on 0 days" not in lb
+    assert "no question has resolved yet" in lb
+    assert "Incomplete common set: no scored forecasts from" in lb  # the reason is kept
+    methods = (res.out_dir / "methods.html").read_text()
+    assert "<td></td>" not in methods and 'aria-label="not applicable"' in methods

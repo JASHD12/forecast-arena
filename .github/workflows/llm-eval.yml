@@ -16,7 +16,7 @@ on:
           - power-2026-11a.jsonl
         default: power-2026-10.jsonl
       variants:
-        description: "T355: comma-separated variants that replace the default list (llm_plain, llm_context, agent, agent_quant, agent_analyst, agent_skills); empty keeps the boolean inputs below"
+        description: "T355: comma-separated variants that replace the default list (llm_plain, llm_context, agent, agent_quant, agent_analyst, agent_skills, agent_committee); empty keeps the boolean inputs below"
         default: ""
       limit:
         description: "Golden questions to sample (stratified, seeded)"
@@ -81,6 +81,9 @@ jobs:
           cache-dependency-path: requirements/*.txt
       - name: Install pinned dependencies
         run: make setup
+      - name: Install the A2A SDK (agent_committee only)
+        if: contains(inputs.variants, 'agent_committee')
+        run: .venv/bin/pip install -r requirements/a2a.txt
       - name: Install the local LLM runtime
         if: inputs.local
         env:
@@ -107,7 +110,7 @@ jobs:
           set -o pipefail
           if [ -n "$VARIANTS" ]; then
             # T355: an explicit list replaces the defaults; only known names are accepted
-            if ! printf '%s' "$VARIANTS" | grep -Eq '^(llm_plain|llm_context|agent|agent_quant|agent_analyst|agent_skills)(,(llm_plain|llm_context|agent|agent_quant|agent_analyst|agent_skills))*$'; then
+            if ! printf '%s' "$VARIANTS" | grep -Eq '^(llm_plain|llm_context|agent|agent_quant|agent_analyst|agent_skills|agent_committee)(,(llm_plain|llm_context|agent|agent_quant|agent_analyst|agent_skills|agent_committee))*$'; then
               echo "refused: unknown variant in '$VARIANTS'" >&2; exit 2
             fi
             variants=""

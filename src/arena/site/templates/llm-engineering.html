@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% from "macros.html" import page_head %}
 {% block content %}
-{{ page_head("AI / LLM engineering", "What I measured about LLMs", "Eight experiments on adapting, shrinking, routing and judging language models for forecasting, each with its cost and the decision it led to. Negative results are kept.") }}
+{{ page_head("AI / LLM engineering", "What I measured about LLMs", (llm.rows|length ~ " experiments on adapting, shrinking, routing, judging and orchestrating language models for forecasting, each with its cost and the decision it led to. Negative results are kept.")) }}
 <p class="note"><strong>Evaluation, not live results.</strong> Every figure on this page is read from the committed result files by code. The open-model rows are scored on the same {{ llm.n }} frozen test questions (October and early November 2026, power and markets); lower Brier is better and 0.25 is what always saying 50% scores. Total paid spend for the paid runs listed here: US${{ "%.2f"|format(llm.total_cost) }}. Research project, not advice.</p>
 
 <section class="card" aria-labelledby="l-chart"><h2 id="l-chart">Where the models land</h2>

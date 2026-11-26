@@ -865,6 +865,6 @@ main summary { min-height: 1.5rem; }
 /* LLM engineering page (T325): bars of Brier per arm; text kept at 12 px in a 360-wide viewBox. */
 .llm-chart { width: 100%; max-width: 40rem; height: auto; display: block; }
 .llm-chart .lc-bar { fill: var(--c, var(--accent)); }
-.llm-chart .lc-name, .llm-chart .lc-val, .llm-chart .lc-tick { fill: var(--text, currentColor); font-size: 12px; }
+.llm-chart .lc-name, .llm-chart .lc-val, .llm-chart .lc-tick { fill: var(--text, currentColor); font-size: 12px; paint-order: stroke; stroke: var(--surface, #fff); stroke-width: 3px; stroke-linejoin: round; }
 .llm-chart .lc-tick { fill: var(--muted); }
 .llm-chart .lc-coin { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 4 3; }

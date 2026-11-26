@@ -70,10 +70,27 @@ def eval_build(obj: Ctx, first: object, last: object, out: Path) -> None:
     "--variant",
     "variants",
     multiple=True,
-    type=click.Choice(["llm_plain", "llm_context", "llm_local", "agent", "llm_context_sc5"]),
+    type=click.Choice(
+        [
+            "llm_plain",
+            "llm_context",
+            "llm_local",
+            "agent",
+            "agent_quant",
+            "agent_analyst",
+            "agent_skills",
+            "llm_context_sc5",
+        ]
+    ),
     default=("llm_plain", "llm_context"),
 )
 @click.option("--limit", type=int, default=None, help="Stratified seeded sample size.")
+@click.option(
+    "--ml-probs",
+    type=click.Path(exists=True, path_type=Path),
+    default=None,
+    help="Replayed ml probabilities (evals/golden/ml-probs-power.json); needed by agent_analyst.",
+)
 @click.option("--fake", is_flag=True, help="FakeLLM answers (the CI gate; no network).")
 @click.option("--max-tokens", type=int, default=60_000, help="Hard token cap for this run.")
 @click.option("--out", "out_dir", type=click.Path(path_type=Path), default=Path("evals/results"))
@@ -83,6 +100,7 @@ def eval_run(
     golden: Path,
     variants: tuple[str, ...],
     limit: int | None,
+    ml_probs: Path | None,
     fake: bool,
     max_tokens: int,
     out_dir: Path,
@@ -92,12 +110,28 @@ def eval_run(
     import os
 
     from arena.evals.golden import load
-    from arena.evals.run import AGENT_REQUESTS_PER_QUESTION, EvalCaps, run, sample
+    from arena.evals.run import (
+        AGENT_REQUESTS_PER_QUESTION,
+        AGENT_VARIANTS,
+        EvalCaps,
+        run,
+        sample,
+    )
     from arena.forecasters.selfconsistency import K as SC_K
     from arena.llm.client import FakeLLM, LLMClient
 
     items, sha = load(golden)
     items = sample(items, limit)
+    probs: dict[str, float] | None = None
+    if ml_probs is not None:
+        doc = json.loads(ml_probs.read_text(encoding="utf-8"))
+        if doc.get("golden_sha256") != sha:
+            click.echo("refused: the ml probabilities were built for another golden set", err=True)
+            sys.exit(2)
+        probs = {k: float(v) for k, v in doc["probabilities"].items()}
+    if "agent_analyst" in variants and probs is None:
+        click.echo("refused: agent_analyst needs --ml-probs (replayed ml probabilities)", err=True)
+        sys.exit(2)
     clients: dict[str, LLMClient] = {}
     if fake:
         answer = json.dumps({"probability": 0.5, "rationale": "fake", "key_factors": []})
@@ -127,8 +161,8 @@ def eval_run(
             1,
             len(items)
             * sum(
-                AGENT_REQUESTS_PER_QUESTION
-                if v == "agent"
+                AGENT_REQUESTS_PER_QUESTION + (2 if v == "agent_skills" else 0)  # + skill loads
+                if v in AGENT_VARIANTS
                 else 2 * SC_K
                 if v.endswith("_sc5")
                 else 2
@@ -138,7 +172,9 @@ def eval_run(
         max_tokens=max_tokens,
         max_output_tokens=obj.settings.llm_max_output_tokens,
     )
-    res = run(items, clients, obj.clock, golden=golden.name, golden_sha256=sha, caps=caps)
+    res = run(
+        items, clients, obj.clock, golden=golden.name, golden_sha256=sha, caps=caps, ml_probs=probs
+    )
     if fake:
         res["run_id"] = "fake-" + res["run_id"]
     out_dir.mkdir(parents=True, exist_ok=True)

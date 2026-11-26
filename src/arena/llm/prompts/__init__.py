@@ -17,6 +17,14 @@ def load(name: str, version: str = PROMPT_VERSION) -> str:
     )
 
 
+def fingerprint_map(versions: dict[str, str]) -> str:
+    """Like `fingerprint`, with a version per prompt file (equal to it when all versions match)."""
+    h = hashlib.sha256()
+    for name in sorted(versions):
+        h.update(name.encode() + b"\n" + load(name, versions[name]).encode())
+    return h.hexdigest()[:12]
+
+
 def fingerprint(names: tuple[str, ...], version: str = PROMPT_VERSION) -> str:
     """Short hash of the named prompt files of a version (part of forecaster versions)."""
     h = hashlib.sha256()

@@ -3,14 +3,14 @@
 from arena.scoring.boards import COMMON_GROUP
 from arena.site import charts, content, titles
 
-IDS = ("llm_local_ft", "llm_router", "agent_hybrid")
+IDS = ("llm_local_ft", "llm_router", "agent_hybrid", "agent_quant", "agent_analyst", "agent_skills")
 
 
 def test_names_say_experimental_and_colours_are_distinct() -> None:
     for fid in IDS:
         assert titles.forecaster_name(fid).endswith("(experimental)")
-        assert charts.series_class(fid) in {"s-9", "s-10", "s-11"}
-    assert len({charts.series_class(f) for f in IDS}) == 3
+        assert charts.series_class(fid) in {"s-9", "s-10", "s-11", "s-13", "s-14", "s-15"}
+    assert len({charts.series_class(f) for f in IDS}) == len(IDS)
     assert "s-8" != charts.series_class("llm_local_ft")  # not the fallback slot
 
 

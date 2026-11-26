@@ -22,6 +22,14 @@ on:
         description: "T223b: also evaluate the tool-using agent (series and base-rate tools only; about 6 requests per question, so raise max_tokens)"
         type: boolean
         default: false
+      quant:
+        description: "T344: also evaluate agent_quant and agent_analyst (replayed ml probabilities from evals/golden/ml-probs-power.json; about 6 requests per question each, so raise max_tokens)"
+        type: boolean
+        default: false
+      skills:
+        description: "T355: also evaluate agent_skills (agent_quant plus load_skill); run together with quant on the same seeded items"
+        type: boolean
+        default: false
       self_consistency:
         description: "T298: also evaluate llm_context sampled five times and averaged (5x the tokens of llm_context; owner OK H36 first; raise max_tokens)"
         type: boolean
@@ -81,11 +89,15 @@ jobs:
           LOCAL: ${{ inputs.local }}
           AGENT: ${{ inputs.agent }}
           SC: ${{ inputs.self_consistency }}
+          QUANT: ${{ inputs.quant }}
+          SKILLS: ${{ inputs.skills }}
         run: |
           set -o pipefail
           variants="--variant llm_plain --variant llm_context"
           if [ "$LOCAL" = "true" ]; then variants="$variants --variant llm_local"; fi
           if [ "$AGENT" = "true" ]; then variants="$variants --variant agent"; fi
+          if [ "$QUANT" = "true" ]; then variants="$variants --variant agent_quant --variant agent_analyst --ml-probs evals/golden/ml-probs-power.json"; fi
+          if [ "$SKILLS" = "true" ]; then variants="$variants --variant agent_skills"; fi
           if [ "$SC" = "true" ]; then variants="$variants --variant llm_context_sc5"; fi
           .venv/bin/arena eval run --golden evals/golden/power-2026-10.jsonl \
             --limit "$LIMIT" --max-tokens "$MAX_TOKENS" $variants | tee eval.log

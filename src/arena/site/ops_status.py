@@ -26,6 +26,9 @@ LLM_FORECASTERS = (
     "llm_local_ft",
     "llm_router",
     "agent_hybrid",
+    "agent_quant",
+    "agent_analyst",
+    "agent_skills",
 )
 
 

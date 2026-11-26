@@ -354,6 +354,26 @@ def build_forecasters(
                 ledger, settings, client, agent, retriever, {"base_rate": out[0], "ml": ml}
             )
         )
+    for flag, cls in (
+        (settings.agent_quant, "AgentQuant"),
+        (settings.agent_analyst, "AgentAnalyst"),
+        (settings.agent_skills, "AgentSkills"),
+    ):
+        if flag:  # T342/T343/T353: experimental variants of `agent`, same sample, caps and peers
+            from arena.agent import quant as quant_mod
+
+            out.append(
+                getattr(quant_mod, cls)(
+                    client,
+                    per_domain=n,
+                    max_tool_calls=settings.agent_max_tool_calls,
+                    peers={"base_rate": out[0], "ml": ml},
+                    retriever=retriever,
+                    prompt_version="v2" if retriever is not None else "v1",
+                    news=agent.news,
+                    wiki=agent.wiki,
+                )
+            )
     if settings.llm_local:
         out.append(_local_forecaster(settings, n, tracer, clk))
     if settings.llm_local_ft:

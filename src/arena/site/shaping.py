@@ -223,6 +223,9 @@ def _rows(
         "llm_local_ft",
         "llm_router",
         "agent_hybrid",
+        "agent_quant",
+        "agent_analyst",
+        "agent_skills",
         "bandit_hedge",
     ]
     ordered = [f for f in order if f in fids] + sorted(fids - set(order))

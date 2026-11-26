@@ -47,6 +47,9 @@ VARIANTS: dict[str, type[LLMForecaster]] = {
 #: Wikipedia backend (a replay of a past day would need as-of snapshots of both), no ML peer
 #: and no retriever, so a tool call to those is recorded as an error, and the result is labelled.
 AGENT_VARIANT = "agent"
+#: Experimental agent variants (T344): same loop and limits, different prompt and tools. The
+#: analyst needs the replayed `ml` probabilities (`evals/golden/ml-probs-power.json`).
+AGENT_VARIANTS = ("agent", "agent_quant", "agent_analyst", "agent_skills")
 AGENT_REQUESTS_PER_QUESTION = 6  # up to 4 tool turns, the final answer and one repair
 
 
@@ -73,6 +76,33 @@ class GoldenBaseRate:
         return Forecast(
             forecast_id=f"{q.question_id}::base_rate", question_id=q.question_id,
             forecaster_id=self.forecaster_id, forecaster_version="golden", probability=p,
+            created_at=asof,
+        )  # fmt: skip
+
+
+class ReplayML:
+    """A peer that answers with replayed `ml` probabilities from a stored backtest (not live)."""
+
+    forecaster_id = "ml"
+
+    def __init__(self, probabilities: Mapping[str, float]) -> None:
+        self.by_question = dict(probabilities)
+
+    def version(self) -> str:
+        """Fixed."""
+        return "replay"
+
+    def forecast(self, q: Question, ctx: dict[str, Any], asof: Any) -> Forecast | Skip:
+        """The replayed probability of the question, or a skip when it has none (never a guess)."""
+        p = self.by_question.get(q.question_id)
+        if p is None:
+            return Skip(
+                question_id=q.question_id, forecaster_id=self.forecaster_id,
+                reason_code="model_missing", detail="no replayed ml probability", created_at=asof,
+            )  # fmt: skip
+        return Forecast(
+            forecast_id=f"{q.question_id}::ml", question_id=q.question_id,
+            forecaster_id=self.forecaster_id, forecaster_version="replay", probability=p,
             created_at=asof,
         )  # fmt: skip
 
@@ -124,6 +154,7 @@ def run(
     golden_sha256: str,
     caps: EvalCaps | None = None,
     now_id: Callable[[], str] | None = None,
+    ml_probs: Mapping[str, float] | None = None,
 ) -> dict[str, Any]:
     """Evaluate every variant in `clients` on `items`; returns the JSON-ready result."""
     caps = caps or EvalCaps()
@@ -136,8 +167,19 @@ def run(
     for name, client in clients.items():
         traced = TracingLLM(GuardedLLM(client, guard), tracer, clock)
         f: Any
-        if name == AGENT_VARIANT:
-            f = AgentForecaster(traced, peers={"base_rate": GoldenBaseRate(items)})
+        if name in AGENT_VARIANTS:
+            from arena.agent.quant import AgentAnalyst, AgentQuant, AgentSkills
+
+            peers: dict[str, Any] = {"base_rate": GoldenBaseRate(items)}
+            if ml_probs is not None:
+                peers["ml"] = ReplayML(ml_probs)
+            cls = {
+                "agent": AgentForecaster,
+                "agent_quant": AgentQuant,
+                "agent_analyst": AgentAnalyst,
+                "agent_skills": AgentSkills,
+            }
+            f = cls[name](traced, peers=peers)
         else:
             f = VARIANTS[name](traced)
         f.max_output_tokens = caps.max_output_tokens

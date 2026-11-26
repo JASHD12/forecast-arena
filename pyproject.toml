@@ -29,7 +29,7 @@ arena = "arena.cli:main"
 where = ["src"]
 
 [tool.setuptools.package-data]
-arena = ["py.typed", "site/templates/*.html", "site/templates/*.xml", "site/static/*", "llm/prompts/*.md",
+arena = ["py.typed", "site/templates/*.html", "site/templates/*.xml", "site/static/*", "llm/prompts/*.md", "agent/skills/*/SKILL.md",
          "domains/*.txt"]
 
 [tool.ruff]

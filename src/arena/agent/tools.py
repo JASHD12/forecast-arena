@@ -8,6 +8,9 @@
 | search_news(query, days_back) | up to 10 headlines (title, outlet, URL, time) published
 before the forecast time |
 | wikipedia_summary(title, project) | the lead summary of an article |
+| estimate_probability() | reference estimate from this question's stored data (`agent_quant`) |
+| calculate_probability(c, sd, t, dir) | normal-distribution arithmetic (`agent_quant`) |
+| load_skill(name) | text of one forecasting skill (`agent_skills`; own limit, no research call) |
 | similar_past_questions(k, same_domain) | the k most similar questions resolved before the
 forecast time, with outcomes (offered only with prompt v2; `agent/retrieval.py`) |
 
@@ -21,6 +24,7 @@ sources, not article text.
 from __future__ import annotations
 
 import json
+import math
 import time as _time
 import urllib.parse
 import xml.etree.ElementTree as ET
@@ -249,6 +253,66 @@ SIMILAR_SPEC = ToolSpec(
 )
 
 
+ESTIMATE_SPEC = ToolSpec(
+    "estimate_probability",
+    "A reference probability for this question computed from its stored data only (for example "
+    "the DWD forecast with a normal error, or how often recent days crossed the threshold), "
+    "with the method and inputs. Takes no arguments. Returns an error if the topic has no "
+    "reference model.",
+    {"type": "object", "properties": {}, "additionalProperties": False},
+)
+
+CALC_SPEC = ToolSpec(
+    "calculate_probability",
+    "Probability that a normally distributed quantity with the given centre and standard "
+    "deviation is above (direction gt) or below (direction lt) a threshold. Pure arithmetic.",
+    {
+        "type": "object",
+        "properties": {
+            "center": {"type": "number"},
+            "sd": {"type": "number"},
+            "threshold": {"type": "number"},
+            "direction": {"type": "string", "enum": ["gt", "lt"]},
+        },
+        "required": ["center", "sd", "threshold", "direction"],
+        "additionalProperties": False,
+    },
+)
+
+
+MAX_SKILL_LOADS = 2
+SKILL_TOOL = "load_skill"
+
+
+def skill_spec() -> ToolSpec:
+    """The `load_skill` tool; the enum lists the skills that exist (see `arena.agent.skills`)."""
+    from arena.agent import skills
+
+    return ToolSpec(
+        SKILL_TOOL,
+        "The full text of one forecasting skill (a short procedure with base rates for one topic). "
+        f"At most {MAX_SKILL_LOADS} loads per question; they do not use up the research calls. "
+        "The index of skills is in your instructions.",
+        {
+            "type": "object",
+            "properties": {"name": {"type": "string", "enum": skills.names()}},
+            "required": ["name"],
+            "additionalProperties": False,
+        },
+    )
+
+
+def normal_probability(center: float, sd: float, threshold: float, direction: str) -> float:
+    """P(X > threshold) for direction "gt", P(X < threshold) for "lt"; X ~ Normal(center, sd)."""
+    if not sd > 0 or not math.isfinite(sd):
+        raise ValueError("sd must be a positive number")
+    if direction not in ("gt", "lt"):
+        raise ValueError("direction must be 'gt' or 'lt'")
+    z = (threshold - center) / sd
+    sf = 0.5 * math.erfc(z / math.sqrt(2))  # P(X > threshold)
+    return sf if direction == "gt" else 1.0 - sf
+
+
 @dataclass
 class TraceEntry:
     """One tool call, compactly."""
@@ -283,6 +347,8 @@ class ToolBox:
         news: NewsBackend | None = None,
         wiki: Callable[[str, str], dict[str, str]] | None = None,
         similar: Callable[[int, bool], dict[str, Any]] | None = None,
+        estimate: Callable[[], dict[str, Any]] | None = None,
+        skills: Callable[[str], str] | None = None,
         guard: Callable[[Any], tuple[Any, list[str]]] | None = None,
         max_calls: int = 4,
         time_limit: float = 90.0,
@@ -294,6 +360,8 @@ class ToolBox:
         self.news = news
         self.wiki = wiki
         self.similar = similar
+        self.estimate = estimate  # reference estimate of this question (`agent_quant` only)
+        self.skills = skills  # name -> skill text (`agent_skills` only)
         self.guard = guard  # (result) -> (cleaned result, flags); None keeps results as they are
         self.max_calls = max_calls
         self.time_limit = time_limit
@@ -303,8 +371,9 @@ class ToolBox:
 
     @property
     def calls_left(self) -> int:
-        """Remaining tool calls."""
-        return max(0, self.max_calls - len(self.trace))
+        """Remaining research tool calls (skill loads have their own limit)."""
+        used = sum(1 for t in self.trace if t.tool != SKILL_TOOL)
+        return max(0, self.max_calls - used)
 
     def time_left(self) -> float:
         """Remaining seconds."""
@@ -312,6 +381,8 @@ class ToolBox:
 
     def run(self, call: ToolCall) -> tuple[str, bool]:
         """(result text, is_error). Never raises; never exceeds the limits."""
+        if call.name == SKILL_TOOL:
+            return self._run_skill(call)
         if self.calls_left <= 0:
             return self._refuse(call, f"tool call limit of {self.max_calls} reached")
         if self.time_left() <= 0:
@@ -331,6 +402,28 @@ class ToolBox:
             msg = f"{type(exc).__name__}: {exc}"[:300]
             self.trace.append(TraceEntry(call.name, dict(call.input), False, 0, sources, msg))
             return json.dumps({"tool": call.name, "error": msg}), True
+
+    def _run_skill(self, call: ToolCall) -> tuple[str, bool]:
+        """Load a skill: own limit, never counted against the research calls, text is trusted."""
+        loads = sum(1 for t in self.trace if t.tool == SKILL_TOOL)
+        if self.skills is None:
+            return self._refuse(call, "no skills configured")
+        if loads >= MAX_SKILL_LOADS:
+            return self._refuse(call, f"skill limit of {MAX_SKILL_LOADS} reached")
+        if self.time_left() <= 0:
+            return self._refuse(call, f"time limit of {self.time_limit:.0f}s reached")
+        try:
+            name = str(call.input["name"])
+            text = json.dumps(
+                {"tool": call.name, "data": {"name": name, "skill": self.skills(name)}},
+                ensure_ascii=False,
+            )
+        except (KeyError, ValueError, TypeError) as exc:
+            msg = f"{type(exc).__name__}: {exc}"[:300]
+            self.trace.append(TraceEntry(call.name, dict(call.input), False, 0, [], msg))
+            return json.dumps({"tool": call.name, "error": msg}), True
+        self.trace.append(TraceEntry(call.name, dict(call.input), True, len(text), [], None))
+        return text, False
 
     def _refuse(self, call: ToolCall, reason: str) -> tuple[str, bool]:
         self.trace.append(TraceEntry(call.name, dict(call.input), False, 0, [], reason))
@@ -361,6 +454,15 @@ class ToolBox:
             res = self.wiki(str(a["title"]), str(a["project"]))
             sources.append(res.get("url", ""))
             return res
+        if call.name == "estimate_probability":
+            if self.estimate is None:
+                raise ValueError("no reference model configured")
+            return self.estimate()
+        if call.name == "calculate_probability":
+            p = normal_probability(
+                float(a["center"]), float(a["sd"]), float(a["threshold"]), str(a["direction"])
+            )
+            return {"probability": round(p, 4), "model": "normal", "inputs": dict(a)}
         if call.name == "similar_past_questions":
             if self.similar is None:
                 raise ValueError("no retrieval index configured")

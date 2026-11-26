@@ -226,6 +226,8 @@ def _rows(
         "agent_quant",
         "agent_analyst",
         "agent_skills",
+        "agent_graph_skills",
+        "agent_hybrid_skills",
         "bandit_hedge",
     ]
     ordered = [f for f in order if f in fids] + sorted(fids - set(order))

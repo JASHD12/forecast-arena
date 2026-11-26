@@ -75,6 +75,10 @@ class Settings(BaseModel):
     agent_analyst: bool = False
     #: T353: run `agent_skills` (agent_quant plus the load_skill tool and the forecasting skills).
     agent_skills: bool = False
+    #: T357: run `agent_graph_skills` (agent_graph plus the estimate, calculator and load_skill).
+    agent_graph_skills: bool = False
+    #: T358: run `agent_hybrid_skills` (agent_hybrid plus the estimate, calculator and load_skill).
+    agent_hybrid_skills: bool = False
     #: T121: run the LangGraph agent `agent_graph` (needs requirements/graph.txt).
     agent_graph: bool = False
     #: T122: run `llm_local`, an open model on the local CPU (needs requirements/local.txt).

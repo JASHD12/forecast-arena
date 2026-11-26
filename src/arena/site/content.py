@@ -166,6 +166,18 @@ INFORMATION_SETS = (
         "daily sample",
     ),
     (
+        "agent_graph_skills",
+        "As agent_graph (the LangGraph agent), plus the reference estimate, the probability "
+        "calculator and the load_skill tool (experimental)",
+        "daily sample",
+    ),
+    (
+        "agent_hybrid_skills",
+        "As agent_hybrid (hybrid retrieval and guarded tool text), plus the reference estimate, "
+        "the probability calculator and the load_skill tool (experimental)",
+        "daily sample",
+    ),
+    (
         "bandit_hedge",
         "The other forecasters' forecasts of the same question, blended with weights learned "
         "online from resolved questions (Hedge; experimental)",
@@ -187,6 +199,8 @@ AI_FORECASTERS = frozenset(
         "agent_quant",
         "agent_analyst",
         "agent_skills",
+        "agent_graph_skills",
+        "agent_hybrid_skills",
     }
 )
 #: Experimental forecasters (SPEC 17): named "(experimental)", outside the common-set board.
@@ -198,6 +212,8 @@ EXPERIMENTAL_FORECASTERS = frozenset(
         "agent_quant",
         "agent_analyst",
         "agent_skills",
+        "agent_graph_skills",
+        "agent_hybrid_skills",
         "bandit_hedge",
     }
 )

@@ -43,3 +43,11 @@ isolates the skills is `agent_skills` against `agent_quant`.
 Results are published with intervals and sample sizes, negative ones included. `agent_skills` goes live (experimental, outside the headline board and
 the ensemble) only if H-S1 and H-S2 hold and a dry run stays within the 300,000-token daily cap; otherwise it stays off and the card says why.
 No live forecaster or prompt changes because of how a specific live question resolved (I8). The evaluation is run once.
+
+## Addendum 2026-11-26: the graph and hybrid variants (T357, T358)
+
+`agent_graph_skills` and `agent_hybrid_skills` add the same three tools (`estimate_probability`, `calculate_probability`, `load_skill`) to the LangGraph agent
+and to the hybrid-retrieval agent. They have **no offline evaluation**: the replay harness has no LangGraph runtime, retriever or reranker, and weather,
+Wikipedia, currencies and crypto cannot be replayed. They therefore follow the decision rule above indirectly: they are launched (experimental, outside the
+headline board and the ensemble) only if `agent_skills` passes its evaluation, and then judged live, on the same sampled questions against their base
+forecaster (`agent_graph`, `agent_hybrid`), after at least 30 official days. Nothing about them changes because of how a specific live question resolved (I8).

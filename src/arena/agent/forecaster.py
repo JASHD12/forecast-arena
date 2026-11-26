@@ -92,20 +92,19 @@ class AgentForecaster:
         )
 
     def _toolbox(self, q: Question, ctx: dict[str, Any], asof: datetime, **extra: Any) -> ToolBox:
-        """The tool executor for one question (variants add tools through `extra`)."""
-        return ToolBox(
-            ctx,
-            asof,
-            probabilities=self._peer_probabilities(q, ctx, asof),
-            news=self.news,
-            wiki=self.wiki,
-            similar=self._similar(q, asof),
-            guard=self.guard,
-            max_calls=self.max_tool_calls,
-            time_limit=self.time_limit,
-            monotonic=self.monotonic,
-            **extra,
-        )
+        """The tool executor for one question (variants add tools or change limits via `extra`)."""
+        kw: dict[str, Any] = {
+            "probabilities": self._peer_probabilities(q, ctx, asof),
+            "news": self.news,
+            "wiki": self.wiki,
+            "similar": self._similar(q, asof),
+            "guard": self.guard,
+            "max_calls": self.max_tool_calls,
+            "time_limit": self.time_limit,
+            "monotonic": self.monotonic,
+        }
+        kw.update(extra)
+        return ToolBox(ctx, asof, **kw)
 
     def _system(self) -> str:
         """The system prompt of this forecaster (variants fill in more placeholders)."""

@@ -53,6 +53,8 @@ LLM_FORECASTERS = frozenset(
         "agent_quant",
         "agent_analyst",
         "agent_skills",
+        "agent_graph_skills",
+        "agent_hybrid_skills",
     }
 )
 INCIDENT_LABEL = "incident"
@@ -73,6 +75,8 @@ def expected_forecasters(settings: Settings) -> frozenset[str]:
         | ({"agent_quant"} if settings.agent_quant else set())
         | ({"agent_analyst"} if settings.agent_analyst else set())
         | ({"agent_skills"} if settings.agent_skills else set())
+        | ({"agent_graph_skills"} if settings.agent_graph_skills else set())
+        | ({"agent_hybrid_skills"} if settings.agent_hybrid_skills else set())
         | ({"bandit_hedge"} if settings.bandit else set())
     )
 

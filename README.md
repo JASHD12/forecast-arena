@@ -63,6 +63,7 @@ Each technique is tried against the project's baselines on questions it never sa
 <!-- lab:start -->
 | Technique | Status | Card |
 |---|---|---|
+| A committee of specialist agents over A2A against one agent with skills | evaluated (not a live score) | [None](None) |
 | Ask the Arena: tiered chat over the published record | evaluated (not a live score) | [docs/lab/ask-arena.md](docs/lab/ask-arena.md) |
 | Ask the project: cited answers over the project documents | evaluated (not a live score) | [docs/lab/docs-assistant.md](docs/lab/docs-assistant.md) |
 | Calibration methods compared: identity, Platt, isotonic, beta | evaluated (not a live score) | [docs/lab/calibration.md](docs/lab/calibration.md) |
@@ -70,6 +71,7 @@ Each technique is tried against the project's baselines on questions it never sa
 | Cost routing: a cheap pair first, the paid model only when they are unsure | evaluated (not a live score) | [docs/lab/routing.md](docs/lab/routing.md) |
 | DPO preference tuning of Qwen2.5-1.5B on replayed power questions | evaluated (not a live score) | [docs/lab/dpo-r1.md](docs/lab/dpo-r1.md) |
 | Distillation from Claude into Qwen2.5-1.5B (soft-label QLoRA) | evaluated (not a live score) | [docs/lab/distill-r1.md](docs/lab/distill-r1.md) |
+| Forecasting skills for the tool-using agent | evaluated (not a live score) | [None](None) |
 | Guardrails and red-team suite for untrusted tool and news text | evaluated (not a live score) | [docs/lab/guardrails.md](docs/lab/guardrails.md) |
 | LLM judge against the agent's own ratings (not human calibration) | evaluated (not a live score) | [docs/lab/judge-agent.md](docs/lab/judge-agent.md) |
 | LLM-as-judge for stored rationales | evaluated (not a live score) | [docs/lab/judge.md](docs/lab/judge.md) |

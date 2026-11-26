@@ -36,6 +36,7 @@ DECISIONS = {
 NEXT = (
     "Replicate the routing result on fresh live days before any change (pre-registered, evaluated after 24 December).",
     "Calibrate the judge against the owner's 30 human labels and report the agreement honestly.",
+    "Fix the committee's skeptic output budget and run it again only as a new, separately pre-registered version (committee-r2).",
     "Try a larger teacher-label set or a larger student only as a new pre-registered experiment.",
 )
 GROUP = {
@@ -185,11 +186,17 @@ def _agent_rows(res: Path) -> list[dict[str, Any]]:
             f"{v['rule']}: {'met' if v['passed'] else 'not met' if v['passed'] is False else 'n/a'}."
             for v in ae.verdicts(r)
         )
+        asked = int(str(new.get("asked") or new["n"]))
+        cover = (
+            ""
+            if asked == new["n"]
+            else f" {e.new} answered {new['n']} of {asked} questions and skipped the rest."
+        )
         out.append(
             {
                 "key": key,
                 "title": title,
-                "result": f"Brier {new['brier']:.4f} for {e.new}, {ref['brier']:.4f} for {e.ref}, {base['brier']:.4f} for the base rate ({new['n']} questions; replay, lower is better). {rules}",
+                "result": f"Brier {new['brier']:.4f} for {e.new}, {ref['brier']:.4f} for {e.ref}, {base['brier']:.4f} for the base rate ({new['n']} questions; replay, lower is better).{cover} {rules}",
                 "cost": r.cost_usd,
                 "decision": ae.decision_sentence(r),
             }

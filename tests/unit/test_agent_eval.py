@@ -110,3 +110,34 @@ def test_the_flow_diagram_has_no_figures_and_readable_text() -> None:
     import re
 
     assert not re.search(r"\d\.\d", svg.replace("1.5", ""))
+
+
+def test_same_items_brier_and_cost_per_answered_question_are_generated() -> None:
+    run = _run()
+    run["metrics"]["agent_committee"] = {**_arm(0.17, 0.2), "answered": 2, "n": 4}
+    run["metrics"]["agent_skills"] = {**_arm(0.1, 0.1), "n": 4, "answered": 4}
+    run["rows"] = [
+        {"variant": "agent_committee", "question_id": "a", "probability": 0.8, "outcome": 1},
+        {"variant": "agent_committee", "question_id": "b", "probability": 0.2, "outcome": 0},
+        {"variant": "agent_committee", "question_id": "c", "probability": None, "outcome": 1},
+        {"variant": "agent_skills", "question_id": "a", "probability": 0.6, "outcome": 1},
+        {"variant": "agent_skills", "question_id": "b", "probability": 0.4, "outcome": 0},
+        {"variant": "agent_skills", "question_id": "c", "probability": 0.9, "outcome": 1},
+    ]
+    r = ae.build(run, "agent-committee")
+    same = r.metrics["agent_skills / same items as agent_committee"]
+    assert same == {"n": 2, "brier": 0.16}  # (0.16 + 0.16) / 2
+    assert any("answered 2 of 4" in n and "100.00 US$ per 1,000" in n for n in r.notes)
+    assert r.cost_usd == 0.2  # only the committee arm; agent_skills is counted in the skills result
+
+
+def test_the_committed_results_validate_and_their_verdicts_are_reproducible() -> None:
+    root = Path("evals/results")
+    run = root / "eval-20261126T195707.json"
+    if not run.is_file():
+        return
+    res = json.loads(run.read_text())
+    for exp in ("agent-skills", "agent-committee"):
+        built = ae.build(res, exp)
+        stored = LabResult.model_validate(json.loads((root / f"lab-{exp}.json").read_text()))
+        assert stored == built

@@ -1,0 +1,67 @@
+{
+  "kind": "evaluation",
+  "experiment": "agent-committee",
+  "title": "A committee of specialist agents over A2A against one agent with skills",
+  "created_at": "2026-11-26T19:57:07.450167+00:00",
+  "why": "Multi-agent systems and the A2A protocol are how companies split a job between specialised agents; the question is whether the split beats one agent with the same tools. (a2a-protocol)",
+  "prereg_sha256": "501de9027419c87c26b3a909bba75f4707cb9896016f6924d3e159cc94d25e94",
+  "dataset_sha256": {
+    "eval": "fd31d14b6c5123b30e1c95c18063b28dd41718414af7826d1de02da48801ceac"
+  },
+  "artefacts": {
+    "eval_run": "eval-20261126T195707"
+  },
+  "metrics": {
+    "agent_skills / eval": {
+      "n": 90,
+      "asked": 90,
+      "brier": 0.1279,
+      "log_score": 0.4091,
+      "ece": 0.1057,
+      "cost_usd_per_1k": 1.3928
+    },
+    "agent_committee / eval": {
+      "n": 37,
+      "asked": 90,
+      "brier": 0.147,
+      "log_score": 0.4562,
+      "ece": 0.0414,
+      "cost_usd_per_1k": 1.4162
+    },
+    "base_rate / eval": {
+      "n": 37,
+      "brier": 0.1908
+    },
+    "agent_skills / same items as agent_committee": {
+      "n": 37,
+      "brier": 0.1289
+    }
+  },
+  "paired": [
+    {
+      "a": "agent_committee",
+      "b": "agent_skills",
+      "split": "eval",
+      "diff": 0.018099999999999998,
+      "lo": 0.003426457142857154,
+      "hi": 0.03340025353016688,
+      "n": 37,
+      "days": 14
+    }
+  ],
+  "cost_usd": 0.127462,
+  "notes": [
+    "Run eval-20261126T195707 of llm-eval.yml on power-2026-11a.jsonl (90 questions), replay with the tools a replay can honour; labelled evaluation, never the live record.",
+    "The replay has no news backend and no retriever: the news scout answered 'no evidence available' and the historian gave the base rate only, so this tests a reduced committee.",
+    "Skips per arm: agent_skills none; agent_committee {'error': 53}. Versions: agent_skills `claude-haiku-5-5|prompt-v1-78474be2c501|tools-4|out-1024|quant-r1|skills-r1-d011316a`; agent_committee `claude-haiku-5-5|prompt-a752bbec04d4|committee-r1|members-quant-r1,hist-r1,scout-r1,skeptic-r1|a2a-1.0|sdk-1.3.1|guards-r1|skills-d011316a|out-1024`.",
+    "agent_committee answered 37 of 90 questions; its cost per answered question is 3.44 US$ per 1,000.",
+    "Cost is the run's recorded tokens at the list price of the model, per arm; this result carries the cost of agent_committee.",
+    "Brier of the arms that answered fewer questions is on their answered items only; paired differences use the questions both arms answered (the pair's n)."
+  ],
+  "limits": [
+    "Electricity only (the one topic a replay can reproduce), 90 questions from 15 days; the six questions of a day are correlated, so the intervals are day-block intervals.",
+    "One run, one sample of the model's answers; a repeat could differ.",
+    "Weather, Wikipedia, currencies and crypto are judged only on live days."
+  ],
+  "card": null
+}

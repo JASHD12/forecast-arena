@@ -31,6 +31,7 @@ class Experiment:
     cost_ratio_max: float
     rule_names: tuple[str, str]
     note: str
+    own_arms: tuple[str, ...] = ()  # arms whose cost this result carries (none counted twice)
 
 
 EXPERIMENTS = {
@@ -47,6 +48,7 @@ EXPERIMENTS = {
         1.3,
         ("H-S1", "H-S2"),
         "agent_skills is agent_quant plus load_skill; agent is the live prompt with replay tools.",
+        ("agent", "agent_quant", "agent_skills"),
     ),
     "agent-committee": Experiment(
         "agent-committee",
@@ -62,6 +64,7 @@ EXPERIMENTS = {
         ("H-C1", "H-C2"),
         "The replay has no news backend and no retriever: the news scout answered 'no evidence "
         "available' and the historian gave the base rate only, so this tests a reduced committee.",
+        ("agent_committee",),  # the agent_skills arm is counted in the agent-skills result
     ),
 }
 
@@ -69,6 +72,30 @@ EXPERIMENTS = {
 def _per_question_cost(m: dict[str, Any]) -> float | None:
     cost, n = m.get("cost_usd"), m.get("n")
     return None if cost is None or not n else float(cost) / int(n)
+
+
+def _r(x: float | None) -> float | None:
+    return None if x is None else round(float(x), 4)
+
+
+def _same_items(
+    res: dict[str, Any], new: str, ref: str
+) -> dict[str, float | int | str | None] | None:
+    """Brier of `ref` on the questions `new` answered, when `new` answered fewer than `ref` (from the rows)."""
+    got = {
+        r["question_id"]
+        for r in res.get("rows", [])
+        if r["variant"] == new and r["probability"] is not None
+    }
+    mine = [
+        r
+        for r in res.get("rows", [])
+        if r["variant"] == ref and r["probability"] is not None and r["question_id"] in got
+    ]
+    if not got or len(got) == res["metrics"][ref]["answered"] or not mine:
+        return None
+    b = sum((r["probability"] - r["outcome"]) ** 2 for r in mine) / len(mine)
+    return {"n": len(mine), "brier": round(b, 4)}
 
 
 def _pair(res: dict[str, Any], new: str, ref: str) -> dict[str, Any] | None:
@@ -99,19 +126,23 @@ def build(res: dict[str, Any], experiment: str, *, run_id: str | None = None) ->
         c = _per_question_cost(m)
         metrics[f"{arm} / eval"] = {
             "n": m["answered"],
-            "brier": m["brier"],
-            "log_score": m["log_score"],
-            "ece": m.get("ece"),
+            "asked": m["n"],
+            "brier": _r(m["brier"]),
+            "log_score": _r(m["log_score"]),
+            "ece": _r(m.get("ece")),
             "cost_usd_per_1k": None if c is None else round(1000 * c, 4),
         }
-    first = res["metrics"][e.arms[0]]
+    newm = res["metrics"][e.new]
     metrics["base_rate / eval"] = {
-        "n": first["answered"],
-        "brier": first["base_rate_brier_same_items"],
+        "n": newm["answered"],
+        "brier": _r(newm["base_rate_brier_same_items"]),  # on the items the new arm answered
     }
+    same = _same_items(res, e.new, e.ref)
+    if same is not None:
+        metrics[f"{e.ref} / same items as {e.new}"] = same
     pair = _pair(res, e.new, e.ref)
     paired = [] if pair is None else [{"a": e.new, "b": e.ref, "split": "eval", **pair}]
-    cost = round(sum(res["metrics"][a].get("cost_usd") or 0.0 for a in e.arms), 6)
+    cost = round(sum(res["metrics"][a].get("cost_usd") or 0.0 for a in e.own_arms), 6)
     notes = [
         f"Run {run_id or res['run_id']} of llm-eval.yml on {res['golden']} ({res['n_items']} questions), "
         "replay with the tools a replay can honour; labelled evaluation, never the live record.",
@@ -121,7 +152,16 @@ def build(res: dict[str, Any], experiment: str, *, run_id: str | None = None) ->
         + ". Versions: "
         + "; ".join(f"{a} `{res['versions'][a]}`" for a in e.arms)
         + ".",
-        "Cost is the whole run's tokens at the list price of the model, split per arm.",
+        *[
+            f"{a} answered {res['metrics'][a]['answered']} of {res['metrics'][a]['n']} questions; its cost per "
+            f"answered question is {res['metrics'][a]['cost_usd'] / res['metrics'][a]['answered'] * 1000:.2f} US$ per 1,000."
+            for a in e.arms
+            if res["metrics"][a]["answered"] < res["metrics"][a]["n"]
+        ],
+        "Cost is the run's recorded tokens at the list price of the model, per arm; this result carries "
+        f"the cost of {', '.join(e.own_arms)}.",
+        "Brier of the arms that answered fewer questions is on their answered items only; paired "
+        "differences use the questions both arms answered (the pair's n).",
     ]
     return LabResult(
         experiment=experiment,

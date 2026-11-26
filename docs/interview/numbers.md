@@ -204,10 +204,34 @@ Source: `evals/results/eval-20261122T212735.json`
 | llm_plain | claude-haiku-5-5 | 24 | 24 | 0.3309 | 0.2081 | 100% | 0% | 0.0071 | 11280 |
 
 Paired Brier difference: llm_plain - llm_context: +0.1372 [+0.0315, +0.2427] on 24 items; llm_plain - llm_context_sc5: +0.1348 [+0.0336, +0.2349] on 24 items; llm_context - llm_context_sc5: -0.0024 [-0.0161, +0.0110] on 24 items
+
+### Run `eval-20261126T195707` (90 items; caps 2430 requests, 4500000 tokens)
+
+Source: `evals/results/eval-20261126T195707.json`
+
+| Forecaster | Model | n | Answered | Brier | Base rate, same items | Valid JSON first try | Repair rate | Cost (USD) | Output tokens |
+|---|---|---|---|---|---|---|---|---|---|
+| agent | claude-haiku-5-5 | 90 | 90 | 0.1302 | 0.2030 | 100% | 0% | 0.0578 | 52167 |
+| agent_committee | claude-haiku-5-5 | 90 | 37 | 0.1470 | 0.1908 | 84% | 10% | 0.1275 | 122763 |
+| agent_quant | claude-haiku-5-5 | 90 | 90 | 0.1369 | 0.2030 | 100% | 0% | 0.0955 | 48337 |
+| agent_skills | claude-haiku-5-5 | 90 | 90 | 0.1279 | 0.2030 | 96% | 4% | 0.1254 | 52647 |
+
+Paired Brier difference: agent - agent_quant: -0.0067 [-0.0213, +0.0083] on 90 items; agent - agent_skills: +0.0023 [-0.0055, +0.0109] on 90 items; agent - agent_committee: -0.0133 [-0.0351, +0.0079] on 37 items; agent_quant - agent_skills: +0.0090 [-0.0028, +0.0204] on 90 items; agent_quant - agent_committee: -0.0033 [-0.0143, +0.0104] on 37 items; agent_skills - agent_committee: -0.0181 [-0.0334, -0.0034] on 37 items
 <!-- evals:end -->
 
 <!-- lab:start -->
 ## Experiments lab (evaluations; not the live record)
+
+### A committee of specialist agents over A2A against one agent with skills
+
+Source: `evals/results/lab-agent-committee.json`; card `None`
+
+| Arm | Questions | Brier | Log score | ECE | US$ per 1,000 |
+|---|---|---|---|---|---|
+| agent_committee / eval | 37 | 0.147 | 0.4562 | 0.0414 | 1.4162 |
+| agent_skills / eval | 90 | 0.1279 | 0.4091 | 0.1057 | 1.3928 |
+| agent_skills / same items as agent_committee | 37 | 0.1289 | - | - | - |
+| base_rate / eval | 37 | 0.1908 | - | - | - |
 
 ### Ask the Arena: tiered chat over the published record
 
@@ -329,6 +353,17 @@ Source: `evals/results/lab-distill-r1.json`; card `docs/lab/distill-r1.md`
 | qlora_1_5b / test_all | 276 | 0.2378 | 0.6683 | 0.0687 |
 | qlora_1_5b / test_nov | 90 | 0.233 | 0.6586 | 0.1175 |
 | qlora_1_5b / test_oct | 186 | 0.24 | 0.6729 | 0.0902 |
+
+### Forecasting skills for the tool-using agent
+
+Source: `evals/results/lab-agent-skills.json`; card `None`
+
+| Arm | Questions | Brier | Log score | ECE | US$ per 1,000 |
+|---|---|---|---|---|---|
+| agent / eval | 90 | 0.1302 | 0.4178 | 0.1009 | 0.6418 |
+| agent_quant / eval | 90 | 0.1369 | 0.4331 | 0.0796 | 1.0608 |
+| agent_skills / eval | 90 | 0.1279 | 0.4091 | 0.1057 | 1.3928 |
+| base_rate / eval | 90 | 0.203 | - | - | - |
 
 ### Guardrails and red-team suite for untrusted tool and news text
 

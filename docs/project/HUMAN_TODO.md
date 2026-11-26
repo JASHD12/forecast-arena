@@ -329,3 +329,8 @@ curl -X POST -H "Authorization: Bearer TOKEN" -H "Accept: application/vnd.github
   - About box of `forecast-arena` (gear icon next to "About"): description "Live public benchmark: classical ML vs LLM agents forecasting tomorrow, with forecasts locked in a hash-chained ledger before the answer exists." Website `https://jashd12.github.io/forecast-arena/`. Topics: forecasting, machine-learning, llm, llm-agents, mlops, time-series, data-science, python, github-actions, langgraph. Tick "Use the topics..." as you like; untick Releases/Packages if empty.
   - Check the wording "Specified and directed by me; implemented with AI coding agents" is how you want to describe your role; add your CV/LinkedIn/email to `site_content/recruiter_facts.json` (H16) so the profile shows a contact line.
 
+
+- [ ] H43 · Decide whether to try the committee again as `committee-r2` (T368)
+  - Result of r1 (2026-11-26): it answered 37 of 90 questions because the skeptic's JSON broke (119 of 316 calls hit the 300-token output limit) and it was worse than `agent_skills` on those 37. `agent_skills` also missed its rule by a hair (cost 1.31x against 1.30x; the Brier interval includes zero). Nothing is live; see DECISIONS and `docs/lab/agent-committee.md`.
+  - If yes: say "go for committee-r2" in chat. The agent then writes the fix as a new version (larger output budget for the scout and the skeptic, tolerant critique parsing), pre-registers it before any run, and asks you for the cost estimate of one more paid run (about US$0.15-0.25 for the committee arm; budget left after this run: US$0.50).
+  - If no: tick this item and write "no"; the r1 result stays as the published outcome.

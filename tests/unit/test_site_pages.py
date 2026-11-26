@@ -277,5 +277,6 @@ def test_empty_boards_are_one_sentence_and_methods_blanks_are_labelled(tmp_path)
     lb = re.sub(r"<[^>]+>", " ", (res.out_dir / "leaderboard.html").read_text())
     assert "0 questions on 0 days" not in lb
     assert "no question has resolved yet" in lb
+    assert "Incomplete common set: no scored forecasts from" in lb  # the reason is kept
     methods = (res.out_dir / "methods.html").read_text()
     assert "<td></td>" not in methods and 'aria-label="not applicable"' in methods

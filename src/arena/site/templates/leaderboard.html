@@ -21,7 +21,7 @@
 {% endif %}
 {% macro boards(list, note, suffix="", overall=True) %}
 {% for b in list if (b.domain == "overall") == overall %}
-{% if not b.questions and not b.rows %}<p class="note board-empty">{{ "Same questions for everyone" if b.kind == "common" else "All questions" }} · {{ "All topics" if b.domain == "overall" else dname(b.domain) }}{{ suffix }}: no question has resolved yet, so there is nothing to score. The board fills in as answers arrive.</p>{% else %}
+{% if not b.questions and not b.rows %}<p class="note board-empty">{{ "Same questions for everyone" if b.kind == "common" else "All questions" }} · {{ "All topics" if b.domain == "overall" else dname(b.domain) }}{{ suffix }}: no question has resolved yet, so there is nothing to score. The board fills in as answers arrive.{% if b.missing_forecasters %} Incomplete common set: no scored forecasts from {{ b.missing_forecasters|join(", ") }} in this scope. All registered members are required for the headline comparison.{% endif %}</p>{% else %}
 <h3>{{ "Same questions for everyone" if b.kind == "common" else "All questions" }} · {{ "All topics" if b.domain == "overall" else dname(b.domain) }}{{ suffix }}</h3>
 {{ board_table(b, note if note else ("Common set: only questions answered by every forecaster in the group" if b.kind == "common" else "All questions: forecasters that answer everything")) }}
 {% endif %}

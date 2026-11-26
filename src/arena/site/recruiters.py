@@ -206,7 +206,7 @@ PROOFS: tuple[tuple[str, str, str, tuple[str, ...]], ...] = (
         "in-process transport) and a read-only A2A agent for the benchmark itself, kept "
         "separate from MCP (agent-to-tool); experimental, off until its pre-registered evaluation",
         "",
-        ("src/arena/a2a", "src/arena/agent/committee.py", "lab/prereg/agent-committee.md"),
+        ("src/arena/a2a", "src/arena/agent/committee.py", "tests/unit/test_agent_committee.py"),
     ),
     (
         "REST and JSON APIs",

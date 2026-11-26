@@ -135,6 +135,10 @@ jobs:
           # T277: the route exists and answers 503 (no model mounted) with onnxruntime importable in the image
           test "$(curl -s -o /dev/null -w '%{http_code}' -X POST -H 'content-type: application/json' -d '{"stat":"mean","target_date":"2026-11-02","daily":[],"threshold":50}' http://127.0.0.1:8000/predict/power)" = 503
           docker exec arena-api .venv/bin/python -c "import onnxruntime"
+          # T364: arena-oracle (A2A) is served next to the REST API: fetch its card, ask one question
+          curl -fsS http://127.0.0.1:8000/a2a/.well-known/agent-card.json | python3 -c "import json,sys; d=json.load(sys.stdin); assert d['name']=='arena-oracle' and d['skills'], d"
+          docker exec arena-api .venv/bin/arena a2a ask --url http://127.0.0.1:8000/a2a/ --skill leaderboard | python3 -c "import json,sys; d=json.load(sys.stdin); assert d['state']=='COMPLETED' and d['data']['result']['rows'], d"
+          docker exec arena-api .venv/bin/arena a2a ask --url http://127.0.0.1:8000/a2a/ --text "Should I buy Google stock?" | python3 -c "import json,sys; d=json.load(sys.stdin); assert d['data']['refused'] is True, d"
           docker logs arena-api | tail -5
 
   dbt:
@@ -205,6 +209,9 @@ jobs:
           for i in $(seq 1 30); do curl -fsS http://127.0.0.1:8000/health && break; sleep 2; done
           curl -fsS "http://127.0.0.1:8000/leaderboard" | python3 -c "import json,sys; d=json.load(sys.stdin); assert d['rows'], d"
           curl -fsS http://127.0.0.1:8000/metrics | grep -q '^arena_http_requests_total'  # T295
+          # T364: the A2A agent behind the same Service: its card, then one read-only question inside the pod
+          curl -fsS http://127.0.0.1:8000/a2a/.well-known/agent-card.json | python3 -c "import json,sys; d=json.load(sys.stdin); assert d['name']=='arena-oracle', d"
+          kubectl exec deployment/arena-api -- .venv/bin/arena a2a ask --url http://127.0.0.1:8000/a2a/ --skill leaderboard | python3 -c "import json,sys; d=json.load(sys.stdin); assert d['state']=='COMPLETED' and d['data']['result']['rows'], d"
       - name: Run the CronJob once and check it succeeds
         run: |
           kubectl create job verify-once --from=cronjob/arena-verify

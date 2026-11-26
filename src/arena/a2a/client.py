@@ -14,7 +14,7 @@ from dataclasses import dataclass
 from typing import Any
 
 import httpx
-from a2a.client import ClientConfig, ClientFactory
+from a2a.client import A2ACardResolver, ClientConfig, ClientFactory
 from a2a.helpers.proto_helpers import get_message_text, new_message, new_text_part
 from a2a.types import a2a_pb2 as pb
 from google.protobuf.json_format import MessageToDict
@@ -66,16 +66,26 @@ class A2AClient:
         self.base_url = base_url
         self.timeout = timeout
         self._client: Any = None
+        self._card: Any = None
 
     async def card(self) -> pb.AgentCard:
         """The agent's card, fetched through the SDK's resolver from the well-known path."""
         await self._ensure()
-        return self._client._card
+        return self._card
 
     async def _ensure(self) -> None:
+        """Resolve the card once; every interface is pinned to the URL the card came from.
+
+        A card is data from the other side: its `url` fields are not followed to another host, so a
+        card cannot redirect this client (and a service behind a port mapping or a proxy works).
+        """
         if self._client is None:
+            card = await A2ACardResolver(self.http, self.base_url).get_agent_card()
+            for iface in card.supported_interfaces:
+                iface.url = self.base_url.rstrip("/") + "/"
             factory = ClientFactory(ClientConfig(httpx_client=self.http, streaming=False))
-            self._client = await factory.create_from_url(self.base_url)
+            self._client = factory.create(card)
+            self._card = card
 
     async def ask(self, payload: dict[str, Any]) -> CallResult:
         """Send `payload` as one JSON message and wait for the task to finish."""

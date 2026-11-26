@@ -12,6 +12,7 @@ IDS = (
     "agent_skills",
     "agent_graph_skills",
     "agent_hybrid_skills",
+    "agent_committee",
 )
 
 
@@ -27,6 +28,7 @@ def test_names_say_experimental_and_colours_are_distinct() -> None:
             "s-15",
             "s-16",
             "s-17",
+            "s-18",
         }
     assert len({charts.series_class(f) for f in IDS}) == len(IDS)
     assert "s-8" != charts.series_class("llm_local_ft")  # not the fallback slot

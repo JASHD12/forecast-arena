@@ -79,6 +79,7 @@ def eval_build(obj: Ctx, first: object, last: object, out: Path) -> None:
             "agent_quant",
             "agent_analyst",
             "agent_skills",
+            "agent_committee",
             "llm_context_sc5",
         ]
     ),
@@ -113,6 +114,7 @@ def eval_run(
     from arena.evals.run import (
         AGENT_REQUESTS_PER_QUESTION,
         AGENT_VARIANTS,
+        COMMITTEE_REQUESTS_PER_QUESTION,
         EvalCaps,
         run,
         sample,
@@ -135,7 +137,11 @@ def eval_run(
     clients: dict[str, LLMClient] = {}
     if fake:
         answer = json.dumps({"probability": 0.5, "rationale": "fake", "key_factors": []})
-        clients = {v: FakeLLM(lambda s, t, tools: answer) for v in variants}
+        critique = json.dumps({"severity": "none", "issues": [], "direction": "none"})
+        clients = {
+            v: FakeLLM(lambda s, t, tools: critique if "skeptic of" in s else answer)
+            for v in variants
+        }
     else:
         if os.environ.get("GITHUB_ACTIONS") != "true":
             click.echo(
@@ -161,7 +167,10 @@ def eval_run(
             1,
             len(items)
             * sum(
-                AGENT_REQUESTS_PER_QUESTION + (2 if v == "agent_skills" else 0)  # + skill loads
+                COMMITTEE_REQUESTS_PER_QUESTION
+                if v == "agent_committee"
+                else AGENT_REQUESTS_PER_QUESTION
+                + (2 if v == "agent_skills" else 0)  # + skill loads
                 if v in AGENT_VARIANTS
                 else 2 * SC_K
                 if v.endswith("_sc5")

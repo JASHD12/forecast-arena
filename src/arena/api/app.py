@@ -182,4 +182,28 @@ def create_app(ledger: Ledger) -> FastAPI:
         metrics.predictions.labels("ok", power_model.version).inc()
         return PowerPrediction(**out)
 
+    _mount_oracle(app, b)
     return app
+
+
+def _mount_oracle(app: FastAPI, b: Benchmark) -> None:
+    """Serve `arena-oracle` (A2A, read-only) at `/a2a` when the optional SDK is installed (T364).
+
+    The card announces `ARENA_A2A_PUBLIC_URL` (default: this server on port 8000); the project's own
+    client pins the interface to the URL it fetched the card from, so port mappings are harmless.
+    """
+    try:
+        from arena.a2a.oracle import Oracle, build_oracle_app
+    except ImportError:  # the A2A SDK is an optional requirement (requirements/a2a.txt)
+        return
+    docs = Path("docs")
+    oracle = Oracle(b, _docs_index(docs) if (docs / "SPEC.md").is_file() else None)
+    url = os.environ.get("ARENA_A2A_PUBLIC_URL", "http://127.0.0.1:8000/a2a/")
+    app.mount("/a2a", build_oracle_app(oracle, url))
+
+
+def _docs_index(root: Path) -> Any:
+    from arena.lab.docs_assistant import DOC_PATHS, DocsIndex, load_chunks
+
+    chunks = load_chunks(root.parent, [p for p in DOC_PATHS if (root.parent / p).is_file()])
+    return DocsIndex(chunks) if chunks else None

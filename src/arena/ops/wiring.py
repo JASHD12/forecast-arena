@@ -413,6 +413,19 @@ def build_forecasters(
                 retriever=retriever,
             )
         )
+    if settings.agent_committee:  # T363: needs requirements/a2a.txt; a missing SDK fails the run
+        from arena.agent.committee import AgentCommittee
+
+        out.append(
+            AgentCommittee(
+                client,
+                per_domain=n,
+                peers={"base_rate": out[0]},  # members get the base rate, never `ml`
+                news=agent.news,
+                wiki=agent.wiki,
+                retriever=retriever,
+            )
+        )
     from arena.forecasters import router as router_mod
 
     rp = router_mod.load_params()

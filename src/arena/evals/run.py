@@ -49,8 +49,11 @@ VARIANTS: dict[str, type[LLMForecaster]] = {
 AGENT_VARIANT = "agent"
 #: Experimental agent variants (T344): same loop and limits, different prompt and tools. The
 #: analyst needs the replayed `ml` probabilities (`evals/golden/ml-probs-power.json`).
-AGENT_VARIANTS = ("agent", "agent_quant", "agent_analyst", "agent_skills")
+AGENT_VARIANTS = ("agent", "agent_quant", "agent_analyst", "agent_skills", "agent_committee")
 AGENT_REQUESTS_PER_QUESTION = 6  # up to 4 tool turns, the final answer and one repair
+#: The committee (T365): scout, two chair calls, skeptic, and one repair attempt each for the
+#: chair's answers and the skeptic's critique.
+COMMITTEE_REQUESTS_PER_QUESTION = 7
 
 
 class GoldenBaseRate:
@@ -179,7 +182,15 @@ def run(
                 "agent_analyst": AgentAnalyst,
                 "agent_skills": AgentSkills,
             }
-            f = cls[name](traced, peers=peers)
+            if name == "agent_committee":
+                # The committee never sees `ml`. The replay has no news backend and no retriever, so
+                # its news-scout answers "no evidence available" and the historian gives the base
+                # rate only (stated in lab/prereg/agent-committee.md and on the card).
+                from arena.agent.committee import AgentCommittee
+
+                f = AgentCommittee(traced, peers={"base_rate": peers["base_rate"]})
+            else:
+                f = cls[name](traced, peers=peers)
         else:
             f = VARIANTS[name](traced)
         f.max_output_tokens = caps.max_output_tokens

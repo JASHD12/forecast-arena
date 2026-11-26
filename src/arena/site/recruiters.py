@@ -201,6 +201,14 @@ PROOFS: tuple[tuple[str, str, str, tuple[str, ...]], ...] = (
         ("src/arena/mcp_server.py",),
     ),
     (
+        "Multi-agent systems, A2A",
+        "A committee of specialist agents that talk over the A2A protocol (official SDK, "
+        "in-process transport) and a read-only A2A agent for the benchmark itself, kept "
+        "separate from MCP (agent-to-tool); experimental, off until its pre-registered evaluation",
+        "",
+        ("src/arena/a2a", "src/arena/agent/committee.py", "tests/unit/test_agent_committee.py"),
+    ),
+    (
         "REST and JSON APIs",
         "FastAPI service and a static JSON API with schemas generated from pydantic models",
         "api.html",

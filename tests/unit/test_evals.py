@@ -229,3 +229,38 @@ def test_analyst_eval_peer_returns_replayed_ml_and_never_a_guess() -> None:
     assert peer.forecast(q, {}, NOW).probability == 0.8
     other = peer.forecast(items[1].question, {}, NOW)
     assert other.reason_code == "model_missing"
+
+
+def test_committee_variant_runs_in_the_fake_gate_without_ml_and_with_no_news(tmp_path) -> None:
+    pytest.importorskip("a2a")
+    from arena.cli import main
+
+    out = CliRunner().invoke(
+        main,
+        [
+            "eval",
+            "run",
+            "--golden",
+            str(GOLDEN),
+            "--fake",
+            "--limit",
+            "4",
+            "--out",
+            str(tmp_path),
+            "--variant",
+            "agent_committee",
+        ],
+    )
+    assert out.exit_code == 0, out.output
+    (path,) = tmp_path.glob("fake-*.json")
+    res = json.loads(path.read_text())
+    m = res["metrics"]["agent_committee"]
+    assert m["answered"] == 4 and m["skips"] == {}
+    assert "committee-r1" in res["versions"]["agent_committee"]
+    # scout (no news backend: no model call), chair draft, skeptic, chair final = 3 calls per item
+    assert m["calls"] == 12
+
+
+def test_the_llm_eval_workflow_accepts_the_committee_variant_and_installs_the_sdk() -> None:
+    wf = Path(".github/workflows/llm-eval.yml").read_text()
+    assert wf.count("agent_committee") >= 3 and "requirements/a2a.txt" in wf

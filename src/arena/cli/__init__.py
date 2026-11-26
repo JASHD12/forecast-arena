@@ -198,4 +198,12 @@ def mcp_command(obj: Ctx) -> None:
 
 
 # Command modules register themselves on the groups above (T187: split by purpose).
-from arena.cli import jobs, lab_cmds, lab_paid_cmds, llm_cmds, record, reports  # noqa: E402,F401
+from arena.cli import (  # noqa: E402,F401
+    a2a_cmds,
+    jobs,
+    lab_cmds,
+    lab_paid_cmds,
+    llm_cmds,
+    record,
+    reports,
+)

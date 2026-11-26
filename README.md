@@ -52,7 +52,7 @@ append-only, hash-chained ledger. When the data arrives, every forecast is score
 
 | If you hire for | Start here | What it shows |
 |---|---|---|
-| **AI / LLM engineering** | [Evals](https://jashd12.github.io/forecast-arena/evals.html), [LLM page](https://jashd12.github.io/forecast-arena/llm.html), [What I measured about LLMs](https://jashd12.github.io/forecast-arena/llm-engineering.html), [Lab](https://jashd12.github.io/forecast-arena/lab.html) | frozen golden-set evals that caught a truncation bug, tool-using and LangGraph agents, hybrid retrieval with reranking, prompt-injection guards, a QLoRA fine-tune (notebook and pre-registration ready) |
+| **AI / LLM engineering** | [Evals](https://jashd12.github.io/forecast-arena/evals.html), [LLM page](https://jashd12.github.io/forecast-arena/llm.html), [What I measured about LLMs](https://jashd12.github.io/forecast-arena/llm-engineering.html), [Lab](https://jashd12.github.io/forecast-arena/lab.html) | frozen golden-set evals that caught a truncation bug, tool-using and LangGraph agents, forecasting skills loaded on demand, a committee of specialist agents over the A2A protocol (built and off, pre-registered evaluation), hybrid retrieval with reranking, prompt-injection guards, and a QLoRA fine-tune with its published negative result |
 | **ML / MLOps** | [Backtests](https://jashd12.github.io/forecast-arena/backtests.html), [`registry.py`](src/arena/forecasters/registry.py), [`onnx_power.py`](src/arena/forecasters/onnx_power.py) | champion/challenger promotion by a written rule, artefact hashes, ONNX serving with parity tests, CI with Docker, Kubernetes (kind), dbt and Airflow |
 | **Data science** | [Leaderboard](https://jashd12.github.io/forecast-arena/leaderboard.html), [Findings](https://jashd12.github.io/forecast-arena/findings.html), [Methods](https://jashd12.github.io/forecast-arena/methods.html) | proper scoring rules, day-block bootstrap intervals, calibration and conformal studies, honest negative results |
 
@@ -63,6 +63,7 @@ Each technique is tried against the project's baselines on questions it never sa
 <!-- lab:start -->
 | Technique | Status | Card |
 |---|---|---|
+| A committee of specialist agents over A2A against one agent with skills | evaluated (not a live score) | [None](None) |
 | Ask the Arena: tiered chat over the published record | evaluated (not a live score) | [docs/lab/ask-arena.md](docs/lab/ask-arena.md) |
 | Ask the project: cited answers over the project documents | evaluated (not a live score) | [docs/lab/docs-assistant.md](docs/lab/docs-assistant.md) |
 | Calibration methods compared: identity, Platt, isotonic, beta | evaluated (not a live score) | [docs/lab/calibration.md](docs/lab/calibration.md) |
@@ -70,6 +71,7 @@ Each technique is tried against the project's baselines on questions it never sa
 | Cost routing: a cheap pair first, the paid model only when they are unsure | evaluated (not a live score) | [docs/lab/routing.md](docs/lab/routing.md) |
 | DPO preference tuning of Qwen2.5-1.5B on replayed power questions | evaluated (not a live score) | [docs/lab/dpo-r1.md](docs/lab/dpo-r1.md) |
 | Distillation from Claude into Qwen2.5-1.5B (soft-label QLoRA) | evaluated (not a live score) | [docs/lab/distill-r1.md](docs/lab/distill-r1.md) |
+| Forecasting skills for the tool-using agent | evaluated (not a live score) | [None](None) |
 | Guardrails and red-team suite for untrusted tool and news text | evaluated (not a live score) | [docs/lab/guardrails.md](docs/lab/guardrails.md) |
 | LLM judge against the agent's own ratings (not human calibration) | evaluated (not a live score) | [docs/lab/judge-agent.md](docs/lab/judge-agent.md) |
 | LLM-as-judge for stored rationales | evaluated (not a live score) | [docs/lab/judge.md](docs/lab/judge.md) |
@@ -87,7 +89,7 @@ Each technique is tried against the project's baselines on questions it never sa
 | Cost routing with the simpler ml-first rule on fresh days | pre-registered 2026-11-23 (lab/prereg/routing-ml-only.md); evaluated after 2026-12-24 | - |
 | In-browser model tier for Ask the Arena: real-browser test | built and opt-in; tested with a fake engine only, a real-browser test is still open | - |
 
-Live experimental forecasters: the QLoRA-tuned model (running since the first morning after 2026-11-22, with its fixed pre-registered expectations) and, once its launch check passes, an agent with hybrid retrieval and guards (still switched off). The cascade router was **not built**: its pre-registered rule saved no paid calls (the routing card has the numbers). None of them enters the headline board. Details: [Lab page](https://jashd12.github.io/forecast-arena/lab.html), [what I measured about LLMs](https://jashd12.github.io/forecast-arena/llm-engineering.html), [explainer](docs/explainers/06-experiments-lab.md).
+Live experimental forecasters: the QLoRA-tuned model (running since the first morning after 2026-11-22, with its fixed pre-registered expectations). Built and switched off until their pre-registered launch checks pass: an agent with hybrid retrieval and guards, agents with a calculator, an ML-forecast reviewer and forecasting skills (also on the LangGraph and hybrid agents), and a committee of specialist agents over the A2A protocol. The cascade router was **not built**: its pre-registered rule saved no paid calls (the routing card has the numbers). None of them enters the headline board. Details: [Lab page](https://jashd12.github.io/forecast-arena/lab.html), [what I measured about LLMs](https://jashd12.github.io/forecast-arena/llm-engineering.html), [explainer](docs/explainers/06-experiments-lab.md).
 <!-- lab:end -->
 
 ## An open-source tool from this project
@@ -345,6 +347,8 @@ docker compose up --build
 Then open <http://localhost:8000/docs> for the read-only REST API (it serves the offline
 end-to-end ledger; the comment in `compose.yaml` shows how to serve the real record).
 
+The same server also mounts `arena-oracle`, the benchmark as a read-only A2A agent, at `/a2a` (see below).
+
 LLM forecasters only call a real provider inside GitHub Actions, with hard daily caps;
 locally and in tests they use a scripted fake.
 
@@ -369,6 +373,20 @@ claude mcp add forecast-arena -- "$PWD/.venv/bin/arena" --ledger-dir "$PWD/_ledg
 For Claude Desktop, add the same command and arguments as a server entry in its
 `claude_desktop_config.json`. Then ask, for example, "Which forecaster has the best Brier
 score on electricity questions?"
+
+### Ask the benchmark from another agent (A2A)
+
+MCP connects an agent to tools; the Agent2Agent (A2A) protocol connects an agent to another agent. `arena-oracle` is the benchmark as a read-only A2A agent (official `a2a-sdk`, Apache-2.0): it publishes an Agent Card, answers `list_questions`, `get_question`, `leaderboard` and `explain_method`, refuses advice, stock and personal-data questions, and writes nothing. It is mounted at `/a2a` by the REST API, so the Docker image and the Kubernetes demo serve it, and CI fetches its card and asks it a question. It is not hosted publicly (the site is static).
+
+```bash
+.venv/bin/pip install -r requirements/a2a.txt
+```
+
+```bash
+.venv/bin/arena --ledger-dir _ledger a2a ask --text "who leads on electricity?"
+```
+
+The same A2A layer runs the experimental **committee** forecaster (`agent_committee`, off): a chair that calls four specialist agents in-process (`src/arena/a2a/`, `src/arena/agent/committee.py`, [explainer](docs/explainers/11-multi-agent-a2a.md)). Its rules were pre-registered before any run ([`lab/prereg/agent-committee.md`](lab/prereg/agent-committee.md)).
 
 ## Auf Deutsch
 

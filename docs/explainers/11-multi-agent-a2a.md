@@ -1,7 +1,7 @@
 # Multi-agent systems and the A2A protocol (T360-T366)
 
-Written 2026-11-26. Everything here is code in this repository; nothing was run on the live record, and the
-committee has **no evaluation result yet** (the paid run needs the owner's approval, see "What is not done").
+Written 2026-11-26. Everything here is code in this repository; nothing was run on the live record. The committee's one
+pre-registered offline evaluation has run (see "What the evaluation found"): **it did not meet its rule and stays off.**
 
 ## What it is
 
@@ -53,11 +53,21 @@ card, its own task lifecycle, its own model and policy). The repository has both
 - **Hosted agents**: no new hosting, accounts or secrets; the only key is the one the other forecasters already use.
 - **Following the URL in a card**: see above.
 
+## What the evaluation found
+
+One run on the 90 November electricity questions (`docs/lab/agent-committee.md`, numbers generated from the result file):
+
+- The committee answered **37 of 90** questions. The rest were recorded skips: the skeptic's JSON failed to parse after its
+  one repair, and 119 of its 316 model calls ended at the 300-token output limit (the likely cause).
+- On those 37 it scored worse than `agent_skills` on the same questions (the paired interval lies above zero), so H-C1 is not
+  met. Cost per question asked was about the same, per answered question about 2.5 times.
+- Decision by the pre-registered rule: stays off. The fix (a larger output budget, tolerant parsing) is a **new version**,
+  `committee-r2`, under a new pre-registration; it is not patched into r1 (I8). It is waiting for the owner (HUMAN_TODO H43).
+- The skills evaluation from the same run (`docs/lab/agent-skills.md`) also missed its rule narrowly.
+
 ## What is not done (and not claimed)
 
-- The paid evaluation (`lab/prereg/agent-committee.md`, H-C1 to H-C4) has not run. The harness variant and the workflow input
-  exist; the run needs `main` and the owner's approval of the exact estimate. Until then there is **no claim** that the
-  committee is better, worse or cheaper than `agent_skills`.
+- There is **no claim** that a committee beats one agent. The evidence so far points the other way, on one topic, in a replay.
 - The replay has no news backend and no retriever, so even that evaluation tests a reduced committee (estimate, base rate,
   critique, chair). The news scout and the retrieval of similar questions can only be judged live, after 30 official days.
 - The written A2A specification site was not reachable from the build environment, so only SDK-verified behaviour is used
@@ -78,8 +88,9 @@ card, its own task lifecycle, its own model and policy). The repository has both
    the message; the base rate is the only peer forecast handed over. Nothing else about the question exists in the member.
 6. **Could a headline hijack the committee?** Tool text passes the guards (`guards-r1`) before the scout's model reads it, the
    scout returns items by number mapped to real headlines (no invented citations), and the chair is told reports are data.
-7. **Does it beat the single agent?** Not known. That is what the pre-registered evaluation decides (H-C1: lower Brier than
-   `agent_skills`; H-C2: at most 2.5 times the cost), and a negative result will be published the same way.
+7. **Does it beat the single agent?** Not in the one evaluation so far: r1 answered 37 of 90 questions (a format bug in the
+   skeptic step) and was worse than `agent_skills` on those. The result is published as it is; a fixed r2 would need its own
+   pre-registration.
 8. **Why is the quant member not an LLM?** The reference estimate is code; a model adds cost and noise there. Specialisation
    can also mean "this part is deterministic".
 9. **What does it cost?** At most seven model requests per question by the harness's cap (four in the normal path), all through

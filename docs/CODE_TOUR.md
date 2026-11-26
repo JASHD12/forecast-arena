@@ -41,6 +41,16 @@ the daily token budget through `llm/budget.py`). Tool output is treated as data.
 failure becomes a recorded skip with a reason, never a default probability. The LangGraph
 version of the same agent is in `agent/graph.py`.
 
+## 4b. Agents talking to agents: `src/arena/a2a/` and `src/arena/agent/committee.py`
+
+`a2a/` wraps the official A2A SDK: Agent Cards, an executor that moves a task through
+submitted, working and completed or failed, a client that never raises, and an in-process
+transport (the SDK's ASGI routes behind `httpx.ASGITransport`, so no socket). `committee.py`
+is the experimental forecaster built on it: a chair calls `quant-analyst`, `historian` and
+`news-scout` in parallel, writes a draft, asks the `skeptic`, and writes the final answer;
+the quorum rule skips instead of guessing. `a2a/oracle.py` is the benchmark itself as a
+read-only A2A agent, mounted by the REST API at `/a2a`, next to the MCP server.
+
 ## 5. Scoring and statistics: `src/arena/scoring/core.py` and `stats.py`
 
 Brier and log scores on clipped probabilities, skill against the base rate, paired

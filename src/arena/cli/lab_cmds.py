@@ -172,6 +172,26 @@ def lab_card_cmd(result: Path) -> None:
     click.echo(f"card -> {out}")
 
 
+@lab.command("agent-eval")
+@click.argument("eval_run", type=click.Path(exists=True, path_type=Path))
+@click.option("--experiment", type=click.Choice(["agent-skills", "agent-committee"]), required=True)
+@click.option("--out", type=click.Path(path_type=Path), default=None)
+def lab_agent_eval(eval_run: Path, experiment: str, out: Path | None) -> None:
+    """Turn one `arena eval run` file into the lab result of the skills or committee experiment."""
+    import json
+
+    from arena.lab import agent_eval as ae
+
+    res = json.loads(eval_run.read_text(encoding="utf-8"))
+    r = ae.build(res, experiment)
+    path = out or Path("evals/results") / f"lab-{experiment}.json"
+    path.write_text(r.model_dump_json(indent=2) + "\n", encoding="utf-8")
+    click.echo(f"wrote {path}")
+    for v in ae.verdicts(r):
+        state = "PASS" if v["passed"] else "NOT MET" if v["passed"] is False else "n/a"
+        click.echo(f"{v['rule']}: {state} - {v['text']}")
+
+
 @lab.command("grounding")
 @click.option(
     "--out", type=click.Path(path_type=Path), default=Path("evals/results/lab-grounding.json")

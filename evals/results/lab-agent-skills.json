@@ -1,0 +1,70 @@
+{
+  "kind": "evaluation",
+  "experiment": "agent-skills",
+  "title": "Forecasting skills for the tool-using agent",
+  "created_at": "2026-11-26T19:57:07.450167+00:00",
+  "why": "Progressive disclosure of short, reviewed skill notes is how Anthropic and others package domain know-how for agents without growing every prompt; the question is whether it helps a forecaster. (anthropic-skills)",
+  "prereg_sha256": "fb8d060985cef583d2078a662c7a24db2a3b1bc5899415c56e9f9636cab96eb7",
+  "dataset_sha256": {
+    "eval": "fd31d14b6c5123b30e1c95c18063b28dd41718414af7826d1de02da48801ceac"
+  },
+  "artefacts": {
+    "eval_run": "eval-20261126T195707"
+  },
+  "metrics": {
+    "agent / eval": {
+      "n": 90,
+      "asked": 90,
+      "brier": 0.1302,
+      "log_score": 0.4178,
+      "ece": 0.1009,
+      "cost_usd_per_1k": 0.6418
+    },
+    "agent_quant / eval": {
+      "n": 90,
+      "asked": 90,
+      "brier": 0.1369,
+      "log_score": 0.4331,
+      "ece": 0.0796,
+      "cost_usd_per_1k": 1.0608
+    },
+    "agent_skills / eval": {
+      "n": 90,
+      "asked": 90,
+      "brier": 0.1279,
+      "log_score": 0.4091,
+      "ece": 0.1057,
+      "cost_usd_per_1k": 1.3928
+    },
+    "base_rate / eval": {
+      "n": 90,
+      "brier": 0.203
+    }
+  },
+  "paired": [
+    {
+      "a": "agent_skills",
+      "b": "agent_quant",
+      "split": "eval",
+      "diff": -0.008976666666666668,
+      "lo": -0.020360472222222228,
+      "hi": 0.002838916666666669,
+      "n": 90,
+      "days": 15
+    }
+  ],
+  "cost_usd": 0.278587,
+  "notes": [
+    "Run eval-20261126T195707 of llm-eval.yml on power-2026-11a.jsonl (90 questions), replay with the tools a replay can honour; labelled evaluation, never the live record.",
+    "agent_skills is agent_quant plus load_skill; agent is the live prompt with replay tools.",
+    "Skips per arm: agent none; agent_quant none; agent_skills none. Versions: agent `claude-haiku-5-5|prompt-v1-c431eac3ad4a|tools-4|out-1024`; agent_quant `claude-haiku-5-5|prompt-v1-d5017c1522da|tools-4|out-1024|quant-r1`; agent_skills `claude-haiku-5-5|prompt-v1-78474be2c501|tools-4|out-1024|quant-r1|skills-r1-d011316a`.",
+    "Cost is the run's recorded tokens at the list price of the model, per arm; this result carries the cost of agent, agent_quant, agent_skills.",
+    "Brier of the arms that answered fewer questions is on their answered items only; paired differences use the questions both arms answered (the pair's n)."
+  ],
+  "limits": [
+    "Electricity only (the one topic a replay can reproduce), 90 questions from 15 days; the six questions of a day are correlated, so the intervals are day-block intervals.",
+    "One run, one sample of the model's answers; a repeat could differ.",
+    "Weather, Wikipedia, currencies and crypto are judged only on live days."
+  ],
+  "card": null
+}

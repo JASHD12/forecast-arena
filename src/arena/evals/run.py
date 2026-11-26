@@ -49,7 +49,7 @@ VARIANTS: dict[str, type[LLMForecaster]] = {
 AGENT_VARIANT = "agent"
 #: Experimental agent variants (T344): same loop and limits, different prompt and tools. The
 #: analyst needs the replayed `ml` probabilities (`evals/golden/ml-probs-power.json`).
-AGENT_VARIANTS = ("agent", "agent_quant", "agent_analyst")
+AGENT_VARIANTS = ("agent", "agent_quant", "agent_analyst", "agent_skills")
 AGENT_REQUESTS_PER_QUESTION = 6  # up to 4 tool turns, the final answer and one repair
 
 
@@ -168,7 +168,7 @@ def run(
         traced = TracingLLM(GuardedLLM(client, guard), tracer, clock)
         f: Any
         if name in AGENT_VARIANTS:
-            from arena.agent.quant import AgentAnalyst, AgentQuant
+            from arena.agent.quant import AgentAnalyst, AgentQuant, AgentSkills
 
             peers: dict[str, Any] = {"base_rate": GoldenBaseRate(items)}
             if ml_probs is not None:
@@ -177,6 +177,7 @@ def run(
                 "agent": AgentForecaster,
                 "agent_quant": AgentQuant,
                 "agent_analyst": AgentAnalyst,
+                "agent_skills": AgentSkills,
             }
             f = cls[name](traced, peers=peers)
         else:

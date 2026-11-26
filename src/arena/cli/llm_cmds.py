@@ -78,6 +78,7 @@ def eval_build(obj: Ctx, first: object, last: object, out: Path) -> None:
             "agent",
             "agent_quant",
             "agent_analyst",
+            "agent_skills",
             "llm_context_sc5",
         ]
     ),
@@ -160,7 +161,7 @@ def eval_run(
             1,
             len(items)
             * sum(
-                AGENT_REQUESTS_PER_QUESTION
+                AGENT_REQUESTS_PER_QUESTION + (2 if v == "agent_skills" else 0)  # + skill loads
                 if v in AGENT_VARIANTS
                 else 2 * SC_K
                 if v.endswith("_sc5")

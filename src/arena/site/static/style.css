@@ -299,21 +299,21 @@ details.faq[open] summary { margin-bottom: .5rem; }
 /* ---- Home v3: hero with standings, KPIs, spotlight, race chart, topics, pillars ---- */
 :root {
   --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #6250d6; --s5: #eda100; --s6: #e87ba4;
-  --s7: #008300; --s8: #e34948; --s9: #0e8f9b; --s10: #9c6a2f; --s11: #7d8a1f; --s12: #b0407d; --s13: #34495e; --s14: #00b3e6; --sref: #7b818c;
+  --s7: #008300; --s8: #e34948; --s9: #0e8f9b; --s10: #9c6a2f; --s11: #7d8a1f; --s12: #b0407d; --s13: #34495e; --s14: #00b3e6; --s15: #b8860b; --sref: #7b818c;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #9085e9; --s5: #c98500; --s6: #d55181;
-    --s7: #008300; --s8: #e66767; --s9: #3bb8c4; --s10: #c79a5c; --s11: #a8b64a; --s12: #e079ad; --s13: #8da2b8; --s14: #4fd0f2; --sref: #9aa3b5;
+    --s7: #008300; --s8: #e66767; --s9: #3bb8c4; --s10: #c79a5c; --s11: #a8b64a; --s12: #e079ad; --s13: #8da2b8; --s14: #4fd0f2; --s15: #d4a72c; --sref: #9aa3b5;
   }
 }
 :root[data-theme="dark"] {
     --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #9085e9; --s5: #c98500; --s6: #d55181;
-    --s7: #008300; --s8: #e66767; --s9: #3bb8c4; --s10: #c79a5c; --s11: #a8b64a; --s12: #e079ad; --s13: #8da2b8; --s14: #4fd0f2; --sref: #9aa3b5;
+    --s7: #008300; --s8: #e66767; --s9: #3bb8c4; --s10: #c79a5c; --s11: #a8b64a; --s12: #e079ad; --s13: #8da2b8; --s14: #4fd0f2; --s15: #d4a72c; --sref: #9aa3b5;
 }
 .s-1 { --c: var(--s1); } .s-2 { --c: var(--s2); } .s-3 { --c: var(--s3); } .s-4 { --c: var(--s4); }
 .s-5 { --c: var(--s5); } .s-6 { --c: var(--s6); } .s-7 { --c: var(--s7); } .s-8 { --c: var(--s8); }
-.s-9 { --c: var(--s9); } .s-10 { --c: var(--s10); } .s-11 { --c: var(--s11); } .s-12 { --c: var(--s12); } .s-13 { --c: var(--s13); } .s-14 { --c: var(--s14); }
+.s-9 { --c: var(--s9); } .s-10 { --c: var(--s10); } .s-11 { --c: var(--s11); } .s-12 { --c: var(--s12); } .s-13 { --c: var(--s13); } .s-14 { --c: var(--s14); } .s-15 { --c: var(--s15); }
 .s-ref { --c: var(--sref); }
 .ico { width: 1.25rem; height: 1.25rem; vertical-align: -.2rem; }
 

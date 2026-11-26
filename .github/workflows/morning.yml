@@ -25,7 +25,7 @@ on:
         type: boolean
         default: false
       experimental:
-        description: "Dry runs only (T279): switch the experimental agent_hybrid, agent_quant and agent_analyst forecasters on to measure runner time and tokens"
+        description: "Dry runs only (T279): switch the experimental agent_hybrid, agent_quant, agent_analyst and agent_skills forecasters on to measure runner time and tokens"
         type: boolean
         default: false
 
@@ -106,6 +106,7 @@ jobs:
       ARENA_AGENT_HYBRID: ${{ (inputs.experimental && inputs.dry_run) && '1' || vars.ARENA_AGENT_HYBRID || '0' }}  # T274: agent_hybrid (hybrid retrieval + guards); switched on at launch (T279)
       ARENA_AGENT_QUANT: ${{ (inputs.experimental && inputs.dry_run) && '1' || vars.ARENA_AGENT_QUANT || '0' }}  # T342: agent_quant (calculator and reference estimate); off until its evaluation passes (T345)
       ARENA_AGENT_ANALYST: ${{ (inputs.experimental && inputs.dry_run) && '1' || vars.ARENA_AGENT_ANALYST || '0' }}  # T343: agent_analyst (starts from the ml forecast); off until its evaluation passes (T345)
+      ARENA_AGENT_SKILLS: ${{ (inputs.experimental && inputs.dry_run) && '1' || vars.ARENA_AGENT_SKILLS || '0' }}  # T353: agent_skills (agent_quant plus load_skill); off until its evaluation passes (T356)
       ARENA_AGENT_RAG: ${{ vars.ARENA_AGENT_RAG || '1' }}  # T120: similar-past-questions tool (local embeddings, no API cost)
       OMP_NUM_THREADS: "2"
     steps:

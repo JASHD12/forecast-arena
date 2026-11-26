@@ -160,6 +160,12 @@ INFORMATION_SETS = (
         "daily sample",
     ),
     (
+        "agent_skills",
+        "As agent_quant, plus the load_skill tool: short topic notes written by the project team, "
+        "loaded on demand (experimental)",
+        "daily sample",
+    ),
+    (
         "bandit_hedge",
         "The other forecasters' forecasts of the same question, blended with weights learned "
         "online from resolved questions (Hedge; experimental)",
@@ -180,6 +186,7 @@ AI_FORECASTERS = frozenset(
         "agent_hybrid",
         "agent_quant",
         "agent_analyst",
+        "agent_skills",
     }
 )
 #: Experimental forecasters (SPEC 17): named "(experimental)", outside the common-set board.
@@ -190,6 +197,7 @@ EXPERIMENTAL_FORECASTERS = frozenset(
         "agent_hybrid",
         "agent_quant",
         "agent_analyst",
+        "agent_skills",
         "bandit_hedge",
     }
 )

@@ -107,6 +107,12 @@ class AgentForecaster:
             **extra,
         )
 
+    def _system(self) -> str:
+        """The system prompt of this forecaster (variants fill in more placeholders)."""
+        return prompts.load("agent_system", self._pv("agent_system")).replace(
+            "{max_calls}", str(self.max_tool_calls)
+        )
+
     def _pv(self, name: str) -> str:
         """Version of prompt file `name` (the agent's own unless a variant overrides it)."""
         return self.prompt_versions.get(name, self.prompt_version)
@@ -154,9 +160,7 @@ class AgentForecaster:
         if self.sample is not None and q.question_id not in self.sample:
             return self._skip(q, "not_sampled", "not in today's LLM sample", asof)
         box = self._toolbox(q, ctx, asof)
-        system = prompts.load("agent_system", self._pv("agent_system")).replace(
-            "{max_calls}", str(self.max_tool_calls)
-        )
+        system = self._system()
         turns: list[Turn] = [UserText(self._user_prompt(q, ctx, asof))]
         usage = Usage()
         try:

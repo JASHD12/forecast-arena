@@ -8,6 +8,7 @@ prompt and the tools differ, and both differences are visible in the version str
   as-of context and the question only, no peers, no outcomes) and `calculate_probability`
   (normal-distribution arithmetic). Its prompt asks for a numeric estimate first and an
   adjustment for evidence second, and tells the model that hedging is punished by the score.
+- `agent_skills` (T353) is `agent_quant` plus `load_skill` (see `agent/skills/`).
 - `agent_analyst` keeps the existing tools; its prompt tells the model to start from the `ml`
   forecast (`get_ml_forecast`, which the live agent has had since the first version and never
   called) and to change it only for evidence the model cannot see, naming that evidence.
@@ -25,8 +26,16 @@ from collections.abc import Mapping
 from datetime import datetime
 from typing import Any
 
+from arena.agent import skills
 from arena.agent.forecaster import AgentForecaster
-from arena.agent.tools import CALC_SPEC, ESTIMATE_SPEC, SIMILAR_SPEC, TOOL_SPECS, ToolBox
+from arena.agent.tools import (
+    CALC_SPEC,
+    ESTIMATE_SPEC,
+    SIMILAR_SPEC,
+    TOOL_SPECS,
+    ToolBox,
+    skill_spec,
+)
 from arena.forecasters.ml_weather import GUST_SIGMA, TMAX_SIGMA, TMIN_SIGMA, WeatherRules
 from arena.models import Question
 
@@ -135,3 +144,33 @@ class AgentAnalyst(AgentForecaster):
     def version(self) -> str:
         """The agent version plus the revision of the analyst prompt."""
         return f"{super().version()}|{ANALYST_REVISION}"
+
+
+SKILLS_REVISION = "skills-r1"
+
+
+class AgentSkills(AgentQuant):
+    """`agent_skills` (T353): `agent_quant` plus `load_skill`, progressive disclosure of skills.
+
+    The prompt (`agent_system_v5`) carries a one-line index of the skills; the model may load the
+    text of at most two per question, which does not use up its research calls, so the research
+    budget equals `agent_quant`'s. The version string carries a fingerprint of every skill file,
+    so any edit to a skill is a visible version change (I8).
+    """
+
+    forecaster_id = "agent_skills"
+    prompt_versions = {"agent_system": "v5"}  # noqa: RUF012 - read-only class default
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+        self.tools = (*self.tools, skill_spec())
+
+    def version(self) -> str:
+        """The quant version plus the skills revision and the fingerprint of every skill file."""
+        return f"{super().version()}|{SKILLS_REVISION}-{skills.fingerprint()}"
+
+    def _system(self) -> str:
+        return super()._system().replace("{skills_index}", skills.index_text())
+
+    def _toolbox(self, q: Question, ctx: dict[str, Any], asof: datetime, **extra: Any) -> ToolBox:
+        return super()._toolbox(q, ctx, asof, skills=skills.load, **extra)

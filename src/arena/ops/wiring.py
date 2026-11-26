@@ -357,8 +357,9 @@ def build_forecasters(
     for flag, cls in (
         (settings.agent_quant, "AgentQuant"),
         (settings.agent_analyst, "AgentAnalyst"),
+        (settings.agent_skills, "AgentSkills"),
     ):
-        if flag:  # T342/T343: experimental variants of `agent`, same sample, caps and peers
+        if flag:  # T342/T343/T353: experimental variants of `agent`, same sample, caps and peers
             from arena.agent import quant as quant_mod
 
             out.append(

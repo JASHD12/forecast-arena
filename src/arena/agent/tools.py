@@ -10,6 +10,7 @@ before the forecast time |
 | wikipedia_summary(title, project) | the lead summary of an article |
 | estimate_probability() | reference estimate from this question's stored data (`agent_quant`) |
 | calculate_probability(c, sd, t, dir) | normal-distribution arithmetic (`agent_quant`) |
+| load_skill(name) | text of one forecasting skill (`agent_skills`; own limit, no research call) |
 | similar_past_questions(k, same_domain) | the k most similar questions resolved before the
 forecast time, with outcomes (offered only with prompt v2; `agent/retrieval.py`) |
 
@@ -279,6 +280,28 @@ CALC_SPEC = ToolSpec(
 )
 
 
+MAX_SKILL_LOADS = 2
+SKILL_TOOL = "load_skill"
+
+
+def skill_spec() -> ToolSpec:
+    """The `load_skill` tool; the enum lists the skills that exist (see `arena.agent.skills`)."""
+    from arena.agent import skills
+
+    return ToolSpec(
+        SKILL_TOOL,
+        "The full text of one forecasting skill (a short procedure with base rates for one topic). "
+        f"At most {MAX_SKILL_LOADS} loads per question; they do not use up the research calls. "
+        "The index of skills is in your instructions.",
+        {
+            "type": "object",
+            "properties": {"name": {"type": "string", "enum": skills.names()}},
+            "required": ["name"],
+            "additionalProperties": False,
+        },
+    )
+
+
 def normal_probability(center: float, sd: float, threshold: float, direction: str) -> float:
     """P(X > threshold) for direction "gt", P(X < threshold) for "lt"; X ~ Normal(center, sd)."""
     if not sd > 0 or not math.isfinite(sd):
@@ -325,6 +348,7 @@ class ToolBox:
         wiki: Callable[[str, str], dict[str, str]] | None = None,
         similar: Callable[[int, bool], dict[str, Any]] | None = None,
         estimate: Callable[[], dict[str, Any]] | None = None,
+        skills: Callable[[str], str] | None = None,
         guard: Callable[[Any], tuple[Any, list[str]]] | None = None,
         max_calls: int = 4,
         time_limit: float = 90.0,
@@ -337,6 +361,7 @@ class ToolBox:
         self.wiki = wiki
         self.similar = similar
         self.estimate = estimate  # reference estimate of this question (`agent_quant` only)
+        self.skills = skills  # name -> skill text (`agent_skills` only)
         self.guard = guard  # (result) -> (cleaned result, flags); None keeps results as they are
         self.max_calls = max_calls
         self.time_limit = time_limit
@@ -346,8 +371,9 @@ class ToolBox:
 
     @property
     def calls_left(self) -> int:
-        """Remaining tool calls."""
-        return max(0, self.max_calls - len(self.trace))
+        """Remaining research tool calls (skill loads have their own limit)."""
+        used = sum(1 for t in self.trace if t.tool != SKILL_TOOL)
+        return max(0, self.max_calls - used)
 
     def time_left(self) -> float:
         """Remaining seconds."""
@@ -355,6 +381,8 @@ class ToolBox:
 
     def run(self, call: ToolCall) -> tuple[str, bool]:
         """(result text, is_error). Never raises; never exceeds the limits."""
+        if call.name == SKILL_TOOL:
+            return self._run_skill(call)
         if self.calls_left <= 0:
             return self._refuse(call, f"tool call limit of {self.max_calls} reached")
         if self.time_left() <= 0:
@@ -374,6 +402,28 @@ class ToolBox:
             msg = f"{type(exc).__name__}: {exc}"[:300]
             self.trace.append(TraceEntry(call.name, dict(call.input), False, 0, sources, msg))
             return json.dumps({"tool": call.name, "error": msg}), True
+
+    def _run_skill(self, call: ToolCall) -> tuple[str, bool]:
+        """Load a skill: own limit, never counted against the research calls, text is trusted."""
+        loads = sum(1 for t in self.trace if t.tool == SKILL_TOOL)
+        if self.skills is None:
+            return self._refuse(call, "no skills configured")
+        if loads >= MAX_SKILL_LOADS:
+            return self._refuse(call, f"skill limit of {MAX_SKILL_LOADS} reached")
+        if self.time_left() <= 0:
+            return self._refuse(call, f"time limit of {self.time_limit:.0f}s reached")
+        try:
+            name = str(call.input["name"])
+            text = json.dumps(
+                {"tool": call.name, "data": {"name": name, "skill": self.skills(name)}},
+                ensure_ascii=False,
+            )
+        except (KeyError, ValueError, TypeError) as exc:
+            msg = f"{type(exc).__name__}: {exc}"[:300]
+            self.trace.append(TraceEntry(call.name, dict(call.input), False, 0, [], msg))
+            return json.dumps({"tool": call.name, "error": msg}), True
+        self.trace.append(TraceEntry(call.name, dict(call.input), True, len(text), [], None))
+        return text, False
 
     def _refuse(self, call: ToolCall, reason: str) -> tuple[str, bool]:
         self.trace.append(TraceEntry(call.name, dict(call.input), False, 0, [], reason))

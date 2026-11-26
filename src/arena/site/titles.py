@@ -28,6 +28,7 @@ FORECASTER_NAMES = {
     "agent_hybrid": "AI agent, hybrid retrieval (experimental)",
     "agent_quant": "AI agent with a calculator (experimental)",
     "agent_analyst": "AI analyst reviewing the ML model (experimental)",
+    "agent_skills": "AI agent with skills (experimental)",
     "bandit_hedge": "Learned blend of forecasters (experimental)",
     "ensemble": "Ensemble",
     "human_panel": "Human panel",

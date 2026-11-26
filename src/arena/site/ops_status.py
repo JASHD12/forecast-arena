@@ -28,6 +28,7 @@ LLM_FORECASTERS = (
     "agent_hybrid",
     "agent_quant",
     "agent_analyst",
+    "agent_skills",
 )
 
 

@@ -203,14 +203,18 @@ def test_quant_and_analyst_variants_run_in_the_fake_gate(tmp_path) -> None:
         "--out",
         str(tmp_path),
     ]
-    variants = ["--variant", "agent", "--variant", "agent_quant", "--variant", "agent_analyst"]
+    variants = [
+        "--variant", "agent", "--variant", "agent_quant", "--variant", "agent_analyst",
+        "--variant", "agent_skills",
+    ]  # fmt: skip
     refused = CliRunner().invoke(main, [*args, *variants])
     assert refused.exit_code == 2 and "needs --ml-probs" in refused.output
     ok = CliRunner().invoke(main, [*args, *variants, "--ml-probs", str(ML_PROBS)])
     assert ok.exit_code == 0, ok.output
     (path,) = tmp_path.glob("fake-*.json")
     res = json.loads(path.read_text())
-    assert set(res["metrics"]) == {"agent", "agent_quant", "agent_analyst"}
+    assert set(res["metrics"]) == {"agent", "agent_quant", "agent_analyst", "agent_skills"}
+    assert "skills-r1-" in res["versions"]["agent_skills"]
     assert res["versions"]["agent_quant"].endswith("quant-r1")
     assert res["versions"]["agent_analyst"].endswith("analyst-r1")
     assert res["versions"]["agent"] not in (res["versions"]["agent_quant"],)

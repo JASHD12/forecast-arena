@@ -9,6 +9,8 @@ prompt and the tools differ, and both differences are visible in the version str
   (normal-distribution arithmetic). Its prompt asks for a numeric estimate first and an
   adjustment for evidence second, and tells the model that hedging is punished by the score.
 - `agent_skills` (T353) is `agent_quant` plus `load_skill` (see `agent/skills/`).
+- `agent_graph_skills` and `agent_hybrid_skills` (T357, T358) add the same toolset to the
+  LangGraph agent and to the hybrid-retrieval agent.
 - `agent_analyst` keeps the existing tools; its prompt tells the model to start from the `ml`
   forecast (`get_ml_forecast`, which the live agent has had since the first version and never
   called) and to change it only for evidence the model cannot see, naming that evidence.
@@ -28,6 +30,8 @@ from typing import Any
 
 from arena.agent import skills
 from arena.agent.forecaster import AgentForecaster
+from arena.agent.graph import GraphAgentForecaster
+from arena.agent.hybrid import AgentHybrid
 from arena.agent.tools import (
     CALC_SPEC,
     ESTIMATE_SPEC,
@@ -174,3 +178,78 @@ class AgentSkills(AgentQuant):
 
     def _toolbox(self, q: Question, ctx: dict[str, Any], asof: datetime, **extra: Any) -> ToolBox:
         return super()._toolbox(q, ctx, asof, skills=skills.load, **extra)
+
+
+class _QuantSkillsTools:
+    """What the graph and hybrid skills variants add to their base agent (T357, T358).
+
+    The same toolset as `agent_skills`: `estimate_probability`, `calculate_probability` and
+    `load_skill`. Skill loads keep their own limit and bypass any tool-output guard (the text is
+    trusted operator text); estimate and calculator results pass through the guard like any
+    other tool result.
+    """
+
+    tools: tuple[Any, ...]
+
+    def _add_quant_skill_tools(self) -> None:
+        self.tools = (*self.tools, ESTIMATE_SPEC, CALC_SPEC, skill_spec())
+
+    @staticmethod
+    def _quant_skills_extra(q: Question, ctx: dict[str, Any]) -> dict[str, Any]:
+        return {"estimate": lambda: numeric_estimate(q, ctx), "skills": skills.load}
+
+    @staticmethod
+    def _version_suffix() -> str:
+        return f"|{QUANT_REVISION}|{SKILLS_REVISION}-{skills.fingerprint()}"
+
+
+class AgentGraphSkills(_QuantSkillsTools, GraphAgentForecaster):
+    """`agent_graph_skills`: `agent_graph` plus the estimate, the calculator and `load_skill`.
+
+    The graph's system and critique prompts are version 2 (they carry the skills index, the
+    estimate-first rule and a consistency check against the estimate); the plan, evidence, user,
+    final and repair prompts stay as `agent_graph`'s.
+    """
+
+    forecaster_id = "agent_graph_skills"
+    prompt_versions = {"graph_system": "v2", "graph_critique": "v2"}  # noqa: RUF012
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+        self._add_quant_skill_tools()
+
+    def version(self) -> str:
+        """The graph version plus the quant and skills revisions."""
+        return f"{super().version()}{self._version_suffix()}"
+
+    def _system(self) -> str:
+        return super()._system().replace("{skills_index}", skills.index_text())
+
+    def _toolbox(self, q: Question, ctx: dict[str, Any], asof: datetime, **extra: Any) -> ToolBox:
+        return super()._toolbox(q, ctx, asof, **self._quant_skills_extra(q, ctx), **extra)
+
+
+class AgentHybridSkills(_QuantSkillsTools, AgentHybrid):
+    """`agent_hybrid_skills`: `agent_hybrid` plus the estimate, the calculator and `load_skill`.
+
+    Uses prompt `agent_system_v5` (the skills prompt; it already says "if similar_past_questions
+    is offered") with the hybrid agent's other prompts; a missing reranker or retriever is the same
+    visible `model_missing` skip as for `agent_hybrid`.
+    """
+
+    forecaster_id = "agent_hybrid_skills"
+    prompt_versions = {"agent_system": "v5"}  # noqa: RUF012 - read-only class default
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+        self._add_quant_skill_tools()
+
+    def version(self) -> str:
+        """The hybrid version plus the quant and skills revisions."""
+        return f"{super().version()}{self._version_suffix()}"
+
+    def _system(self) -> str:
+        return super()._system().replace("{skills_index}", skills.index_text())
+
+    def _toolbox(self, q: Question, ctx: dict[str, Any], asof: datetime, **extra: Any) -> ToolBox:
+        return super()._toolbox(q, ctx, asof, **self._quant_skills_extra(q, ctx), **extra)

@@ -941,3 +941,7 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
 - [x] T354 · Offline tests (FakeLLM): loader, limits, flow, version fingerprint, wiring
 - [ ] T355 · One capped paid evaluation with `agent_quant` and `agent_skills` on the November frozen items first (`llm-eval.yml` inputs `quant` and `skills`; needs the owner's OK with the exact estimate; run from `main`)
 - [ ] T356 · Launch only if the pre-registered rule passes (dry run in an unsealed window, tokens against the cap, flag one day at a time)
+
+- [x] T357 · `agent_graph_skills`: the LangGraph agent plus the estimate, the calculator and `load_skill` (graph prompts v2), experimental, flag `ARENA_AGENT_GRAPH_SKILLS`, off (deps: T353)
+- [x] T358 · `agent_hybrid_skills`: the hybrid-retrieval agent plus the same tools (prompt `agent_system_v5`), experimental, flag `ARENA_AGENT_HYBRID_SKILLS`, off; shares one retriever and reranker with `agent_hybrid` (deps: T353)
+- [ ] T359 · Launch check of both variants only after `agent_skills` passes its pre-registered rule (dry run in an unsealed window, tokens against the 300,000 cap), then live comparison against their base forecasters after 30 official days (deps: T356)

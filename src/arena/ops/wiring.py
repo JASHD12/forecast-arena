@@ -9,6 +9,7 @@ from functools import partial
 from typing import TYPE_CHECKING, Any
 
 from arena.agent.forecaster import AgentForecaster
+from arena.agent.hybrid import AgentHybrid
 from arena.agent.tools import GdeltBackend, wikipedia_summary
 from arena.clock import Clock, SystemClock
 from arena.config import WEATHER_STATIONS, Settings
@@ -189,17 +190,18 @@ def _ft_forecaster(settings: Settings, n: int) -> Forecaster:
     return LLMLocalFT(scorer, art, n)
 
 
-def _hybrid_forecaster(
+def _hybrid_forecasters(
     ledger: Ledger,
     settings: Settings,
     client: LLMClient | None,
     agent: AgentForecaster,
     retriever: Any,
     peers: dict[str, Forecaster],
-) -> Forecaster:
-    """`agent_hybrid` next to `agent`. A missing reranker or retriever is a visible
-    `model_missing` skip, not a failure of the whole run (the lock-critical job must go on)."""
-    from arena.agent.hybrid import AgentHybrid
+    classes: Sequence[type[AgentHybrid]],
+) -> list[Forecaster]:
+    """`agent_hybrid` (and its skills variant) next to `agent`, sharing one retriever and one
+    reranker. A missing reranker or retriever is a visible `model_missing` skip, not a failure of
+    the whole run (the lock-critical job must go on)."""
     from arena.agent.retrieval import CrossEncoderReranker, FastEmbedder, PastQuestions
 
     common: dict[str, Any] = {
@@ -216,10 +218,11 @@ def _hybrid_forecaster(
         rr = CrossEncoderReranker(cache_dir=cache)
     except Exception as exc:  # ImportError, download or load failure
         reason = f"hybrid retrieval unavailable: {type(exc).__name__}: {exc}"
-        return AgentHybrid(client, missing=reason, **common)
-    return AgentHybrid(
-        client, retriever=retriever, reranker=rr.score, reranker_name=rr.name, **common
-    )
+        return [cls(client, missing=reason, **common) for cls in classes]
+    return [
+        cls(client, retriever=retriever, reranker=rr.score, reranker_name=rr.name, **common)
+        for cls in classes
+    ]
 
 
 def _conformal_margins(ledger: Ledger) -> dict[str, dict[str, float]]:
@@ -348,11 +351,16 @@ def build_forecasters(
         wiki=None if llm is not None else partial(wikipedia_summary, http),
     )
     out += [LLMPlain(client, n), LLMContext(client, n), agent]
+    hybrids: list[type[AgentHybrid]] = []
     if settings.agent_hybrid:
-        out.append(
-            _hybrid_forecaster(
-                ledger, settings, client, agent, retriever, {"base_rate": out[0], "ml": ml}
-            )
+        hybrids.append(AgentHybrid)
+    if settings.agent_hybrid_skills:  # T358: the same retriever and reranker as agent_hybrid
+        from arena.agent.quant import AgentHybridSkills
+
+        hybrids.append(AgentHybridSkills)
+    if hybrids:
+        out += _hybrid_forecasters(
+            ledger, settings, client, agent, retriever, {"base_rate": out[0], "ml": ml}, hybrids
         )
     for flag, cls in (
         (settings.agent_quant, "AgentQuant"),
@@ -384,6 +392,19 @@ def build_forecasters(
 
         out.append(
             GraphAgentForecaster(
+                client,
+                max_tool_calls=settings.agent_max_tool_calls,
+                peers={"base_rate": out[0], "ml": ml},
+                news=agent.news,
+                wiki=agent.wiki,
+                retriever=retriever,
+            )
+        )
+    if settings.agent_graph_skills:  # T357: same peers, news, wiki and retriever as agent_graph
+        from arena.agent.quant import AgentGraphSkills
+
+        out.append(
+            AgentGraphSkills(
                 client,
                 max_tool_calls=settings.agent_max_tool_calls,
                 peers={"base_rate": out[0], "ml": ml},

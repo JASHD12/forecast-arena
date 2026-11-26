@@ -78,3 +78,4 @@ Nothing. See the session summary above and `python scripts/status.py`.
 - 2026-11-24 · Stale-text sweep: README and all site pages re-read from a fresh ledger build; Status/Lab/Privacy/Stack/About/Home and the recruiter page corrected (see DECISIONS).
 - 2026-11-26 · T340-T343 built: `agent_quant` and `agent_analyst` (experimental, off), numeric tools, eval variants and replayed ml probabilities; T344 (paid eval) and T345 (launch) wait for merge and the owner's OK.
 - 2026-11-26 · T350-T354 built: six forecasting skills, `load_skill` tool and `agent_skills` (experimental, off) in PR #49; T355 (paid eval) and T356 (launch) wait for merge and the owner's OK.
+- 2026-11-26 · T357-T358 built: `agent_graph_skills` and `agent_hybrid_skills` (experimental, off); T355 (paid eval) waits for PR #50, T359 for the evaluation result.

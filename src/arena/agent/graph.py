@@ -79,12 +79,18 @@ class GraphAgentForecaster(AgentForecaster):
     def version(self) -> str:
         """Model id, prompt fingerprint, tool limit, retrieval and LangGraph version."""
         model = self.client.model if self.client is not None else "none"
-        fp = prompts.fingerprint(self.prompt_files, self.prompt_version)
+        fp = prompts.fingerprint_map({n: self._pv(n) for n in self.prompt_files})
         rag = f"|rag-{self.retriever.embedder.name}" if self.retriever is not None else ""
         lg = _pkg_version("langgraph")
         return (
             f"{model}|graph-prompt-{self.prompt_version}-{fp}|tools-{self.max_tool_calls}"
             f"{rag}|out-{self.max_output_tokens}|langgraph-{lg}"
+        )
+
+    def _system(self) -> str:
+        """The graph's system prompt (variants fill in more placeholders)."""
+        return prompts.load("graph_system", self._pv("graph_system")).replace(
+            "{max_calls}", str(self.max_tool_calls)
         )
 
     def _call(self, system: str, s: State) -> State:
@@ -102,15 +108,18 @@ class GraphAgentForecaster(AgentForecaster):
     def _graph(self, q: Question, ctx: dict[str, Any], asof: datetime, box: ToolBox) -> Any:
         from langgraph.graph import END, START, StateGraph
 
-        v = self.prompt_version
-        system = prompts.load("graph_system", v).replace("{max_calls}", str(self.max_tool_calls))
+        system = self._system()
 
         def step(name: str, s: State) -> list[str]:
             return [*s.get("path", []), name]
 
         def plan(s: State) -> State:
             turns: list[Turn] = [
-                UserText(self._user_prompt(q, ctx, asof) + "\n\n" + prompts.load("graph_plan", v))
+                UserText(
+                    self._user_prompt(q, ctx, asof)
+                    + "\n\n"
+                    + prompts.load("graph_plan", self._pv("graph_plan"))
+                )
             ]
             out = self._call(system, {**s, "turns": turns})
             return {**out, "path": step("plan", s)}
@@ -120,7 +129,7 @@ class GraphAgentForecaster(AgentForecaster):
             if self.retriever is not None:
                 calls.append(ToolCall("auto-similar", "similar_past_questions", {"k": 5}))
             evidence = {c.name: json.loads(box.run(c)[0]) for c in calls}
-            text = prompts.load("graph_evidence", v).replace(
+            text = prompts.load("graph_evidence", self._pv("graph_evidence")).replace(
                 "{evidence}", json.dumps(evidence, ensure_ascii=False, default=str)
             )
             # the plan reply may have asked for tools; the API needs results for them first
@@ -130,7 +139,7 @@ class GraphAgentForecaster(AgentForecaster):
         def research(s: State) -> State:
             turns = s["turns"]
             if s.get("final"):
-                turns = [*turns, UserText(prompts.load("agent_final", v))]
+                turns = [*turns, UserText(prompts.load("agent_final", self._pv("agent_final")))]
             out = self._call(system, {**s, "turns": turns})
             return {**out, "path": step("research", s)}
 
@@ -154,7 +163,14 @@ class GraphAgentForecaster(AgentForecaster):
         def critique(s: State) -> State:
             turns = self._close_tool_calls(s)
             out = self._call(
-                system, {**s, "turns": [*turns, UserText(prompts.load("graph_critique", v))]}
+                system,
+                {
+                    **s,
+                    "turns": [
+                        *turns,
+                        UserText(prompts.load("graph_critique", self._pv("graph_critique"))),
+                    ],
+                },
             )
             return {**out, "path": step("critique", s)}
 
@@ -188,17 +204,7 @@ class GraphAgentForecaster(AgentForecaster):
             return self._skip(q, "model_missing", "no LLM configured", asof)
         if self.sample is not None and q.question_id not in self.sample:
             return self._skip(q, "not_sampled", "not in today's LLM sample", asof)
-        box = ToolBox(
-            ctx,
-            asof,
-            probabilities=self._peer_probabilities(q, ctx, asof),
-            news=self.news,
-            wiki=self.wiki,
-            similar=self._similar(q, asof),
-            max_calls=self.max_tool_calls + AUTO_CALLS,
-            time_limit=self.time_limit,
-            monotonic=self.monotonic,
-        )
+        box = self._toolbox(q, ctx, asof, max_calls=self.max_tool_calls + AUTO_CALLS)
         self._spent = Usage()
         state: State = {"turns": [], "usage": Usage(), "resp": None, "final": False, "path": []}
         try:
@@ -209,11 +215,9 @@ class GraphAgentForecaster(AgentForecaster):
             try:
                 answer = parse_answer(resp.text)
             except ParseError as first:
-                repair = prompts.load("repair", self.prompt_version).replace("{error}", str(first))
+                repair = prompts.load("repair", self._pv("repair")).replace("{error}", str(first))
                 turns = [*self._close_tool_calls(state), UserText(repair)]
-                system = prompts.load("graph_system", self.prompt_version)
-                system = system.replace("{max_calls}", str(self.max_tool_calls))
-                out = self._call(system, {**state, "turns": turns})
+                out = self._call(self._system(), {**state, "turns": turns})
                 state = {**state, **out, "path": [*state["path"], "repair"]}
                 resp = out["resp"]
                 assert resp is not None

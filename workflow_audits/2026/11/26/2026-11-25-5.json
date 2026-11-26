@@ -1,0 +1,2360 @@
+{
+ "schema_version": 1,
+ "target_day": "2026-11-25",
+ "observed_at": "2026-11-26T03:43:27.537794Z",
+ "inventory_complete": true,
+ "expected_attempts": [
+  "45703470084:1",
+  "45695706354:1",
+  "45690868943:1",
+  "45685646175:1",
+  "45683855888:1",
+  "45681034718:1",
+  "45679106024:1",
+  "45674179789:1",
+  "45644107347:1",
+  "45636159074:1",
+  "45616148525:1",
+  "45612861038:1",
+  "45584509396:1",
+  "45580634028:1",
+  "45576981011:1",
+  "45572706622:1",
+  "45568750775:1",
+  "45564904871:1",
+  "45561185661:1",
+  "45559899068:1",
+  "45557556184:1",
+  "45554122726:1",
+  "45550681806:1",
+  "45539319530:1",
+  "45536891944:1",
+  "45519073220:1",
+  "45517348188:1",
+  "45514397975:1"
+ ],
+ "attempts": [
+  {
+   "key": "45703470084:1",
+   "job": "resolve",
+   "event": "workflow_dispatch",
+   "created_at": "2026-11-25T21:20:41Z",
+   "started_at": "2026-11-25T21:20:41Z",
+   "ended_at": "2026-11-25T21:22:01Z",
+   "intended_date": "2026-11-25",
+   "mode": "live",
+   "conclusion": "success",
+   "no_op": false,
+   "code_sha": "7a6f4dc7fb999ce9493238bb9967bcfe37b406f1",
+   "event_sha": "7a6f4dc7fb999ce9493238bb9967bcfe37b406f1",
+   "stages": {
+    "run / Set up job": "success",
+    "run / Run actions/checkout@v7": "success",
+    "run / Run actions/setup-python@v7": "success",
+    "run / Install pinned dependencies": "success",
+    "run / Restore cached source data": "success",
+    "run / Mode": "success",
+    "run / Let git push the ledger branch with the built-in token": "success",
+    "run / Record application execution identity": "success",
+    "run / resolve job": "success",
+    "run / Verify the ledger": "success",
+    "run / Build the site from the ledger": "success",
+    "run / Upload the site for Pages": "success",
+    "run / Health check (SPEC 12)": "success",
+    "run / Open, update or close the incident issue": "success",
+    "run / Official start (SPEC 2.9; records the health report, writes the start once)": "success",
+    "run / Fail the run when a health check failed": "skipped",
+    "run / Post Restore cached source data": "success",
+    "run / Post Run actions/setup-python@v7": "success",
+    "run / Post Run actions/checkout@v7": "success",
+    "run / Complete job": "success",
+    "deploy / Set up job": "success",
+    "deploy / Run actions/deploy-pages@v5": "success",
+    "deploy / Run actions/checkout@v7": "success",
+    "deploy / Smoke-test the published site (T182)": "success",
+    "deploy / Post Run actions/checkout@v7": "success",
+    "deploy / Complete job": "success",
+    "job: run": "success",
+    "job: deploy": "success"
+   },
+   "health": {
+    "job": "resolve",
+    "at": "2026-11-25T21:21:32.259496+00:00",
+    "ok": true,
+    "checks": [
+     {
+      "name": "batch_sealed",
+      "ok": true,
+      "detail": "44 questions sealed at 03:25 UTC"
+     },
+     {
+      "name": "nothing_overdue",
+      "ok": true,
+      "detail": "none"
+     },
+     {
+      "name": "sources_fresh",
+      "ok": true,
+      "detail": "5 domain(s) fresh"
+     },
+     {
+      "name": "forecaster_coverage",
+      "ok": true,
+      "detail": "expected 264 forecast-or-skip pairs; complete"
+     },
+     {
+      "name": "ml_available",
+      "ok": true,
+      "detail": "0 ML model_missing/error skips"
+     },
+     {
+      "name": "parse_failures",
+      "ok": true,
+      "detail": "0 of 80 LLM answers unparseable (0%)"
+     },
+     {
+      "name": "ledger_verify",
+      "ok": true,
+      "detail": "ledger verify: PASS: 554 files, 12 batch seals, 13 day seals, 1553 forecasts checked"
+     }
+    ],
+    "workflow_run_id": "45703470084",
+    "workflow_attempt": "1"
+   }
+  },
+  {
+   "key": "45695706354:1",
+   "job": "evening",
+   "event": "workflow_dispatch",
+   "created_at": "2026-11-25T20:31:02Z",
+   "started_at": "2026-11-25T20:31:02Z",
+   "ended_at": "2026-11-25T20:32:50Z",
+   "intended_date": "2026-11-25",
+   "mode": "live",
+   "conclusion": "success",
+   "no_op": false,
+   "code_sha": "7a6f4dc7fb999ce9493238bb9967bcfe37b406f1",
+   "event_sha": "7a6f4dc7fb999ce9493238bb9967bcfe37b406f1",
+   "stages": {
+    "gate / Set up job": "success",
+    "gate / Manual runs are always due": "success",
+    "gate / Run actions/checkout@v7": "skipped",
+    "gate / Run actions/setup-python@v7": "skipped",
+    "gate / Install pinned dependencies": "skipped",
+    "gate / Is the evening job due?": "skipped",
+    "gate / Complete job": "success",
+    "run / Set up job": "success",
+    "run / Run actions/checkout@v7": "success",
+    "run / Run actions/setup-python@v7": "success",
+    "run / Install pinned dependencies": "success",
+    "run / Restore cached source data": "success",
+    "run / Mode": "success",
+    "run / Let git push the ledger branch with the built-in token": "success",
+    "run / Record application execution identity": "success",
+    "run / evening job": "success",
+    "run / Measure when SMARD publishes tomorrow's generation forecasts (T222b, measurement only)": "success",
+    "run / Verify the ledger": "success",
+    "run / Build the site from the ledger": "success",
+    "run / Upload the site for Pages": "success",
+    "run / Health check (SPEC 12)": "success",
+    "run / Open, update or close the incident issue": "success",
+    "run / Persist evening health (including failed checks)": "success",
+    "run / Fail the run when a health check failed": "skipped",
+    "run / Post Restore cached source data": "success",
+    "run / Post Run actions/setup-python@v7": "success",
+    "run / Post Run actions/checkout@v7": "success",
+    "run / Complete job": "success",
+    "deploy / Set up job": "success",
+    "deploy / Run actions/deploy-pages@v5": "success",
+    "deploy / Run actions/checkout@v7": "success",
+    "deploy / Smoke-test the published site (T182)": "success",
+    "deploy / Post Run actions/checkout@v7": "success",
+    "deploy / Complete job": "success",
+    "job: gate": "success",
+    "job: run": "success",
+    "job: deploy": "success"
+   },
+   "health": {
+    "job": "evening",
+    "at": "2026-11-25T20:32:19.242430+00:00",
+    "ok": true,
+    "checks": [
+     {
+      "name": "batch_sealed",
+      "ok": true,
+      "detail": "44 questions sealed at 03:25 UTC"
+     },
+     {
+      "name": "next_batch_published",
+      "ok": true,
+      "detail": "47 questions for 2026-11-26"
+     },
+     {
+      "name": "nothing_overdue",
+      "ok": true,
+      "detail": "none"
+     },
+     {
+      "name": "sources_fresh",
+      "ok": true,
+      "detail": "5 domain(s) fresh"
+     },
+     {
+      "name": "forecaster_coverage",
+      "ok": true,
+      "detail": "expected 264 forecast-or-skip pairs; complete"
+     },
+     {
+      "name": "ml_available",
+      "ok": true,
+      "detail": "0 ML model_missing/error skips"
+     },
+     {
+      "name": "parse_failures",
+      "ok": true,
+      "detail": "0 of 80 LLM answers unparseable (0%)"
+     },
+     {
+      "name": "ledger_verify",
+      "ok": true,
+      "detail": "ledger verify: PASS: 550 files, 12 batch seals, 13 day seals, 1553 forecasts checked"
+     }
+    ],
+    "workflow_run_id": "45695706354",
+    "workflow_attempt": "1"
+   }
+  },
+  {
+   "key": "45690868943:1",
+   "job": "evening",
+   "event": "workflow_dispatch",
+   "created_at": "2026-11-25T20:01:17Z",
+   "started_at": "2026-11-25T20:01:17Z",
+   "ended_at": "2026-11-25T20:03:27Z",
+   "intended_date": "2026-11-25",
+   "mode": "live",
+   "conclusion": "success",
+   "no_op": false,
+   "code_sha": "7a6f4dc7fb999ce9493238bb9967bcfe37b406f1",
+   "event_sha": "7a6f4dc7fb999ce9493238bb9967bcfe37b406f1",
+   "stages": {
+    "gate / Set up job": "success",
+    "gate / Manual runs are always due": "success",
+    "gate / Run actions/checkout@v7": "skipped",
+    "gate / Run actions/setup-python@v7": "skipped",
+    "gate / Install pinned dependencies": "skipped",
+    "gate / Is the evening job due?": "skipped",
+    "gate / Complete job": "success",
+    "run / Set up job": "success",
+    "run / Run actions/checkout@v7": "success",
+    "run / Run actions/setup-python@v7": "success",
+    "run / Install pinned dependencies": "success",
+    "run / Restore cached source data": "success",
+    "run / Mode": "success",
+    "run / Let git push the ledger branch with the built-in token": "success",
+    "run / Record application execution identity": "success",
+    "run / evening job": "success",
+    "run / Measure when SMARD publishes tomorrow's generation forecasts (T222b, measurement only)": "success",
+    "run / Verify the ledger": "success",
+    "run / Build the site from the ledger": "success",
+    "run / Upload the site for Pages": "success",
+    "run / Health check (SPEC 12)": "success",
+    "run / Open, update or close the incident issue": "success",
+    "run / Persist evening health (including failed checks)": "success",
+    "run / Fail the run when a health check failed": "skipped",
+    "run / Post Restore cached source data": "success",
+    "run / Post Run actions/setup-python@v7": "success",
+    "run / Post Run actions/checkout@v7": "success",
+    "run / Complete job": "success",
+    "deploy / Set up job": "success",
+    "deploy / Run actions/deploy-pages@v5": "success",
+    "deploy / Run actions/checkout@v7": "success",
+    "deploy / Smoke-test the published site (T182)": "success",
+    "deploy / Post Run actions/checkout@v7": "success",
+    "deploy / Complete job": "success",
+    "job: gate": "success",
+    "job: run": "success",
+    "job: deploy": "success"
+   },
+   "health": {
+    "job": "evening",
+    "at": "2026-11-25T20:02:47.386712+00:00",
+    "ok": true,
+    "checks": [
+     {
+      "name": "batch_sealed",
+      "ok": true,
+      "detail": "44 questions sealed at 03:25 UTC"
+     },
+     {
+      "name": "next_batch_published",
+      "ok": true,
+      "detail": "47 questions for 2026-11-26"
+     },
+     {
+      "name": "nothing_overdue",
+      "ok": true,
+      "detail": "none"
+     },
+     {
+      "name": "sources_fresh",
+      "ok": true,
+      "detail": "5 domain(s) fresh"
+     },
+     {
+      "name": "forecaster_coverage",
+      "ok": true,
+      "detail": "expected 264 forecast-or-skip pairs; complete"
+     },
+     {
+      "name": "ml_available",
+      "ok": true,
+      "detail": "0 ML model_missing/error skips"
+     },
+     {
+      "name": "parse_failures",
+      "ok": true,
+      "detail": "0 of 80 LLM answers unparseable (0%)"
+     },
+     {
+      "name": "ledger_verify",
+      "ok": true,
+      "detail": "ledger verify: PASS: 546 files, 12 batch seals, 13 day seals, 1553 forecasts checked"
+     }
+    ],
+    "workflow_run_id": "45690868943",
+    "workflow_attempt": "1"
+   }
+  },
+  {
+   "key": "45685646175:1",
+   "job": "resolve",
+   "event": "schedule",
+   "created_at": "2026-11-25T19:29:09Z",
+   "started_at": "2026-11-25T19:29:09Z",
+   "ended_at": "2026-11-25T19:30:40Z",
+   "intended_date": "2026-11-25",
+   "mode": "live",
+   "conclusion": "success",
+   "no_op": false,
+   "code_sha": "7a6f4dc7fb999ce9493238bb9967bcfe37b406f1",
+   "event_sha": "7a6f4dc7fb999ce9493238bb9967bcfe37b406f1",
+   "stages": {
+    "run / Set up job": "success",
+    "run / Run actions/checkout@v7": "success",
+    "run / Run actions/setup-python@v7": "success",
+    "run / Install pinned dependencies": "success",
+    "run / Restore cached source data": "success",
+    "run / Mode": "success",
+    "run / Let git push the ledger branch with the built-in token": "success",
+    "run / Record application execution identity": "success",
+    "run / resolve job": "success",
+    "run / Verify the ledger": "success",
+    "run / Build the site from the ledger": "success",
+    "run / Upload the site for Pages": "success",
+    "run / Health check (SPEC 12)": "success",
+    "run / Open, update or close the incident issue": "success",
+    "run / Official start (SPEC 2.9; records the health report, writes the start once)": "success",
+    "run / Fail the run when a health check failed": "skipped",
+    "run / Post Restore cached source data": "success",
+    "run / Post Run actions/setup-python@v7": "success",
+    "run / Post Run actions/checkout@v7": "success",
+    "run / Complete job": "success",
+    "deploy / Set up job": "success",
+    "deploy / Run actions/deploy-pages@v5": "success",
+    "deploy / Run actions/checkout@v7": "success",
+    "deploy / Smoke-test the published site (T182)": "success",
+    "deploy / Post Run actions/checkout@v7": "success",
+    "deploy / Complete job": "success",
+    "job: run": "success",
+    "job: deploy": "success"
+   },
+   "health": {
+    "job": "resolve",
+    "at": "2026-11-25T19:30:07.736781+00:00",
+    "ok": true,
+    "checks": [
+     {
+      "name": "batch_sealed",
+      "ok": true,
+      "detail": "44 questions sealed at 03:25 UTC"
+     },
+     {
+      "name": "nothing_overdue",
+      "ok": true,
+      "detail": "none"
+     },
+     {
+      "name": "sources_fresh",
+      "ok": true,
+      "detail": "5 domain(s) fresh"
+     },
+     {
+      "name": "forecaster_coverage",
+      "ok": true,
+      "detail": "expected 264 forecast-or-skip pairs; complete"
+     },
+     {
+      "name": "ml_available",
+      "ok": true,
+      "detail": "0 ML model_missing/error skips"
+     },
+     {
+      "name": "parse_failures",
+      "ok": true,
+      "detail": "0 of 80 LLM answers unparseable (0%)"
+     },
+     {
+      "name": "ledger_verify",
+      "ok": true,
+      "detail": "ledger verify: PASS: 541 files, 12 batch seals, 13 day seals, 1553 forecasts checked"
+     }
+    ],
+    "workflow_run_id": "45685646175",
+    "workflow_attempt": "1"
+   }
+  },
+  {
+   "key": "45683855888:1",
+   "job": "players",
+   "event": "schedule",
+   "created_at": "2026-11-25T19:18:20Z",
+   "started_at": "2026-11-25T19:18:20Z",
+   "ended_at": "2026-11-25T19:18:57Z",
+   "intended_date": null,
+   "mode": "live",
+   "conclusion": "success",
+   "no_op": true,
+   "code_sha": null,
+   "event_sha": "7a6f4dc7fb999ce9493238bb9967bcfe37b406f1",
+   "stages": {
+    "gate / Set up job": "success",
+    "gate / Manual runs are always due": "skipped",
+    "gate / Run actions/checkout@v7": "success",
+    "gate / Run actions/setup-python@v7": "success",
+    "gate / Install pinned dependencies": "success",
+    "gate / Is the players job due?": "success",
+    "gate / Post Run actions/setup-python@v7": "success",
+    "gate / Post Run actions/checkout@v7": "success",
+    "gate / Complete job": "success",
+    "job: gate": "success",
+    "job: run": "skipped"
+   },
+   "health": null
+  },
+  {
+   "key": "45681034718:1",
+   "job": "players",
+   "event": "schedule",
+   "created_at": "2026-11-25T19:01:30Z",
+   "started_at": "2026-11-25T19:01:30Z",
+   "ended_at": "2026-11-25T19:02:05Z",
+   "intended_date": null,
+   "mode": "live",
+   "conclusion": "success",
+   "no_op": true,
+   "code_sha": null,
+   "event_sha": "7a6f4dc7fb999ce9493238bb9967bcfe37b406f1",
+   "stages": {
+    "gate / Set up job": "success",
+    "gate / Manual runs are always due": "skipped",
+    "gate / Run actions/checkout@v7": "success",
+    "gate / Run actions/setup-python@v7": "success",
+    "gate / Install pinned dependencies": "success",
+    "gate / Is the players job due?": "success",
+    "gate / Post Run actions/setup-python@v7": "success",
+    "gate / Post Run actions/checkout@v7": "success",
+    "gate / Complete job": "success",
+    "job: gate": "success",
+    "job: run": "skipped"
+   },
+   "health": null
+  },
+  {
+   "key": "45679106024:1",
+   "job": "players",
+   "event": "schedule",
+   "created_at": "2026-11-25T18:49:51Z",
+   "started_at": "2026-11-25T18:49:51Z",
+   "ended_at": "2026-11-25T18:50:36Z",
+   "intended_date": null,
+   "mode": "live",
+   "conclusion": "success",
+   "no_op": true,
+   "code_sha": null,
+   "event_sha": "7a6f4dc7fb999ce9493238bb9967bcfe37b406f1",
+   "stages": {
+    "gate / Set up job": "success",
+    "gate / Manual runs are always due": "skipped",
+    "gate / Run actions/checkout@v7": "success",
+    "gate / Run actions/setup-python@v7": "success",
+    "gate / Install pinned dependencies": "success",
+    "gate / Is the players job due?": "success",
+    "gate / Post Run actions/setup-python@v7": "success",
+    "gate / Post Run actions/checkout@v7": "success",
+    "gate / Complete job": "success",
+    "job: gate": "success",
+    "job: run": "skipped"
+   },
+   "health": null
+  },
+  {
+   "key": "45674179789:1",
+   "job": "resolve",
+   "event": "workflow_dispatch",
+   "created_at": "2026-11-25T18:20:43Z",
+   "started_at": "2026-11-25T18:20:43Z",
+   "ended_at": "2026-11-25T18:22:12Z",
+   "intended_date": "2026-11-25",
+   "mode": "live",
+   "conclusion": "success",
+   "no_op": false,
+   "code_sha": "7a6f4dc7fb999ce9493238bb9967bcfe37b406f1",
+   "event_sha": "7a6f4dc7fb999ce9493238bb9967bcfe37b406f1",
+   "stages": {
+    "run / Set up job": "success",
+    "run / Run actions/checkout@v7": "success",
+    "run / Run actions/setup-python@v7": "success",
+    "run / Install pinned dependencies": "success",
+    "run / Restore cached source data": "success",
+    "run / Mode": "success",
+    "run / Let git push the ledger branch with the built-in token": "success",
+    "run / Record application execution identity": "success",
+    "run / resolve job": "success",
+    "run / Verify the ledger": "success",
+    "run / Build the site from the ledger": "success",
+    "run / Upload the site for Pages": "success",
+    "run / Health check (SPEC 12)": "success",
+    "run / Open, update or close the incident issue": "success",
+    "run / Official start (SPEC 2.9; records the health report, writes the start once)": "success",
+    "run / Fail the run when a health check failed": "skipped",
+    "run / Post Restore cached source data": "success",
+    "run / Post Run actions/setup-python@v7": "success",
+    "run / Post Run actions/checkout@v7": "success",
+    "run / Complete job": "success",
+    "deploy / Set up job": "success",
+    "deploy / Run actions/deploy-pages@v5": "success",
+    "deploy / Run actions/checkout@v7": "success",
+    "deploy / Smoke-test the published site (T182)": "success",
+    "deploy / Post Run actions/checkout@v7": "success",
+    "deploy / Complete job": "success",
+    "job: run": "success",
+    "job: deploy": "success"
+   },
+   "health": {
+    "job": "resolve",
+    "at": "2026-11-25T18:21:46.211380+00:00",
+    "ok": true,
+    "checks": [
+     {
+      "name": "batch_sealed",
+      "ok": true,
+      "detail": "44 questions sealed at 03:25 UTC"
+     },
+     {
+      "name": "nothing_overdue",
+      "ok": true,
+      "detail": "none"
+     },
+     {
+      "name": "sources_fresh",
+      "ok": true,
+      "detail": "5 domain(s) fresh"
+     },
+     {
+      "name": "forecaster_coverage",
+      "ok": true,
+      "detail": "expected 264 forecast-or-skip pairs; complete"
+     },
+     {
+      "name": "ml_available",
+      "ok": true,
+      "detail": "0 ML model_missing/error skips"
+     },
+     {
+      "name": "parse_failures",
+      "ok": true,
+      "detail": "0 of 80 LLM answers unparseable (0%)"
+     },
+     {
+      "name": "ledger_verify",
+      "ok": true,
+      "detail": "ledger verify: PASS: 534 files, 12 batch seals, 13 day seals, 1553 forecasts checked"
+     }
+    ],
+    "workflow_run_id": "45674179789",
+    "workflow_attempt": "1"
+   }
+  },
+  {
+   "key": "45644107347:1",
+   "job": "resolve",
+   "event": "workflow_dispatch",
+   "created_at": "2026-11-25T15:20:47Z",
+   "started_at": "2026-11-25T15:20:47Z",
+   "ended_at": "2026-11-25T15:22:17Z",
+   "intended_date": "2026-11-25",
+   "mode": "live",
+   "conclusion": "success",
+   "no_op": false,
+   "code_sha": "7a6f4dc7fb999ce9493238bb9967bcfe37b406f1",
+   "event_sha": "7a6f4dc7fb999ce9493238bb9967bcfe37b406f1",
+   "stages": {
+    "run / Set up job": "success",
+    "run / Run actions/checkout@v7": "success",
+    "run / Run actions/setup-python@v7": "success",
+    "run / Install pinned dependencies": "success",
+    "run / Restore cached source data": "success",
+    "run / Mode": "success",
+    "run / Let git push the ledger branch with the built-in token": "success",
+    "run / Record application execution identity": "success",
+    "run / resolve job": "success",
+    "run / Verify the ledger": "success",
+    "run / Build the site from the ledger": "success",
+    "run / Upload the site for Pages": "success",
+    "run / Health check (SPEC 12)": "success",
+    "run / Open, update or close the incident issue": "success",
+    "run / Official start (SPEC 2.9; records the health report, writes the start once)": "success",
+    "run / Fail the run when a health check failed": "skipped",
+    "run / Post Restore cached source data": "success",
+    "run / Post Run actions/setup-python@v7": "success",
+    "run / Post Run actions/checkout@v7": "success",
+    "run / Complete job": "success",
+    "deploy / Set up job": "success",
+    "deploy / Run actions/deploy-pages@v5": "success",
+    "deploy / Run actions/checkout@v7": "success",
+    "deploy / Smoke-test the published site (T182)": "success",
+    "deploy / Post Run actions/checkout@v7": "success",
+    "deploy / Complete job": "success",
+    "job: run": "success",
+    "job: deploy": "success"
+   },
+   "health": {
+    "job": "resolve",
+    "at": "2026-11-25T15:21:50.692014+00:00",
+    "ok": true,
+    "checks": [
+     {
+      "name": "batch_sealed",
+      "ok": true,
+      "detail": "44 questions sealed at 03:25 UTC"
+     },
+     {
+      "name": "nothing_overdue",
+      "ok": true,
+      "detail": "none"
+     },
+     {
+      "name": "sources_fresh",
+      "ok": true,
+      "detail": "5 domain(s) fresh"
+     },
+     {
+      "name": "forecaster_coverage",
+      "ok": true,
+      "detail": "expected 264 forecast-or-skip pairs; complete"
+     },
+     {
+      "name": "ml_available",
+      "ok": true,
+      "detail": "0 ML model_missing/error skips"
+     },
+     {
+      "name": "parse_failures",
+      "ok": true,
+      "detail": "0 of 80 LLM answers unparseable (0%)"
+     },
+     {
+      "name": "ledger_verify",
+      "ok": true,
+      "detail": "ledger verify: PASS: 530 files, 12 batch seals, 13 day seals, 1553 forecasts checked"
+     }
+    ],
+    "workflow_run_id": "45644107347",
+    "workflow_attempt": "1"
+   }
+  },
+  {
+   "key": "45636159074:1",
+   "job": "resolve",
+   "event": "workflow_dispatch",
+   "created_at": "2026-11-25T14:37:48Z",
+   "started_at": "2026-11-25T14:37:48Z",
+   "ended_at": "2026-11-25T14:39:19Z",
+   "intended_date": "2026-11-25",
+   "mode": "live",
+   "conclusion": "success",
+   "no_op": false,
+   "code_sha": "7a6f4dc7fb999ce9493238bb9967bcfe37b406f1",
+   "event_sha": "7a6f4dc7fb999ce9493238bb9967bcfe37b406f1",
+   "stages": {
+    "run / Set up job": "success",
+    "run / Run actions/checkout@v7": "success",
+    "run / Run actions/setup-python@v7": "success",
+    "run / Install pinned dependencies": "success",
+    "run / Restore cached source data": "success",
+    "run / Mode": "success",
+    "run / Let git push the ledger branch with the built-in token": "success",
+    "run / Record application execution identity": "success",
+    "run / resolve job": "success",
+    "run / Verify the ledger": "success",
+    "run / Build the site from the ledger": "success",
+    "run / Upload the site for Pages": "success",
+    "run / Health check (SPEC 12)": "success",
+    "run / Open, update or close the incident issue": "success",
+    "run / Official start (SPEC 2.9; records the health report, writes the start once)": "success",
+    "run / Fail the run when a health check failed": "skipped",
+    "run / Post Restore cached source data": "success",
+    "run / Post Run actions/setup-python@v7": "success",
+    "run / Post Run actions/checkout@v7": "success",
+    "run / Complete job": "success",
+    "deploy / Set up job": "success",
+    "deploy / Run actions/deploy-pages@v5": "success",
+    "deploy / Run actions/checkout@v7": "success",
+    "deploy / Smoke-test the published site (T182)": "success",
+    "deploy / Post Run actions/checkout@v7": "success",
+    "deploy / Complete job": "success",
+    "job: run": "success",
+    "job: deploy": "success"
+   },
+   "health": {
+    "job": "resolve",
+    "at": "2026-11-25T14:38:46.418971+00:00",
+    "ok": true,
+    "checks": [
+     {
+      "name": "batch_sealed",
+      "ok": true,
+      "detail": "44 questions sealed at 03:25 UTC"
+     },
+     {
+      "name": "nothing_overdue",
+      "ok": true,
+      "detail": "none"
+     },
+     {
+      "name": "sources_fresh",
+      "ok": true,
+      "detail": "5 domain(s) fresh"
+     },
+     {
+      "name": "forecaster_coverage",
+      "ok": true,
+      "detail": "expected 264 forecast-or-skip pairs; complete"
+     },
+     {
+      "name": "ml_available",
+      "ok": true,
+      "detail": "0 ML model_missing/error skips"
+     },
+     {
+      "name": "parse_failures",
+      "ok": true,
+      "detail": "0 of 80 LLM answers unparseable (0%)"
+     },
+     {
+      "name": "ledger_verify",
+      "ok": true,
+      "detail": "ledger verify: PASS: 526 files, 12 batch seals, 13 day seals, 1553 forecasts checked"
+     }
+    ],
+    "workflow_run_id": "45636159074",
+    "workflow_attempt": "1"
+   }
+  },
+  {
+   "key": "45616148525:1",
+   "job": "morning",
+   "event": "schedule",
+   "created_at": "2026-11-25T12:41:14Z",
+   "started_at": "2026-11-25T12:41:14Z",
+   "ended_at": "2026-11-25T12:41:57Z",
+   "intended_date": null,
+   "mode": "live",
+   "conclusion": "success",
+   "no_op": true,
+   "code_sha": null,
+   "event_sha": "022b7767ab353e164c00b7418e3fd3d3fe471321",
+   "stages": {
+    "gate / Set up job": "success",
+    "gate / Manual runs are always due": "skipped",
+    "gate / Run actions/checkout@v7": "success",
+    "gate / Run actions/setup-python@v7": "success",
+    "gate / Install pinned dependencies": "success",
+    "gate / Is the morning job due?": "success",
+    "gate / Post Run actions/setup-python@v7": "success",
+    "gate / Post Run actions/checkout@v7": "success",
+    "gate / Complete job": "success",
+    "job: gate": "success",
+    "job: deploy": "skipped",
+    "job: run": "skipped"
+   },
+   "health": null
+  },
+  {
+   "key": "45612861038:1",
+   "job": "resolve",
+   "event": "workflow_dispatch",
+   "created_at": "2026-11-25T12:20:47Z",
+   "started_at": "2026-11-25T12:20:47Z",
+   "ended_at": "2026-11-25T12:22:36Z",
+   "intended_date": "2026-11-25",
+   "mode": "live",
+   "conclusion": "success",
+   "no_op": false,
+   "code_sha": "022b7767ab353e164c00b7418e3fd3d3fe471321",
+   "event_sha": "022b7767ab353e164c00b7418e3fd3d3fe471321",
+   "stages": {
+    "run / Set up job": "success",
+    "run / Run actions/checkout@v7": "success",
+    "run / Run actions/setup-python@v7": "success",
+    "run / Install pinned dependencies": "success",
+    "run / Restore cached source data": "success",
+    "run / Mode": "success",
+    "run / Let git push the ledger branch with the built-in token": "success",
+    "run / Record application execution identity": "success",
+    "run / resolve job": "success",
+    "run / Verify the ledger": "success",
+    "run / Build the site from the ledger": "success",
+    "run / Upload the site for Pages": "success",
+    "run / Health check (SPEC 12)": "success",
+    "run / Open, update or close the incident issue": "success",
+    "run / Official start (SPEC 2.9; records the health report, writes the start once)": "success",
+    "run / Fail the run when a health check failed": "skipped",
+    "run / Post Restore cached source data": "success",
+    "run / Post Run actions/setup-python@v7": "success",
+    "run / Post Run actions/checkout@v7": "success",
+    "run / Complete job": "success",
+    "deploy / Set up job": "success",
+    "deploy / Run actions/deploy-pages@v5": "success",
+    "deploy / Run actions/checkout@v7": "success",
+    "deploy / Smoke-test the published site (T182)": "success",
+    "deploy / Post Run actions/checkout@v7": "success",
+    "deploy / Complete job": "success",
+    "job: run": "success",
+    "job: deploy": "success"
+   },
+   "health": {
+    "job": "resolve",
+    "at": "2026-11-25T12:22:02.948020+00:00",
+    "ok": true,
+    "checks": [
+     {
+      "name": "batch_sealed",
+      "ok": true,
+      "detail": "44 questions sealed at 03:25 UTC"
+     },
+     {
+      "name": "nothing_overdue",
+      "ok": true,
+      "detail": "none"
+     },
+     {
+      "name": "sources_fresh",
+      "ok": true,
+      "detail": "5 domain(s) fresh"
+     },
+     {
+      "name": "forecaster_coverage",
+      "ok": true,
+      "detail": "expected 264 forecast-or-skip pairs; complete"
+     },
+     {
+      "name": "ml_available",
+      "ok": true,
+      "detail": "0 ML model_missing/error skips"
+     },
+     {
+      "name": "parse_failures",
+      "ok": true,
+      "detail": "0 of 80 LLM answers unparseable (0%)"
+     },
+     {
+      "name": "ledger_verify",
+      "ok": true,
+      "detail": "ledger verify: PASS: 520 files, 12 batch seals, 13 day seals, 1553 forecasts checked"
+     }
+    ],
+    "workflow_run_id": "45612861038",
+    "workflow_attempt": "1"
+   }
+  },
+  {
+   "key": "45584509396:1",
+   "job": "resolve",
+   "event": "workflow_dispatch",
+   "created_at": "2026-11-25T09:20:45Z",
+   "started_at": "2026-11-25T09:20:45Z",
+   "ended_at": "2026-11-25T09:22:15Z",
+   "intended_date": "2026-11-25",
+   "mode": "live",
+   "conclusion": "success",
+   "no_op": false,
+   "code_sha": "022b7767ab353e164c00b7418e3fd3d3fe471321",
+   "event_sha": "022b7767ab353e164c00b7418e3fd3d3fe471321",
+   "stages": {
+    "run / Set up job": "success",
+    "run / Run actions/checkout@v7": "success",
+    "run / Run actions/setup-python@v7": "success",
+    "run / Install pinned dependencies": "success",
+    "run / Restore cached source data": "success",
+    "run / Mode": "success",
+    "run / Let git push the ledger branch with the built-in token": "success",
+    "run / Record application execution identity": "success",
+    "run / resolve job": "success",
+    "run / Verify the ledger": "success",
+    "run / Build the site from the ledger": "success",
+    "run / Upload the site for Pages": "success",
+    "run / Health check (SPEC 12)": "success",
+    "run / Open, update or close the incident issue": "success",
+    "run / Official start (SPEC 2.9; records the health report, writes the start once)": "success",
+    "run / Fail the run when a health check failed": "skipped",
+    "run / Post Restore cached source data": "success",
+    "run / Post Run actions/setup-python@v7": "success",
+    "run / Post Run actions/checkout@v7": "success",
+    "run / Complete job": "success",
+    "deploy / Set up job": "success",
+    "deploy / Run actions/deploy-pages@v5": "success",
+    "deploy / Run actions/checkout@v7": "success",
+    "deploy / Smoke-test the published site (T182)": "success",
+    "deploy / Post Run actions/checkout@v7": "success",
+    "deploy / Complete job": "success",
+    "job: run": "success",
+    "job: deploy": "success"
+   },
+   "health": {
+    "job": "resolve",
+    "at": "2026-11-25T09:21:44.114094+00:00",
+    "ok": true,
+    "checks": [
+     {
+      "name": "batch_sealed",
+      "ok": true,
+      "detail": "not due before the 09:30 UTC lock"
+     },
+     {
+      "name": "nothing_overdue",
+      "ok": true,
+      "detail": "none"
+     },
+     {
+      "name": "sources_fresh",
+      "ok": true,
+      "detail": "5 domain(s) fresh"
+     },
+     {
+      "name": "parse_failures",
+      "ok": true,
+      "detail": "0 of 80 LLM answers unparseable (0%)"
+     },
+     {
+      "name": "ledger_verify",
+      "ok": true,
+      "detail": "ledger verify: PASS: 516 files, 12 batch seals, 13 day seals, 1553 forecasts checked"
+     }
+    ],
+    "workflow_run_id": "45584509396",
+    "workflow_attempt": "1"
+   }
+  },
+  {
+   "key": "45580634028:1",
+   "job": "resolve",
+   "event": "schedule",
+   "created_at": "2026-11-25T08:55:54Z",
+   "started_at": "2026-11-25T08:55:54Z",
+   "ended_at": "2026-11-25T08:57:23Z",
+   "intended_date": "2026-11-25",
+   "mode": "live",
+   "conclusion": "success",
+   "no_op": false,
+   "code_sha": "022b7767ab353e164c00b7418e3fd3d3fe471321",
+   "event_sha": "022b7767ab353e164c00b7418e3fd3d3fe471321",
+   "stages": {
+    "run / Set up job": "success",
+    "run / Run actions/checkout@v7": "success",
+    "run / Run actions/setup-python@v7": "success",
+    "run / Install pinned dependencies": "success",
+    "run / Restore cached source data": "success",
+    "run / Mode": "success",
+    "run / Let git push the ledger branch with the built-in token": "success",
+    "run / Record application execution identity": "success",
+    "run / resolve job": "success",
+    "run / Verify the ledger": "success",
+    "run / Build the site from the ledger": "success",
+    "run / Upload the site for Pages": "success",
+    "run / Health check (SPEC 12)": "success",
+    "run / Open, update or close the incident issue": "success",
+    "run / Official start (SPEC 2.9; records the health report, writes the start once)": "success",
+    "run / Fail the run when a health check failed": "skipped",
+    "run / Post Restore cached source data": "success",
+    "run / Post Run actions/setup-python@v7": "success",
+    "run / Post Run actions/checkout@v7": "success",
+    "run / Complete job": "success",
+    "deploy / Set up job": "success",
+    "deploy / Run actions/deploy-pages@v5": "success",
+    "deploy / Run actions/checkout@v7": "success",
+    "deploy / Smoke-test the published site (T182)": "success",
+    "deploy / Post Run actions/checkout@v7": "success",
+    "deploy / Complete job": "success",
+    "job: run": "success",
+    "job: deploy": "success"
+   },
+   "health": {
+    "job": "resolve",
+    "at": "2026-11-25T08:56:55.418195+00:00",
+    "ok": true,
+    "checks": [
+     {
+      "name": "batch_sealed",
+      "ok": true,
+      "detail": "not due before the 09:30 UTC lock"
+     },
+     {
+      "name": "nothing_overdue",
+      "ok": true,
+      "detail": "none"
+     },
+     {
+      "name": "sources_fresh",
+      "ok": true,
+      "detail": "5 domain(s) fresh"
+     },
+     {
+      "name": "parse_failures",
+      "ok": true,
+      "detail": "0 of 80 LLM answers unparseable (0%)"
+     },
+     {
+      "name": "ledger_verify",
+      "ok": true,
+      "detail": "ledger verify: PASS: 512 files, 12 batch seals, 13 day seals, 1553 forecasts checked"
+     }
+    ],
+    "workflow_run_id": "45580634028",
+    "workflow_attempt": "1"
+   }
+  },
+  {
+   "key": "45576981011:1",
+   "job": "morning",
+   "event": "workflow_dispatch",
+   "created_at": "2026-11-25T08:31:07Z",
+   "started_at": "2026-11-25T08:31:07Z",
+   "ended_at": "2026-11-25T08:36:29Z",
+   "intended_date": "2026-11-25",
+   "mode": "live",
+   "conclusion": "success",
+   "no_op": false,
+   "code_sha": "022b7767ab353e164c00b7418e3fd3d3fe471321",
+   "event_sha": "022b7767ab353e164c00b7418e3fd3d3fe471321",
+   "stages": {
+    "gate / Set up job": "success",
+    "gate / Manual runs are always due": "success",
+    "gate / Run actions/checkout@v7": "skipped",
+    "gate / Run actions/setup-python@v7": "skipped",
+    "gate / Install pinned dependencies": "skipped",
+    "gate / Is the morning job due?": "skipped",
+    "gate / Complete job": "success",
+    "run / Set up job": "success",
+    "run / Run actions/checkout@v7": "success",
+    "run / Run actions/setup-python@v7": "success",
+    "run / Install pinned dependencies": "success",
+    "run / Install the local LLM runtime (llm_local; a failure only skips llm_local)": "success",
+    "run / Restore cached model weights (Qwen2.5-1.5B-Instruct GGUF, pinned revision)": "success",
+    "run / Restore cached fine-tuned model (llm_local_ft; keyed by the pin file)": "success",
+    "run / Restore cached source data": "success",
+    "run / Mode": "success",
+    "run / Let git push the ledger branch with the built-in token": "success",
+    "run / Record application execution identity": "success",
+    "run / morning job": "success",
+    "run / Measure when SMARD publishes tomorrow's generation forecasts (T222b, measurement only)": "success",
+    "run / Verify the ledger": "success",
+    "run / Build the site from the ledger": "success",
+    "run / Upload the site for Pages": "success",
+    "run / Health check (SPEC 12)": "success",
+    "run / Open, update or close the incident issue": "success",
+    "run / Official start (SPEC 2.9; records the health report, writes the start once)": "success",
+    "run / Fail the run when a health check failed": "skipped",
+    "run / Post Restore cached source data": "success",
+    "run / Post Restore cached fine-tuned model (llm_local_ft; keyed by the pin file)": "success",
+    "run / Post Restore cached model weights (Qwen2.5-1.5B-Instruct GGUF, pinned revision)": "success",
+    "run / Post Run actions/setup-python@v7": "success",
+    "run / Post Run actions/checkout@v7": "success",
+    "run / Complete job": "success",
+    "deploy / Set up job": "success",
+    "deploy / Run actions/deploy-pages@v5": "success",
+    "deploy / Run actions/checkout@v7": "success",
+    "deploy / Smoke-test the published site (T182)": "success",
+    "deploy / Post Run actions/checkout@v7": "success",
+    "deploy / Complete job": "success",
+    "job: gate": "success",
+    "job: run": "success",
+    "job: deploy": "success"
+   },
+   "health": {
+    "job": "morning",
+    "at": "2026-11-25T08:36:02.348804+00:00",
+    "ok": true,
+    "checks": [
+     {
+      "name": "batch_sealed",
+      "ok": true,
+      "detail": "44 questions sealed at 03:25 UTC"
+     },
+     {
+      "name": "data_contracts",
+      "ok": true,
+      "detail": "44 contexts checked, 0 violations"
+     },
+     {
+      "name": "nothing_overdue",
+      "ok": true,
+      "detail": "none"
+     },
+     {
+      "name": "sources_fresh",
+      "ok": true,
+      "detail": "5 domain(s) fresh"
+     },
+     {
+      "name": "forecaster_coverage",
+      "ok": true,
+      "detail": "expected 396 forecast-or-skip pairs; complete"
+     },
+     {
+      "name": "ml_available",
+      "ok": true,
+      "detail": "0 ML model_missing/error skips"
+     },
+     {
+      "name": "parse_failures",
+      "ok": true,
+      "detail": "0 of 80 LLM answers unparseable (0%)"
+     },
+     {
+      "name": "ledger_verify",
+      "ok": true,
+      "detail": "ledger verify: PASS: 508 files, 12 batch seals, 13 day seals, 1553 forecasts checked"
+     }
+    ],
+    "workflow_run_id": "45576981011",
+    "workflow_attempt": "1"
+   }
+  },
+  {
+   "key": "45572706622:1",
+   "job": "morning",
+   "event": "workflow_dispatch",
+   "created_at": "2026-11-25T08:01:20Z",
+   "started_at": "2026-11-25T08:01:20Z",
+   "ended_at": "2026-11-25T08:07:18Z",
+   "intended_date": "2026-11-25",
+   "mode": "live",
+   "conclusion": "success",
+   "no_op": false,
+   "code_sha": "022b7767ab353e164c00b7418e3fd3d3fe471321",
+   "event_sha": "022b7767ab353e164c00b7418e3fd3d3fe471321",
+   "stages": {
+    "gate / Set up job": "success",
+    "gate / Manual runs are always due": "success",
+    "gate / Run actions/checkout@v7": "skipped",
+    "gate / Run actions/setup-python@v7": "skipped",
+    "gate / Install pinned dependencies": "skipped",
+    "gate / Is the morning job due?": "skipped",
+    "gate / Complete job": "success",
+    "run / Set up job": "success",
+    "run / Run actions/checkout@v7": "success",
+    "run / Run actions/setup-python@v7": "success",
+    "run / Install pinned dependencies": "success",
+    "run / Install the local LLM runtime (llm_local; a failure only skips llm_local)": "success",
+    "run / Restore cached model weights (Qwen2.5-1.5B-Instruct GGUF, pinned revision)": "success",
+    "run / Restore cached fine-tuned model (llm_local_ft; keyed by the pin file)": "success",
+    "run / Restore cached source data": "success",
+    "run / Mode": "success",
+    "run / Let git push the ledger branch with the built-in token": "success",
+    "run / Record application execution identity": "success",
+    "run / morning job": "success",
+    "run / Measure when SMARD publishes tomorrow's generation forecasts (T222b, measurement only)": "success",
+    "run / Verify the ledger": "success",
+    "run / Build the site from the ledger": "success",
+    "run / Upload the site for Pages": "success",
+    "run / Health check (SPEC 12)": "success",
+    "run / Open, update or close the incident issue": "success",
+    "run / Official start (SPEC 2.9; records the health report, writes the start once)": "success",
+    "run / Fail the run when a health check failed": "skipped",
+    "run / Post Restore cached source data": "success",
+    "run / Post Restore cached fine-tuned model (llm_local_ft; keyed by the pin file)": "success",
+    "run / Post Restore cached model weights (Qwen2.5-1.5B-Instruct GGUF, pinned revision)": "success",
+    "run / Post Run actions/setup-python@v7": "success",
+    "run / Post Run actions/checkout@v7": "success",
+    "run / Complete job": "success",
+    "deploy / Set up job": "success",
+    "deploy / Run actions/deploy-pages@v5": "success",
+    "deploy / Run actions/checkout@v7": "success",
+    "deploy / Smoke-test the published site (T182)": "success",
+    "deploy / Post Run actions/checkout@v7": "success",
+    "deploy / Complete job": "success",
+    "job: gate": "success",
+    "job: run": "success",
+    "job: deploy": "success"
+   },
+   "health": {
+    "job": "morning",
+    "at": "2026-11-25T08:06:47.611247+00:00",
+    "ok": true,
+    "checks": [
+     {
+      "name": "batch_sealed",
+      "ok": true,
+      "detail": "44 questions sealed at 03:25 UTC"
+     },
+     {
+      "name": "data_contracts",
+      "ok": true,
+      "detail": "44 contexts checked, 0 violations"
+     },
+     {
+      "name": "nothing_overdue",
+      "ok": true,
+      "detail": "none"
+     },
+     {
+      "name": "sources_fresh",
+      "ok": true,
+      "detail": "5 domain(s) fresh"
+     },
+     {
+      "name": "forecaster_coverage",
+      "ok": true,
+      "detail": "expected 396 forecast-or-skip pairs; complete"
+     },
+     {
+      "name": "ml_available",
+      "ok": true,
+      "detail": "0 ML model_missing/error skips"
+     },
+     {
+      "name": "parse_failures",
+      "ok": true,
+      "detail": "0 of 80 LLM answers unparseable (0%)"
+     },
+     {
+      "name": "ledger_verify",
+      "ok": true,
+      "detail": "ledger verify: PASS: 504 files, 12 batch seals, 13 day seals, 1553 forecasts checked"
+     }
+    ],
+    "workflow_run_id": "45572706622",
+    "workflow_attempt": "1"
+   }
+  },
+  {
+   "key": "45568750775:1",
+   "job": "morning",
+   "event": "workflow_dispatch",
+   "created_at": "2026-11-25T07:31:03Z",
+   "started_at": "2026-11-25T07:31:03Z",
+   "ended_at": "2026-11-25T07:37:28Z",
+   "intended_date": "2026-11-25",
+   "mode": "live",
+   "conclusion": "success",
+   "no_op": false,
+   "code_sha": "022b7767ab353e164c00b7418e3fd3d3fe471321",
+   "event_sha": "022b7767ab353e164c00b7418e3fd3d3fe471321",
+   "stages": {
+    "gate / Set up job": "success",
+    "gate / Manual runs are always due": "success",
+    "gate / Run actions/checkout@v7": "skipped",
+    "gate / Run actions/setup-python@v7": "skipped",
+    "gate / Install pinned dependencies": "skipped",
+    "gate / Is the morning job due?": "skipped",
+    "gate / Complete job": "success",
+    "run / Set up job": "success",
+    "run / Run actions/checkout@v7": "success",
+    "run / Run actions/setup-python@v7": "success",
+    "run / Install pinned dependencies": "success",
+    "run / Install the local LLM runtime (llm_local; a failure only skips llm_local)": "success",
+    "run / Restore cached model weights (Qwen2.5-1.5B-Instruct GGUF, pinned revision)": "success",
+    "run / Restore cached fine-tuned model (llm_local_ft; keyed by the pin file)": "success",
+    "run / Restore cached source data": "success",
+    "run / Mode": "success",
+    "run / Let git push the ledger branch with the built-in token": "success",
+    "run / Record application execution identity": "success",
+    "run / morning job": "success",
+    "run / Measure when SMARD publishes tomorrow's generation forecasts (T222b, measurement only)": "success",
+    "run / Verify the ledger": "success",
+    "run / Build the site from the ledger": "success",
+    "run / Upload the site for Pages": "success",
+    "run / Health check (SPEC 12)": "success",
+    "run / Open, update or close the incident issue": "success",
+    "run / Official start (SPEC 2.9; records the health report, writes the start once)": "success",
+    "run / Fail the run when a health check failed": "skipped",
+    "run / Post Restore cached source data": "success",
+    "run / Post Restore cached fine-tuned model (llm_local_ft; keyed by the pin file)": "success",
+    "run / Post Restore cached model weights (Qwen2.5-1.5B-Instruct GGUF, pinned revision)": "success",
+    "run / Post Run actions/setup-python@v7": "success",
+    "run / Post Run actions/checkout@v7": "success",
+    "run / Complete job": "success",
+    "deploy / Set up job": "success",
+    "deploy / Run actions/deploy-pages@v5": "success",
+    "deploy / Run actions/checkout@v7": "success",
+    "deploy / Smoke-test the published site (T182)": "success",
+    "deploy / Post Run actions/checkout@v7": "success",
+    "deploy / Complete job": "success",
+    "job: gate": "success",
+    "job: run": "success",
+    "job: deploy": "success"
+   },
+   "health": {
+    "job": "morning",
+    "at": "2026-11-25T07:36:59.527247+00:00",
+    "ok": true,
+    "checks": [
+     {
+      "name": "batch_sealed",
+      "ok": true,
+      "detail": "44 questions sealed at 03:25 UTC"
+     },
+     {
+      "name": "data_contracts",
+      "ok": true,
+      "detail": "44 contexts checked, 0 violations"
+     },
+     {
+      "name": "nothing_overdue",
+      "ok": true,
+      "detail": "none"
+     },
+     {
+      "name": "sources_fresh",
+      "ok": true,
+      "detail": "5 domain(s) fresh"
+     },
+     {
+      "name": "forecaster_coverage",
+      "ok": true,
+      "detail": "expected 396 forecast-or-skip pairs; complete"
+     },
+     {
+      "name": "ml_available",
+      "ok": true,
+      "detail": "0 ML model_missing/error skips"
+     },
+     {
+      "name": "parse_failures",
+      "ok": true,
+      "detail": "0 of 80 LLM answers unparseable (0%)"
+     },
+     {
+      "name": "ledger_verify",
+      "ok": true,
+      "detail": "ledger verify: PASS: 500 files, 12 batch seals, 13 day seals, 1553 forecasts checked"
+     }
+    ],
+    "workflow_run_id": "45568750775",
+    "workflow_attempt": "1"
+   }
+  },
+  {
+   "key": "45564904871:1",
+   "job": "morning",
+   "event": "workflow_dispatch",
+   "created_at": "2026-11-25T07:01:16Z",
+   "started_at": "2026-11-25T07:01:16Z",
+   "ended_at": "2026-11-25T07:06:41Z",
+   "intended_date": "2026-11-25",
+   "mode": "live",
+   "conclusion": "success",
+   "no_op": false,
+   "code_sha": "022b7767ab353e164c00b7418e3fd3d3fe471321",
+   "event_sha": "022b7767ab353e164c00b7418e3fd3d3fe471321",
+   "stages": {
+    "gate / Set up job": "success",
+    "gate / Manual runs are always due": "success",
+    "gate / Run actions/checkout@v7": "skipped",
+    "gate / Run actions/setup-python@v7": "skipped",
+    "gate / Install pinned dependencies": "skipped",
+    "gate / Is the morning job due?": "skipped",
+    "gate / Complete job": "success",
+    "run / Set up job": "success",
+    "run / Run actions/checkout@v7": "success",
+    "run / Run actions/setup-python@v7": "success",
+    "run / Install pinned dependencies": "success",
+    "run / Install the local LLM runtime (llm_local; a failure only skips llm_local)": "success",
+    "run / Restore cached model weights (Qwen2.5-1.5B-Instruct GGUF, pinned revision)": "success",
+    "run / Restore cached fine-tuned model (llm_local_ft; keyed by the pin file)": "success",
+    "run / Restore cached source data": "success",
+    "run / Mode": "success",
+    "run / Let git push the ledger branch with the built-in token": "success",
+    "run / Record application execution identity": "success",
+    "run / morning job": "success",
+    "run / Measure when SMARD publishes tomorrow's generation forecasts (T222b, measurement only)": "success",
+    "run / Verify the ledger": "success",
+    "run / Build the site from the ledger": "success",
+    "run / Upload the site for Pages": "success",
+    "run / Health check (SPEC 12)": "success",
+    "run / Open, update or close the incident issue": "success",
+    "run / Official start (SPEC 2.9; records the health report, writes the start once)": "success",
+    "run / Fail the run when a health check failed": "skipped",
+    "run / Post Restore cached source data": "success",
+    "run / Post Restore cached fine-tuned model (llm_local_ft; keyed by the pin file)": "success",
+    "run / Post Restore cached model weights (Qwen2.5-1.5B-Instruct GGUF, pinned revision)": "success",
+    "run / Post Run actions/setup-python@v7": "success",
+    "run / Post Run actions/checkout@v7": "success",
+    "run / Complete job": "success",
+    "deploy / Set up job": "success",
+    "deploy / Run actions/deploy-pages@v5": "success",
+    "deploy / Run actions/checkout@v7": "success",
+    "deploy / Smoke-test the published site (T182)": "success",
+    "deploy / Post Run actions/checkout@v7": "success",
+    "deploy / Complete job": "success",
+    "job: gate": "success",
+    "job: run": "success",
+    "job: deploy": "success"
+   },
+   "health": {
+    "job": "morning",
+    "at": "2026-11-25T07:06:18.088538+00:00",
+    "ok": true,
+    "checks": [
+     {
+      "name": "batch_sealed",
+      "ok": true,
+      "detail": "44 questions sealed at 03:25 UTC"
+     },
+     {
+      "name": "data_contracts",
+      "ok": true,
+      "detail": "44 contexts checked, 0 violations"
+     },
+     {
+      "name": "nothing_overdue",
+      "ok": true,
+      "detail": "none"
+     },
+     {
+      "name": "sources_fresh",
+      "ok": true,
+      "detail": "5 domain(s) fresh"
+     },
+     {
+      "name": "forecaster_coverage",
+      "ok": true,
+      "detail": "expected 396 forecast-or-skip pairs; complete"
+     },
+     {
+      "name": "ml_available",
+      "ok": true,
+      "detail": "0 ML model_missing/error skips"
+     },
+     {
+      "name": "parse_failures",
+      "ok": true,
+      "detail": "0 of 80 LLM answers unparseable (0%)"
+     },
+     {
+      "name": "ledger_verify",
+      "ok": true,
+      "detail": "ledger verify: PASS: 496 files, 12 batch seals, 13 day seals, 1553 forecasts checked"
+     }
+    ],
+    "workflow_run_id": "45564904871",
+    "workflow_attempt": "1"
+   }
+  },
+  {
+   "key": "45561185661:1",
+   "job": "morning",
+   "event": "workflow_dispatch",
+   "created_at": "2026-11-25T06:31:04Z",
+   "started_at": "2026-11-25T06:31:04Z",
+   "ended_at": "2026-11-25T06:36:44Z",
+   "intended_date": "2026-11-25",
+   "mode": "live",
+   "conclusion": "success",
+   "no_op": false,
+   "code_sha": "022b7767ab353e164c00b7418e3fd3d3fe471321",
+   "event_sha": "022b7767ab353e164c00b7418e3fd3d3fe471321",
+   "stages": {
+    "gate / Set up job": "success",
+    "gate / Manual runs are always due": "success",
+    "gate / Run actions/checkout@v7": "skipped",
+    "gate / Run actions/setup-python@v7": "skipped",
+    "gate / Install pinned dependencies": "skipped",
+    "gate / Is the morning job due?": "skipped",
+    "gate / Complete job": "success",
+    "run / Set up job": "success",
+    "run / Run actions/checkout@v7": "success",
+    "run / Run actions/setup-python@v7": "success",
+    "run / Install pinned dependencies": "success",
+    "run / Install the local LLM runtime (llm_local; a failure only skips llm_local)": "success",
+    "run / Restore cached model weights (Qwen2.5-1.5B-Instruct GGUF, pinned revision)": "success",
+    "run / Restore cached fine-tuned model (llm_local_ft; keyed by the pin file)": "success",
+    "run / Restore cached source data": "success",
+    "run / Mode": "success",
+    "run / Let git push the ledger branch with the built-in token": "success",
+    "run / Record application execution identity": "success",
+    "run / morning job": "success",
+    "run / Measure when SMARD publishes tomorrow's generation forecasts (T222b, measurement only)": "success",
+    "run / Verify the ledger": "success",
+    "run / Build the site from the ledger": "success",
+    "run / Upload the site for Pages": "success",
+    "run / Health check (SPEC 12)": "success",
+    "run / Open, update or close the incident issue": "success",
+    "run / Official start (SPEC 2.9; records the health report, writes the start once)": "success",
+    "run / Fail the run when a health check failed": "skipped",
+    "run / Post Restore cached source data": "success",
+    "run / Post Restore cached fine-tuned model (llm_local_ft; keyed by the pin file)": "success",
+    "run / Post Restore cached model weights (Qwen2.5-1.5B-Instruct GGUF, pinned revision)": "success",
+    "run / Post Run actions/setup-python@v7": "success",
+    "run / Post Run actions/checkout@v7": "success",
+    "run / Complete job": "success",
+    "deploy / Set up job": "success",
+    "deploy / Run actions/deploy-pages@v5": "success",
+    "deploy / Run actions/checkout@v7": "success",
+    "deploy / Smoke-test the published site (T182)": "success",
+    "deploy / Post Run actions/checkout@v7": "success",
+    "deploy / Complete job": "success",
+    "job: gate": "success",
+    "job: run": "success",
+    "job: deploy": "success"
+   },
+   "health": {
+    "job": "morning",
+    "at": "2026-11-25T06:36:14.747993+00:00",
+    "ok": true,
+    "checks": [
+     {
+      "name": "batch_sealed",
+      "ok": true,
+      "detail": "44 questions sealed at 03:25 UTC"
+     },
+     {
+      "name": "data_contracts",
+      "ok": true,
+      "detail": "44 contexts checked, 0 violations"
+     },
+     {
+      "name": "nothing_overdue",
+      "ok": true,
+      "detail": "none"
+     },
+     {
+      "name": "sources_fresh",
+      "ok": true,
+      "detail": "5 domain(s) fresh"
+     },
+     {
+      "name": "forecaster_coverage",
+      "ok": true,
+      "detail": "expected 396 forecast-or-skip pairs; complete"
+     },
+     {
+      "name": "ml_available",
+      "ok": true,
+      "detail": "0 ML model_missing/error skips"
+     },
+     {
+      "name": "parse_failures",
+      "ok": true,
+      "detail": "0 of 80 LLM answers unparseable (0%)"
+     },
+     {
+      "name": "ledger_verify",
+      "ok": true,
+      "detail": "ledger verify: PASS: 492 files, 12 batch seals, 13 day seals, 1553 forecasts checked"
+     }
+    ],
+    "workflow_run_id": "45561185661",
+    "workflow_attempt": "1"
+   }
+  },
+  {
+   "key": "45559899068:1",
+   "job": "resolve",
+   "event": "workflow_dispatch",
+   "created_at": "2026-11-25T06:20:43Z",
+   "started_at": "2026-11-25T06:20:43Z",
+   "ended_at": "2026-11-25T06:22:35Z",
+   "intended_date": "2026-11-25",
+   "mode": "live",
+   "conclusion": "success",
+   "no_op": false,
+   "code_sha": "022b7767ab353e164c00b7418e3fd3d3fe471321",
+   "event_sha": "022b7767ab353e164c00b7418e3fd3d3fe471321",
+   "stages": {
+    "run / Set up job": "success",
+    "run / Run actions/checkout@v7": "success",
+    "run / Run actions/setup-python@v7": "success",
+    "run / Install pinned dependencies": "success",
+    "run / Restore cached source data": "success",
+    "run / Mode": "success",
+    "run / Let git push the ledger branch with the built-in token": "success",
+    "run / Record application execution identity": "success",
+    "run / resolve job": "success",
+    "run / Verify the ledger": "success",
+    "run / Build the site from the ledger": "success",
+    "run / Upload the site for Pages": "success",
+    "run / Health check (SPEC 12)": "success",
+    "run / Open, update or close the incident issue": "success",
+    "run / Official start (SPEC 2.9; records the health report, writes the start once)": "success",
+    "run / Fail the run when a health check failed": "skipped",
+    "run / Post Restore cached source data": "success",
+    "run / Post Run actions/setup-python@v7": "success",
+    "run / Post Run actions/checkout@v7": "success",
+    "run / Complete job": "success",
+    "deploy / Set up job": "success",
+    "deploy / Run actions/deploy-pages@v5": "success",
+    "deploy / Run actions/checkout@v7": "success",
+    "deploy / Smoke-test the published site (T182)": "success",
+    "deploy / Post Run actions/checkout@v7": "success",
+    "deploy / Complete job": "success",
+    "job: run": "success",
+    "job: deploy": "success"
+   },
+   "health": {
+    "job": "resolve",
+    "at": "2026-11-25T06:22:07.252240+00:00",
+    "ok": true,
+    "checks": [
+     {
+      "name": "batch_sealed",
+      "ok": true,
+      "detail": "not due before the 09:30 UTC lock"
+     },
+     {
+      "name": "nothing_overdue",
+      "ok": true,
+      "detail": "none"
+     },
+     {
+      "name": "sources_fresh",
+      "ok": true,
+      "detail": "5 domain(s) fresh"
+     },
+     {
+      "name": "parse_failures",
+      "ok": true,
+      "detail": "0 of 80 LLM answers unparseable (0%)"
+     },
+     {
+      "name": "ledger_verify",
+      "ok": true,
+      "detail": "ledger verify: PASS: 488 files, 12 batch seals, 13 day seals, 1553 forecasts checked"
+     }
+    ],
+    "workflow_run_id": "45559899068",
+    "workflow_attempt": "1"
+   }
+  },
+  {
+   "key": "45557556184:1",
+   "job": "morning",
+   "event": "workflow_dispatch",
+   "created_at": "2026-11-25T06:01:16Z",
+   "started_at": "2026-11-25T06:01:16Z",
+   "ended_at": "2026-11-25T06:08:09Z",
+   "intended_date": "2026-11-25",
+   "mode": "live",
+   "conclusion": "success",
+   "no_op": false,
+   "code_sha": "022b7767ab353e164c00b7418e3fd3d3fe471321",
+   "event_sha": "022b7767ab353e164c00b7418e3fd3d3fe471321",
+   "stages": {
+    "gate / Set up job": "success",
+    "gate / Manual runs are always due": "success",
+    "gate / Run actions/checkout@v7": "skipped",
+    "gate / Run actions/setup-python@v7": "skipped",
+    "gate / Install pinned dependencies": "skipped",
+    "gate / Is the morning job due?": "skipped",
+    "gate / Complete job": "success",
+    "run / Set up job": "success",
+    "run / Run actions/checkout@v7": "success",
+    "run / Run actions/setup-python@v7": "success",
+    "run / Install pinned dependencies": "success",
+    "run / Install the local LLM runtime (llm_local; a failure only skips llm_local)": "success",
+    "run / Restore cached model weights (Qwen2.5-1.5B-Instruct GGUF, pinned revision)": "success",
+    "run / Restore cached fine-tuned model (llm_local_ft; keyed by the pin file)": "success",
+    "run / Restore cached source data": "success",
+    "run / Mode": "success",
+    "run / Let git push the ledger branch with the built-in token": "success",
+    "run / Record application execution identity": "success",
+    "run / morning job": "success",
+    "run / Measure when SMARD publishes tomorrow's generation forecasts (T222b, measurement only)": "success",
+    "run / Verify the ledger": "success",
+    "run / Build the site from the ledger": "success",
+    "run / Upload the site for Pages": "success",
+    "run / Health check (SPEC 12)": "success",
+    "run / Open, update or close the incident issue": "success",
+    "run / Official start (SPEC 2.9; records the health report, writes the start once)": "success",
+    "run / Fail the run when a health check failed": "skipped",
+    "run / Post Restore cached source data": "success",
+    "run / Post Restore cached fine-tuned model (llm_local_ft; keyed by the pin file)": "success",
+    "run / Post Restore cached model weights (Qwen2.5-1.5B-Instruct GGUF, pinned revision)": "success",
+    "run / Post Run actions/setup-python@v7": "success",
+    "run / Post Run actions/checkout@v7": "success",
+    "run / Complete job": "success",
+    "deploy / Set up job": "success",
+    "deploy / Run actions/deploy-pages@v5": "success",
+    "deploy / Run actions/checkout@v7": "success",
+    "deploy / Smoke-test the published site (T182)": "success",
+    "deploy / Post Run actions/checkout@v7": "success",
+    "deploy / Complete job": "success",
+    "job: gate": "success",
+    "job: run": "success",
+    "job: deploy": "success"
+   },
+   "health": {
+    "job": "morning",
+    "at": "2026-11-25T06:07:36.890406+00:00",
+    "ok": true,
+    "checks": [
+     {
+      "name": "batch_sealed",
+      "ok": true,
+      "detail": "44 questions sealed at 03:25 UTC"
+     },
+     {
+      "name": "data_contracts",
+      "ok": true,
+      "detail": "44 contexts checked, 0 violations"
+     },
+     {
+      "name": "nothing_overdue",
+      "ok": true,
+      "detail": "none"
+     },
+     {
+      "name": "sources_fresh",
+      "ok": true,
+      "detail": "5 domain(s) fresh"
+     },
+     {
+      "name": "forecaster_coverage",
+      "ok": true,
+      "detail": "expected 396 forecast-or-skip pairs; complete"
+     },
+     {
+      "name": "ml_available",
+      "ok": true,
+      "detail": "0 ML model_missing/error skips"
+     },
+     {
+      "name": "parse_failures",
+      "ok": true,
+      "detail": "0 of 80 LLM answers unparseable (0%)"
+     },
+     {
+      "name": "ledger_verify",
+      "ok": true,
+      "detail": "ledger verify: PASS: 484 files, 12 batch seals, 13 day seals, 1553 forecasts checked"
+     }
+    ],
+    "workflow_run_id": "45557556184",
+    "workflow_attempt": "1"
+   }
+  },
+  {
+   "key": "45554122726:1",
+   "job": "morning",
+   "event": "workflow_dispatch",
+   "created_at": "2026-11-25T05:31:04Z",
+   "started_at": "2026-11-25T05:31:04Z",
+   "ended_at": "2026-11-25T05:35:50Z",
+   "intended_date": "2026-11-25",
+   "mode": "live",
+   "conclusion": "success",
+   "no_op": false,
+   "code_sha": "022b7767ab353e164c00b7418e3fd3d3fe471321",
+   "event_sha": "022b7767ab353e164c00b7418e3fd3d3fe471321",
+   "stages": {
+    "gate / Set up job": "success",
+    "gate / Manual runs are always due": "success",
+    "gate / Run actions/checkout@v7": "skipped",
+    "gate / Run actions/setup-python@v7": "skipped",
+    "gate / Install pinned dependencies": "skipped",
+    "gate / Is the morning job due?": "skipped",
+    "gate / Complete job": "success",
+    "run / Set up job": "success",
+    "run / Run actions/checkout@v7": "success",
+    "run / Run actions/setup-python@v7": "success",
+    "run / Install pinned dependencies": "success",
+    "run / Install the local LLM runtime (llm_local; a failure only skips llm_local)": "success",
+    "run / Restore cached model weights (Qwen2.5-1.5B-Instruct GGUF, pinned revision)": "success",
+    "run / Restore cached fine-tuned model (llm_local_ft; keyed by the pin file)": "success",
+    "run / Restore cached source data": "success",
+    "run / Mode": "success",
+    "run / Let git push the ledger branch with the built-in token": "success",
+    "run / Record application execution identity": "success",
+    "run / morning job": "success",
+    "run / Measure when SMARD publishes tomorrow's generation forecasts (T222b, measurement only)": "success",
+    "run / Verify the ledger": "success",
+    "run / Build the site from the ledger": "success",
+    "run / Upload the site for Pages": "success",
+    "run / Health check (SPEC 12)": "success",
+    "run / Open, update or close the incident issue": "success",
+    "run / Official start (SPEC 2.9; records the health report, writes the start once)": "success",
+    "run / Fail the run when a health check failed": "skipped",
+    "run / Post Restore cached source data": "success",
+    "run / Post Restore cached fine-tuned model (llm_local_ft; keyed by the pin file)": "success",
+    "run / Post Restore cached model weights (Qwen2.5-1.5B-Instruct GGUF, pinned revision)": "success",
+    "run / Post Run actions/setup-python@v7": "success",
+    "run / Post Run actions/checkout@v7": "success",
+    "run / Complete job": "success",
+    "deploy / Set up job": "success",
+    "deploy / Run actions/deploy-pages@v5": "success",
+    "deploy / Run actions/checkout@v7": "success",
+    "deploy / Smoke-test the published site (T182)": "success",
+    "deploy / Post Run actions/checkout@v7": "success",
+    "deploy / Complete job": "success",
+    "job: gate": "success",
+    "job: run": "success",
+    "job: deploy": "success"
+   },
+   "health": {
+    "job": "morning",
+    "at": "2026-11-25T05:35:22.830557+00:00",
+    "ok": true,
+    "checks": [
+     {
+      "name": "batch_sealed",
+      "ok": true,
+      "detail": "44 questions sealed at 03:25 UTC"
+     },
+     {
+      "name": "data_contracts",
+      "ok": true,
+      "detail": "44 contexts checked, 0 violations"
+     },
+     {
+      "name": "nothing_overdue",
+      "ok": true,
+      "detail": "none"
+     },
+     {
+      "name": "sources_fresh",
+      "ok": true,
+      "detail": "5 domain(s) fresh"
+     },
+     {
+      "name": "forecaster_coverage",
+      "ok": true,
+      "detail": "expected 396 forecast-or-skip pairs; complete"
+     },
+     {
+      "name": "ml_available",
+      "ok": true,
+      "detail": "0 ML model_missing/error skips"
+     },
+     {
+      "name": "parse_failures",
+      "ok": true,
+      "detail": "0 of 80 LLM answers unparseable (0%)"
+     },
+     {
+      "name": "ledger_verify",
+      "ok": true,
+      "detail": "ledger verify: PASS: 480 files, 12 batch seals, 13 day seals, 1553 forecasts checked"
+     }
+    ],
+    "workflow_run_id": "45554122726",
+    "workflow_attempt": "1"
+   }
+  },
+  {
+   "key": "45550681806:1",
+   "job": "morning",
+   "event": "workflow_dispatch",
+   "created_at": "2026-11-25T05:01:20Z",
+   "started_at": "2026-11-25T05:01:20Z",
+   "ended_at": "2026-11-25T05:07:29Z",
+   "intended_date": "2026-11-25",
+   "mode": "live",
+   "conclusion": "success",
+   "no_op": false,
+   "code_sha": "022b7767ab353e164c00b7418e3fd3d3fe471321",
+   "event_sha": "022b7767ab353e164c00b7418e3fd3d3fe471321",
+   "stages": {
+    "gate / Set up job": "success",
+    "gate / Manual runs are always due": "success",
+    "gate / Run actions/checkout@v7": "skipped",
+    "gate / Run actions/setup-python@v7": "skipped",
+    "gate / Install pinned dependencies": "skipped",
+    "gate / Is the morning job due?": "skipped",
+    "gate / Complete job": "success",
+    "run / Set up job": "success",
+    "run / Run actions/checkout@v7": "success",
+    "run / Run actions/setup-python@v7": "success",
+    "run / Install pinned dependencies": "success",
+    "run / Install the local LLM runtime (llm_local; a failure only skips llm_local)": "success",
+    "run / Restore cached model weights (Qwen2.5-1.5B-Instruct GGUF, pinned revision)": "success",
+    "run / Restore cached fine-tuned model (llm_local_ft; keyed by the pin file)": "success",
+    "run / Restore cached source data": "success",
+    "run / Mode": "success",
+    "run / Let git push the ledger branch with the built-in token": "success",
+    "run / Record application execution identity": "success",
+    "run / morning job": "success",
+    "run / Measure when SMARD publishes tomorrow's generation forecasts (T222b, measurement only)": "success",
+    "run / Verify the ledger": "success",
+    "run / Build the site from the ledger": "success",
+    "run / Upload the site for Pages": "success",
+    "run / Health check (SPEC 12)": "success",
+    "run / Open, update or close the incident issue": "success",
+    "run / Official start (SPEC 2.9; records the health report, writes the start once)": "success",
+    "run / Fail the run when a health check failed": "skipped",
+    "run / Post Restore cached source data": "success",
+    "run / Post Restore cached fine-tuned model (llm_local_ft; keyed by the pin file)": "success",
+    "run / Post Restore cached model weights (Qwen2.5-1.5B-Instruct GGUF, pinned revision)": "success",
+    "run / Post Run actions/setup-python@v7": "success",
+    "run / Post Run actions/checkout@v7": "success",
+    "run / Complete job": "success",
+    "deploy / Set up job": "success",
+    "deploy / Run actions/deploy-pages@v5": "success",
+    "deploy / Run actions/checkout@v7": "success",
+    "deploy / Smoke-test the published site (T182)": "success",
+    "deploy / Post Run actions/checkout@v7": "success",
+    "deploy / Complete job": "success",
+    "job: gate": "success",
+    "job: run": "success",
+    "job: deploy": "success"
+   },
+   "health": {
+    "job": "morning",
+    "at": "2026-11-25T05:07:05.186459+00:00",
+    "ok": true,
+    "checks": [
+     {
+      "name": "batch_sealed",
+      "ok": true,
+      "detail": "44 questions sealed at 03:25 UTC"
+     },
+     {
+      "name": "data_contracts",
+      "ok": true,
+      "detail": "44 contexts checked, 0 violations"
+     },
+     {
+      "name": "nothing_overdue",
+      "ok": true,
+      "detail": "none"
+     },
+     {
+      "name": "sources_fresh",
+      "ok": true,
+      "detail": "5 domain(s) fresh"
+     },
+     {
+      "name": "forecaster_coverage",
+      "ok": true,
+      "detail": "expected 396 forecast-or-skip pairs; complete"
+     },
+     {
+      "name": "ml_available",
+      "ok": true,
+      "detail": "0 ML model_missing/error skips"
+     },
+     {
+      "name": "parse_failures",
+      "ok": true,
+      "detail": "0 of 80 LLM answers unparseable (0%)"
+     },
+     {
+      "name": "ledger_verify",
+      "ok": true,
+      "detail": "ledger verify: PASS: 476 files, 12 batch seals, 13 day seals, 1553 forecasts checked"
+     }
+    ],
+    "workflow_run_id": "45550681806",
+    "workflow_attempt": "1"
+   }
+  },
+  {
+   "key": "45539319530:1",
+   "job": "resolve",
+   "event": "workflow_dispatch",
+   "created_at": "2026-11-25T03:20:40Z",
+   "started_at": "2026-11-25T03:20:40Z",
+   "ended_at": "2026-11-25T03:27:48Z",
+   "intended_date": "2026-11-25",
+   "mode": "live",
+   "conclusion": "success",
+   "no_op": false,
+   "code_sha": "022b7767ab353e164c00b7418e3fd3d3fe471321",
+   "event_sha": "022b7767ab353e164c00b7418e3fd3d3fe471321",
+   "stages": {
+    "run / Set up job": "success",
+    "run / Run actions/checkout@v7": "success",
+    "run / Run actions/setup-python@v7": "success",
+    "run / Install pinned dependencies": "success",
+    "run / Restore cached source data": "success",
+    "run / Mode": "success",
+    "run / Let git push the ledger branch with the built-in token": "success",
+    "run / Record application execution identity": "success",
+    "run / resolve job": "success",
+    "run / Verify the ledger": "success",
+    "run / Build the site from the ledger": "success",
+    "run / Upload the site for Pages": "success",
+    "run / Health check (SPEC 12)": "success",
+    "run / Open, update or close the incident issue": "success",
+    "run / Official start (SPEC 2.9; records the health report, writes the start once)": "success",
+    "run / Fail the run when a health check failed": "skipped",
+    "run / Post Restore cached source data": "success",
+    "run / Post Run actions/setup-python@v7": "success",
+    "run / Post Run actions/checkout@v7": "success",
+    "run / Complete job": "success",
+    "deploy / Set up job": "success",
+    "deploy / Run actions/deploy-pages@v5": "success",
+    "deploy / Run actions/checkout@v7": "success",
+    "deploy / Smoke-test the published site (T182)": "success",
+    "deploy / Post Run actions/checkout@v7": "success",
+    "deploy / Complete job": "success",
+    "job: run": "success",
+    "job: deploy": "success"
+   },
+   "health": {
+    "job": "resolve",
+    "at": "2026-11-25T03:27:24.771495+00:00",
+    "ok": true,
+    "checks": [
+     {
+      "name": "batch_sealed",
+      "ok": true,
+      "detail": "not due before the 09:30 UTC lock"
+     },
+     {
+      "name": "nothing_overdue",
+      "ok": true,
+      "detail": "none"
+     },
+     {
+      "name": "sources_fresh",
+      "ok": true,
+      "detail": "5 domain(s) fresh"
+     },
+     {
+      "name": "parse_failures",
+      "ok": true,
+      "detail": "0 of 80 LLM answers unparseable (0%)"
+     },
+     {
+      "name": "ledger_verify",
+      "ok": true,
+      "detail": "ledger verify: PASS: 471 files, 12 batch seals, 13 day seals, 1553 forecasts checked"
+     }
+    ],
+    "workflow_run_id": "45539319530",
+    "workflow_attempt": "1"
+   }
+  },
+  {
+   "key": "45536891944:1",
+   "job": "morning",
+   "event": "schedule",
+   "created_at": "2026-11-25T03:00:18Z",
+   "started_at": "2026-11-25T03:00:18Z",
+   "ended_at": "2026-11-25T03:26:21Z",
+   "intended_date": "2026-11-25",
+   "mode": "live",
+   "conclusion": "success",
+   "no_op": false,
+   "code_sha": "022b7767ab353e164c00b7418e3fd3d3fe471321",
+   "event_sha": "022b7767ab353e164c00b7418e3fd3d3fe471321",
+   "stages": {
+    "gate / Set up job": "success",
+    "gate / Manual runs are always due": "skipped",
+    "gate / Run actions/checkout@v7": "success",
+    "gate / Run actions/setup-python@v7": "success",
+    "gate / Install pinned dependencies": "success",
+    "gate / Is the morning job due?": "success",
+    "gate / Post Run actions/setup-python@v7": "success",
+    "gate / Post Run actions/checkout@v7": "success",
+    "gate / Complete job": "success",
+    "run / Set up job": "success",
+    "run / Run actions/checkout@v7": "success",
+    "run / Run actions/setup-python@v7": "success",
+    "run / Install pinned dependencies": "success",
+    "run / Install the local LLM runtime (llm_local; a failure only skips llm_local)": "success",
+    "run / Restore cached model weights (Qwen2.5-1.5B-Instruct GGUF, pinned revision)": "success",
+    "run / Restore cached fine-tuned model (llm_local_ft; keyed by the pin file)": "success",
+    "run / Restore cached source data": "success",
+    "run / Mode": "success",
+    "run / Let git push the ledger branch with the built-in token": "success",
+    "run / Record application execution identity": "success",
+    "run / morning job": "success",
+    "run / Measure when SMARD publishes tomorrow's generation forecasts (T222b, measurement only)": "success",
+    "run / Verify the ledger": "success",
+    "run / Build the site from the ledger": "success",
+    "run / Upload the site for Pages": "success",
+    "run / Health check (SPEC 12)": "success",
+    "run / Open, update or close the incident issue": "success",
+    "run / Official start (SPEC 2.9; records the health report, writes the start once)": "success",
+    "run / Fail the run when a health check failed": "skipped",
+    "run / Post Restore cached source data": "success",
+    "run / Post Restore cached fine-tuned model (llm_local_ft; keyed by the pin file)": "success",
+    "run / Post Restore cached model weights (Qwen2.5-1.5B-Instruct GGUF, pinned revision)": "success",
+    "run / Post Run actions/setup-python@v7": "success",
+    "run / Post Run actions/checkout@v7": "success",
+    "run / Complete job": "success",
+    "deploy / Set up job": "success",
+    "deploy / Run actions/deploy-pages@v5": "success",
+    "deploy / Run actions/checkout@v7": "success",
+    "deploy / Smoke-test the published site (T182)": "success",
+    "deploy / Post Run actions/checkout@v7": "success",
+    "deploy / Complete job": "success",
+    "job: gate": "success",
+    "job: run": "success",
+    "job: deploy": "success"
+   },
+   "health": {
+    "job": "morning",
+    "at": "2026-11-25T03:25:49.162440+00:00",
+    "ok": true,
+    "checks": [
+     {
+      "name": "batch_sealed",
+      "ok": true,
+      "detail": "44 questions sealed at 03:25 UTC"
+     },
+     {
+      "name": "data_contracts",
+      "ok": true,
+      "detail": "44 contexts checked, 0 violations"
+     },
+     {
+      "name": "nothing_overdue",
+      "ok": true,
+      "detail": "none"
+     },
+     {
+      "name": "sources_fresh",
+      "ok": true,
+      "detail": "5 domain(s) fresh"
+     },
+     {
+      "name": "forecaster_coverage",
+      "ok": true,
+      "detail": "expected 396 forecast-or-skip pairs; complete"
+     },
+     {
+      "name": "ml_available",
+      "ok": true,
+      "detail": "0 ML model_missing/error skips"
+     },
+     {
+      "name": "parse_failures",
+      "ok": true,
+      "detail": "0 of 80 LLM answers unparseable (0%)"
+     },
+     {
+      "name": "ledger_verify",
+      "ok": true,
+      "detail": "ledger verify: PASS: 467 files, 12 batch seals, 13 day seals, 1553 forecasts checked"
+     }
+    ],
+    "workflow_run_id": "45536891944",
+    "workflow_attempt": "1"
+   }
+  },
+  {
+   "key": "45519073220:1",
+   "job": "evening",
+   "event": "schedule",
+   "created_at": "2026-11-25T00:34:05Z",
+   "started_at": "2026-11-25T00:34:05Z",
+   "ended_at": "2026-11-25T00:34:45Z",
+   "intended_date": null,
+   "mode": "live",
+   "conclusion": "success",
+   "no_op": true,
+   "code_sha": null,
+   "event_sha": "022b7767ab353e164c00b7418e3fd3d3fe471321",
+   "stages": {
+    "gate / Set up job": "success",
+    "gate / Manual runs are always due": "skipped",
+    "gate / Run actions/checkout@v7": "success",
+    "gate / Run actions/setup-python@v7": "success",
+    "gate / Install pinned dependencies": "success",
+    "gate / Is the evening job due?": "success",
+    "gate / Post Run actions/setup-python@v7": "success",
+    "gate / Post Run actions/checkout@v7": "success",
+    "gate / Complete job": "success",
+    "job: gate": "success",
+    "job: run": "skipped",
+    "job: deploy": "skipped"
+   },
+   "health": null
+  },
+  {
+   "key": "45517348188:1",
+   "job": "resolve",
+   "event": "workflow_dispatch",
+   "created_at": "2026-11-25T00:20:41Z",
+   "started_at": "2026-11-25T00:20:41Z",
+   "ended_at": "2026-11-25T00:22:15Z",
+   "intended_date": "2026-11-25",
+   "mode": "live",
+   "conclusion": "success",
+   "no_op": false,
+   "code_sha": "022b7767ab353e164c00b7418e3fd3d3fe471321",
+   "event_sha": "022b7767ab353e164c00b7418e3fd3d3fe471321",
+   "stages": {
+    "run / Set up job": "success",
+    "run / Run actions/checkout@v7": "success",
+    "run / Run actions/setup-python@v7": "success",
+    "run / Install pinned dependencies": "success",
+    "run / Restore cached source data": "success",
+    "run / Mode": "success",
+    "run / Let git push the ledger branch with the built-in token": "success",
+    "run / Record application execution identity": "success",
+    "run / resolve job": "success",
+    "run / Verify the ledger": "success",
+    "run / Build the site from the ledger": "success",
+    "run / Upload the site for Pages": "success",
+    "run / Health check (SPEC 12)": "success",
+    "run / Open, update or close the incident issue": "success",
+    "run / Official start (SPEC 2.9; records the health report, writes the start once)": "success",
+    "run / Fail the run when a health check failed": "skipped",
+    "run / Post Restore cached source data": "success",
+    "run / Post Run actions/setup-python@v7": "success",
+    "run / Post Run actions/checkout@v7": "success",
+    "run / Complete job": "success",
+    "deploy / Set up job": "success",
+    "deploy / Run actions/deploy-pages@v5": "success",
+    "deploy / Run actions/checkout@v7": "success",
+    "deploy / Smoke-test the published site (T182)": "success",
+    "deploy / Post Run actions/checkout@v7": "success",
+    "deploy / Complete job": "success",
+    "job: run": "success",
+    "job: deploy": "success"
+   },
+   "health": {
+    "job": "resolve",
+    "at": "2026-11-25T00:21:38.730093+00:00",
+    "ok": true,
+    "checks": [
+     {
+      "name": "batch_sealed",
+      "ok": true,
+      "detail": "not due before the 09:30 UTC lock"
+     },
+     {
+      "name": "nothing_overdue",
+      "ok": true,
+      "detail": "none"
+     },
+     {
+      "name": "sources_fresh",
+      "ok": true,
+      "detail": "5 domain(s) fresh"
+     },
+     {
+      "name": "parse_failures",
+      "ok": true,
+      "detail": "0 of 0 LLM answers unparseable (0%)"
+     },
+     {
+      "name": "ledger_verify",
+      "ok": true,
+      "detail": "ledger verify: PASS: 454 files, 11 batch seals, 13 day seals, 1341 forecasts checked"
+     }
+    ],
+    "workflow_run_id": "45517348188",
+    "workflow_attempt": "1"
+   }
+  },
+  {
+   "key": "45514397975:1",
+   "job": "resolve",
+   "event": "schedule",
+   "created_at": "2026-11-24T23:58:48Z",
+   "started_at": "2026-11-24T23:58:48Z",
+   "ended_at": "2026-11-25T00:00:08Z",
+   "intended_date": "2026-11-24",
+   "mode": "live",
+   "conclusion": "failure",
+   "no_op": false,
+   "code_sha": "022b7767ab353e164c00b7418e3fd3d3fe471321",
+   "event_sha": "022b7767ab353e164c00b7418e3fd3d3fe471321",
+   "stages": {
+    "run / Set up job": "success",
+    "run / Run actions/checkout@v7": "success",
+    "run / Run actions/setup-python@v7": "success",
+    "run / Install pinned dependencies": "success",
+    "run / Restore cached source data": "success",
+    "run / Mode": "success",
+    "run / Let git push the ledger branch with the built-in token": "success",
+    "run / Record application execution identity": "success",
+    "run / resolve job": "success",
+    "run / Verify the ledger": "success",
+    "run / Build the site from the ledger": "success",
+    "run / Upload the site for Pages": "success",
+    "run / Health check (SPEC 12)": "success",
+    "run / Open, update or close the incident issue": "success",
+    "run / Official start (SPEC 2.9; records the health report, writes the start once)": "success",
+    "run / Fail the run when a health check failed": "failure",
+    "run / Post Restore cached source data": "skipped",
+    "run / Post Run actions/setup-python@v7": "skipped",
+    "run / Post Run actions/checkout@v7": "success",
+    "run / Complete job": "success",
+    "deploy / Set up job": "success",
+    "deploy / Run actions/deploy-pages@v5": "success",
+    "deploy / Run actions/checkout@v7": "success",
+    "deploy / Smoke-test the published site (T182)": "success",
+    "deploy / Post Run actions/checkout@v7": "success",
+    "deploy / Complete job": "success",
+    "job: run": "failure",
+    "job: deploy": "success"
+   },
+   "health": {
+    "job": "resolve",
+    "at": "2026-11-24T23:59:44.324731+00:00",
+    "ok": false,
+    "checks": [
+     {
+      "name": "batch_sealed",
+      "ok": false,
+      "detail": "no questions for 2026-11-24"
+     },
+     {
+      "name": "nothing_overdue",
+      "ok": true,
+      "detail": "none"
+     },
+     {
+      "name": "sources_fresh",
+      "ok": true,
+      "detail": "5 domain(s) fresh"
+     },
+     {
+      "name": "forecaster_coverage",
+      "ok": false,
+      "detail": "expected 0 forecast-or-skip pairs; no batch for 2026-11-24, so nothing could be covered (see batch_sealed)"
+     },
+     {
+      "name": "ml_available",
+      "ok": true,
+      "detail": "0 ML model_missing/error skips"
+     },
+     {
+      "name": "parse_failures",
+      "ok": true,
+      "detail": "0 of 0 LLM answers unparseable (0%)"
+     },
+     {
+      "name": "ledger_verify",
+      "ok": true,
+      "detail": "ledger verify: PASS: 449 files, 11 batch seals, 12 day seals, 1341 forecasts checked"
+     }
+    ],
+    "workflow_run_id": "45514397975",
+    "workflow_attempt": "1"
+   }
+  }
+ ],
+ "incident_numbers": [
+  42
+ ],
+ "open_incident_numbers": [],
+ "players_required": false
+}

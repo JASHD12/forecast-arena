@@ -17,13 +17,13 @@ same data, the same skills and a comparable token budget? An honest "no" (or "ye
 |---|---|---|
 | `quant-analyst` | the deterministic reference estimate (`numeric_estimate`) for the question and the name of the topic skill; "no estimate" for topics without a reference model | none |
 | `historian` | the base rate and the similar past questions (same leakage rule as the agent's tool), as evidence items | none |
-| `news-scout` | as-of headlines and Wikipedia text through the existing tools and guards, then one model call that keeps the relevant items and says in a line what each could change; **never returns a probability** | 1 |
+| `news-scout` | as-of headlines and Wikipedia text through the existing tools and guards, then one model call that keeps the relevant items (by number, mapped back to the real headlines) and says in a line what each could change; **never returns a probability**; with nothing to read it answers "no evidence available" and makes no call | 0 or 1 |
 | `skeptic` | red-teams the chair's draft (threshold or comparator mistakes, hedging, overconfidence, a number that disagrees with the estimate without a reason); never returns a probability | 1 |
 | `chair` | merges the members' artefacts, writes a draft, then the final answer in the standard output contract (`parse_answer`, one repair retry) | 2 |
 
 Fixed message flow per question: chair → (`quant-analyst`, `historian`, `news-scout` in parallel) → chair draft → `skeptic` → chair final.
 Members get only the question fields, the as-of context and the as-of time in the A2A message, and read tools only through the existing `ToolBox` (I3).
-At most four model calls per question (plus one repair), all through the guarded client and the shared 300,000-token daily cap.
+At most four model calls per question in the normal path (three when the scout has nothing to read), plus at most one repair each for the chair's answers and the skeptic's critique (harness cap: seven requests), all through the guarded client and the shared 300,000-token daily cap.
 
 ## Quorum rule (fixed now, I6)
 

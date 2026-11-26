@@ -69,6 +69,10 @@ class Settings(BaseModel):
     agent_rag: bool = False
     #: T274: run `agent_hybrid` (hybrid retrieval + guarded tool text); needs the RAG requirements.
     agent_hybrid: bool = False
+    #: T342: run `agent_quant` (the agent with a reference estimate and a probability calculator).
+    agent_quant: bool = False
+    #: T343: run `agent_analyst` (the agent that starts from the ml forecast).
+    agent_analyst: bool = False
     #: T121: run the LangGraph agent `agent_graph` (needs requirements/graph.txt).
     agent_graph: bool = False
     #: T122: run `llm_local`, an open model on the local CPU (needs requirements/local.txt).

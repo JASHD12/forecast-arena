@@ -148,6 +148,18 @@ INFORMATION_SETS = (
         "daily sample",
     ),
     (
+        "agent_quant",
+        "As agent, plus a reference estimate computed from the stored data and a probability "
+        "calculator (experimental)",
+        "daily sample",
+    ),
+    (
+        "agent_analyst",
+        "As agent, told to start from the ml forecast and change it only for evidence the model "
+        "cannot see (experimental)",
+        "daily sample",
+    ),
+    (
         "bandit_hedge",
         "The other forecasters' forecasts of the same question, blended with weights learned "
         "online from resolved questions (Hedge; experimental)",
@@ -166,10 +178,21 @@ AI_FORECASTERS = frozenset(
         "llm_local_ft",
         "llm_router",
         "agent_hybrid",
+        "agent_quant",
+        "agent_analyst",
     }
 )
 #: Experimental forecasters (SPEC 17): named "(experimental)", outside the common-set board.
-EXPERIMENTAL_FORECASTERS = frozenset({"llm_local_ft", "llm_router", "agent_hybrid", "bandit_hedge"})
+EXPERIMENTAL_FORECASTERS = frozenset(
+    {
+        "llm_local_ft",
+        "llm_router",
+        "agent_hybrid",
+        "agent_quant",
+        "agent_analyst",
+        "bandit_hedge",
+    }
+)
 
 
 TEMPLATE_VERSION_NOTES = {

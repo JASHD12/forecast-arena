@@ -86,6 +86,8 @@ SERIES_SLOTS = {
     "llm_router": 10,
     "agent_hybrid": 11,
     "bandit_hedge": 12,
+    "agent_quant": 13,
+    "agent_analyst": 14,
 }
 RACE_MIN_DAYS = 7  # a line chart over fewer days is noise, not a race
 RACE_WIDE = (700, 300, (16, 220, 34, 44))  # viewBox width, height, pad (top, right, bottom, left)
@@ -99,6 +101,8 @@ AI_FORECASTERS = (
     "llm_local_ft",
     "llm_router",
     "agent_hybrid",
+    "agent_quant",
+    "agent_analyst",
 )
 RACE_LABEL_CHARS = 20  # longest name drawn next to a line (the legend has the full name)
 HIGHLIGHT = ("ml", "base_rate")

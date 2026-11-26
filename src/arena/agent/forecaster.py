@@ -43,6 +43,8 @@ class AgentForecaster:
     forecaster_id = "agent"
     max_output_tokens = 400
     prompt_files: tuple[str, ...] = ("agent_system", "agent_user", "agent_final", "repair")
+    #: Files that use another version than `prompt_version` (experimental variants only).
+    prompt_versions: dict[str, str] = {}  # noqa: RUF012 - read-only class default
 
     def __init__(
         self,
@@ -82,12 +84,32 @@ class AgentForecaster:
     def version(self) -> str:
         """Model id, prompt version and tool limits."""
         model = self.client.model if self.client is not None else "none"
-        fp = prompts.fingerprint(self.prompt_files, self.prompt_version)
+        fp = prompts.fingerprint_map({n: self._pv(n) for n in self.prompt_files})
         rag = f"|rag-{self.retriever.embedder.name}" if self.retriever is not None else ""
         return (
             f"{model}|prompt-{self.prompt_version}-{fp}|tools-{self.max_tool_calls}{rag}"
             f"|out-{self.max_output_tokens}"
         )
+
+    def _toolbox(self, q: Question, ctx: dict[str, Any], asof: datetime, **extra: Any) -> ToolBox:
+        """The tool executor for one question (variants add tools through `extra`)."""
+        return ToolBox(
+            ctx,
+            asof,
+            probabilities=self._peer_probabilities(q, ctx, asof),
+            news=self.news,
+            wiki=self.wiki,
+            similar=self._similar(q, asof),
+            guard=self.guard,
+            max_calls=self.max_tool_calls,
+            time_limit=self.time_limit,
+            monotonic=self.monotonic,
+            **extra,
+        )
+
+    def _pv(self, name: str) -> str:
+        """Version of prompt file `name` (the agent's own unless a variant overrides it)."""
+        return self.prompt_versions.get(name, self.prompt_version)
 
     def _similar(self, q: Question, asof: datetime) -> Callable[[int, bool], dict[str, Any]] | None:
         """The RAG tool bound to this question and forecast time (I3: asof filter)."""
@@ -131,19 +153,8 @@ class AgentForecaster:
             return self._skip(q, "model_missing", "no LLM configured", asof)
         if self.sample is not None and q.question_id not in self.sample:
             return self._skip(q, "not_sampled", "not in today's LLM sample", asof)
-        box = ToolBox(
-            ctx,
-            asof,
-            probabilities=self._peer_probabilities(q, ctx, asof),
-            news=self.news,
-            wiki=self.wiki,
-            similar=self._similar(q, asof),
-            guard=self.guard,
-            max_calls=self.max_tool_calls,
-            time_limit=self.time_limit,
-            monotonic=self.monotonic,
-        )
-        system = prompts.load("agent_system", self.prompt_version).replace(
+        box = self._toolbox(q, ctx, asof)
+        system = prompts.load("agent_system", self._pv("agent_system")).replace(
             "{max_calls}", str(self.max_tool_calls)
         )
         turns: list[Turn] = [UserText(self._user_prompt(q, ctx, asof))]
@@ -153,7 +164,7 @@ class AgentForecaster:
             try:
                 answer = parse_answer(answer_text)
             except ParseError as first:
-                repair = prompts.load("repair", self.prompt_version).replace("{error}", str(first))
+                repair = prompts.load("repair", self._pv("repair")).replace("{error}", str(first))
                 # `_loop` already appended the model's reply to `turns`; adding it again
                 # would send two assistant messages in a row, which the API merges and
                 # then rejects for modified thinking blocks (seen live on 2026-11-13).
@@ -208,7 +219,7 @@ class AgentForecaster:
             results = tuple((c.id, *box.run(c)) for c in resp.tool_calls)
             turns.append(ToolResults(results))
             if box.calls_left <= 0 or box.time_left() <= 0:
-                turns.append(UserText(prompts.load("agent_final", self.prompt_version)))
+                turns.append(UserText(prompts.load("agent_final", self._pv("agent_final"))))
                 resp = self.client.complete(
                     system, turns, max_tokens=self.max_output_tokens, tools=self.tools
                 )
@@ -218,7 +229,7 @@ class AgentForecaster:
 
     def _user_prompt(self, q: Question, ctx: dict[str, Any], asof: datetime) -> str:
         return (
-            prompts.load("agent_user", self.prompt_version)
+            prompts.load("agent_user", self._pv("agent_user"))
             .replace("{today}", asof.date().isoformat())
             .replace("{lock_time}", q.lock_time.strftime("%Y-%m-%d %H:%M UTC"))
             .replace("{asof}", asof.strftime("%Y-%m-%d %H:%M UTC"))

@@ -8,6 +8,8 @@
 | search_news(query, days_back) | up to 10 headlines (title, outlet, URL, time) published
 before the forecast time |
 | wikipedia_summary(title, project) | the lead summary of an article |
+| estimate_probability() | reference estimate from this question's stored data (`agent_quant`) |
+| calculate_probability(c, sd, t, dir) | normal-distribution arithmetic (`agent_quant`) |
 | similar_past_questions(k, same_domain) | the k most similar questions resolved before the
 forecast time, with outcomes (offered only with prompt v2; `agent/retrieval.py`) |
 
@@ -21,6 +23,7 @@ sources, not article text.
 from __future__ import annotations
 
 import json
+import math
 import time as _time
 import urllib.parse
 import xml.etree.ElementTree as ET
@@ -249,6 +252,44 @@ SIMILAR_SPEC = ToolSpec(
 )
 
 
+ESTIMATE_SPEC = ToolSpec(
+    "estimate_probability",
+    "A reference probability for this question computed from its stored data only (for example "
+    "the DWD forecast with a normal error, or how often recent days crossed the threshold), "
+    "with the method and inputs. Takes no arguments. Returns an error if the topic has no "
+    "reference model.",
+    {"type": "object", "properties": {}, "additionalProperties": False},
+)
+
+CALC_SPEC = ToolSpec(
+    "calculate_probability",
+    "Probability that a normally distributed quantity with the given centre and standard "
+    "deviation is above (direction gt) or below (direction lt) a threshold. Pure arithmetic.",
+    {
+        "type": "object",
+        "properties": {
+            "center": {"type": "number"},
+            "sd": {"type": "number"},
+            "threshold": {"type": "number"},
+            "direction": {"type": "string", "enum": ["gt", "lt"]},
+        },
+        "required": ["center", "sd", "threshold", "direction"],
+        "additionalProperties": False,
+    },
+)
+
+
+def normal_probability(center: float, sd: float, threshold: float, direction: str) -> float:
+    """P(X > threshold) for direction "gt", P(X < threshold) for "lt"; X ~ Normal(center, sd)."""
+    if not sd > 0 or not math.isfinite(sd):
+        raise ValueError("sd must be a positive number")
+    if direction not in ("gt", "lt"):
+        raise ValueError("direction must be 'gt' or 'lt'")
+    z = (threshold - center) / sd
+    sf = 0.5 * math.erfc(z / math.sqrt(2))  # P(X > threshold)
+    return sf if direction == "gt" else 1.0 - sf
+
+
 @dataclass
 class TraceEntry:
     """One tool call, compactly."""
@@ -283,6 +324,7 @@ class ToolBox:
         news: NewsBackend | None = None,
         wiki: Callable[[str, str], dict[str, str]] | None = None,
         similar: Callable[[int, bool], dict[str, Any]] | None = None,
+        estimate: Callable[[], dict[str, Any]] | None = None,
         guard: Callable[[Any], tuple[Any, list[str]]] | None = None,
         max_calls: int = 4,
         time_limit: float = 90.0,
@@ -294,6 +336,7 @@ class ToolBox:
         self.news = news
         self.wiki = wiki
         self.similar = similar
+        self.estimate = estimate  # reference estimate of this question (`agent_quant` only)
         self.guard = guard  # (result) -> (cleaned result, flags); None keeps results as they are
         self.max_calls = max_calls
         self.time_limit = time_limit
@@ -361,6 +404,15 @@ class ToolBox:
             res = self.wiki(str(a["title"]), str(a["project"]))
             sources.append(res.get("url", ""))
             return res
+        if call.name == "estimate_probability":
+            if self.estimate is None:
+                raise ValueError("no reference model configured")
+            return self.estimate()
+        if call.name == "calculate_probability":
+            p = normal_probability(
+                float(a["center"]), float(a["sd"]), float(a["threshold"]), str(a["direction"])
+            )
+            return {"probability": round(p, 4), "model": "normal", "inputs": dict(a)}
         if call.name == "similar_past_questions":
             if self.similar is None:
                 raise ValueError("no retrieval index configured")

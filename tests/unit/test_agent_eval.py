@@ -96,12 +96,7 @@ def test_cli_writes_a_valid_result_and_the_page_shows_rows_and_the_flow(tmp_path
         and "0.2400" in rows[1]["result"]
     )
     c = le._committee(tmp_path)
-    assert (
-        c is not None
-        and "<svg" in str(c["svg"])
-        and "news scout" in str(c["svg"]).lower()
-        or c is not None
-    )
+    assert c is not None and "<svg" in str(c["svg"]) and "Scout" in str(c["svg"])
     assert [v["rule"] for v in c["verdicts"]] == ["H-C1", "H-C2"]
 
 

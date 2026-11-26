@@ -88,7 +88,7 @@ def highlights() -> str:
         for f in sorted((ROOT / "evals" / "results").glob("eval-*.json"))
     ]
     runs = [r for r in runs if not any(v.endswith("|so") for v in r["versions"].values())]
-    runs = [r for r in runs if "llm_plain" in r["metrics"]]  # the JSON-validity story of the first runs
+    runs = [r for r in runs if "llm_plain" in r["metrics"]]  # JSON-validity story
     first, last = runs[0], runs[-1]
     pct = lambda r: f"{100 * r['metrics']['llm_plain']['json_valid_first_try']:.0f}%"  # noqa: E731
     lines = [

@@ -173,7 +173,8 @@ def _agent_rows(res: Path) -> list[dict[str, Any]]:
     out: list[dict[str, Any]] = []
     for key, title in (
         ("agent-skills", "Skills for the tool-using agent"),
-        ("agent-committee", "A committee of specialist agents over A2A"),
+        ("agent-committee", "A committee of specialist agents over A2A (r1)"),
+        ("agent-committee-r2", "The committee, version r2 (fixed output budget and parsing)"),
     ):
         path = res / f"lab-{key}.json"
         if not path.is_file():
@@ -306,11 +307,17 @@ def _committee(res: Path) -> dict[str, Any] | None:
     from arena.lab import agent_eval as ae
     from arena.lab.results import LabResult
 
-    path = res / "lab-agent-committee.json"
-    if not path.is_file():
+    versions = []
+    for key, label in (("agent-committee", "r1"), ("agent-committee-r2", "r2")):
+        path = res / f"lab-{key}.json"
+        if path.is_file():
+            r = LabResult.model_validate(json.loads(path.read_text(encoding="utf-8")))
+            versions.append(
+                {"label": label, "verdicts": ae.verdicts(r), "note": ae.EXPERIMENTS[key].note}
+            )
+    if not versions:
         return None
-    r = LabResult.model_validate(json.loads(path.read_text(encoding="utf-8")))
-    return {"svg": committee_flow_svg(), "verdicts": ae.verdicts(r), "note": r.notes[1]}
+    return {"svg": committee_flow_svg(), "versions": versions}
 
 
 def load_page(results_dir: Path | None = None, budget: Path | None = None) -> dict[str, Any] | None:

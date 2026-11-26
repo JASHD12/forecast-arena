@@ -66,7 +66,46 @@ EXPERIMENTS = {
         "available' and the historian gave the base rate only, so this tests a reduced committee.",
         ("agent_committee",),  # the agent_skills arm is counted in the agent-skills result
     ),
+    "agent-committee-r2": Experiment(
+        "agent-committee-r2",
+        "The committee, version r2 (output budget and reply parsing fixed), against one agent with skills",
+        "Multi-agent systems and the A2A protocol are how companies split a job between "
+        "specialised agents; this is the same question as the first run after fixing the defect "
+        "it exposed. (a2a-protocol)",
+        "lab/prereg/agent-committee-r2.md",
+        ("agent_skills", "agent_committee"),
+        "agent_committee",
+        "agent_skills",
+        2.5,
+        ("H-C1", "H-C2"),
+        "r2 changes only the output budget and the parsing of the scout's and skeptic's replies "
+        "(pre-registered before the run). The agent_skills arm is the one of run 45883972017, "
+        "reused on the same golden file. The replay has no news backend and no retriever, so this "
+        "still tests a reduced committee.",
+        ("agent_committee",),
+    ),
 }
+
+
+def merge_reference(res: dict[str, Any], ref: dict[str, Any], arm: str) -> dict[str, Any]:
+    """`res` plus the arm `arm` taken from another run on the same golden file (nothing is re-run).
+
+    The files must name the same golden file hash; the pairs of `res` with that arm are recomputed from
+    the rows with the harness's own function, so they are on identical questions.
+    """
+    if res["golden_sha256"] != ref["golden_sha256"]:
+        raise ValueError("the reference run used another golden file")
+    if arm not in ref["metrics"] or arm in res["metrics"]:
+        raise ValueError(f"arm {arm} must be in the reference run and not in this run")
+    from arena.evals.run import paired
+
+    out = dict(res)
+    out["metrics"] = {**res["metrics"], arm: ref["metrics"][arm]}
+    out["versions"] = {**res["versions"], arm: ref["versions"][arm]}
+    out["rows"] = [*res["rows"], *[r for r in ref["rows"] if r["variant"] == arm]]
+    out["reference_run"] = {"arm": arm, "run_id": ref["run_id"]}
+    out["paired"] = paired(out["rows"], [*res["metrics"], arm])
+    return out
 
 
 def _per_question_cost(m: dict[str, Any]) -> float | None:
@@ -144,6 +183,13 @@ def build(res: dict[str, Any], experiment: str, *, run_id: str | None = None) ->
     paired = [] if pair is None else [{"a": e.new, "b": e.ref, "split": "eval", **pair}]
     cost = round(sum(res["metrics"][a].get("cost_usd") or 0.0 for a in e.own_arms), 6)
     notes = [
+        *(
+            [
+                f"The {res['reference_run']['arm']} arm is reused from run {res['reference_run']['run_id']} (same golden file)."
+            ]
+            if "reference_run" in res
+            else []
+        ),
         f"Run {run_id or res['run_id']} of llm-eval.yml on {res['golden']} ({res['n_items']} questions), "
         "replay with the tools a replay can honour; labelled evaluation, never the live record.",
         e.note,
@@ -189,6 +235,15 @@ def verdicts(r: LabResult) -> list[dict[str, Any]]:
     e = EXPERIMENTS[r.experiment]
     new, ref = r.metrics[f"{e.new} / eval"], r.metrics[f"{e.ref} / eval"]
     out: list[dict[str, Any]] = []
+    if r.experiment == "agent-committee-r2":  # H-C5: the fix worked (mechanical)
+        asked, got = int(str(new.get("asked") or new["n"])), int(str(new["n"]))
+        out.append(
+            {
+                "rule": "H-C5",
+                "passed": got >= 0.9 * asked,
+                "text": f"the committee answered {got} of {asked} questions; the rule needs at least 90%.",
+            }
+        )
     p = r.paired[0] if r.paired else None
     if p is None:
         out.append(

@@ -39,13 +39,14 @@ RESEARCH_MEMBERS = (QUANT_MEMBER, HISTORIAN, SCOUT)
 REVISIONS = {
     QUANT_MEMBER: "quant-r1",
     HISTORIAN: "hist-r1",
-    SCOUT: "scout-r1",
-    SKEPTIC: "skeptic-r1",
+    SCOUT: "scout-r2",
+    SKEPTIC: "skeptic-r2",
 }
 NO_EVIDENCE = "no evidence available"
 MAX_ITEMS = 5
-SCOUT_MAX_TOKENS = 300
-SKEPTIC_MAX_TOKENS = 300
+#: r2: 1,024 (r1 used 300 and 119 of 316 model calls ended at the limit, see DECISIONS 2026-11-26).
+SCOUT_MAX_TOKENS = 1024
+SKEPTIC_MAX_TOKENS = 1024
 _TOPIC_SKILL = {
     "power": "electricity-day-ahead",
     "weather": "weather-dwd-mosmix",
@@ -281,7 +282,7 @@ class Members:
 def _select(items: list[dict[str, Any]], text: str) -> list[dict[str, Any]]:
     """Map the scout's numbered picks back to real items; anything unparseable selects nothing."""
     try:
-        obj = json.loads(text.strip())
+        obj = json.loads(extract_object(text))
         picks = obj["items"]
     except (ValueError, KeyError, TypeError):
         return []
@@ -312,11 +313,29 @@ def _select(items: list[dict[str, Any]], text: str) -> list[dict[str, Any]]:
     return out
 
 
-def parse_critique(text: str) -> dict[str, Any]:
-    """The skeptic's JSON object, strictly: `severity`, `issues` (at most four strings), `direction`."""
+def extract_object(text: str) -> str:
+    """The one JSON object inside `text`: bare, in a code fence, or surrounded by a sentence (r2).
+
+    Only the outermost braces are taken; what is inside is still parsed and checked strictly, and
+    text with no complete object (for example a reply cut off at the output limit) is refused.
+    """
     s = text.strip()
-    if not (s.startswith("{") and s.endswith("}")):
-        raise ValueError("not a bare JSON object")
+    if s.startswith("```"):
+        s = s.strip("`")
+        s = s[s.index("{") :] if "{" in s else s
+    first, last = s.find("{"), s.rfind("}")
+    if first < 0 or last < first:
+        raise ValueError("no JSON object in the reply")
+    return s[first : last + 1]
+
+
+def parse_critique(text: str) -> dict[str, Any]:
+    """The skeptic's JSON object: `severity`, `issues` (at most four strings), `direction`.
+
+    r2 accepts the object inside a code fence or a sentence; the contract of its content is as strict
+    as before.
+    """
+    s = extract_object(text)
     try:
         obj = json.loads(s)
     except json.JSONDecodeError as exc:

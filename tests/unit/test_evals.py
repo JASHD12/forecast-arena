@@ -256,7 +256,7 @@ def test_committee_variant_runs_in_the_fake_gate_without_ml_and_with_no_news(tmp
     res = json.loads(path.read_text())
     m = res["metrics"]["agent_committee"]
     assert m["answered"] == 4 and m["skips"] == {}
-    assert "committee-r1" in res["versions"]["agent_committee"]
+    assert "committee-r2" in res["versions"]["agent_committee"]
     # scout (no news backend: no model call), chair draft, skeptic, chair final = 3 calls per item
     assert m["calls"] == 12
 

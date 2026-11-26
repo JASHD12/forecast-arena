@@ -97,7 +97,7 @@ def test_cli_writes_a_valid_result_and_the_page_shows_rows_and_the_flow(tmp_path
     )
     c = le._committee(tmp_path)
     assert c is not None and "<svg" in str(c["svg"]) and "Scout" in str(c["svg"])
-    assert [v["rule"] for v in c["verdicts"]] == ["H-C1", "H-C2"]
+    assert [v["rule"] for v in c["versions"][0]["verdicts"]] == ["H-C1", "H-C2"]
 
 
 def test_without_result_files_there_is_no_row_and_no_committee_section(tmp_path: Path) -> None:
@@ -141,3 +141,47 @@ def test_the_committed_results_validate_and_their_verdicts_are_reproducible() ->
         built = ae.build(res, exp)
         stored = LabResult.model_validate(json.loads((root / f"lab-{exp}.json").read_text()))
         assert stored == built
+
+
+def test_reference_arm_is_reused_only_on_the_same_golden_file_and_pairs_are_recomputed() -> None:
+    ref = _run()
+
+    def row(v: str, q: str, p: float, y: int, d: str) -> dict:
+        return {"variant": v, "question_id": q, "day": d, "probability": p, "outcome": y}
+
+    ref["rows"] = [row("agent_skills", f"q{i}", 0.7, 1, f"d{i % 3}") for i in range(6)]
+    new = _run()
+    del new["metrics"]["agent_skills"], new["versions"]["agent_skills"]
+    new["rows"] = [row("agent_committee", f"q{i}", 0.9, 1, f"d{i % 3}") for i in range(6)]
+    new["metrics"]["agent_committee"] = {**_arm(0.01, 0.2), "answered": 6, "n": 6}
+    merged = ae.merge_reference(new, ref, "agent_skills")
+    assert merged["reference_run"] == {"arm": "agent_skills", "run_id": "eval-x"}
+    pair = next(
+        p for p in merged["paired"] if {p["a"], p["b"]} == {"agent_skills", "agent_committee"}
+    )
+    assert pair["n"] == 6
+    r = ae.build(merged, "agent-committee-r2")
+    assert any("reused from run eval-x" in n for n in r.notes)
+    assert r.cost_usd == 0.2
+    h5 = ae.verdicts(r)[0]
+    assert h5["rule"] == "H-C5" and h5["passed"] is True
+    other = {**ref, "golden_sha256": "b" * 64}
+    try:
+        ae.merge_reference(new, other, "agent_skills")
+    except ValueError as exc:
+        assert "another golden file" in str(exc)
+    else:
+        raise AssertionError("expected a refusal")
+    low = {
+        **new,
+        "metrics": {
+            **new["metrics"],
+            "agent_committee": {**_arm(0.01, 0.2), "answered": 80, "n": 90},
+        },
+    }
+    assert (
+        ae.verdicts(ae.build(ae.merge_reference(low, ref, "agent_skills"), "agent-committee-r2"))[
+            0
+        ]["passed"]
+        is False
+    )

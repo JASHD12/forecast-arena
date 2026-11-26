@@ -945,3 +945,14 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
 - [x] T357 · `agent_graph_skills`: the LangGraph agent plus the estimate, the calculator and `load_skill` (graph prompts v2), experimental, flag `ARENA_AGENT_GRAPH_SKILLS`, off (deps: T353)
 - [x] T358 · `agent_hybrid_skills`: the hybrid-retrieval agent plus the same tools (prompt `agent_system_v5`), experimental, flag `ARENA_AGENT_HYBRID_SKILLS`, off; shares one retriever and reranker with `agent_hybrid` (deps: T353)
 - [ ] T359 · Launch check of both variants only after `agent_skills` passes its pre-registered rule (dry run in an unsealed window, tokens against the 300,000 cap), then live comparison against their base forecasters after 30 official days (deps: T356)
+
+## Phase 22 - A2A and a multi-agent forecasting committee (owner request 2026-11-26)
+
+- [x] T360 · Research and governance: A2A facts in `docs/SOURCES.md`, DECISIONS, SPEC 17 rows, `requirements/a2a.txt` (pinned, licence Apache-2.0)
+- [x] T361 · Pre-registration `lab/prereg/agent-committee.md` (committed before any run) (deps: T360)
+- [ ] T362 · A2A layer `src/arena/a2a/` (cards, server, client, in-process transport), CLI `arena a2a serve|card|ask`, offline tests (deps: T360)
+- [ ] T363 · Committee members and chair as A2A agents, `agent_committee` (experimental, flag `ARENA_AGENT_COMMITTEE`, off), registration and traces (deps: T361, T362)
+- [ ] T364 · `arena-oracle`: the ledger as a read-only A2A agent, served from the Docker image, fetched by the Docker and kind CI jobs, contract test against the MCP server (deps: T362)
+- [ ] T365 · Paid evaluation of `agent_committee` on the November frozen items: **prepared in the PR** (variant in the eval harness and in `llm-eval.yml`); the run itself needs `main` and the owner's OK with an exact estimate (deps: T363)
+- [ ] T366 · Showcase: explainer `docs/explainers/10-multi-agent-a2a.md`, README role table, committee section on the LLM engineering page generated from the evaluation result once it exists (deps: T365)
+- [ ] T367 · Launch only if T365 passes its pre-registered rule: dry run in an unsealed window, then the flag; live comparison with `agent_skills` after 30 official days (deps: T365)

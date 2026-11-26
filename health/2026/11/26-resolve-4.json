@@ -1,0 +1,34 @@
+{
+ "job": "resolve",
+ "at": "2026-11-26T06:21:35.473314+00:00",
+ "ok": true,
+ "checks": [
+  {
+   "name": "batch_sealed",
+   "ok": true,
+   "detail": "not due before the 09:30 UTC lock"
+  },
+  {
+   "name": "nothing_overdue",
+   "ok": true,
+   "detail": "none"
+  },
+  {
+   "name": "sources_fresh",
+   "ok": true,
+   "detail": "5 domain(s) fresh"
+  },
+  {
+   "name": "parse_failures",
+   "ok": true,
+   "detail": "2 of 80 LLM answers unparseable (2%)"
+  },
+  {
+   "name": "ledger_verify",
+   "ok": true,
+   "detail": "ledger verify: PASS: 596 files, 13 batch seals, 14 day seals, 1772 forecasts checked"
+  }
+ ],
+ "workflow_run_id": "45767542991",
+ "workflow_attempt": "1"
+}

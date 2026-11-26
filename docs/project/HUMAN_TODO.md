@@ -188,6 +188,7 @@ curl -X POST -H "Authorization: Bearer TOKEN" -H "Accept: application/vnd.github
     questions exist does nothing, and a players row already written is never replaced.
   - Do not give the token to the agent (AGENTS.md S2, S3). Done when the Status page shows
     seven days of morning runs starting before 08:30 UTC.
+  - Progress (checked 2026-11-26): set up at cron-job.org (morning 05:00-08:30, evening 20:00 and 20:30, resolve every 3 hours at :20). The evening batch of 25 Nov was published by the 20:02 UTC dispatch (GitHub's own evening slots did not fire); GitHub's morning cron sealed the 25 and 26 Nov batches at 03:25 and 02:32 UTC, so the morning dispatches only record "already sealed". Two on-time mornings so far; tick this after about 2026-12-01 if it keeps up.
 - [ ] H21 · `main` now rejects direct pushes (found 2026-11-19)
   - What happened: `git push origin main` was refused: "Protected branch update failed ...
     Changes must be made through a pull request. 2 of 2 required status checks are expected."

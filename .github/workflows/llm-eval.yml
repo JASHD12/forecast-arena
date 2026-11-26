@@ -8,6 +8,16 @@ name: llm-eval
 on:
   workflow_dispatch:
     inputs:
+      golden:
+        description: "T355: frozen golden set (the November set is the pre-registered primary set of lab/prereg/agent-skills.md)"
+        type: choice
+        options:
+          - power-2026-10.jsonl
+          - power-2026-11a.jsonl
+        default: power-2026-10.jsonl
+      variants:
+        description: "T355: comma-separated variants that replace the default list (llm_plain, llm_context, agent, agent_quant, agent_analyst, agent_skills); empty keeps the boolean inputs below"
+        default: ""
       limit:
         description: "Golden questions to sample (stratified, seeded)"
         default: "24"
@@ -49,7 +59,7 @@ permissions:
 jobs:
   eval:
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 90  # T355: the agent variants make several requests per question, one after the other
     env:
       ARENA_CONTACT: ${{ vars.ARENA_CONTACT }}
       ARENA_LLM_PROVIDER: ${{ vars.ARENA_LLM_PROVIDER }}
@@ -91,15 +101,29 @@ jobs:
           SC: ${{ inputs.self_consistency }}
           QUANT: ${{ inputs.quant }}
           SKILLS: ${{ inputs.skills }}
+          GOLDEN: ${{ inputs.golden }}
+          VARIANTS: ${{ inputs.variants }}
         run: |
           set -o pipefail
-          variants="--variant llm_plain --variant llm_context"
-          if [ "$LOCAL" = "true" ]; then variants="$variants --variant llm_local"; fi
-          if [ "$AGENT" = "true" ]; then variants="$variants --variant agent"; fi
-          if [ "$QUANT" = "true" ]; then variants="$variants --variant agent_quant --variant agent_analyst --ml-probs evals/golden/ml-probs-power.json"; fi
-          if [ "$SKILLS" = "true" ]; then variants="$variants --variant agent_skills"; fi
-          if [ "$SC" = "true" ]; then variants="$variants --variant llm_context_sc5"; fi
-          .venv/bin/arena eval run --golden evals/golden/power-2026-10.jsonl \
+          if [ -n "$VARIANTS" ]; then
+            # T355: an explicit list replaces the defaults; only known names are accepted
+            if ! printf '%s' "$VARIANTS" | grep -Eq '^(llm_plain|llm_context|agent|agent_quant|agent_analyst|agent_skills)(,(llm_plain|llm_context|agent|agent_quant|agent_analyst|agent_skills))*$'; then
+              echo "refused: unknown variant in '$VARIANTS'" >&2; exit 2
+            fi
+            variants=""
+            for v in $(printf '%s' "$VARIANTS" | tr ',' ' '); do variants="$variants --variant $v"; done
+            case ",$VARIANTS," in
+              *,agent_analyst,*) variants="$variants --ml-probs evals/golden/ml-probs-power.json" ;;
+            esac
+          else
+            variants="--variant llm_plain --variant llm_context"
+            if [ "$LOCAL" = "true" ]; then variants="$variants --variant llm_local"; fi
+            if [ "$AGENT" = "true" ]; then variants="$variants --variant agent"; fi
+            if [ "$QUANT" = "true" ]; then variants="$variants --variant agent_quant --variant agent_analyst --ml-probs evals/golden/ml-probs-power.json"; fi
+            if [ "$SKILLS" = "true" ]; then variants="$variants --variant agent_skills"; fi
+            if [ "$SC" = "true" ]; then variants="$variants --variant llm_context_sc5"; fi
+          fi
+          .venv/bin/arena eval run --golden "evals/golden/$GOLDEN" \
             --limit "$LIMIT" --max-tokens "$MAX_TOKENS" $variants | tee eval.log
           { echo "## LLM evaluation (not the live record)"; echo '```'; cat eval.log; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
       - name: Print the result (the log is how the agent reads it back)

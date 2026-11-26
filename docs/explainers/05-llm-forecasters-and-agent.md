@@ -21,6 +21,12 @@ Code: `src/arena/forecasters/llm.py`, `src/arena/agent/` (`forecaster.py`, `tool
      tools, critique); a supplemental forecaster with one question per topic per day.
    - `llm_local`: the `llm_context` prompt answered by an open-weights model
      (Qwen2.5-1.5B, llama.cpp) on the CI runner's CPU. It is the cost floor, not a contender.
+   - Experimental variants, each a separate id, built and switched off until a pre-registered
+     evaluation passes (none of them changes the forecasters above): `agent_quant` (a reference
+     estimate and a probability calculator), `agent_analyst` (starts from the `ml` forecast),
+     `agent_skills` (short skill notes loaded on demand), the LangGraph and hybrid-retrieval
+     agents with the same additions, and `agent_committee` (a chair and four specialist agents
+     over the A2A protocol). See `06-experiments-lab.md` and `11-multi-agent-a2a.md`.
 2. **A shared, seeded daily sample.** Calling a paid model on every question would be costly, so
    each day a seeded, template-stratified sample (3 questions per domain by default) is drawn
    and *every* LLM forecaster answers exactly that sample. The comparison is paired. Questions

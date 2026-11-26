@@ -210,8 +210,11 @@ def lab() -> str:
     rows.append("")
     rows.append(
         "Live experimental forecasters: the QLoRA-tuned model (running since the first morning "
-        "after 2026-11-22, with its fixed pre-registered expectations) and, once its launch "
-        "check passes, an agent with hybrid retrieval and guards (still switched off). The "
+        "after 2026-11-22, with its fixed pre-registered expectations). Built and switched off "
+        "until their pre-registered launch checks pass: an agent with hybrid retrieval and "
+        "guards, agents with a calculator, an ML-forecast reviewer and forecasting skills (also "
+        "on the LangGraph and hybrid agents), and a committee of specialist agents over the A2A "
+        "protocol. The "
         "cascade router was **not built**: its pre-registered rule saved no paid calls (the "
         "routing card has the numbers). None of them enters the headline board. Details: "
         "[Lab page](https://jashd12.github.io/"

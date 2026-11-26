@@ -922,3 +922,12 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
   - Second judge run done 2026-11-23 (`lab-judge` run 45258529928, US$0.134, 30 of 30 scored): Haiku against Sonnet weighted kappa 0.80 (data_use), 0.75 (direction), 0.76 (hedging); exact match 50% / 50% / 77%. `evals/results/lab-judge-llm.json`, `docs/lab/judge-llm.md`. Still LLM against LLM; H29 stays open.
 - [x] T329 · More scheduled slots for the lock-critical jobs after the 2026-11-24 morning batch was missed (deps: T180)
   - Done 2026-11-24: morning cron `7,27,47 19-23,0-8`, evening `7,37 16-23`; evidence and reasoning in DECISIONS. The external dispatch (H20) stays the reliable fix.
+
+## Phase 20 - Make the tool-using agent numerate (owner request 2026-11-26)
+
+- [x] T340 · Pre-registration `lab/prereg/llm-quant-tools.md` (hypotheses, items, metrics, decision rule, replay limits)
+- [x] T341 · Numeric tools `estimate_probability` and `calculate_probability` (`src/arena/agent/tools.py`, `agent/quant.py`); leakage-free by construction (stored context and question only)
+- [x] T342 · `agent_quant` (prompt v3), experimental, flag `ARENA_AGENT_QUANT`, off
+- [x] T343 · `agent_analyst` (prompt v4, starts from the `ml` forecast), experimental, flag `ARENA_AGENT_ANALYST`, off
+- [ ] T344 · One capped paid evaluation on the frozen power set (`llm-eval.yml` input `quant`, replayed `ml` probabilities in `evals/golden/ml-probs-power.json`); result `evals/results/lab-llm-quant.json`, card, LAB_BUDGET row (deps: T340-T343 merged; needs the owner's OK for the exact estimate)
+- [ ] T345 · Launch check only if the pre-registered rule passes: dry run in an unsealed window, tokens against the 300,000 cap, flags one per day (deps: T344)

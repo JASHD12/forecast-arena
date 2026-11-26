@@ -80,3 +80,4 @@ Nothing. See the session summary above and `python scripts/status.py`.
 - 2026-11-24 · T325 `llm-engineering.html` built from result files, T255b dropped, H11 steps written, profile README accepts the owner's work-experience file (H42).
 - 2026-11-24 · Checked the red runs (morning #35, resolve #56/#57, evening #22): real cause is the missed 2026-11-24 batch; fixed two misleading health results (evening before 16:00 UTC, coverage message). The day stays failed and unclean by rule.
 - 2026-11-24 · Stale-text sweep: README and all site pages re-read from a fresh ledger build; Status/Lab/Privacy/Stack/About/Home and the recruiter page corrected (see DECISIONS).
+- 2026-11-26 · T340-T343 built: `agent_quant` and `agent_analyst` (experimental, off), numeric tools, eval variants and replayed ml probabilities; T344 (paid eval) and T345 (launch) wait for merge and the owner's OK.

@@ -176,3 +176,52 @@ def test_agent_variant_runs_tools_over_the_golden_context_and_base_rate() -> Non
     assert all(
         "probability" in t and "None" not in t.split("probability")[1][:6] for t in tool_results
     )
+
+
+ML_PROBS = GOLDEN.parent / "ml-probs-power.json"
+
+
+def test_replayed_ml_probabilities_cover_exactly_the_frozen_golden_items() -> None:
+    items, sha = load(GOLDEN)
+    doc = json.loads(ML_PROBS.read_text())
+    assert doc["kind"] == "replay" and doc["golden_sha256"] == sha
+    assert set(doc["probabilities"]) == {it.question.question_id for it in items}
+    assert all(0.0 < p < 1.0 for p in doc["probabilities"].values())
+
+
+def test_quant_and_analyst_variants_run_in_the_fake_gate(tmp_path) -> None:
+    from arena.cli import main
+
+    args = [
+        "eval",
+        "run",
+        "--golden",
+        str(GOLDEN),
+        "--fake",
+        "--limit",
+        "6",
+        "--out",
+        str(tmp_path),
+    ]
+    variants = ["--variant", "agent", "--variant", "agent_quant", "--variant", "agent_analyst"]
+    refused = CliRunner().invoke(main, [*args, *variants])
+    assert refused.exit_code == 2 and "needs --ml-probs" in refused.output
+    ok = CliRunner().invoke(main, [*args, *variants, "--ml-probs", str(ML_PROBS)])
+    assert ok.exit_code == 0, ok.output
+    (path,) = tmp_path.glob("fake-*.json")
+    res = json.loads(path.read_text())
+    assert set(res["metrics"]) == {"agent", "agent_quant", "agent_analyst"}
+    assert res["versions"]["agent_quant"].endswith("quant-r1")
+    assert res["versions"]["agent_analyst"].endswith("analyst-r1")
+    assert res["versions"]["agent"] not in (res["versions"]["agent_quant"],)
+
+
+def test_analyst_eval_peer_returns_replayed_ml_and_never_a_guess() -> None:
+    from arena.evals.run import ReplayML
+
+    items, _ = load(GOLDEN)
+    q = items[0].question
+    peer = ReplayML({q.question_id: 0.8})
+    assert peer.forecast(q, {}, NOW).probability == 0.8
+    other = peer.forecast(items[1].question, {}, NOW)
+    assert other.reason_code == "model_missing"

@@ -24,7 +24,7 @@ fight has not happened yet:
 
 ## Method
 
-- Items: the frozen power sets `evals/golden/power-2026-10.jsonl` and `power-2026-11a.jsonl` (276 questions, built before any run; sha256
+- Items: the frozen power set `evals/golden/power-2026-10.jsonl` (186 questions of October 2026, built before any run; sha256
   recorded in the result), a seeded stratified subset of at most 100 items to fit the lab budget (see `docs/project/LAB_BUDGET.md`).
 - Arms on identical items: `agent` (the live prompt and tools, replay version), `agent_quant`, `agent_analyst`, plus `ml` (replayed
   probabilities in `evals/golden/ml-probs-power.json`, built with the free power backtest) and the golden base rate.

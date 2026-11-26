@@ -45,6 +45,8 @@ backtest first, then freeze the version, then write forecasts before the lock li
 |---|---|---|
 | `llm_local_ft` | the QLoRA-tuned Qwen, scored by one forward pass (YES/NO logit margin, Platt calibrated); frozen artefact pinned by SHA-256 | `ARENA_LLM_LOCAL_FT`, on by default since 2026-11-22 (variable `0` switches off) |
 | `agent_hybrid` | the tool-using agent (not the LangGraph one) with hybrid retrieval (BM25 + dense + RRF + cross-encoder) and harness guards | `ARENA_AGENT_HYBRID`, off until a launch dry run |
+| `agent_quant` | the tool-using agent with a reference estimate computed from the stored data and a probability calculator (prompt v3) | `ARENA_AGENT_QUANT`, off until its evaluation |
+| `agent_analyst` | the tool-using agent told to start from the `ml` forecast and change it only for evidence (prompt v4) | `ARENA_AGENT_ANALYST`, off until its evaluation |
 | `llm_router` | cascade over peers: cheap pair when decisive and in agreement, otherwise `llm_context`. **Not built**: its pre-registered build condition (at least 30% of paid calls saved) was not met in the routing study | none (no thresholds file) |
 | `glgbm` | global LightGBM challenger, promoted only by the weekly 28-day rule | weekly job |
 

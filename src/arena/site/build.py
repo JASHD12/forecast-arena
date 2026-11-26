@@ -280,6 +280,8 @@ def build_site(
                     latest_b and latest_b < clock.now().date() and clock.now().time() >= LOCK_TIME
                 ),
                 "latest": latest,
+                # questions are published the evening before; the morning run writes forecasts
+                "awaiting_forecasts": bool(latest) and not any(r["pn"] for r in latest),
                 "cards": pick_cards(latest),
                 "outcomes": split_outcomes(previous),
                 "forecasters": fids,

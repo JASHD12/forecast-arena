@@ -69,16 +69,17 @@
 <p class="lock-line"><span class="lock-countdown" data-lock-utc="09:30">Forecasts lock at 09:30 UTC every day; after that nothing can be added for the day.</span></p>
 {% if no_batch_today %}<p class="note st-note st-hint" role="note">No batch was locked for today, so this is the latest one ({{ latest_batch }}). See <a href="status.html">Status</a> for what happened.</p>{% endif %}
 <div class="section-head" id="today"><h2>{% if latest_batch %}Questions for {{ latest_batch }}{% else %}Today's questions{% endif %}</h2>
-<span class="note">Each bar is one forecaster's probability of YES, published before the lock.</span></div>
+<span class="note">{% if awaiting_forecasts %}No forecaster has answered yet.{% else %}Each bar is one forecaster's probability of YES, published before the lock.{% endif %}</span></div>
+{% if latest and awaiting_forecasts %}<p class="note st-note st-hint" role="note">These {{ latest|length }} questions were published the evening before. Every forecaster writes its probability in the morning run, before the lock at 09:30 UTC; the bars appear here then. Nothing is missing and nothing has been skipped.</p>{% endif %}
 {% if latest %}
 <ul class="qgrid">
 {% for row in cards %}<li class="qcard">
 <div class="qmeta"><span class="chip chip-{{ row.domain }}">{{ dname(row.domain) }}</span>{{ outcome_badge(row) }}</div>
 <h3><a href="{{ qhref(row.qid) }}">{{ row.title }}</a></h3>
-{{ bars_answered(row, forecasters) }}
+{% if not awaiting_forecasts %}{{ bars_answered(row, forecasters) }}{% endif %}
 </li>
 {% endfor %}</ul>
-<p class="more-link"><a class="btn btn-accent" href="questions/index.html">See all {{ latest|length }} questions for {{ latest_batch }} →</a> <span class="note">Shown here: the {{ cards|length }} that most forecasters answered. All locks are at 09:30 UTC.</span></p>
+<p class="more-link"><a class="btn btn-accent" href="questions/index.html">See all {{ latest|length }} questions for {{ latest_batch }} →</a> <span class="note">{% if awaiting_forecasts %}Shown here: one per topic. {% else %}Shown here: the {{ cards|length }} that most forecasters answered. {% endif %}All locks are at 09:30 UTC.</span></p>
 {% else %}<p class="empty">No questions yet. Questions are published the evening before, answered the next morning and locked at 09:30 UTC.</p>{% endif %}
 
 <div class="duo">

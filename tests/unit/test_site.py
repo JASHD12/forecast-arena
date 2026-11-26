@@ -78,6 +78,24 @@ def test_home_shows_questions_and_forecasts(tmp_path) -> None:
     assert _html.escape(q.text) in text and _html.escape(q.resolution_rule) in text
 
 
+def test_home_explains_questions_that_have_no_forecasts_yet(tmp_path) -> None:
+    """Evening batch: questions exist, the morning run has not written forecasts yet."""
+    led = Ledger(tmp_path / "l")
+    q = question()
+    led.append(layout.questions_path(q.batch_date), [q])
+    res = build_site(led, tmp_path / "site", CLOCK, tmp_path / "none")
+    home = (res.out_dir / "index.html").read_text()
+    assert "No forecaster has answered yet." in home
+    assert "bars appear here then" in home and "nothing has been skipped" in home
+    assert "did not answer this one" not in home
+    # once any forecast exists the usual bars come back
+    led.append(layout.forecasts_path(q.batch_date), [forecast(q, "base_rate", 0.61)])
+    home = (
+        build_site(led, tmp_path / "site2", CLOCK, tmp_path / "none").out_dir / "index.html"
+    ).read_text()
+    assert "No forecaster has answered yet." not in home and "width: 61.0%" in home
+
+
 def test_about_from_site_content_is_escaped(tmp_path) -> None:
     content = tmp_path / "content"
     content.mkdir()

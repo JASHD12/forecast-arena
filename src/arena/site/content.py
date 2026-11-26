@@ -178,6 +178,14 @@ INFORMATION_SETS = (
         "daily sample",
     ),
     (
+        "agent_committee",
+        "A committee: a chair that calls four specialist agents over the A2A protocol (a reference "
+        "estimate, the base rate and similar past questions, as-of headlines, and a skeptic that "
+        "critiques the draft); it sees only the stored data, the base rate and tool results "
+        "published before the forecast time, never the ML forecast (experimental)",
+        "daily sample",
+    ),
+    (
         "bandit_hedge",
         "The other forecasters' forecasts of the same question, blended with weights learned "
         "online from resolved questions (Hedge; experimental)",
@@ -201,6 +209,7 @@ AI_FORECASTERS = frozenset(
         "agent_skills",
         "agent_graph_skills",
         "agent_hybrid_skills",
+        "agent_committee",
     }
 )
 #: Experimental forecasters (SPEC 17): named "(experimental)", outside the common-set board.
@@ -214,6 +223,7 @@ EXPERIMENTAL_FORECASTERS = frozenset(
         "agent_skills",
         "agent_graph_skills",
         "agent_hybrid_skills",
+        "agent_committee",
         "bandit_hedge",
     }
 )

@@ -31,6 +31,7 @@ LLM_FORECASTERS = (
     "agent_skills",
     "agent_graph_skills",
     "agent_hybrid_skills",
+    "agent_committee",
 )
 
 

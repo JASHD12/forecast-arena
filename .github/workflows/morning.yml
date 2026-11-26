@@ -25,7 +25,7 @@ on:
         type: boolean
         default: false
       experimental:
-        description: "Dry runs only (T279): switch the experimental agent_hybrid, agent_quant, agent_analyst, agent_skills, agent_graph_skills and agent_hybrid_skills forecasters on to measure runner time and tokens"
+        description: "Dry runs only (T279): switch the experimental agent_hybrid, agent_quant, agent_analyst, agent_skills, agent_graph_skills, agent_hybrid_skills and agent_committee forecasters on to measure runner time and tokens"
         type: boolean
         default: false
 
@@ -109,6 +109,7 @@ jobs:
       ARENA_AGENT_SKILLS: ${{ (inputs.experimental && inputs.dry_run) && '1' || vars.ARENA_AGENT_SKILLS || '0' }}  # T353: agent_skills (agent_quant plus load_skill); off until its evaluation passes (T356)
       ARENA_AGENT_GRAPH_SKILLS: ${{ (inputs.experimental && inputs.dry_run) && '1' || vars.ARENA_AGENT_GRAPH_SKILLS || '0' }}  # T357: agent_graph_skills (agent_graph plus the estimate, calculator and load_skill); off until agent_skills passes its evaluation
       ARENA_AGENT_HYBRID_SKILLS: ${{ (inputs.experimental && inputs.dry_run) && '1' || vars.ARENA_AGENT_HYBRID_SKILLS || '0' }}  # T358: agent_hybrid_skills (agent_hybrid plus the estimate, calculator and load_skill); off until agent_skills passes its evaluation
+      ARENA_AGENT_COMMITTEE: ${{ (inputs.experimental && inputs.dry_run) && '1' || vars.ARENA_AGENT_COMMITTEE || '0' }}  # T363: agent_committee (specialist agents over A2A); off until its evaluation passes (T367)
       ARENA_AGENT_RAG: ${{ vars.ARENA_AGENT_RAG || '1' }}  # T120: similar-past-questions tool (local embeddings, no API cost)
       OMP_NUM_THREADS: "2"
     steps:
@@ -125,6 +126,9 @@ jobs:
         run: |
           make setup
           .venv/bin/pip install -r requirements/rag.txt -r requirements/graph.txt -r requirements/inference.txt
+      - name: Install the A2A SDK (agent_committee only; the run does not depend on it otherwise)
+        if: env.ARENA_AGENT_COMMITTEE == '1'
+        run: .venv/bin/pip install -r requirements/a2a.txt
       - name: Install the local LLM runtime (llm_local; a failure only skips llm_local)
         continue-on-error: true
         env:

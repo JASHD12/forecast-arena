@@ -1388,3 +1388,8 @@ and evidence requirements. Do not backfill historical ML forecasts.
 - Decision: new ids `agent_quant` (reference estimate and calculator, prompt v3) and `agent_analyst` (starts from `ml`, prompt v4), same model, limits, sample and peers as `agent`, off by default (`ARENA_AGENT_QUANT`, `ARENA_AGENT_ANALYST`; on only for experimental dry runs). The existing `agent`, `agent_graph`, `llm_context` and `llm_plain` keep their prompts and version strings (I8); a test pins that per-file prompt versions do not change their fingerprint. Pre-registered first (`lab/prereg/llm-quant-tools.md`); weather is judged only on live days because it cannot be replayed.
 - Two new colour slots (`--s13`, `--s14`) because all twelve were used. The LangGraph variant was left out on purpose (about double the cost); it can follow if these help.
 - Evaluation: replayed `ml` probabilities for the 186 frozen items are committed (`evals/golden/ml-probs-power.json`, built from the champion backtest run, hash recorded); the analyst arm is refused without them.
+
+## 2026-11-26 · Recruiter pages after the owner's Codex change (PR #47)
+
+- Context: #47 removed the link between the Werkstudent and the full-time recruiter pages and the line pointing to the LLM engineering page. `recruiters-ml.html` and `llm-engineering.html` are still built and tested.
+- Decision: leave the owner's change as it is. `recruiters-ml.html` is reachable by URL only; `llm-engineering.html` is in the More menu and the README role table. The AI-engineering role card on the recruiter page could link to it (conditional on the page existing) if the owner asks.

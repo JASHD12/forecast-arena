@@ -5,20 +5,16 @@ move older "Done log" lines to `docs/progress-archive.md`.
 
 ## Now
 
-## Session summary (2026-11-23)
+## Session summary (2026-11-26)
 
-- **State:** every agent task that does not wait on you, on a date or on a blocked host is done. `status.py` lists only those.
-  Merged and deployed: forecast-audit (tool, German electricity case, `audit.html`, recruiter pages), Ask the Arena (tiers 0 and 1,
-  optional tier 2), judge result, distillation (labels and Colab evaluation), profile README draft, stale-text refresh.
-- **Live (verified on the ledger, 2026-11-23 morning run):** five topics (crypto live), 43 questions, sealed 08:02 UTC (88 minutes before the
-  lock), `llm_local_ft` live, 199,608 of 300,000 tokens, all health checks pass, official record started 2026-11-23.
-- **Lab budget:** US$0.96 of 2.00 (`docs/project/LAB_BUDGET.md`).
-- **Waiting on you:** H41 (test the in-browser model in Chrome/Edge), H42 (paste the profile README), H40 (CV, contact, About text, pilot), H29 (30 judge
-  labels), H33 (Mac smoke), H06/H15 (panel, players), H14 (Impressum). Waiting on dates: T222b (2026-11-27), T093 and T301b (2026-11-30).
-  Blocked host: T255b (Phoenix docs). T325 is deferred until a role is chosen.
-- **Next agent steps:** the `agent_hybrid` launch check (dry run of `morning.yml` with `experimental=true`, scheduled for 2026-11-24 00:05 UTC because today's batch is sealed), then each
-  WAIT task when its date passes (T327, the `ml`-first routing evaluation, waits until 2026-12-24). The pre-registration for the `ml`-first routing rule is committed (`lab/prereg/routing-ml-only.md`).
-- **Open risks:** tier 2 of the chat was tested only with a fake engine (no real WebGPU here); GitHub starts scheduled runs hours late (H20).
+- **State:** nothing the agent can do is waiting except dated checks. `status.py`: OPEN_AGENT_TASKS=4 (T279 launch check, T222b, T093, T301b are time-gated, T327 waits to 2026-12-24).
+- **Pipelines (checked on the ledger and in Actions, 2026-11-26 12:00 UTC):** morning batches of 25 and 26 Nov sealed at 03:25 and 02:32 UTC (44 and 47 questions, all nine forecasters), evening of 25 Nov published the 26 Nov batch at 20:02 UTC (cron-job.org dispatch), resolve runs every 3 hours; every health check passes. The 2026-11-24 batch was lost (no evening run on 23 Nov, no morning run before the lock): incident #42, closed 2026-11-25 00:21 UTC; that day stays unclean and shows as missed on Status.
+- **Official record:** started 2026-11-23; two official days so far (15 questions scored). Electricity questions of 23 Nov were voided (SMARD did not publish).
+- **Merged since 23 Nov:** judge and second-judge results, race chart colours and extra schedule slots, LLM engineering page (T325), health-check fixes, stale-text sweep, recruiter copy (owner's Codex change). T255b dropped; T084b needs your CLAUDE.md line (H11).
+- **Lab budget:** US$1.09 of 2.00 (`docs/project/LAB_BUDGET.md`).
+- **Waiting on you:** H20 tick after about 2026-12-01, H29 (30 judge labels), H33 (Mac smoke), H11, H40/H42 (paste the profile README), H41, H06/H15, H14.
+- **Next agent steps:** `agent_hybrid` dry run in an unsealed window (00:10 UTC, 27 Nov) and, if clean, one line to switch `ARENA_AGENT_HYBRID` on; T222b (27 Nov); T093 and T301b (30 Nov).
+- **Open risks:** GitHub's evening slots did not fire on 25 Nov, so the evening job depends on cron-job.org; tier 2 of the chat was tested only with a fake engine.
 
 ## In progress
 

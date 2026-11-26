@@ -33,7 +33,7 @@
 <p class="note">GitHub often starts scheduled jobs hours late, so each job is scheduled many times and a small gate lets the first run that has work do it. The lock at 09:30 UTC never moves.</p>
 <ol class="timeline">
 <li><time>From 16:00 (day before)</time><span><strong>Evening job</strong>: the next batch's questions are published so people can answer before the lock. It is attempted several times an hour until 23:59 and does its work once.</span></li>
-<li><time>Before 09:30</time><span><strong>Morning job</strong>: questions the evening job missed are created, every forecaster answers, the batch is sealed. It is attempted several times an hour from 19:00 until the lock; a run after the lock cannot create the batch.</span></li>
+<li><time>Before 09:30</time><span><strong>Morning job</strong>: questions the evening job missed are created, every forecaster answers, the batch is sealed. It is attempted several times an hour from 00:00 UTC (the gate looks at the current UTC day) until the lock; a run after the lock cannot create the batch.</span></li>
 <li><time>09:30</time><span><strong>Lock</strong>: nothing can be added for the day after this.</span></li>
 <li><time>Every 3 hours</time><span><strong>Resolve job</strong>: answers collected from the official sources, finished days sealed into the hash chain, site rebuilt.</span></li>
 <li><time>Sunday 02:00</time><span><strong>Weekly job</strong>: models retrained, promoted only by a written rule, drift and feature importance published on <a href="experiments.html">Experiments</a>.</span></li>

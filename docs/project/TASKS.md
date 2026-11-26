@@ -929,8 +929,8 @@ first screens; honest authorship line). Order: A, then B1/B2/C1-C5, then the res
 - [x] T341 · Numeric tools `estimate_probability` and `calculate_probability` (`src/arena/agent/tools.py`, `agent/quant.py`); leakage-free by construction (stored context and question only)
 - [x] T342 · `agent_quant` (prompt v3), experimental, flag `ARENA_AGENT_QUANT`, off
 - [x] T343 · `agent_analyst` (prompt v4, starts from the `ml` forecast), experimental, flag `ARENA_AGENT_ANALYST`, off
-- [ ] T344 · One capped paid evaluation on the frozen power set (`llm-eval.yml` input `quant`, replayed `ml` probabilities in `evals/golden/ml-probs-power.json`); result `evals/results/lab-llm-quant.json`, card, LAB_BUDGET row (deps: T340-T343 merged; needs the owner's OK for the exact estimate)
-- [ ] T345 · Launch check only if the pre-registered rule passes: dry run in an unsealed window, tokens against the 300,000 cap, flags one per day (deps: T344)
+- [x] T344 · Partly done 2026-11-26: `agent_quant` was evaluated against `agent` in the skills run (run 45883972017, November items: Brier 0.1369 vs 0.1302, paired -0.0067 [-0.0213, +0.0083] for agent minus quant, so no benefit shown; see `docs/lab/agent-skills.md`); `agent_analyst` (needs the replayed ml probabilities, which exist only for the October set) was not run and stays unevaluated. Original text: One capped paid evaluation on the frozen power set (`llm-eval.yml` input `quant`, replayed `ml` probabilities in `evals/golden/ml-probs-power.json`); result `evals/results/lab-llm-quant.json`, card, LAB_BUDGET row (deps: T340-T343 merged; needs the owner's OK for the exact estimate)
+- [x] T345 · Decided 2026-11-26: not launched, `agent_quant` showed no gain over `agent` (T344). Launch check only if the pre-registered rule passes: dry run in an unsealed window, tokens against the 300,000 cap, flags one per day (deps: T344)
 
 ## Phase 21 - Forecasting skills for the tool-using agent (owner request 2026-11-26)
 

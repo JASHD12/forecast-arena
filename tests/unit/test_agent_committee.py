@@ -246,8 +246,8 @@ def test_trace_has_calls_and_sizes_but_no_article_text() -> None:
 def test_version_names_every_member_the_protocol_the_sdk_and_the_skill_fingerprint() -> None:
     v = _agent(Script()).version()
     for part in (
-        "committee-r1",
-        "quant-r1,hist-r1,scout-r1,skeptic-r1",
+        "committee-r2",
+        "quant-r1,hist-r1,scout-r2,skeptic-r2",
         "a2a-1.0",
         "sdk-1.3.1",
         "guards-r1",
@@ -261,7 +261,7 @@ def test_agent_cards_of_the_members_are_valid() -> None:
 
     for name, spec in _agent(Script()).agent_specs().items():
         assert validate_card(build_card(spec, f"http://{name}.invalid/")) == []
-        assert spec.version.endswith("|committee-r1|sdk-1.3.1")
+        assert spec.version.endswith("|committee-r2|sdk-1.3.1")
 
 
 def test_parse_critique_is_strict() -> None:
@@ -278,3 +278,37 @@ def test_parse_critique_is_strict() -> None:
 
 def test_every_topic_skill_the_quant_analyst_names_exists() -> None:
     assert committee_members.topic_skill_known()
+
+
+def test_r2_reads_the_object_inside_a_fence_or_sentence_but_not_a_cut_off_reply() -> None:
+    from arena.agent.committee_members import extract_object
+
+    obj = json.dumps(CRIT)
+    assert parse_critique(f"```json\n{obj}\n```")["severity"] == "minor"
+    assert parse_critique(f"Here is my critique: {obj} Done.")["direction"] == "down"
+    for bad in (obj[:-12], "no object here", ""):
+        with pytest.raises(ValueError):
+            parse_critique(bad)
+    assert extract_object(f"x {obj} y") == obj
+
+
+def test_r2_gives_the_model_members_the_full_output_budget() -> None:
+    assert committee_members.SCOUT_MAX_TOKENS == committee_members.SKEPTIC_MAX_TOKENS == 1024
+    seen: list[int] = []
+
+    class Spy(FakeLLM):
+        def complete(self, system, turns, *, max_tokens, tools=()):  # type: ignore[override]
+            seen.append(max_tokens)
+            return super().complete(system, turns, max_tokens=max_tokens, tools=tools)
+
+    s = Script()
+    spy = Spy(s)
+    out = committee.AgentCommittee(
+        spy,
+        peers=PEERS,
+        news=StaticNews(
+            [Headline("Strompreis steigt", "dpa.example", "https://dpa.example/a", ASOF)]
+        ),
+    ).forecast(_q(), CTX, ASOF)
+    assert isinstance(out, Forecast)
+    assert seen.count(1024) >= 2  # the scout and the skeptic

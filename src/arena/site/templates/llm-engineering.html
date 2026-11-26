@@ -21,8 +21,8 @@
 <p>A chair calls four specialist agents (reference estimate, base rate and similar questions, news scout, skeptic) as separate agents of the A2A protocol, then writes the answer. It is experimental and off. This is the fixed message flow; the result row above is an evaluation on a replay.</p>
 {{ llm.committee.svg }}
 <ol><li>The chair sends the question and the as-of data to the quant analyst, the historian and the news scout in parallel.</li><li>It writes a draft from their reports and sends draft and reports to the skeptic.</li><li>It writes the final answer after the critique.</li></ol>
-<p>Pre-registered rules applied to the stored numbers:</p><ul>{% for v in llm.committee.verdicts %}<li><strong>{{ v.rule }}:</strong> {{ v.text }}</li>{% endfor %}</ul>
-<p class="note">{{ llm.committee.note }}</p></section>{% endif %}
+{% for ver in llm.committee.versions %}<h3>Version {{ ver.label }}: the pre-registered rules applied to the stored numbers</h3><ul>{% for v in ver.verdicts %}<li><strong>{{ v.rule }}:</strong> {{ v.text }}</li>{% endfor %}</ul>
+<p class="note">{{ ver.note }}</p>{% endfor %}</section>{% endif %}
 <section class="card" aria-labelledby="l-next"><h2 id="l-next">What I would do next</h2>
 <ul>{% for n in llm.next %}<li>{{ n }}</li>{% endfor %}</ul></section>
 {% endblock %}

@@ -62,7 +62,7 @@ One run on the 90 November electricity questions (`docs/lab/agent-committee.md`,
 - On those 37 it scored worse than `agent_skills` on the same questions (the paired interval lies above zero), so H-C1 is not
   met. Cost per question asked was about the same, per answered question about 2.5 times.
 - Decision by the pre-registered rule: stays off. The fix (a larger output budget, tolerant parsing) is a **new version**,
-  `committee-r2`, under a new pre-registration; it is not patched into r1 (I8). It is waiting for the owner (HUMAN_TODO H43).
+  `committee-r2` (built and pre-registered in `lab/prereg/agent-committee-r2.md` after the owner's go; its single run is the next step); it is not patched into r1 (I8).
 - The skills evaluation from the same run (`docs/lab/agent-skills.md`) also missed its rule narrowly.
 
 ## What is not done (and not claimed)

@@ -49,7 +49,7 @@ from arena.llm.client import LLMClient, LLMError, Usage, UserText
 from arena.llm.parse import Answer, ParseError, parse_answer
 from arena.models import Forecast, Question, Skip
 
-COMMITTEE_REVISION = "committee-r1"
+COMMITTEE_REVISION = "committee-r2"
 MEMBER_TIMEOUT = 90.0
 COMMITTEE_TIMEOUT = 300.0
 MIN_RESEARCH_MEMBERS = 2

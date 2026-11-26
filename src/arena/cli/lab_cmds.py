@@ -174,15 +174,30 @@ def lab_card_cmd(result: Path) -> None:
 
 @lab.command("agent-eval")
 @click.argument("eval_run", type=click.Path(exists=True, path_type=Path))
-@click.option("--experiment", type=click.Choice(["agent-skills", "agent-committee"]), required=True)
+@click.option(
+    "--experiment",
+    type=click.Choice(["agent-skills", "agent-committee", "agent-committee-r2"]),
+    required=True,
+)
+@click.option(
+    "--reference-run",
+    type=click.Path(exists=True, path_type=Path),
+    default=None,
+    help="An earlier run on the same golden file whose agent_skills arm is reused.",
+)
 @click.option("--out", type=click.Path(path_type=Path), default=None)
-def lab_agent_eval(eval_run: Path, experiment: str, out: Path | None) -> None:
+def lab_agent_eval(
+    eval_run: Path, experiment: str, reference_run: Path | None, out: Path | None
+) -> None:
     """Turn one `arena eval run` file into the lab result of the skills or committee experiment."""
     import json
 
     from arena.lab import agent_eval as ae
 
     res = json.loads(eval_run.read_text(encoding="utf-8"))
+    if reference_run is not None:
+        ref = json.loads(reference_run.read_text(encoding="utf-8"))
+        res = ae.merge_reference(res, ref, "agent_skills")
     r = ae.build(res, experiment)
     path = out or Path("evals/results") / f"lab-{experiment}.json"
     path.write_text(r.model_dump_json(indent=2) + "\n", encoding="utf-8")

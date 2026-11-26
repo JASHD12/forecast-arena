@@ -237,8 +237,19 @@ def test_committee_variant_runs_in_the_fake_gate_without_ml_and_with_no_news(tmp
 
     out = CliRunner().invoke(
         main,
-        ["eval", "run", "--golden", str(GOLDEN), "--fake", "--limit", "4", "--out", str(tmp_path)]
-        + ["--variant", "agent_committee"],
+        [
+            "eval",
+            "run",
+            "--golden",
+            str(GOLDEN),
+            "--fake",
+            "--limit",
+            "4",
+            "--out",
+            str(tmp_path),
+            "--variant",
+            "agent_committee",
+        ],
     )
     assert out.exit_code == 0, out.output
     (path,) = tmp_path.glob("fake-*.json")

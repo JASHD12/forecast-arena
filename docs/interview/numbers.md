@@ -423,16 +423,16 @@ Source: `evals/results/lab-sentiment.json`; card `docs/lab/sentiment.md`
 
 | Arm | Questions | Brier |
 |---|---|---|
-| always_0.5 / bigmove | 607 | 0.25 |
-| always_0.5 / up | 215 | 0.25 |
-| base_rate / bigmove | 607 | 0.2572 |
-| base_rate / up | 215 | 0.2517 |
-| ml / bigmove | 607 | 0.2375 |
-| ml / up | 215 | 0.25 |
+| always_0.5 / bigmove | 887 | 0.25 |
+| always_0.5 / up | 302 | 0.25 |
+| base_rate / bigmove | 887 | 0.2574 |
+| base_rate / up | 302 | 0.2528 |
+| ml / bigmove | 887 | 0.2372 |
+| ml / up | 302 | 0.25 |
 | questions / bigmove | 1220 | - |
 | questions / up | 565 | - |
-| sentiment / bigmove | 607 | 0.2406 |
-| sentiment / up | 215 | 0.2584 |
+| sentiment / bigmove | 887 | 0.2403 |
+| sentiment / up | 302 | 0.2595 |
 
 ### Numeric grounding of model rationales
 

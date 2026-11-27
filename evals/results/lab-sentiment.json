@@ -2,11 +2,11 @@
   "kind": "evaluation",
   "experiment": "sentiment",
   "title": "News tone (GDELT) as a crypto forecaster: sentiment-gdelt-r1 against ml",
-  "created_at": "2026-11-27T21:41:02.715881+00:00",
+  "created_at": "2026-11-27T22:13:02.899442+00:00",
   "why": "Sentiment from news and social media is a common feature in forecasting products; this is the pre-registered test of whether it adds anything for crypto. (gdelt-doc-api)",
   "prereg_sha256": "5bccbf95323300646686558af39943709f7539e6ce22cbdd2d5f58643b0aa474",
   "dataset_sha256": {
-    "gdelt_manifest": "795a896d6a57d6e59500133fb7b58c8f19a653e19b4b933707ad52ec9deec5be",
+    "gdelt_manifest": "d927ecf4675e3ea66519d027189578a93340540dc8dc76aa56696300b4b068b6",
     "coingecko_bitcoin": "304b9b369fe12166aae65f775aaca0b4923cb1b6bcb5a4c22ce6cbf9d061cc30",
     "coingecko_ethereum": "3c268c849100abee18d12da566dba125753e9a2414cb049194ea61923c140ddf",
     "coingecko_solana": "0eef1d9c6a6494fd0cbddde1292af6ec9964ac3aa9f292cbfc492e9bd4346ba1",
@@ -14,49 +14,49 @@
     "coingecko_binancecoin": "0353bd4d6c7af3cc3ce14d2bfd94dc34a68c52ce18a097bb8b136e7adca4ef48"
   },
   "artefacts": {
-    "gdelt_chunks": "41 of 50 recorded"
+    "gdelt_chunks": "46 of 50 recorded"
   },
   "metrics": {
     "questions / bigmove": {
       "n": 1220,
-      "without_gdelt_features": 613,
+      "without_gdelt_features": 333,
       "no_model_yet": 0
     },
     "sentiment / bigmove": {
-      "n": 607,
-      "brier": 0.2406
+      "n": 887,
+      "brier": 0.2403
     },
     "ml / bigmove": {
-      "n": 607,
-      "brier": 0.2375
+      "n": 887,
+      "brier": 0.2372
     },
     "base_rate / bigmove": {
-      "n": 607,
-      "brier": 0.2572
+      "n": 887,
+      "brier": 0.2574
     },
     "always_0.5 / bigmove": {
-      "n": 607,
+      "n": 887,
       "brier": 0.25
     },
     "questions / up": {
       "n": 565,
-      "without_gdelt_features": 272,
-      "no_model_yet": 78
+      "without_gdelt_features": 183,
+      "no_model_yet": 80
     },
     "sentiment / up": {
-      "n": 215,
-      "brier": 0.2584
+      "n": 302,
+      "brier": 0.2595
     },
     "ml / up": {
-      "n": 215,
+      "n": 302,
       "brier": 0.25
     },
     "base_rate / up": {
-      "n": 215,
-      "brier": 0.2517
+      "n": 302,
+      "brier": 0.2528
     },
     "always_0.5 / up": {
-      "n": 215,
+      "n": 302,
       "brier": 0.25
     }
   },
@@ -65,63 +65,62 @@
       "a": "sentiment",
       "b": "ml",
       "split": "bigmove",
-      "diff": 0.0031,
-      "lo": -0.00048,
-      "hi": 0.00676,
-      "n": 607,
+      "diff": 0.00316,
+      "lo": -0.00032,
+      "hi": 0.00661,
+      "n": 887,
       "days": 200
     },
     {
       "a": "sentiment",
       "b": "base_rate",
       "split": "bigmove",
-      "diff": -0.01651,
-      "lo": -0.02856,
-      "hi": -0.00527,
-      "n": 607,
+      "diff": -0.01704,
+      "lo": -0.028,
+      "hi": -0.00708,
+      "n": 887,
       "days": 200
     },
     {
       "a": "sentiment",
       "b": "always_0.5",
       "split": "bigmove",
-      "diff": -0.00936,
-      "lo": -0.0195,
-      "hi": 0.00115,
-      "n": 607,
+      "diff": -0.00965,
+      "lo": -0.01919,
+      "hi": -0.00052,
+      "n": 887,
       "days": 200
     },
     {
       "a": "sentiment",
       "b": "base_rate",
       "split": "up",
-      "diff": 0.00675,
-      "lo": -0.0035,
-      "hi": 0.01759,
-      "n": 215,
-      "days": 54
+      "diff": 0.00672,
+      "lo": -0.00273,
+      "hi": 0.01712,
+      "n": 302,
+      "days": 61
     },
     {
       "a": "sentiment",
       "b": "always_0.5",
       "split": "up",
-      "diff": 0.00844,
-      "lo": -0.01004,
-      "hi": 0.02698,
-      "n": 215,
-      "days": 54
+      "diff": 0.00949,
+      "lo": -0.00145,
+      "hi": 0.02105,
+      "n": 302,
+      "days": 61
     }
   ],
   "cost_usd": 0.0,
   "notes": [
     "Backtest (I4): never part of a live score. Walk-forward from 2026-03-12, refit every 7 days, no outcome used before it was known. Paired day-block bootstrap intervals.",
-    "bigmove: 607 scored questions, fewer than 800: inconclusive",
-    "up: 215 scored questions, fewer than 800: inconclusive"
+    "up: 302 scored questions, fewer than 800: inconclusive"
   ],
   "limits": [
     "CoinGecko's demo history is 365 days, so there is no held-out year (stated in the pre-registration); the test period is the last part of one year.",
     "GDELT counts per day are small for these queries (single or double digits for most days), so the tone is a noisy feature.",
-    "41 of 50 GDELT history chunks were recorded; days in missing chunks have no features and are not scored for any arm.",
+    "46 of 50 GDELT history chunks were recorded; days in missing chunks have no features and are not scored for any arm.",
     "Many test questions have no usable GDELT numbers (a day without matching articles has no tone, or its chunk was not recorded): see the 'questions' rows. Those are not scored for any arm, so the comparison is on the days with news only.",
     "No claim about prediction of price direction beyond this period, and no advice."
   ],

@@ -34,6 +34,7 @@ MODES = ("TimelineTone", "TimelineVolRaw")
 CHUNK_DAYS = 90
 PAUSE = 6.0
 RETRIES = 5
+MAX_FAILED_IN_A_ROW = 3
 
 
 def fetch(url: str) -> tuple[int, bytes]:
@@ -76,6 +77,7 @@ def main() -> None:
     args.out_dir.mkdir(parents=True, exist_ok=True)
     manifest = []
     first = True
+    streak = 0
     for coin, query in QUERIES.items():
         for mode in MODES:
             for a, b in chunks(date.fromisoformat(args.start), date.fromisoformat(args.end)):
@@ -111,6 +113,14 @@ def main() -> None:
                     }
                 )
                 print(f"{status} {len(body):>8} {name}", flush=True)
+                streak = 0 if status == 200 else streak + 1
+                if streak >= MAX_FAILED_IN_A_ROW:
+                    print("stopping: GDELT keeps refusing", flush=True)
+                    break
+            if streak >= MAX_FAILED_IN_A_ROW:
+                break
+        if streak >= MAX_FAILED_IN_A_ROW:
+            break
     (args.out_dir / "manifest.json").write_text(json.dumps(manifest, indent=1) + "\n", "utf-8")
     failed = sum(1 for m in manifest if m["status"] != 200)
     print(f"{len(manifest) - failed} of {len(manifest)} chunks saved, {failed} failed")

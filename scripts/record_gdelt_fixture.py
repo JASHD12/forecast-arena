@@ -15,6 +15,7 @@ import argparse
 import hashlib
 import json
 import time
+import urllib.error
 import urllib.parse
 import urllib.request
 from datetime import UTC, datetime
@@ -47,10 +48,24 @@ def main() -> None:
             }
         )
         url = f"{BASE}?{q}"
-        req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
-        with urllib.request.urlopen(req, timeout=60) as resp:
-            body = resp.read()
-            status = resp.status
+        status, body = 0, b""
+        for attempt in range(5):
+            if attempt:
+                time.sleep(30 * attempt)
+            req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
+            try:
+                with urllib.request.urlopen(req, timeout=60) as resp:
+                    body, status = resp.read(), resp.status
+                break
+            except urllib.error.HTTPError as exc:
+                status = exc.code
+                print(f"{mode}: HTTP {status}, attempt {attempt + 1} of 5", flush=True)
+                if status != 429 and status < 500:
+                    break
+            except OSError as exc:
+                print(f"{mode}: {exc!r}, attempt {attempt + 1} of 5", flush=True)
+        if status != 200:
+            raise SystemExit(f"{mode}: no good response (last status {status})")
         (args.out_dir / f"{mode.lower()}.json").write_bytes(body)
         provenance.append(
             {

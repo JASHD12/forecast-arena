@@ -16,7 +16,7 @@ append-only, hash-chained ledger. When the data arrives, every forecast is score
 |---|---|
 | **Live since** | 13 November 2026, about 30 to 43 questions a day on five topics: electricity, weather, Wikipedia attention, exchange rates and, since 23 November 2026, crypto prices (forecasting exercise only, no trading, data from CoinGecko); crypto joins the overall boards after 30 days |
 | **Status** | the **official record started on 23 November 2026** (five clean days in a row, then the owner's fixed start date); days before that are rehearsal and are shown but do not count towards headline scores |
-| **Who forecasts** | base rate, persistence, a gradient-boosted ML model, Claude (plain, with data, with tools, as a LangGraph agent), an open 1.5B model on CPU, and an experimental QLoRA-tuned model; further agent variants (calculator, skills, hybrid retrieval, a committee over A2A) are built and switched off until their pre-registered evaluations pass |
+| **Who forecasts** | base rate, persistence, a gradient-boosted ML model, Claude (with data, with tools, as a LangGraph agent; a question-only variant was retired on 2026-11-27), an open 1.5B model on CPU, and an experimental QLoRA-tuned model; further agent variants (calculator, skills, hybrid retrieval, a committee over A2A) are built and switched off until their pre-registered evaluations pass |
 | **Honest so far** | the ML model beats the baselines in backtest; whether an LLM agent beats it live is too early to tell; the fine-tuned model is live as an experiment and, measured on 276 frozen test questions, has no edge over its untuned base (the 4-bit export lost the gain; the [evaluation card](docs/lab/qlora-r1.md) says why); the skills and committee agents missed their pre-registered rules on the November replay ([skills](docs/lab/agent-skills.md), [committee](docs/lab/agent-committee.md)) and stay off |
 
 <!-- headline:start -->
@@ -291,7 +291,7 @@ many times and a gate lets the first run with work do it (`src/arena/ops/schedul
 |---|---|
 | `base_rate`, `persistence` | past outcomes of the same question template |
 | `ml` | the as-of data; one model per domain (`docs/models/`) |
-| `llm_plain` / `llm_context` | the question (and, for context, the as-of data) |
+| `llm_context` (and `llm_plain`, retired 2026-11-27) | the question and the as-of data (plain: the question only) |
 | `agent`, `agent_graph` | as `llm_context`, plus read-only tools (plain loop and LangGraph), call limits |
 | `llm_local` | the open Qwen2.5-1.5B model on the CI runner's CPU, same prompt as `llm_context` |
 | `llm_local_ft` (experimental) | the QLoRA-tuned model, one forward pass, calibrated probability; in no headline board |

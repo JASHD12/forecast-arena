@@ -90,3 +90,27 @@ def test_bandit_hedge_is_experimental_but_not_an_llm_forecaster() -> None:
     assert fid not in COMMON_GROUP and fid not in MEMBERS and fid not in LLM_FORECASTERS
     assert fid not in expected_forecasters(Settings.from_env({}))
     assert fid in expected_forecasters(Settings.from_env({"ARENA_BANDIT": "1"}))
+
+
+def test_llm_plain_is_retired_unless_the_flag_brings_it_back(tmp_path) -> None:
+    from arena.config import Settings
+    from arena.ledger import Ledger
+    from arena.llm.client import FakeLLM
+    from arena.ops.health import expected_forecasters
+    from arena.ops.wiring import build_forecasters
+    from arena.site.content import RETIRED_FORECASTERS
+
+    assert "llm_plain" in RETIRED_FORECASTERS and "llm_plain" not in COMMON_GROUP
+    assert titles.forecaster_name("llm_plain").endswith("(retired)")
+    off = Settings.from_env({})
+    assert off.llm_plain is False and "llm_plain" not in expected_forecasters(off)
+    fs, _ = build_forecasters(
+        Ledger(tmp_path / "a"), [], off, __import__("datetime").date(2026, 11, 12), llm=FakeLLM([])
+    )
+    assert "llm_plain" not in [f.forecaster_id for f in fs]
+    on = Settings.from_env({"ARENA_LLM_PLAIN": "1"})
+    assert "llm_plain" in expected_forecasters(on)
+    fs, _ = build_forecasters(
+        Ledger(tmp_path / "b"), [], on, __import__("datetime").date(2026, 11, 12), llm=FakeLLM([])
+    )
+    assert "llm_plain" in [f.forecaster_id for f in fs]

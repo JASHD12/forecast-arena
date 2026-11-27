@@ -75,11 +75,11 @@ def test_five_days_offline(tmp_path) -> None:
     assert len(base) == 2 * len(qs)  # base_rate and persistence answer everything
     llm = {
         fid: {f.question_id for f in fs if f.forecaster_id == fid}
-        for fid in ("llm_plain", "llm_context", "agent")
+        for fid in ("llm_context", "agent")
     }
-    assert llm["llm_plain"] == llm["llm_context"] == llm["agent"]  # paired daily sample
+    assert llm["llm_context"] == llm["agent"]  # paired daily sample
     assert led.exists(layout.agent_traces_path(FIRST))
-    assert len(llm["llm_plain"]) == 3 * DAYS
+    assert len(llm["llm_context"]) == 3 * DAYS
     skips = [r for _, r in led.iter_family("forecasts") if isinstance(r, Skip)]
     assert {s.reason_code for s in skips} == {"not_sampled", "model_missing"}
     missing_ml = [s for s in skips if s.forecaster_id == "ml"]
@@ -96,7 +96,7 @@ def test_five_days_offline(tmp_path) -> None:
 
     rec = load(led)
     board = {r.forecaster_id: r for r in leaderboard(rec.scored)}
-    assert set(board) == {"base_rate", "persistence", "llm_plain", "llm_context", "agent"}
+    assert set(board) == {"base_rate", "persistence", "llm_context", "agent"}
     assert board["base_rate"].n == len(qs) and board["base_rate"].skill == 0
     assert counts(rec).open == 0
 
@@ -113,7 +113,7 @@ def test_five_days_offline(tmp_path) -> None:
         for x in led.read_bytes(rel).decode().splitlines()
     ]
     spans = [s for t in traces for s in t.get("spans", [])]
-    assert {t["forecaster_id"] for t in traces} == {"llm_plain", "llm_context", "agent"}
+    assert {t["forecaster_id"] for t in traces} == {"llm_context", "agent"}
     assert spans and all(s["model"] and s["question_id"] and s["duration_ms"] >= 0 for s in spans)
     llm_page = (site.out_dir / "llm.html").read_text()
     assert "Calls per day" in llm_page and "fake-model-1" in llm_page
@@ -134,7 +134,7 @@ def test_five_days_offline(tmp_path) -> None:
     from arena.site.ops_status import llm_usage, parse_failures, source_freshness
 
     assert sum(u.requests for u in llm_usage(led, FIRST + timedelta(days=DAYS), DAYS + 1)) > 0
-    assert {p.forecaster_id for p in parse_failures(rec)} == {"llm_plain", "llm_context", "agent"}
+    assert {p.forecaster_id for p in parse_failures(rec)} == {"llm_context", "agent"}
     now = datetime(2026, 10, 27, tzinfo=UTC)
     assert [f.domain for f in source_freshness(rec, now)] == ["power"]
 

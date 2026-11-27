@@ -55,6 +55,7 @@ from arena.site.content import (
     NAV,
     NAV_MORE,
     PLACEHOLDER,
+    RETIRED_FORECASTERS,
     SKIP_HELP,
 )
 from arena.site.forecast_audit import CHART_CLASS, lineage, load_case
@@ -284,7 +285,12 @@ def build_site(
                 "awaiting_forecasts": bool(latest) and not any(r["pn"] for r in latest),
                 "cards": pick_cards(latest),
                 "outcomes": split_outcomes(previous),
-                "forecasters": fids,
+                # a retired forecaster is listed only while the latest batch has its rows
+                "forecasters": [
+                    f
+                    for f in fids
+                    if f not in RETIRED_FORECASTERS or any(f in r["pn"] for r in latest)
+                ],
                 "previous_batch": prev_b,
                 "previous": previous,
                 "headline": headline[0],

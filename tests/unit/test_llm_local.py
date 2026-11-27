@@ -141,5 +141,6 @@ def test_output_cap_comes_from_settings_and_shows_in_the_version(tmp_path) -> No
     s = Settings.from_env({"ARENA_LLM_MAX_OUTPUT_TOKENS": "1024"})
     fs, _ = build_forecasters(Ledger(tmp_path), [], s, B, llm=FakeLLM([GOOD]))
     llms = [f for f in fs if hasattr(f, "max_output_tokens")]
-    assert {f.forecaster_id for f in llms} >= {"llm_plain", "llm_context", "agent"}
+    assert {f.forecaster_id for f in llms} >= {"llm_context", "agent"}
+    assert "llm_plain" not in {f.forecaster_id for f in fs}  # retired 2026-11-27
     assert all(f.max_output_tokens == 1024 and "|out-1024" in f.version() for f in llms)

@@ -27,7 +27,12 @@ from arena.models import Forecast, Question, Skip
 from arena.scoring.core import Scored
 
 #: The experts: forecasters that answer (almost) every question or a seeded daily sample.
-EXPERTS: tuple[str, ...] = ("base_rate", "ml", "llm_plain", "llm_context", "agent")
+EXPERTS: tuple[str, ...] = (
+    "base_rate",
+    "ml",
+    "llm_context",
+    "agent",
+)  # llm_plain retired 2026-11-27
 LAG_DAYS = 2
 SHRINK = 5  # pseudo-rounds at the coin-flip loss 0.25 so a rarely-seen expert is not over-trusted
 PRIOR_LOSS = 0.25

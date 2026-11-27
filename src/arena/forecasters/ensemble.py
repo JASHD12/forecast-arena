@@ -1,7 +1,8 @@
 """`ensemble` (SPEC 8.6): a logistic regression on the other forecasters' logits.
 
-Inputs are the probabilities of the common-set members (`base_rate`, `ml`, `llm_plain`,
-`llm_context`, `agent`) for the same question, as logits, plus one indicator per domain.
+Inputs are the probabilities of the common-set members (`base_rate`, `ml`,
+`llm_context`, `agent`; `llm_plain` was retired on 2026-11-27) for the same question, as logits,
+plus one indicator per domain.
 It is retrained weekly on resolved **official-record** forecasts only (an expanding window;
 rehearsal days never train it) and stays inactive until at least 300 resolved common-set
 forecasts exist (the same threshold the common-set board uses to drop its "too early" label).

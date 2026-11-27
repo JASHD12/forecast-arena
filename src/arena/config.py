@@ -56,7 +56,7 @@ class Settings(BaseModel):
     llm_effort: Literal["low", "medium", "high", "xhigh", "max"] | None = None
     llm_questions_per_domain: int = Field(3, ge=0)
     llm_max_requests_per_day: int = Field(100, ge=0)
-    llm_max_tokens_per_day: int = Field(400_000, ge=0)
+    llm_max_tokens_per_day: int = Field(300_000, ge=0)  # the production cap (owner, 2026-11-21)
     llm_max_output_tokens: int = Field(400, ge=1)
     #: T190: automatic prompt caching (Anthropic); changes cost, never the answer.
     llm_cache: bool = False
@@ -79,6 +79,8 @@ class Settings(BaseModel):
     agent_graph_skills: bool = False
     #: T358: run `agent_hybrid_skills` (agent_hybrid plus the estimate, calculator and load_skill).
     agent_hybrid_skills: bool = False
+    #: Retired 2026-11-27 (owner decision): `llm_plain` ("AI, question only") no longer forecasts.
+    llm_plain: bool = False
     #: T363: run `agent_committee` (chair and specialists over A2A; needs requirements/a2a.txt).
     agent_committee: bool = False
     #: T121: run the LangGraph agent `agent_graph` (needs requirements/graph.txt).

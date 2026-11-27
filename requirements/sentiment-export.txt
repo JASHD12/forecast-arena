@@ -3,5 +3,5 @@
 # Apache-2.0, onnx Apache-2.0, torch BSD-3.
 -r sentiment.txt
 -r torch.txt
-transformers==5.8.0
-onnx==1.20.1
+transformers==5.24.1
+onnx==1.23.2

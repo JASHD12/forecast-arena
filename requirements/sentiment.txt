@@ -1,4 +1,4 @@
 # Headline sentiment at run time (T372): ONNX Runtime and the Rust tokenizer, no PyTorch.
 # Licences: onnxruntime MIT, tokenizers Apache-2.0. Not part of lock.txt (like onnx.txt).
-onnxruntime==1.31.1
+onnxruntime==1.32.0
 tokenizers==0.23.3

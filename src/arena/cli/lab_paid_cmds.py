@@ -557,3 +557,96 @@ def lab_distill_merge(
     }
     dl.write_labels(out, dl.labels_file(ids, probs, summary))
     click.echo(f"{len(usable)} of {len(ids)} rows labelled -> {out}")
+
+
+# ---- Open sentiment model against Claude labels (T375) ------------------------------------------
+
+
+@lab.command("sentiment-labels-run")
+@click.option(
+    "--model-dir",
+    type=click.Path(exists=True, file_okay=False, path_type=Path),
+    required=True,
+    help="Directory written by scripts/export_sentiment_onnx.py (ONNX model, tokenizer, manifest).",
+)
+@click.option("--max-tokens", type=int, default=400_000, help="Hard token cap for this run.")
+@click.option("--model", default="", help="Claude model id instead of the configured one.")
+@click.pass_obj
+def lab_sentiment_labels_run(obj: Ctx, model_dir: Path, max_tokens: int, model: str) -> None:
+    """Rate 500 current crypto headlines with the open model and with Claude (Actions only).
+
+    The headlines are fetched first and the run stops before any paid call when too few were
+    found. Titles are scored in memory and discarded; only counts and agreement are printed.
+    """
+    from arena.lab import sentiment_labels as sl
+    from arena.lab.paid import PaidRun
+    from arena.llm.budget import BudgetExhausted
+    from arena.llm.client import LLMError
+    from arena.llm.factory import client_from_settings
+    from arena.nlp import sentiment as nlp
+    from arena.sources import gdelt_tone as G
+    from arena.sources.http import HttpClient, HttpError
+
+    _refuse_outside_actions()
+    http = HttpClient(obj.settings.user_agent())
+    by_coin: dict[str, list[str]] = {}
+    failed: list[str] = []
+    for i, coin in enumerate(G.QUERIES):
+        if i:
+            import time
+
+            time.sleep(G.REQUEST_PAUSE)
+        try:
+            resp = http.get(G.BASE, sl.artlist_params(coin))
+            by_coin[coin] = [t for t, _ in sl.parse_titles(resp.json())]
+        except (HttpError, sl.LabelError, ValueError) as exc:
+            failed.append(f"{coin}: {type(exc).__name__}")
+    sample = sl.sample_titles(by_coin)
+    if len(sample) < sl.MIN_TITLES:
+        click.echo(
+            f"stopped before any paid call: {len(sample)} headlines (need {sl.MIN_TITLES}); "
+            f"failed: {failed}",
+            err=True,
+        )
+        sys.exit(1)
+    backend = nlp.load_backend(model_dir)
+    open_ratings = [sl.open_rating(s) for s in nlp.score([t for _, t in sample], backend)]
+    if model:
+        client = client_from_settings(obj.settings.model_copy(update={"llm_model": model}))
+        if client is None:
+            click.echo("model_missing: no LLM configured", err=True)
+            sys.exit(1)
+    else:
+        client = _client(obj)
+    run = PaidRun(
+        client, max_requests=len(sample) * 2 + 10, max_tokens=max_tokens, max_output_tokens=60
+    )
+
+    def ask(system: str, user: str) -> str:
+        return run.ask(system, user).text
+
+    pairs: list[tuple[int, int | None]] = []
+    stopped = ""
+    for (coin, title), o in zip(sample, open_ratings, strict=True):
+        try:
+            pairs.append((o, sl.rate_with_claude(ask, coin, title)))
+        except (LLMError, BudgetExhausted) as exc:
+            stopped = type(exc).__name__
+            break
+    result = sl.compare(pairs)
+    n_asked = len(pairs)
+    summary = run.summary()
+    cost = summary.get("cost_usd")
+    per_1k = None if not n_asked or cost is None else round(1000 * float(cost) / n_asked, 4)
+    out = {
+        **result,
+        "headlines_sampled": len(sample),
+        "asked": n_asked,
+        "stopped_by": stopped,
+        "cost_usd_per_1k": per_1k,
+        "per_coin": {c: sum(1 for k, _ in sample if k == c) for c in by_coin},
+        "fetch_failed": failed,
+        "run": summary,
+        "claude_model": client.model,
+    }
+    click.echo("SL_RESULT=" + json.dumps(out, sort_keys=True))

@@ -1,0 +1,7 @@
+# One-off export of the sentiment model to ONNX (T372, scripts/export_sentiment_onnx.py).
+# Needs the CPU PyTorch wheel (see torch.txt) plus transformers and onnx. Licences: transformers
+# Apache-2.0, onnx Apache-2.0, torch BSD-3.
+-r sentiment.txt
+-r torch.txt
+transformers==5.8.0
+onnx==1.20.1

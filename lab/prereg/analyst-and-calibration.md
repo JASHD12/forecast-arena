@@ -79,3 +79,9 @@ Whatever the numbers, they are published with intervals, sample sizes, per-topic
 The November power set has already been used by other variants (`agent`, `agent_quant`, `agent_skills`, the committee), so it is a shared test set,
 not a fresh one. The replay has no news or Wikipedia backend and no retriever; tool calls to them are recorded as errors. The 232-question live-day
 set is small, days are correlated (the intervals are day-block), and rehearsal days are included.
+
+## Addendum 2026-11-27 (before any run): coverage of the live `ml` arm
+
+The live `ml` forecast exists for 209 of the 232 live-day questions (`evals/golden/replay-weather-attention-2026-11-25.ml-probs.json`; the other 23 have
+no `ml` forecast in the ledger). Paired comparisons against `ml` on that set use only the 209 questions; comparisons that do not involve `ml` use all of them.
+No missing probability is filled in.

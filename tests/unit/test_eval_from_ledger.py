@@ -62,6 +62,7 @@ def test_items_carry_context_outcome_and_base_rate(tmp_path: Path) -> None:
     assert len(b.items) == len(qs) and b.dropped == {}
     it = b.items[0]
     assert it.base_rate == 0.4 and it.outcome in (0, 1) and it.asof == ASOF
+    assert b.ml == {}  # the test ledger has no `ml` forecasts: nothing is invented
     assert "daily_usd_00utc" in it.context
 
 

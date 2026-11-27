@@ -104,6 +104,22 @@ def _build_from_ledger(obj: Ctx, topics: str, until: object, out: Path) -> None:
     if not build.items:
         raise click.ClickException("no resolved question with a morning snapshot: nothing frozen")
     sha = dump(build.items, out)
+    ml_path = out.with_suffix(".ml-probs.json")
+    ml_path.write_text(
+        json.dumps(
+            {
+                "golden": out.name,
+                "golden_sha256": sha,
+                "kind": "live",
+                "note": "the live ml forecast of each question's morning, read from the ledger; "
+                "not a replay, but the questions are past days (evaluation only)",
+                "probabilities": dict(sorted(build.ml.items())),
+            },
+            indent=1,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
     sidecar = out.with_suffix(".meta.json")
     sidecar.write_text(
         json.dumps(fl.meta(build, names, day, sha, out.name), indent=1) + "\n", encoding="utf-8"

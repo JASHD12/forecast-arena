@@ -13,5 +13,6 @@
   "attention": 80,
   "weather": 152
  },
+ "items_with_live_ml_forecast": 209,
  "dropped": {}
 }

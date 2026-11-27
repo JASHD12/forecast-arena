@@ -31,6 +31,8 @@ class LedgerBuild:
 
     items: list[GoldenItem] = field(default_factory=list)
     dropped: dict[str, int] = field(default_factory=dict)
+    #: the live `ml` forecast of each item's morning, read from the ledger (not recomputed)
+    ml: dict[str, float] = field(default_factory=dict)
 
     def drop(self, why: str) -> None:
         """Count one left-out question."""
@@ -52,12 +54,15 @@ def build_from_ledger(ledger: Ledger, topics: Sequence[str], until: date) -> Led
     }
     outcomes: dict[str, Resolution] = {}
     base: dict[str, float] = {}
+    ml: dict[str, float] = {}
     for _, r in ledger.iter_family("resolutions"):
         if isinstance(r, Resolution):
             outcomes.setdefault(r.question_id, r)
     for _, f in ledger.iter_family("forecasts"):
         if isinstance(f, Forecast) and f.forecaster_id == "base_rate":
             base.setdefault(f.question_id, f.probability)
+        if isinstance(f, Forecast) and f.forecaster_id == "ml":
+            ml.setdefault(f.question_id, f.probability)
     snaps: dict[tuple[str, date], dict[str, Any]] = {}
     out = LedgerBuild()
     for qid in sorted(questions):
@@ -77,6 +82,8 @@ def build_from_ledger(ledger: Ledger, topics: Sequence[str], until: date) -> Led
             continue
         asof = datetime.fromisoformat(str(ctx.get("asof", q.created_at.isoformat())))
         out.items.append(GoldenItem(asof.astimezone(UTC), q, ctx, int(res.outcome), base.get(qid)))
+        if qid in ml:
+            out.ml[qid] = round(ml[qid], 6)
     return out
 
 
@@ -96,5 +103,6 @@ def meta(
         "until_batch_day": until.isoformat(),
         "items": len(build.items),
         "items_per_topic": dict(sorted(per_topic.items())),
+        "items_with_live_ml_forecast": len(build.ml),
         "dropped": dict(sorted(build.dropped.items())),
     }

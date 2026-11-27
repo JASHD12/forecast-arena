@@ -61,8 +61,12 @@ One run on the 90 November electricity questions (`docs/lab/agent-committee.md`,
   one repair, and 119 of its 316 model calls ended at the 300-token output limit (the likely cause).
 - On those 37 it scored worse than `agent_skills` on the same questions (the paired interval lies above zero), so H-C1 is not
   met. Cost per question asked was about the same, per answered question about 2.5 times.
-- Decision by the pre-registered rule: stays off. The fix (a larger output budget, tolerant parsing) is a **new version**,
-  `committee-r2` (built and pre-registered in `lab/prereg/agent-committee-r2.md` after the owner's go; its single run is the next step); it is not patched into r1 (I8).
+- Decision by the pre-registered rule: stays off. The fix (a larger output budget, tolerant parsing) was made as a **new
+  version**, `committee-r2` (pre-registered in `lab/prereg/agent-committee-r2.md` before its run), not patched into r1 (I8).
+- **r2 result** (`docs/lab/agent-committee-r2.md`): the fix worked (87 of 90 questions answered, H-C5 met), but the committee
+  scored +0.0060 [-0.0036, +0.0152] against `agent_skills` on the same questions (H-C1 not met: the interval includes zero and the
+  point estimate is worse) at about 1.4 times the cost (H-C2 met). It stays off. The replay has no news backend, so the news
+  scout, the member most likely to help, was not tested.
 - The skills evaluation from the same run (`docs/lab/agent-skills.md`) also missed its rule narrowly.
 
 ## What is not done (and not claimed)
@@ -88,9 +92,9 @@ One run on the 90 November electricity questions (`docs/lab/agent-committee.md`,
    the message; the base rate is the only peer forecast handed over. Nothing else about the question exists in the member.
 6. **Could a headline hijack the committee?** Tool text passes the guards (`guards-r1`) before the scout's model reads it, the
    scout returns items by number mapped to real headlines (no invented citations), and the chair is told reports are data.
-7. **Does it beat the single agent?** Not in the one evaluation so far: r1 answered 37 of 90 questions (a format bug in the
-   skeptic step) and was worse than `agent_skills` on those. The result is published as it is; a fixed r2 would need its own
-   pre-registration.
+7. **Does it beat the single agent?** Not in the evaluations so far: r1 answered only 37 of 90 questions (a format bug in the
+   skeptic step); the fixed r2 answered 87 and was +0.0060 [-0.0036, +0.0152] against `agent_skills` at about 1.4 times the
+   cost, so the data do not show a benefit. Both results are published as they are.
 8. **Why is the quant member not an LLM?** The reference estimate is code; a model adds cost and noise there. Specialisation
    can also mean "this part is deterministic".
 9. **What does it cost?** At most seven model requests per question by the harness's cap (four in the normal path), all through

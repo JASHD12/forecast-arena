@@ -217,6 +217,14 @@ Source: `evals/results/eval-20261126T195707.json`
 | agent_skills | claude-haiku-5-5 | 90 | 90 | 0.1279 | 0.2030 | 96% | 4% | 0.1254 | 52647 |
 
 Paired Brier difference: agent - agent_quant: -0.0067 [-0.0213, +0.0083] on 90 items; agent - agent_skills: +0.0023 [-0.0055, +0.0109] on 90 items; agent - agent_committee: -0.0133 [-0.0351, +0.0079] on 37 items; agent_quant - agent_skills: +0.0090 [-0.0028, +0.0204] on 90 items; agent_quant - agent_committee: -0.0033 [-0.0143, +0.0104] on 37 items; agent_skills - agent_committee: -0.0181 [-0.0334, -0.0034] on 37 items
+
+### Run `eval-20261126T224957` (90 items; caps 630 requests, 1500000 tokens)
+
+Source: `evals/results/eval-20261126T224957.json`
+
+| Forecaster | Model | n | Answered | Brier | Base rate, same items | Valid JSON first try | Repair rate | Cost (USD) | Output tokens |
+|---|---|---|---|---|---|---|---|---|---|
+| agent_committee | claude-haiku-5-5 | 90 | 87 | 0.1351 | 0.2043 | 69% | 32% | 0.1809 | 201411 |
 <!-- evals:end -->
 
 <!-- lab:start -->
@@ -513,6 +521,17 @@ Source: `evals/results/lab-stacking.json`; card `docs/lab/stacking.md`
 | equal_mean | 32 | 0.1722 |
 | ml | 32 | 0.1077 |
 | stacking | 32 | 0.0987 |
+
+### The committee, version r2 (output budget and reply parsing fixed), against one agent with skills
+
+Source: `evals/results/lab-agent-committee-r2.json`; card `None`
+
+| Arm | Questions | Brier | Log score | ECE | US$ per 1,000 |
+|---|---|---|---|---|---|
+| agent_committee / eval | 87 | 0.1351 | 0.4328 | 0.0953 | 2.0098 |
+| agent_skills / eval | 90 | 0.1279 | 0.4091 | 0.1057 | 1.3928 |
+| agent_skills / same items as agent_committee | 87 | 0.1291 | - | - | - |
+| base_rate / eval | 87 | 0.2043 | - | - | - |
 
 ### Two LLM judges compared (not human calibration)
 

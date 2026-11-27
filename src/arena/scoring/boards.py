@@ -16,7 +16,10 @@ from datetime import date, timedelta
 from arena.scoring.core import REFERENCE, Scored, log_score
 from arena.scoring.stats import Interval, day_block_bootstrap, paired_brier_difference
 
-COMMON_GROUP = ("base_rate", "ml", "llm_plain", "llm_context", "agent")
+#: The headline comparison group. `llm_plain` ("AI, question only") was a member until it was
+#: retired on 2026-11-27 (owner decision: cost, and keep only the agents with data); its forecasts
+#: stay in the ledger, but it writes no new ones, so it cannot be required of new questions.
+COMMON_GROUP = ("base_rate", "ml", "llm_context", "agent")
 ALL_GROUP = ("base_rate", "persistence", "ml", "ensemble")
 MIN_DAYS = 30
 MIN_COMMON = 300

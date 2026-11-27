@@ -113,7 +113,8 @@ INFORMATION_SETS = (
     ("ml", "The full as-of context", "all questions"),
     (
         "llm_plain",
-        "Question text, resolution rule, current date; no data, no tools",
+        "Question text, resolution rule, current date; no data, no tools (retired 2026-11-27: "
+        "no new forecasts, earlier ones stay)",
         "daily sample",
     ),
     (
@@ -212,6 +213,8 @@ AI_FORECASTERS = frozenset(
         "agent_committee",
     }
 )
+#: Forecasters that no longer write new forecasts (their history stays visible).
+RETIRED_FORECASTERS = frozenset({"llm_plain"})  # retired 2026-11-27 (owner decision)
 #: Experimental forecasters (SPEC 17): named "(experimental)", outside the common-set board.
 EXPERIMENTAL_FORECASTERS = frozenset(
     {

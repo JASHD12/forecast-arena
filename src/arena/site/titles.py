@@ -18,7 +18,7 @@ FORECASTER_NAMES = {
     "base_rate": "Base rate",
     "persistence": "Same as last time",
     "ml": "ML model",
-    "llm_plain": "AI, question only",
+    "llm_plain": "AI, question only (retired)",
     "llm_context": "AI with data",
     "agent": "AI agent with tools",
     "agent_graph": "AI agent (LangGraph)",

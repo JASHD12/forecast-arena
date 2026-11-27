@@ -60,15 +60,14 @@ LLM_FORECASTERS = frozenset(
 )
 INCIDENT_LABEL = "incident"
 INCIDENT_TITLE = "Forecast Arena incident: a job or health check failed"
-CORE_FORECASTERS = frozenset(
-    {"base_rate", "persistence", "ml", "llm_plain", "llm_context", "agent"}
-)
+CORE_FORECASTERS = frozenset({"base_rate", "persistence", "ml", "llm_context", "agent"})
 
 
 def expected_forecasters(settings: Settings) -> frozenset[str]:
     """Declared production roster, independent of what the factory actually registered."""
     return (
         CORE_FORECASTERS
+        | ({"llm_plain"} if settings.llm_plain else set())
         | ({"llm_local"} if settings.llm_local else set())
         | ({"agent_graph"} if settings.agent_graph else set())
         | ({"llm_local_ft"} if settings.llm_local_ft else set())

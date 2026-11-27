@@ -382,7 +382,7 @@ Information sets (this table is shown on the Methods page):
 | `base_rate` | Trailing outcomes of the same template and entity | all questions |
 | `persistence` | Yesterday's outcome of the same template and entity | all questions |
 | `ml` | The full as-of context | all questions |
-| `llm_plain` | Question text, resolution rule, current date. No data, no tools | daily sample |
+| `llm_plain` | Question text, resolution rule, current date. No data, no tools. **Retired 2026-11-27** (owner decision: cost, and keep only the agents with data); its earlier forecasts stay in the ledger, the flag `ARENA_LLM_PLAIN` (default off) can bring it back | daily sample |
 | `llm_context` | The above plus a compact text rendering of the as-of context | daily sample |
 | `agent` | As `llm_context`, plus tools (section 9.3) | daily sample |
 | `ensemble` | Other forecasters' probabilities | where inputs exist |
@@ -518,7 +518,7 @@ outside GitHub Actions.
   score and for paired differences between forecasters.
 - **Leaderboards**:
   - *Common set*: only questions answered by every forecaster in the comparison group
-    (`base_rate`, `ml`, `llm_plain`, `llm_context`, `agent`). This is the headline.
+    (`base_rate`, `ml`, `llm_context`, `agent`; until 2026-11-27 also `llm_plain`, see DECISIONS). This is the headline.
   - *All questions*: forecasters that answer everything (`base_rate`, `persistence`,
     `ml`, `ensemble`).
   - Both per domain and overall.

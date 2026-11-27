@@ -350,7 +350,9 @@ def build_forecasters(
         news=None if llm is not None else GdeltBackend(http),
         wiki=None if llm is not None else partial(wikipedia_summary, http),
     )
-    out += [LLMPlain(client, n), LLMContext(client, n), agent]
+    if settings.llm_plain:  # retired 2026-11-27: only on if the owner switches it back on
+        out.append(LLMPlain(client, n))
+    out += [LLMContext(client, n), agent]
     hybrids: list[type[AgentHybrid]] = []
     if settings.agent_hybrid:
         hybrids.append(AgentHybrid)

@@ -79,6 +79,8 @@ class Settings(BaseModel):
     agent_graph_skills: bool = False
     #: T358: run `agent_hybrid_skills` (agent_hybrid plus the estimate, calculator and load_skill).
     agent_hybrid_skills: bool = False
+    #: Retired 2026-11-27 (owner decision): `llm_plain` ("AI, question only") no longer forecasts.
+    llm_plain: bool = False
     #: T363: run `agent_committee` (chair and specialists over A2A; needs requirements/a2a.txt).
     agent_committee: bool = False
     #: T121: run the LangGraph agent `agent_graph` (needs requirements/graph.txt).

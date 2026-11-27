@@ -21,6 +21,7 @@ import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 
+UTC_TZ = timezone.utc  # noqa: UP017 (not datetime.UTC: that needs Python 3.11, macOS ships 3.9)
 BASE = "https://api.gdeltproject.org/api/v2/doc/doc"
 USER_AGENT = "forecast-arena-research/0.1 (github.com/JASHD12/forecast-arena)"
 
@@ -72,7 +73,7 @@ def main() -> None:
                 "mode": mode,
                 "url": url,
                 "status": status,
-                "fetched_at": datetime.now(timezone.utc)  # noqa: UP017 (runs on Python 3.9 too).isoformat(),
+                "fetched_at": datetime.now(UTC_TZ).isoformat(),
                 "sha256": hashlib.sha256(body).hexdigest(),
             }
         )

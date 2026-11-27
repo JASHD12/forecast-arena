@@ -29,6 +29,7 @@ from datetime import UTC, datetime, time, timedelta
 from typing import Any
 
 from arena.config import Settings
+from arena.forecasters.catalog import CORE_FORECASTERS, expected_roster
 from arena.ledger import Ledger, layout
 from arena.ledger.verify import verify
 from arena.models import BatchSeal, Forecast, Skip
@@ -60,27 +61,11 @@ LLM_FORECASTERS = frozenset(
 )
 INCIDENT_LABEL = "incident"
 INCIDENT_TITLE = "Forecast Arena incident: a job or health check failed"
-CORE_FORECASTERS = frozenset({"base_rate", "persistence", "ml", "llm_context", "agent"})
 
 
 def expected_forecasters(settings: Settings) -> frozenset[str]:
-    """Declared production roster, independent of what the factory actually registered."""
-    return (
-        CORE_FORECASTERS
-        | ({"llm_plain"} if settings.llm_plain else set())
-        | ({"llm_local"} if settings.llm_local else set())
-        | ({"agent_graph"} if settings.agent_graph else set())
-        | ({"llm_local_ft"} if settings.llm_local_ft else set())
-        | ({"agent_hybrid"} if settings.agent_hybrid else set())
-        | ({"agent_quant"} if settings.agent_quant else set())
-        | ({"agent_analyst"} if settings.agent_analyst else set())
-        | ({"agent_skills"} if settings.agent_skills else set())
-        | ({"agent_graph_skills"} if settings.agent_graph_skills else set())
-        | ({"agent_hybrid_skills"} if settings.agent_hybrid_skills else set())
-        | ({"agent_committee"} if settings.agent_committee else set())
-        | ({"llm_context_cal"} if settings.llm_context_cal else set())
-        | ({"bandit_hedge"} if settings.bandit else set())
-    )
+    """Declared production roster (from the catalog), independent of what the factory registered."""
+    return expected_roster(settings)
 
 
 @dataclass(frozen=True)

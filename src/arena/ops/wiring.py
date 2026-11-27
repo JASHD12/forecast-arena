@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import importlib.util
 from collections.abc import Callable, Sequence
+from dataclasses import dataclass
 from datetime import date, datetime, timedelta
 from functools import partial
 from typing import TYPE_CHECKING, Any
@@ -373,7 +374,6 @@ def build_forecasters(
     tracer = Tracer()  # T123: one span per model call, written with the day's traces
     if client is not None:
         client = TracingLLM(client, tracer, clk)
-    n = settings.llm_questions_per_domain
     http = HttpClient(settings.user_agent())
     retriever = None
     if settings.agent_rag and client is not None:
@@ -382,6 +382,7 @@ def build_forecasters(
 
         embedder = FastEmbedder(cache_dir=settings.cache_dir / "fastembed")
         retriever = PastQuestions.from_ledger(ledger, embedder)
+    n = settings.llm_questions_per_domain
     agent = AgentForecaster(
         client,
         per_domain=n,
@@ -392,109 +393,168 @@ def build_forecasters(
         news=None if llm is not None else GdeltBackend(http),
         wiki=None if llm is not None else partial(wikipedia_summary, http),
     )
-    if settings.llm_plain:  # retired 2026-11-27: only on if the owner switches it back on
-        out.append(LLMPlain(client, n))
-    out += [LLMContext(client, n), agent]
+    b = _Build(ledger, settings, clk, n, client, tracer, out[0], ml, retriever, agent)
+    # Registration order matters: forecasters that read peers (`needs_peers`) come last, after
+    # everything they read; tests/unit/test_wiring_order.py pins it.
+    out += _llm_family(b)
+    out += _agent_variants(b)
+    out += _open_models(b)
+    out += _graph_family(b)
+    out += _peer_readers(b)
+    for f in out:  # per-call output cap from the settings (thinking counts against it)
+        if hasattr(f, "max_output_tokens"):
+            f.max_output_tokens = settings.llm_max_output_tokens
+    return out, guard
+
+
+@dataclass
+class _Build:
+    """What the per-family registration functions share."""
+
+    ledger: Ledger
+    settings: Settings
+    clk: Clock
+    n: int
+    client: LLMClient | None
+    tracer: Tracer
+    base: Forecaster
+    ml: Forecaster
+    retriever: Any
+    agent: AgentForecaster
+
+    @property
+    def peers(self) -> dict[str, Forecaster]:
+        """What the agent family may read: the base rate and `ml`."""
+        return {"base_rate": self.base, "ml": self.ml}
+
+
+def _llm_family(b: _Build) -> list[Forecaster]:
+    """`llm_plain` (retired, off), `llm_context` and `agent`."""
+    out: list[Forecaster] = []
+    if b.settings.llm_plain:  # retired 2026-11-27: only on if the owner switches it back on
+        out.append(LLMPlain(b.client, b.n))
+    out += [LLMContext(b.client, b.n), b.agent]
+    return out
+
+
+def _agent_variants(b: _Build) -> list[Forecaster]:
+    """Experimental variants of `agent`: hybrid retrieval, quant, analyst and skills."""
+    s = b.settings
+    out: list[Forecaster] = []
     hybrids: list[type[AgentHybrid]] = []
-    if settings.agent_hybrid:
+    if s.agent_hybrid:
         hybrids.append(AgentHybrid)
-    if settings.agent_hybrid_skills:  # T358: the same retriever and reranker as agent_hybrid
+    if s.agent_hybrid_skills:  # T358: the same retriever and reranker as agent_hybrid
         from arena.agent.quant import AgentHybridSkills
 
         hybrids.append(AgentHybridSkills)
     if hybrids:
-        out += _hybrid_forecasters(
-            ledger, settings, client, agent, retriever, {"base_rate": out[0], "ml": ml}, hybrids
-        )
+        out += _hybrid_forecasters(b.ledger, s, b.client, b.agent, b.retriever, b.peers, hybrids)
     for flag, cls in (
-        (settings.agent_quant, "AgentQuant"),
-        (settings.agent_analyst, "AgentAnalyst"),
-        (settings.agent_skills, "AgentSkills"),
+        (s.agent_quant, "AgentQuant"),
+        (s.agent_analyst, "AgentAnalyst"),
+        (s.agent_skills, "AgentSkills"),
     ):
         if flag:  # T342/T343/T353: experimental variants of `agent`, same sample, caps and peers
             from arena.agent import quant as quant_mod
 
             out.append(
                 getattr(quant_mod, cls)(
-                    client,
-                    per_domain=n,
-                    max_tool_calls=settings.agent_max_tool_calls,
-                    peers={"base_rate": out[0], "ml": ml},
-                    retriever=retriever,
-                    prompt_version="v2" if retriever is not None else "v1",
-                    news=agent.news,
-                    wiki=agent.wiki,
+                    b.client,
+                    per_domain=b.n,
+                    max_tool_calls=s.agent_max_tool_calls,
+                    peers=b.peers,
+                    retriever=b.retriever,
+                    prompt_version="v2" if b.retriever is not None else "v1",
+                    news=b.agent.news,
+                    wiki=b.agent.wiki,
                 )
             )
-    if settings.llm_local:
-        out.append(_local_forecaster(settings, n, tracer, clk))
-    if settings.llm_local_ft:
-        out.append(_ft_forecaster(settings, n))
-    if settings.agent_graph:
+    return out
+
+
+def _open_models(b: _Build) -> list[Forecaster]:
+    """The open models on the runner's CPU: `llm_local` and the fine-tuned `llm_local_ft`."""
+    out: list[Forecaster] = []
+    if b.settings.llm_local:
+        out.append(_local_forecaster(b.settings, b.n, b.tracer, b.clk))
+    if b.settings.llm_local_ft:
+        out.append(_ft_forecaster(b.settings, b.n))
+    return out
+
+
+def _graph_family(b: _Build) -> list[Forecaster]:
+    """The LangGraph agent, its skills variant and the A2A committee."""
+    s = b.settings
+    out: list[Forecaster] = []
+    if s.agent_graph:
         # No silent fallback: if langgraph is missing this raises and the run fails.
         from arena.agent.graph import GraphAgentForecaster
 
         out.append(
             GraphAgentForecaster(
-                client,
-                max_tool_calls=settings.agent_max_tool_calls,
-                peers={"base_rate": out[0], "ml": ml},
-                news=agent.news,
-                wiki=agent.wiki,
-                retriever=retriever,
+                b.client,
+                max_tool_calls=s.agent_max_tool_calls,
+                peers=b.peers,
+                news=b.agent.news,
+                wiki=b.agent.wiki,
+                retriever=b.retriever,
             )
         )
-    if settings.agent_graph_skills:  # T357: same peers, news, wiki and retriever as agent_graph
+    if s.agent_graph_skills:  # T357: same peers, news, wiki and retriever as agent_graph
         from arena.agent.quant import AgentGraphSkills
 
         out.append(
             AgentGraphSkills(
-                client,
-                max_tool_calls=settings.agent_max_tool_calls,
-                peers={"base_rate": out[0], "ml": ml},
-                news=agent.news,
-                wiki=agent.wiki,
-                retriever=retriever,
+                b.client,
+                max_tool_calls=s.agent_max_tool_calls,
+                peers=b.peers,
+                news=b.agent.news,
+                wiki=b.agent.wiki,
+                retriever=b.retriever,
             )
         )
-    if settings.agent_committee:  # T363: needs requirements/a2a.txt; a missing SDK fails the run
+    if s.agent_committee:  # T363: needs requirements/a2a.txt; a missing SDK fails the run
         from arena.agent.committee import AgentCommittee
 
         out.append(
             AgentCommittee(
-                client,
-                per_domain=n,
-                peers={"base_rate": out[0]},  # members get the base rate, never `ml`
-                news=agent.news,
-                wiki=agent.wiki,
-                retriever=retriever,
+                b.client,
+                per_domain=b.n,
+                peers={"base_rate": b.base},  # members get the base rate, never `ml`
+                news=b.agent.news,
+                wiki=b.agent.wiki,
+                retriever=b.retriever,
             )
         )
+    return out
+
+
+def _peer_readers(b: _Build) -> list[Forecaster]:
+    """Forecasters that read the others' forecasts of the same question: listed last."""
     from arena.forecasters import router as router_mod
 
+    out: list[Forecaster] = []
     rp = router_mod.load_params()
-    if rp is not None:  # listed after the forecasters it reads; not registered until frozen
+    if rp is not None:  # not registered until frozen
         out.append(router_mod.RouterForecaster(rp))
-    if settings.llm_context_cal:  # T382: reads `llm_context`'s answer, so listed after it
+    if b.settings.llm_context_cal:  # T382: reads `llm_context`'s answer
         from arena.forecasters.llm_context_cal import LLMContextCal, load_map
 
         cal = load_map()
         if cal is not None:  # no artefact, no forecaster (never a guessed map)
             out.append(LLMContextCal(cal))
-    if settings.bandit:  # T293: reads the peers' forecasts like the ensemble, so listed after them
+    if b.settings.bandit:  # T293: reads the peers' forecasts like the ensemble
         from arena.forecasters import bandit as bandit_mod
         from arena.scoring.core import load as load_record
 
         out.append(
-            bandit_mod.BanditForecaster(bandit_mod.train(load_record(ledger).scored, clk.now()))
+            bandit_mod.BanditForecaster(bandit_mod.train(load_record(b.ledger).scored, b.clk.now()))
         )
-    ens = live_ensemble(ledger, clk.now())
+    ens = live_ensemble(b.ledger, b.clk.now())
     if ens is not None:  # listed last: it combines the forecasts the others just wrote
         out.append(ens)
-    for f in out:  # per-call output cap from the settings (thinking counts against it)
-        if hasattr(f, "max_output_tokens"):
-            f.max_output_tokens = settings.llm_max_output_tokens
-    return out, guard
+    return out
 
 
 def weekly_setup(

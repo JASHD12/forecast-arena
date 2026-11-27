@@ -1,0 +1,49 @@
+name: gdelt-record
+
+# T371: record real GDELT DOC 2.0 responses (a small test fixture and the daily tone and
+# volume history of the five coins) from a GitHub runner, because the agent's sandbox is
+# rate limited by GDELT. Uses no secrets, writes no ledger, pushes nothing: the result is a
+# workflow artifact and the job log. Raw responses only, nothing is parsed or filled here.
+# Triggers: by hand, and when this file is pushed to the sentiment branch.
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - claude/elegant-noether-e5b2qq
+    paths:
+      - .github/workflows/gdelt-record.yml
+      - scripts/record_gdelt_history.py
+
+permissions:
+  contents: read
+
+jobs:
+  record:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Small fixture (bitcoin, 10 days, both modes)
+        run: python scripts/record_gdelt_fixture.py gdelt_fixture
+      - name: Show the fixture
+        run: |
+          for f in gdelt_fixture/*.json; do echo "=== $f"; head -c 4000 "$f"; echo; done
+      - name: History for the five coins
+        run: python scripts/record_gdelt_history.py gdelt_history
+      - name: Pack the history (gzip + base64 in the log, so it can be read without a download)
+        run: |
+          tar czf gdelt_history.tgz gdelt_history
+          ls -l gdelt_history.tgz
+          echo "::group::gdelt_history.tgz base64"
+          base64 -w 0 gdelt_history.tgz; echo
+          echo "::endgroup::"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: gdelt-record
+          path: |
+            gdelt_fixture
+            gdelt_history

@@ -1465,3 +1465,6 @@ and evidence requirements. Do not backfill historical ML forecasts.
 
 ## Owner decision: GDELT only, 2026-11-27
 - Answer to H44 (chat): no Reddit, stay GDELT only. Task T371b is closed, the Reddit variant and hypothesis H-SE3 of `lab/prereg/sentiment.md` are not tested, and no Reddit secrets are created. X is also not used (decision above). The pre-registration is not edited: H-SE3 stays listed as parked, which is now final.
+
+## GDELT recording workflow, 2026-11-27 (T371)
+- **Owner OK** (chat): build `gdelt-record.yml`, because the agent's sandbox gets 429 or resets from GDELT. It uses no secret, does not push, and writes no ledger; it saves raw responses as an artifact and prints them in the job log. It runs by hand and when the workflow or its script is pushed to the sentiment branch (so it can run before anything reaches `main`). It records raw bodies only; the parser is written afterwards against them, and a failed chunk is recorded as failed, never filled (I6).

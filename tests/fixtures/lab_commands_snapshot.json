@@ -1,0 +1,46 @@
+{
+ "lab_commands": [
+  "agent-eval",
+  "anomaly",
+  "ask",
+  "bandit",
+  "calibration",
+  "card",
+  "conformal",
+  "dataset",
+  "distill-labels",
+  "distill-merge",
+  "docs-eval",
+  "explain",
+  "ft-calibrate",
+  "ft-eval",
+  "ft-parity",
+  "ft-score",
+  "grounding",
+  "judge-compare",
+  "judge-eval",
+  "judge-run",
+  "judge-sheet",
+  "lineage",
+  "prompt-final",
+  "prompt-score",
+  "prompt-search",
+  "redteam",
+  "regimes",
+  "retrieval",
+  "routing",
+  "routing-score",
+  "sentiment-labels-run",
+  "stacking",
+  "vectordb"
+ ],
+ "groups": {
+  "dataset": [
+   "build"
+  ],
+  "retrieval": [
+   "build",
+   "eval"
+  ]
+ }
+}

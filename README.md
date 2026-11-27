@@ -76,6 +76,7 @@ Each technique is tried against the project's baselines on questions it never sa
 | Guardrails and red-team suite for untrusted tool and news text | evaluated (not a live score) | [docs/lab/guardrails.md](docs/lab/guardrails.md) |
 | LLM judge against the agent's own ratings (not human calibration) | evaluated (not a live score) | [docs/lab/judge-agent.md](docs/lab/judge-agent.md) |
 | LLM-as-judge for stored rationales | evaluated (not a live score) | [docs/lab/judge.md](docs/lab/judge.md) |
+| News tone (GDELT) as a crypto forecaster: sentiment-gdelt-r1 against ml | evaluated (not a live score) | [docs/lab/sentiment.md](docs/lab/sentiment.md) |
 | Numeric grounding of model rationales | evaluated (not a live score) | [docs/lab/grounding.md](docs/lab/grounding.md) |
 | Offline prompt optimisation for the free local model | evaluated (not a live score) | [docs/lab/prompt-opt.md](docs/lab/prompt-opt.md) |
 | Online learning of which forecaster to trust (Hedge and Thompson sampling) | evaluated (not a live score) | [docs/lab/bandit.md](docs/lab/bandit.md) |
@@ -389,6 +390,8 @@ MCP connects an agent to tools; the Agent2Agent (A2A) protocol connects an agent
 ```
 
 The same A2A layer runs the experimental **committee** forecaster (`agent_committee`, off): a chair that calls four specialist agents in-process (`src/arena/a2a/`, `src/arena/agent/committee.py`, [explainer](docs/explainers/11-multi-agent-a2a.md)). Its rules were pre-registered before any run ([`lab/prereg/agent-committee.md`](lab/prereg/agent-committee.md)).
+
+A pre-registered **crowd-mood experiment** tests whether the tone of GDELT news predicts crypto moves beyond `ml` (backtest only, off; [explainer](docs/explainers/12-sentiment.md), [card](docs/lab/sentiment.md), [pre-registration](lab/prereg/sentiment.md)). No Reddit, no X, no stored text.
 
 ## Auf Deutsch
 

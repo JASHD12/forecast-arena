@@ -14,3 +14,4 @@ questions with honest answers.
 | `06-scoring-and-statistics.md` | 6 | T075 |
 | `07-operations-and-monitoring.md` | 7 | T085 |
 | `08-production-skills.md` | 16 | T300 |
+| `12-sentiment.md` | 23 | T376 |

@@ -68,3 +68,28 @@ def test_gdelt_failure_is_a_recorded_skip_and_no_context() -> None:
     provider = gdelt_news(http, ASOF, skips.append, pause=0)
     assert provider("bitcoin", ASOF) is None
     assert len(skips) == len(COINS) and skips[0].startswith("crypto/gdelt/")
+
+
+def test_mood_panel_only_for_crypto_snapshots_with_gdelt_numbers() -> None:
+    from arena.site.shaping import mood_panel
+
+    dom = fixture_crypto()
+    q = dom.generate_questions(B, ASOF)[0]
+    assert mood_panel(q, {}) is None
+    ctx = {
+        "gdelt": {
+            "last_known_day": "2026-11-08",
+            "tone": [["2026-11-07", -1.5], ["2026-11-08", 0.5]],
+            "count": [["2026-11-06", 3], ["2026-11-07", 5], ["2026-11-08", 8]],
+        }
+    }
+    panel = mood_panel(q, ctx)
+    assert (
+        panel is not None and "<svg" in str(panel["tone_svg"]) and "<svg" in str(panel["count_svg"])
+    )
+    assert panel["rows"] == [
+        ("2026-11-06", None, 3.0),
+        ("2026-11-07", -1.5, 5.0),
+        ("2026-11-08", 0.5, 8.0),
+    ]
+    assert panel["last_known_day"] == "2026-11-08"

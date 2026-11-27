@@ -187,6 +187,13 @@ INFORMATION_SETS = (
         "daily sample",
     ),
     (
+        "sentiment",
+        "The ml probability of the same crypto question and the news tone and article count of "
+        "the days before it (GDELT, aggregate numbers only, each day counted 12 hours after it "
+        "ended); backtest only so far, not running live (experimental)",
+        "crypto questions",
+    ),
+    (
         "bandit_hedge",
         "The other forecasters' forecasts of the same question, blended with weights learned "
         "online from resolved questions (Hedge; experimental)",
@@ -227,6 +234,7 @@ EXPERIMENTAL_FORECASTERS = frozenset(
         "agent_graph_skills",
         "agent_hybrid_skills",
         "agent_committee",
+        "sentiment",
         "bandit_hedge",
     }
 )

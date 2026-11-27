@@ -72,6 +72,9 @@ def main() -> None:
             "days), so the tone is a noisy feature.",
             f"{len(chunks)} of 50 GDELT history chunks were recorded; days in missing chunks have "
             "no features and are not scored for any arm.",
+            "Many test questions have no usable GDELT numbers (a day without matching articles has "
+            "no tone, or its chunk was not recorded): see the 'questions' rows. Those are "
+            "not scored for any arm, so the comparison is on the days with news only.",
             "No claim about prediction of price direction beyond this period, and no advice.",
         ],
     )

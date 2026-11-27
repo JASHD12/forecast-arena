@@ -27,7 +27,7 @@ from arena.site.content import (
     STACK_LIBRARIES,
     TEMPLATE_VERSION_NOTES,
 )
-from arena.site.qchart import chart_data, series_svg
+from arena.site.qchart import ChartData, chart_data, series_svg
 from arena.site.titles import plain_title
 
 
@@ -260,7 +260,34 @@ def _question_chart(
     cd = chart_data(q, ctx, None if res is None else res.observed_value)
     if cd is None or not any(pts for _, pts in cd.series):
         return None
-    return {"svg": series_svg(cd), "data": cd}
+    return {"svg": series_svg(cd), "data": cd, "mood": mood_panel(q, ctx)}
+
+
+def mood_panel(q: Question, ctx: dict[str, Any]) -> dict[str, Any] | None:
+    """The "Crowd mood" panel of a crypto question: GDELT news tone and article counts known
+    at forecast time (aggregates only, T376), or None when the snapshot has none."""
+    g = ctx.get("gdelt") if q.domain == "crypto" else None
+    if not isinstance(g, dict):
+        return None
+    td = q.target_date.isoformat()
+    tone = [(str(d), float(v)) for d, v in g.get("tone", [])]
+    count = [(str(d), float(v)) for d, v in g.get("count", [])]
+    if not tone and not count:
+        return None
+    parts = {
+        "tone_svg": series_svg(
+            ChartData("Average news tone", "tone", [("tone", tone)], None, None, td)
+        ),
+        "count_svg": series_svg(
+            ChartData(
+                "Matching articles per day", "articles", [("articles", count)], None, None, td
+            )
+        ),
+    }
+    days = sorted({d for d, _ in tone} | {d for d, _ in count})
+    t_map, c_map = dict(tone), dict(count)
+    rows = [(d, t_map.get(d), c_map.get(d)) for d in days]
+    return {**parts, "rows": rows, "last_known_day": g.get("last_known_day", "")}
 
 
 def model_timeline(runs: Sequence[dict[str, Any]]) -> list[dict[str, Any]]:

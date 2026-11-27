@@ -18,7 +18,7 @@ move older "Done log" lines to `docs/progress-archive.md`.
 
 ## In progress
 
-- **Part 2, forecaster improvements (Phase 24, branch `claude/elegant-noether-e5b2qq`, no PR yet).** T380 (evaluation infrastructure) and T381 (pre-registration `lab/prereg/analyst-and-calibration.md`) done; next T382 (new ids: `llm_context_cal`, per-topic and cost reporting) and T383 (catalog refactor). The paid evaluation runs only after the Part 2 PR is merged and needs the owner's budget tier (H46).
+- **Part 2, forecaster improvements (Phase 24, branch `claude/elegant-noether-e5b2qq`, no PR yet).** T380, T381 and T382 done (evaluation infrastructure, pre-registration `lab/prereg/analyst-and-calibration.md`, `llm_context_cal` and per-topic reporting); next T383 (catalog refactor). The paid evaluation runs only after the Part 2 PR is merged and needs the owner's budget tier (H46).
 
 - **Part 1, crypto sentiment forecaster (Phase 23, branch `claude/elegant-noether-e5b2qq`, no PR yet): built and evaluated.** Owner decisions 2026-11-27: GDELT only, no Reddit (H44 closed), no X.
   - Result: H-SE1 not met (news tone does not beat `ml` on big moves: +0.0035 [-0.0005, +0.0077] over 1,000 questions); direction inconclusive (305 questions). `sentiment` stays off. See DECISIONS 2026-11-27 and `docs/lab/sentiment.md`.

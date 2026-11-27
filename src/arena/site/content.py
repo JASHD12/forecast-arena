@@ -187,6 +187,13 @@ INFORMATION_SETS = (
         "daily sample",
     ),
     (
+        "llm_context_cal",
+        "The raw answer of llm_context for the same question, passed through one fixed logit map "
+        "fitted on lab training answers (power questions only; other topics pass through "
+        "unchanged); no tokens, no other data (experimental)",
+        "the daily sample of llm_context",
+    ),
+    (
         "sentiment",
         "The ml probability of the same crypto question and the news tone and article count of "
         "the days before it (GDELT, aggregate numbers only, each day counted 12 hours after it "
@@ -218,6 +225,7 @@ AI_FORECASTERS = frozenset(
         "agent_graph_skills",
         "agent_hybrid_skills",
         "agent_committee",
+        "llm_context_cal",
     }
 )
 #: Forecasters that no longer write new forecasts (their history stays visible).
@@ -234,6 +242,7 @@ EXPERIMENTAL_FORECASTERS = frozenset(
         "agent_graph_skills",
         "agent_hybrid_skills",
         "agent_committee",
+        "llm_context_cal",
         "sentiment",
         "bandit_hedge",
     }

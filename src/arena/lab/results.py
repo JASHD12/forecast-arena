@@ -109,6 +109,7 @@ COLUMNS: dict[str, str] = {
     "latency_ms_p50": "Latency p50 (ms)",
     "size_mb": "Size (MB)",
     "cost_usd_per_1k": "US$ per 1,000",
+    "cost_usd_per_1k_answered": "US$ per 1,000 answered",
 }
 
 

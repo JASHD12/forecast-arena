@@ -1,0 +1,15 @@
+{
+ "kind": "calibration map of llm_context (power, training split only)",
+ "map": "p' = sigmoid(a * logit(p) + b); p clipped to [0.01, 0.99]",
+ "a": 1.5656,
+ "b": 0.257455,
+ "n_train": 1198,
+ "labelled_ids_in_file": 1198,
+ "labels_sha256": "35951fd9faf547c678538f381a359b435cd9baa2d47f553562c9eede8255f667",
+ "train_sha256": "74cff093e1507ce0b7c541602dbe29be9357dc250202242ccdd26a433e42aac4",
+ "teacher": "claude-haiku-5-5",
+ "in_sample_brier_raw": 0.184,
+ "in_sample_brier_calibrated": 0.1782,
+ "version": "cal-platt-r1|d8b4c430",
+ "note": "in-sample numbers only describe the fit; the test is the pre-registered one"
+}

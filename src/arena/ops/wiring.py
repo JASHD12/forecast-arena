@@ -475,6 +475,12 @@ def build_forecasters(
     rp = router_mod.load_params()
     if rp is not None:  # listed after the forecasters it reads; not registered until frozen
         out.append(router_mod.RouterForecaster(rp))
+    if settings.llm_context_cal:  # T382: reads `llm_context`'s answer, so listed after it
+        from arena.forecasters.llm_context_cal import LLMContextCal, load_map
+
+        cal = load_map()
+        if cal is not None:  # no artefact, no forecaster (never a guessed map)
+            out.append(LLMContextCal(cal))
     if settings.bandit:  # T293: reads the peers' forecasts like the ensemble, so listed after them
         from arena.forecasters import bandit as bandit_mod
         from arena.scoring.core import load as load_record

@@ -92,6 +92,8 @@ SERIES_SLOTS = {
     "agent_graph_skills": 16,
     "agent_hybrid_skills": 17,
     "agent_committee": 18,
+    "llm_context_cal": 19,
+    "sentiment": 20,
 }
 RACE_MIN_DAYS = 7  # a line chart over fewer days is noise, not a race
 RACE_WIDE = (700, 300, (16, 220, 34, 44))  # viewBox width, height, pad (top, right, bottom, left)
@@ -111,6 +113,7 @@ AI_FORECASTERS = (
     "agent_graph_skills",
     "agent_hybrid_skills",
     "agent_committee",
+    "llm_context_cal",
 )
 RACE_LABEL_CHARS = 20  # longest name drawn next to a line (the legend has the full name)
 HIGHLIGHT = ("ml", "base_rate")

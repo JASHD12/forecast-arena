@@ -33,6 +33,7 @@ FORECASTER_NAMES = {
     "agent_hybrid_skills": "AI agent, hybrid retrieval, with skills (experimental)",
     "agent_committee": "AI committee of specialist agents (experimental)",
     "sentiment": "News-tone model for crypto (experimental, backtest only)",
+    "llm_context_cal": "AI with data, recalibrated (experimental)",
     "bandit_hedge": "Learned blend of forecasters (experimental)",
     "ensemble": "Ensemble",
     "human_panel": "Human panel",

@@ -78,6 +78,7 @@ def expected_forecasters(settings: Settings) -> frozenset[str]:
         | ({"agent_graph_skills"} if settings.agent_graph_skills else set())
         | ({"agent_hybrid_skills"} if settings.agent_hybrid_skills else set())
         | ({"agent_committee"} if settings.agent_committee else set())
+        | ({"llm_context_cal"} if settings.llm_context_cal else set())
         | ({"bandit_hedge"} if settings.bandit else set())
     )
 

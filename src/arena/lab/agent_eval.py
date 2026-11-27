@@ -170,7 +170,30 @@ def build(res: dict[str, Any], experiment: str, *, run_id: str | None = None) ->
             "log_score": _r(m["log_score"]),
             "ece": _r(m.get("ece")),
             "cost_usd_per_1k": None if c is None else round(1000 * c, 4),
+            **(
+                {"cost_usd_per_1k_answered": round(1000 * m["cost_usd_per_answered"], 4)}
+                if m.get("cost_usd_per_answered") is not None
+                else {}
+            ),
         }
+    topics = sorted({tp for a in e.arms for tp in res["metrics"][a].get("by_topic", {})})
+    if len(topics) > 1:  # per-topic reporting, only when the run has more than one topic (T382)
+        for arm in e.arms:
+            for tp in topics:
+                bt = res["metrics"][arm].get("by_topic", {}).get(tp)
+                if bt:
+                    metrics[f"{arm} / {tp}"] = {
+                        "n": bt["answered"],
+                        "asked": bt["n"],
+                        "brier": _r(bt["brier"]),
+                    }
+        first = res["metrics"][e.arms[0]].get("by_topic", {})
+        for tp in topics:
+            if first.get(tp):
+                metrics[f"base_rate / {tp}"] = {
+                    "n": first[tp]["answered"],
+                    "brier": _r(first[tp]["base_rate_brier_same_items"]),
+                }
     newm = res["metrics"][e.new]
     metrics["base_rate / eval"] = {
         "n": newm["answered"],
@@ -181,6 +204,21 @@ def build(res: dict[str, Any], experiment: str, *, run_id: str | None = None) ->
         metrics[f"{e.ref} / same items as {e.new}"] = same
     pair = _pair(res, e.new, e.ref)
     paired = [] if pair is None else [{"a": e.new, "b": e.ref, "split": "eval", **pair}]
+    for p in res.get("paired_by_topic", []):  # per-topic intervals (T382)
+        if {p["a"], p["b"]} == {e.new, e.ref}:
+            same_way = (p["a"], p["b"]) == (e.new, e.ref)
+            paired.append(
+                {
+                    "a": e.new,
+                    "b": e.ref,
+                    "split": p["topic"],
+                    "diff": p["diff"] if same_way else -p["diff"],
+                    "lo": p["lo"] if same_way else -p["hi"],
+                    "hi": p["hi"] if same_way else -p["lo"],
+                    "n": p["n"],
+                    "days": p["days"],
+                }
+            )
     cost = round(sum(res["metrics"][a].get("cost_usd") or 0.0 for a in e.own_arms), 6)
     notes = [
         *(

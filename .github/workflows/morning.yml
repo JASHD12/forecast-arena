@@ -104,6 +104,7 @@ jobs:
       ARENA_LLM_LOCAL_FT: ${{ vars.ARENA_LLM_LOCAL_FT || '1' }}  # T271: fine-tuned model, live since H32 (owner decision 2026-11-22); set the repository variable to 0 to switch it off
       ARENA_AGENT_GRAPH: ${{ vars.ARENA_AGENT_GRAPH || '1' }}  # T121: LangGraph agent, 1 question per topic per day
       ARENA_BANDIT: ${{ vars.ARENA_BANDIT || '0' }}  # T293: bandit_hedge (learned blend of the other forecasters); off until the owner decides
+      ARENA_LLM_CONTEXT_CAL: ${{ vars.ARENA_LLM_CONTEXT_CAL || '0' }}  # T382: llm_context_cal (llm_context's answers through a fixed logit map, no tokens); off until its pre-registered test (lab/prereg/analyst-and-calibration.md) is run
       ARENA_SENTIMENT: ${{ vars.ARENA_SENTIMENT || '0' }}  # T373: archive GDELT news-tone aggregates of the five coins in the crypto morning context (no forecaster yet, no secret); off until the owner decides
       ARENA_AGENT_HYBRID: ${{ (inputs.experimental && inputs.dry_run) && '1' || vars.ARENA_AGENT_HYBRID || '0' }}  # T274: agent_hybrid (hybrid retrieval + guards); switched on at launch (T279)
       ARENA_AGENT_QUANT: ${{ (inputs.experimental && inputs.dry_run) && '1' || vars.ARENA_AGENT_QUANT || '0' }}  # T342: agent_quant (calculator and reference estimate); off until its evaluation passes (T345)

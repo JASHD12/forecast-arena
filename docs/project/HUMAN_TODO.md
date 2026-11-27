@@ -340,3 +340,8 @@ curl -X POST -H "Authorization: Bearer TOKEN" -H "Accept: application/vnd.github
   - Recommended default: **no Reddit**. The forecaster runs on GDELT news tone alone (Part 1 as built). Reply "no Reddit" and T371b is closed.
   - If you want Reddit anyway: read https://www.reddit.com/wiki/api/ and the terms yourself, then reply "yes Reddit". You then need to: create a Reddit "script" app on your own account (https://www.reddit.com/prefs/apps) and accept the terms, add the repository secrets `ARENA_REDDIT_CLIENT_ID` and `ARENA_REDDIT_CLIENT_SECRET` (Settings > Secrets and variables > Actions; the agent never sees the values), and add standing approval 8 to `CLAUDE.md` for workflows that send them to Reddit's API. Until all of that is ticked the agent builds nothing that calls Reddit.
   - Answered 2026-11-27 (chat): **no Reddit, stay GDELT only.** T371b is closed; no Reddit secrets or CLAUDE.md approval 8 are needed. X is not used either (DECISIONS 2026-11-27).
+
+- [ ] H45 · Approve the one paid run of the headline-label comparison (T375)
+  - What it does: 500 current crypto headlines from GDELT are rated by a small open model (free, on the runner) and by Claude Haiku (paid), and the agreement is measured (`lab/prereg/sentiment-labels.md`). No headline is stored or shown. Estimated cost about 150,000 tokens, about US$0.03 to US$0.10; hard cap 400,000 tokens; lab budget left US$0.32.
+  - It only helps the portfolio story (open model against LLM labeller); no forecaster needs it. Skipping it costs nothing.
+  - To approve: reply "run the labels" in chat after the Part 1 pull request is merged. The agent then dispatches the workflow `lab-sentiment-labels` from `main` once.

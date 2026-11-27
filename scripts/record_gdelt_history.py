@@ -18,7 +18,7 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
-from datetime import UTC, date, datetime, timedelta
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 BASE = "https://api.gdeltproject.org/api/v2/doc/doc"
@@ -109,7 +109,7 @@ def main() -> None:
                         "bytes": len(body),
                         "sha256": hashlib.sha256(body).hexdigest(),
                         "url": url,
-                        "fetched_at": datetime.now(UTC).isoformat(),
+                        "fetched_at": datetime.now(timezone.utc)  # noqa: UP017 (runs on Python 3.9 too).isoformat(),
                     }
                 )
                 print(f"{status} {len(body):>8} {name}", flush=True)

@@ -345,3 +345,7 @@ curl -X POST -H "Authorization: Bearer TOKEN" -H "Accept: application/vnd.github
   - What it does: 500 current crypto headlines from GDELT are rated by a small open model (free, on the runner) and by Claude Haiku (paid), and the agreement is measured (`lab/prereg/sentiment-labels.md`). No headline is stored or shown. Estimated cost about 150,000 tokens, about US$0.03 to US$0.10; hard cap 400,000 tokens; lab budget left US$0.32.
   - It only helps the portfolio story (open model against LLM labeller); no forecaster needs it. Skipping it costs nothing.
   - To approve: reply "run the labels" in chat after the Part 1 pull request is merged. The agent then dispatches the workflow `lab-sentiment-labels` from `main` once.
+
+- [ ] H46 · Choose the budget tier for the Part 2 paid evaluation (T381, `lab/prereg/analyst-and-calibration.md`)
+  - The lab budget has US$0.32 left. Tier A (about US$0.13): `agent_analyst` and `llm_context` on the 90 November power questions. Tier B (about US$0.10 more): `llm_context` on the 186 October questions. Tier C (about US$0.40 more): `agent_quant`, `agent_skills` and `agent_analyst` on 120 weather and Wikipedia replay questions. The Part 1 label comparison (H45, at most about US$0.10) uses the same budget.
+  - Reply with the tier and, for B or C, the new total lab budget (for example "tier A" or "tier A, B and C, lab budget US$2.50"). The agent then dispatches `llm-eval` from `main` once per tier, after the Part 2 pull request is merged. Nothing is spent before your reply.

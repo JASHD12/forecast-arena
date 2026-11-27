@@ -81,11 +81,26 @@ def check_ecb(http: HttpClient) -> str:
     return "; ".join(parts)
 
 
+def check_gdelt(http: HttpClient) -> str:
+    """Bitcoin's daily news tone and article count for the last ten days (GDELT DOC 2.0)."""
+    from arena.sources.gdelt_tone import GdeltClient
+
+    today = SystemClock().now().date()
+    news = GdeltClient(http).daily("bitcoin", today - timedelta(days=10), today)
+    if not news.tone:
+        raise RuntimeError("no tone values in the last ten days")
+    day = max(news.tone)
+    return (
+        f"{len(news.tone)} days, {day}: tone {news.tone[day]:.2f}, {news.count.get(day)} articles"
+    )
+
+
 CHECKS: dict[str, Callable[[HttpClient], str]] = {
     "ecb": check_ecb,
     "wikimedia": check_wikimedia,
     "smard": check_smard,
     "weather": check_weather,
+    "gdelt": check_gdelt,
 }
 
 

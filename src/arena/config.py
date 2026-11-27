@@ -91,6 +91,9 @@ class Settings(BaseModel):
     llm_local_ft: bool = False
     #: T293: run `bandit_hedge`, online learning of which forecaster to trust (peers only).
     bandit: bool = False
+    #: T373: archive GDELT news-tone aggregates in the crypto morning context (SPEC 7.6); the
+    #: `sentiment` forecaster itself is not registered yet (DECISIONS 2026-11-27). Off by default.
+    sentiment: bool = False
     #: Where large model weights are cached (kept apart from the per-run data cache).
     models_dir: Path = Path("models_cache")
 

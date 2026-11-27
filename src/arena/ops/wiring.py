@@ -149,11 +149,53 @@ def build_domains(
                     {c: f.prices for c, f in fetched.items()},
                     {c: (f.url, f.sha256) for c, f in fetched.items()},
                     on_skip=on_skip,
+                    news=gdelt_news(http, now, on_skip) if settings.sentiment else None,
                 )
             )
         else:
             raise ValueError(f"domain {name!r} is not available yet")
     return out
+
+
+#: GDELT days fetched per coin for the morning context (a 15-day window is stored).
+GDELT_DAYS = 30
+
+
+def gdelt_news(
+    http: HttpClient,
+    now: datetime,
+    on_skip: Callable[[str], None] | None = None,
+    pause: float | None = None,
+) -> Callable[[str, datetime], dict[str, Any] | None]:
+    """A (coin, asof) -> GDELT aggregates provider (T373, flag `ARENA_SENTIMENT`).
+
+    Fetches the last 30 days of tone and article counts once per coin; a coin whose request
+    fails has no `gdelt` entry today and the reason is recorded (I6). Only aggregate numbers
+    are kept, never article text (S7).
+    """
+    from arena.forecasters.sentiment import gdelt_context
+    from arena.sources.gdelt_tone import GdeltClient, GdeltError
+    from arena.sources.http import HttpError
+
+    skip = on_skip or (lambda m: None)
+    client = GdeltClient(http) if pause is None else GdeltClient(http, pause, lambda s: None)
+    end = now.date()
+    start = end - timedelta(days=GDELT_DAYS - 1)
+    covered = {start + timedelta(days=i) for i in range(GDELT_DAYS)}
+    fetched: dict[str, Any] = {}
+    for coin in COINS:
+        try:
+            fetched[coin] = client.daily(coin, start, end)
+        except (GdeltError, HttpError) as exc:
+            skip(f"crypto/gdelt/{coin}: {type(exc).__name__}: {str(exc)[:120]}")
+
+    def provider(coin: str, asof: datetime) -> dict[str, Any] | None:
+        news = fetched.get(coin)
+        if news is None:
+            return None
+        return gdelt_context(news.tone, news.count, covered, asof)
+
+    return provider
 
 
 def _local_forecaster(settings: Settings, n: int, tracer: Tracer, clock: Clock) -> Forecaster:

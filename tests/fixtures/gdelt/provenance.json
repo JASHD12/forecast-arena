@@ -1,0 +1,16 @@
+[
+  {
+    "mode": "TimelineTone",
+    "url": "https://api.gdeltproject.org/api/v2/doc/doc?query=bitcoin+sourcelang%3Aenglish&mode=TimelineTone&format=json&startdatetime=20261101000000&enddatetime=20261110000000",
+    "status": 200,
+    "fetched_at": "2026-11-27T17:11:19.895936+00:00",
+    "sha256": "a3fd794f1121d897ae1396e01b53f6dad0c025ce7ff9ac28c41479cedd8a15a4"
+  },
+  {
+    "mode": "TimelineVolRaw",
+    "url": "https://api.gdeltproject.org/api/v2/doc/doc?query=bitcoin+sourcelang%3Aenglish&mode=TimelineVolRaw&format=json&startdatetime=20261101000000&enddatetime=20261110000000",
+    "status": 200,
+    "fetched_at": "2026-11-27T17:12:22.666936+00:00",
+    "sha256": "93bbf713a9a407eb339c455626502e3cb221169cfb7995cd00f46fca0b9a2c4b"
+  }
+]

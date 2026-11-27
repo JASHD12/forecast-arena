@@ -32,6 +32,8 @@ class ChartData:
     reference: tuple[float, str] | None = None
     observed: float | None = None
     target_day: str = ""
+    #: Prefix of the element ids, so several charts can share one page without duplicate ids.
+    uid: str = ""
 
 
 def _points(rows: Sequence[dict[str, Any]], key: str, value: str) -> list[tuple[str, float]]:
@@ -136,9 +138,9 @@ def _series_one(cd: ChartData, W: int, H: int, PAD: tuple[int, int, int, int], s
     e = html.escape
     p = [
         f'<svg class="qchart qchart-{sfx}" viewBox="0 0 {W} {H}" role="img" '
-        f'aria-labelledby="qc-t-{sfx} qc-d-{sfx}">',
-        f'<title id="qc-t-{sfx}">{e(cd.title)}</title>',
-        f'<desc id="qc-d-{sfx}">{e(cd.title)} in {e(cd.unit)} as known at forecast time'
+        f'aria-labelledby="qc{cd.uid}-t-{sfx} qc{cd.uid}-d-{sfx}">',
+        f'<title id="qc{cd.uid}-t-{sfx}">{e(cd.title)}</title>',
+        f'<desc id="qc{cd.uid}-d-{sfx}">{e(cd.title)} in {e(cd.unit)} as known at forecast time'
         f"{', with the threshold' if cd.reference else ''}"
         f"{' and the observed value' if cd.observed is not None else ''}. "
         "The values are also in the table below.</desc>",

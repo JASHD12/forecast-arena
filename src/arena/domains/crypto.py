@@ -90,10 +90,13 @@ class CryptoDomain:
         store: AsOfStore,
         evidence: Mapping[str, tuple[str, str]] | None = None,
         on_skip: Callable[[str], None] | None = None,
+        news: Callable[[str, datetime], dict[str, Any] | None] | None = None,
     ) -> None:
         self.store = store
         self.evidence = dict(evidence or {})
         self.on_skip = on_skip or (lambda msg: None)
+        #: (coin, asof) -> GDELT aggregates known at asof, or None; off unless set (T373).
+        self.news = news
 
     def prices(self, coin: str, asof: datetime) -> dict[date, float]:
         """{UTC day: price} known at `asof`."""
@@ -251,13 +254,18 @@ class CryptoDomain:
         coin = str(question.params["coin"])
         px = self.prices(coin, asof)
         last = sorted(px)[-CONTEXT_DAYS:]
-        return {
+        ctx: dict[str, Any] = {
             "domain": DOMAIN,
             "asof": asof.isoformat(),
             "attribution": ATTRIBUTION,
             "coin": question.params["coin_name"],
             "daily_usd_00utc": [{"day": d.isoformat(), "price": px[d]} for d in last],
         }
+        if self.news is not None:
+            gdelt = self.news(coin, asof)
+            if gdelt:
+                ctx["gdelt"] = gdelt
+        return ctx
 
     def _p0p1(self, question: Question) -> tuple[float | None, float | None]:
         px = self.prices(str(question.params["coin"]), datetime.max.replace(tzinfo=UTC))
@@ -310,8 +318,9 @@ def crypto_domain_from_prices(
     prices: Mapping[str, Mapping[date, float]],
     evidence: Mapping[str, tuple[str, str]],
     on_skip: Callable[[str], None] | None = None,
+    news: Callable[[str, datetime], dict[str, Any] | None] | None = None,
 ) -> CryptoDomain:
-    """Build a domain from fetched daily prices."""
+    """Build a domain from fetched daily prices (and optionally GDELT aggregates)."""
     store = AsOfStore()
     add_prices(store, prices)
-    return CryptoDomain(store, evidence=evidence, on_skip=on_skip)
+    return CryptoDomain(store, evidence=evidence, on_skip=on_skip, news=news)

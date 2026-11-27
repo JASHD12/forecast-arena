@@ -18,7 +18,10 @@ move older "Done log" lines to `docs/progress-archive.md`.
 
 ## In progress
 
-Nothing. See the session summary above and `python scripts/status.py`.
+- **Part 1, crypto sentiment forecaster (Phase 23, branch `claude/elegant-noether-e5b2qq`, no PR yet): built and evaluated.** Owner decisions 2026-11-27: GDELT only, no Reddit (H44 closed), no X.
+  - Result: H-SE1 not met (news tone does not beat `ml` on big moves: +0.0035 [-0.0005, +0.0077] over 1,000 questions); direction inconclusive (305 questions). `sentiment` stays off. See DECISIONS 2026-11-27 and `docs/lab/sentiment.md`.
+  - T370-T374 and T376 done; T375 (open model against Claude labels, needs a headline recording and the owner's OK for about US$0.03) not started. The `ARENA_SENTIMENT` archive of GDELT aggregates is off.
+  - Open the single Part 1 PR only when the owner asks; the owner merges it before Part 2.
 
 ## Open risks and surprises
 

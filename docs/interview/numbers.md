@@ -417,6 +417,23 @@ Source: `evals/results/lab-judge.json`; card `docs/lab/judge.md`
 | judge / llm_local | 20 |
 | judge / llm_plain | 20 |
 
+### News tone (GDELT) as a crypto forecaster: sentiment-gdelt-r1 against ml
+
+Source: `evals/results/lab-sentiment.json`; card `docs/lab/sentiment.md`
+
+| Arm | Questions | Brier |
+|---|---|---|
+| always_0.5 / bigmove | 1000 | 0.25 |
+| always_0.5 / up | 305 | 0.25 |
+| base_rate / bigmove | 1000 | 0.2574 |
+| base_rate / up | 305 | 0.2529 |
+| ml / bigmove | 1000 | 0.2372 |
+| ml / up | 305 | 0.25 |
+| questions / bigmove | 1220 | - |
+| questions / up | 565 | - |
+| sentiment / bigmove | 1000 | 0.2407 |
+| sentiment / up | 305 | 0.2592 |
+
 ### Numeric grounding of model rationales
 
 Source: `evals/results/lab-grounding.json`; card `docs/lab/grounding.md`

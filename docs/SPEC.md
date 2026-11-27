@@ -364,6 +364,14 @@ are recorded. Research only; no trading, no advice (S1, S12).
 
 Goes live only after HUMAN_TODO H12 (terms confirmed, key, workflow approval).
 
+### 7.6 Crypto news tone (added 2026-11-27 at the owner's request; GDELT only)
+
+Source: GDELT DOC 2.0 `TimelineTone` and `TimelineVolRaw` for a fixed query per coin
+(attribution "Data: GDELT Project" with a link to https://www.gdeltproject.org/). A day's
+value is used only after that UTC day ended plus a publication lag recorded in
+`docs/SOURCES.md`. Features only: the question templates of 7.5 are unchanged. Reddit is not
+used (HUMAN_TODO H44). No article text is stored; titles, outlet, URL and time at most (S7).
+
 ## 8. Forecasters
 
 Each forecaster implements:
@@ -658,6 +666,7 @@ that compare techniques against the existing baselines. Design: `docs/project/LA
 | `agent_hybrid_skills` | as `agent_hybrid` (hybrid retrieval and guarded tool text), plus the same three tools; prompt `agent_system_v5`; skill text is trusted and bypasses the guard | same limits and sample as `agent_hybrid`; experimental, off; same launch rule |
 | `agent_committee` | a committee of specialist agents that talk over the A2A protocol (official `a2a-sdk`, in-process transport): `quant-analyst` (reference estimate, no model call), `historian` (base rate and similar past questions, no model call), `news-scout` (as-of headlines and Wikipedia through the guarded tools, one model call, returns evidence and no probability), `skeptic` (one model call, red-teams the draft) and the `chair` (two model calls, writes the answer under the standard output contract); fixed flow and quorum rule in `lab/prereg/agent-committee.md`; the version string carries every member's revision, the protocol and SDK versions and the prompt fingerprints | same limits and sample as `agent_skills`; at most four model calls per question; experimental, off until its evaluation |
 | `agent_analyst` | as `agent`; prompt `agent_system_v4` tells it to start from the `ml` forecast (`get_ml_forecast`, computed in the same run) and change it only for evidence the model cannot see | same limits and sample as `agent`; experimental, off until its evaluation |
+| `sentiment` | `ml`'s crypto volatility probability and GDELT news tone and article volume of the days before the as-of time (daily values after the day ended plus a lag); no texts | crypto `bigmove` and `up`; `sentiment-gdelt-r1`; experimental, flag `ARENA_SENTIMENT`, off; outside the headline board and the ensemble |
 | `bandit_hedge` | the other forecasters' forecasts of the same question (peers only, as the ensemble) and the resolved outcomes of questions at least two batch days old | every question for which two or more experts answered; no model call, no cost |
 
 The daily LLM token cap is 300,000 in the live workflows and, since 2026-11-27, also the code default (owner decision 2026-11-21; it was 400,000 in SPEC 9.4 before).

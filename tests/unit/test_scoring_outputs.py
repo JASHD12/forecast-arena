@@ -102,9 +102,9 @@ def test_site_json_and_mcp_preserve_revised_outcome_and_report_missing_members(
     # T206: the common block is the home page's board (here an incomplete common set)
     assert lb.common is not None
     assert lb.common.rows == [] and lb.common.questions == 0
-    assert set(lb.common.missing_forecasters) == {"llm_plain", "llm_context", "agent"}
+    assert set(lb.common.missing_forecasters) == {"llm_context", "agent"}
     html = (result.out_dir / "leaderboard.html").read_text()
-    assert "Incomplete common set: no scored forecasts from llm_plain, llm_context, agent" in html
+    assert "Incomplete common set: no scored forecasts from llm_context, agent" in html
     assert 'class="podium"' not in html
     bug_page = (result.out_dir / "questions" / f"{qs['bug'].question_id}.html").read_text()
     assert 'class="verdict verdict-void"' in bug_page

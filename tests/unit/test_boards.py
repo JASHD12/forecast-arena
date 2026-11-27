@@ -55,7 +55,7 @@ def test_supported_only_when_interval_excludes_zero() -> None:
     b = board(make(40, 10, SKILLS), "common")
     v = {r.forecaster_id: r.verdict for r in b.rows}
     assert v["ml"] == "supported: better than base_rate"
-    assert v["llm_plain"] == "no supported difference from base_rate"
+    assert v["llm_context"] == "no supported difference from base_rate"
     assert v["base_rate"] == "reference"
 
 

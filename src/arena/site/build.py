@@ -285,12 +285,11 @@ def build_site(
                 "awaiting_forecasts": bool(latest) and not any(r["pn"] for r in latest),
                 "cards": pick_cards(latest),
                 "outcomes": split_outcomes(previous),
-                # a retired forecaster is listed on the home page only while it still has rows there
+                # a retired forecaster is listed only while the latest batch has its rows
                 "forecasters": [
                     f
                     for f in fids
-                    if f not in RETIRED_FORECASTERS
-                    or any(f in r["pn"] for r in (*latest, *previous))
+                    if f not in RETIRED_FORECASTERS or any(f in r["pn"] for r in latest)
                 ],
                 "previous_batch": prev_b,
                 "previous": previous,

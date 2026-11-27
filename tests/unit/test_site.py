@@ -153,3 +153,24 @@ def test_data_dictionary_documents_every_exported_column() -> None:
     for table in TABLES:
         assert set(COLUMN_DOCS[table]) == set(types[table]), table
         assert all(len(v) > 10 for v in COLUMN_DOCS[table].values())
+
+
+def test_home_does_not_count_a_retired_forecaster_as_missing(tmp_path) -> None:
+    from datetime import timedelta
+
+    led = Ledger(tmp_path / "l")
+    q1 = question()
+    q2 = question(batch=q1.batch_date + timedelta(days=1))
+    led.append(layout.questions_path(q1.batch_date), [q1])
+    led.append(
+        layout.forecasts_path(q1.batch_date),
+        [forecast(q1, "base_rate", 0.6), forecast(q1, "llm_plain", 0.3)],
+    )
+    led.append(layout.questions_path(q2.batch_date), [q2])
+    led.append(layout.forecasts_path(q2.batch_date), [forecast(q2, "base_rate", 0.55)])
+    clock = FixedClock(datetime(2026, 11, 14, tzinfo=UTC))
+    home = (
+        build_site(led, tmp_path / "site", clock, tmp_path / "none").out_dir / "index.html"
+    ).read_text()
+    assert "width: 55.0%" in home
+    assert "did not answer this one" not in home  # llm_plain is retired, not missing

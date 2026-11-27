@@ -11,7 +11,8 @@ Code: `src/arena/forecasters/llm.py`, `src/arena/agent/` (`forecaster.py`, `tool
 
 1. **Five LLM forecasters, one information ladder.** Each sees a little more than the one
    before, so a difference in score can be traced to what was added:
-   - `llm_plain`: the question text, the resolution rule and the date. No data, no tools.
+   - `llm_plain`: the question text, the resolution rule and the date. No data, no tools. **Retired on 2026-11-27**
+     (owner decision: cost, and keep only the forecasters that get data); it no longer forecasts, its earlier records stay.
    - `llm_context`: the same plus a compact rendering of the as-of context (about 6,000
      characters at most: recent values, calendar, the weather forecast, top-list trajectories).
    - `agent`: as `llm_context`, plus read-only tools: `get_series`, `get_base_rate`,

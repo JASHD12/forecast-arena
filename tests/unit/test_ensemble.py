@@ -136,8 +136,8 @@ def test_morning_job_gives_a_combining_forecaster_the_peers_forecasts(tmp_path) 
         assert set(peers) == {"base_rate", "persistence"}  # the broken forecaster wrote a skip
 
 
-def _ledger_with_official_rows(tmp_path, official_start: date | None, days: int = 12):
-    """A real ledger folder: `days` batch days x 6 power questions, all five members answered
+def _ledger_with_official_rows(tmp_path, official_start: date | None, days: int = 14):
+    """A real ledger folder: `days` batch days x 6 power questions, all four members answered
     and every question resolved; `meta/official_start.json` is written when a date is given."""
     import json
 
@@ -184,7 +184,9 @@ def test_live_ensemble_is_registered_last_only_with_an_official_start(tmp_path) 
     assert ens.version().startswith("ensemble-lr-r1-2026-12-05-n")  # cutoff: Monday minus 2 days
 
     early = datetime(2026, 11, 30, 7, 30, tzinfo=UTC)  # first Monday: 6 days x 6 = 36 questions
-    assert live_ensemble(led, early) is None  # under 60 questions: still inactive
+    assert (
+        live_ensemble(led, early) is None
+    )  # under 75 questions (300 rows of 4 members): still inactive
 
     from arena.config import Settings
 

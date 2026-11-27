@@ -54,7 +54,9 @@ def daily_sample(questions: Sequence[Question], per_domain: int) -> set[str]:
 
 def render_context(ctx: dict[str, Any], limit: int = CONTEXT_CHARS) -> str:
     """Compact JSON rendering of the as-of context, truncated to `limit` characters."""
-    text = json.dumps(ctx, sort_keys=True, separators=(",", ":"), default=str)
+    # `gdelt` (T373) is read only by the `sentiment` forecaster; the LLM prompts stay as they were.
+    shown = {k: v for k, v in ctx.items() if k != "gdelt"}
+    text = json.dumps(shown, sort_keys=True, separators=(",", ":"), default=str)
     return text if len(text) <= limit else text[:limit] + " ...(truncated)"
 
 

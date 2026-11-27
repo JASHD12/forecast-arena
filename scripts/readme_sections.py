@@ -145,7 +145,10 @@ def _lab_bullets() -> list[str]:
     docs = json.loads((res / "lab-docs-assistant.json").read_text(encoding="utf-8"))
     dm = docs["metrics"]["docs_assistant"]
     sk = json.loads((res / "lab-agent-skills.json").read_text(encoding="utf-8"))
-    cm = json.loads((res / "lab-agent-committee.json").read_text(encoding="utf-8"))
+    r2 = res / "lab-agent-committee-r2.json"
+    cm = json.loads(
+        (r2 if r2.is_file() else res / "lab-agent-committee.json").read_text(encoding="utf-8")
+    )
     skp = sk["paired"][0]
     cmp_ = cm["paired"][0]
     cm_new = cm["metrics"]["agent_committee / eval"]
@@ -155,9 +158,9 @@ def _lab_bullets() -> list[str]:
         f"[{skp['lo']:+.4f}, {skp['hi']:+.4f}] against the calculator-only agent on "
         f"{skp['n']} questions (interval includes zero, cost just over its limit: not launched); a "
         f"committee of specialist agents over the A2A protocol answered {cm_new['n']} of "
-        f"{cm_new['asked']} questions (a format defect in one member) and was "
-        f"{cmp_['diff']:+.4f} [{cmp_['lo']:+.4f}, {cmp_['hi']:+.4f}] worse than one agent with "
-        "skills on those; it stays off and a fixed version is pre-registered."
+        f"{cm_new['asked']} questions and scored {cmp_['diff']:+.4f} "
+        f"[{cmp_['lo']:+.4f}, {cmp_['hi']:+.4f}] against one agent with skills on the same "
+        "questions (interval includes zero, no benefit shown); it stays off."
     )
     return [
         agents_bullet,

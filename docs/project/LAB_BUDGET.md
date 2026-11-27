@@ -14,3 +14,4 @@ sums the `cost_usd` of `evals/results/lab-*.json` and fails `make check` if the 
 | lab-distill-labels second run (rows 774 to 1,199; 425 labelled, 1 parse error) | 2026-11-22 | 45079870076 | 1,217,859 | 0.23 | 0.96 |
 | lab-judge second judge (Claude Sonnet 5.5, the 30 labelled items, 30 of 30 scored; estimate was 0.22) | 2026-11-23 | 45258529928 | 49,479 | 0.13 | 1.09 |
 | llm-eval on the 90 November items: agent, agent_quant, agent_skills, agent_committee (one run, all arms answered or skipped by their own rules; estimate was 0.45-0.55) | 2026-11-26 | 45883972017 | 2,956,832 | 0.41 | 1.50 |
+| llm-eval, committee r2 only (agent_committee on the 90 November items; the agent_skills arm reused from the first run) | 2026-11-26 | 45905311845 | 1,003,169 | 0.18 | 1.68 |

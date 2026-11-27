@@ -21,20 +21,17 @@ permissions:
 jobs:
   record:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 180
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
-      - name: Small fixture (bitcoin, 10 days, both modes)
-        run: python scripts/record_gdelt_fixture.py gdelt_fixture
-      - name: Show the fixture
+      - name: Record the chunks that are not committed yet (resumable, at most 150 minutes)
         run: |
-          for f in gdelt_fixture/*.json; do echo "=== $f"; head -c 4000 "$f"; echo; done
-      - name: History for the five coins
-        run: python scripts/record_gdelt_history.py gdelt_history
-      - name: Pack the history (gzip + base64 in the log, so it can be read without a download)
+          python scripts/record_gdelt_history.py gdelt_history \
+            --existing tests/fixtures/gdelt/history --max-minutes 150
+      - name: Pack the new chunks (gzip + base64 in the log, so they can be read without a download)
         run: |
           tar czf gdelt_history.tgz gdelt_history
           ls -l gdelt_history.tgz
@@ -44,6 +41,4 @@ jobs:
       - uses: actions/upload-artifact@v7
         with:
           name: gdelt-record
-          path: |
-            gdelt_fixture
-            gdelt_history
+          path: gdelt_history

@@ -1,12 +1,16 @@
 """Record raw GDELT DOC 2.0 daily tone and volume history for the five coins (T371).
 
-    python scripts/record_gdelt_history.py OUT_DIR [--start 2025-11-01] [--end 2026-11-10]
+    python scripts/record_gdelt_history.py OUT_DIR [--existing DIR] [--max-minutes 150]
+                                           [--start 2025-11-01] [--end 2026-11-10]
 
 For each coin query of lab/prereg/sentiment.md and each mode (TimelineTone, TimelineVolRaw)
 the range is fetched in 90-day chunks and every response body is saved unmodified, with a
 ``manifest.json`` (URL, status, bytes, SHA-256, UTC time). A 429 or a network error is retried
-after a pause; a chunk that still fails is recorded as failed, never filled. One request every
-6 seconds (GDELT asks for one every 5). Network only; never part of ``make check``.
+after a pause. A chunk that still fails is recorded as failed, never filled, and the next chunk
+is tried after a longer pause. Chunks whose file already exists in ``--existing`` are skipped,
+so a run only fetches what is missing; ``--max-minutes`` stops the run cleanly and still writes
+the manifest of what it did. One request every 6 seconds (GDELT asks for one every 5).
+Network only; never part of ``make check``.
 """
 
 from __future__ import annotations
@@ -35,7 +39,7 @@ MODES = ("TimelineTone", "TimelineVolRaw")
 CHUNK_DAYS = 90
 PAUSE = 6.0
 RETRIES = 5
-MAX_FAILED_IN_A_ROW = 3
+FAILURE_PAUSE = 120.0
 
 
 def fetch(url: str) -> tuple[int, bytes]:
@@ -74,14 +78,23 @@ def main() -> None:
     ap.add_argument("out_dir", type=Path)
     ap.add_argument("--start", default="2025-11-01")
     ap.add_argument("--end", default="2026-11-10")
+    ap.add_argument("--existing", type=Path, default=None)
+    ap.add_argument("--max-minutes", type=float, default=150.0)
     args = ap.parse_args()
     args.out_dir.mkdir(parents=True, exist_ok=True)
     manifest = []
     first = True
-    streak = 0
+    deadline = time.monotonic() + args.max_minutes * 60
+    stopped = False
     for coin, query in QUERIES.items():
         for mode in MODES:
             for a, b in chunks(date.fromisoformat(args.start), date.fromisoformat(args.end)):
+                name = f"{coin}_{mode.lower()}_{a:%Y%m%d}_{b:%Y%m%d}.json"
+                if args.existing is not None and (args.existing / name).is_file():
+                    continue
+                if time.monotonic() > deadline:
+                    stopped = True
+                    break
                 if not first:
                     time.sleep(PAUSE)
                 first = False
@@ -96,7 +109,6 @@ def main() -> None:
                 )
                 url = f"{BASE}?{q}"
                 status, body = fetch(url)
-                name = f"{coin}_{mode.lower()}_{a:%Y%m%d}_{b:%Y%m%d}.json"
                 if status == 200:
                     (args.out_dir / name).write_bytes(body)
                 manifest.append(
@@ -114,13 +126,12 @@ def main() -> None:
                     }
                 )
                 print(f"{status} {len(body):>8} {name}", flush=True)
-                streak = 0 if status == 200 else streak + 1
-                if streak >= MAX_FAILED_IN_A_ROW:
-                    print("stopping: GDELT keeps refusing", flush=True)
-                    break
-            if streak >= MAX_FAILED_IN_A_ROW:
+                if status != 200:
+                    time.sleep(FAILURE_PAUSE)
+            if stopped:
                 break
-        if streak >= MAX_FAILED_IN_A_ROW:
+        if stopped:
+            print("stopping: time budget used", flush=True)
             break
     (args.out_dir / "manifest.json").write_text(json.dumps(manifest, indent=1) + "\n", "utf-8")
     failed = sum(1 for m in manifest if m["status"] != 200)

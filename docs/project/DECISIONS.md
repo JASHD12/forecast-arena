@@ -1468,3 +1468,7 @@ and evidence requirements. Do not backfill historical ML forecasts.
 
 ## GDELT recording workflow, 2026-11-27 (T371)
 - **Owner OK** (chat): build `gdelt-record.yml`, because the agent's sandbox gets 429 or resets from GDELT. It uses no secret, does not push, and writes no ledger; it saves raw responses as an artifact and prints them in the job log. It runs by hand and when the workflow or its script is pushed to the sentiment branch (so it can run before anything reaches `main`). It records raw bodies only; the parser is written afterwards against them, and a failed chunk is recorded as failed, never filled (I6).
+
+## Sentiment forecaster: no live wiring before the backtest result, 2026-11-27 (T373)
+- The pre-registration (`lab/prereg/sentiment.md`) keeps `sentiment` off unless H-SE1 is met, and even then a launch needs a dry run and the owner's OK. Wiring a flag, a fitted-model artefact and a daily GDELT snapshot into the morning job touches about ten places (SPEC, config, wiring, health, site lists, `morning.yml`) and would be dead code if the result is negative. So T373 delivers the forecaster module, its as-of GDELT context builder and tests; the live registration is done only if the pre-registered result justifies it.
+- Questions without usable GDELT numbers (a day with no articles, or a day in an unrecorded chunk) are skipped for every arm, so the arms are scored on identical questions; the card shows how many were skipped.

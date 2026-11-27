@@ -19,7 +19,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from arena.backtest import sentiment as B
 from arena.domains.crypto import COINS, crypto_domain_from_prices
-from arena.lab.results import LabResult
+from arena.lab.results import LabResult, card_markdown
 from arena.sources.coingecko import parse_daily
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -32,6 +32,7 @@ def main() -> None:
     """Build rows, walk forward, summarise, write the LabResult."""
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--out", type=Path, default=ROOT / "evals" / "results" / "lab-sentiment.json")
+    ap.add_argument("--card", type=Path, default=ROOT / "docs" / "lab" / "sentiment.md")
     args = ap.parse_args()
     prices = {
         c: parse_daily(json.loads(gzip.decompress((CG / f"{c}_365d.json.gz").read_bytes())))
@@ -55,6 +56,7 @@ def main() -> None:
             "gdelt_manifest": B.sha256_file(GDELT / "manifest.json"),
             **{f"coingecko_{c}": B.sha256_file(CG / f"{c}_365d.json.gz") for c in COINS},
         },
+        card="docs/lab/sentiment.md",
         artefacts={"gdelt_chunks": f"{len(chunks)} of 50 recorded"},
         metrics=s["metrics"],
         paired=s["paired"],
@@ -75,6 +77,8 @@ def main() -> None:
     )
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(result.model_dump_json(indent=2) + "\n", "utf-8")
+    args.card.parent.mkdir(parents=True, exist_ok=True)
+    args.card.write_text(card_markdown(result), "utf-8")
     print(
         json.dumps({"metrics": s["metrics"], "paired": s["paired"], "notes": s["notes"]}, indent=1)
     )

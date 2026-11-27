@@ -550,5 +550,41 @@
   "sha256": "23b7b67e118c6b2483c77118b63539741b282df933f3586237a35e38388a3fa6",
   "url": "https://api.gdeltproject.org/api/v2/doc/doc?query=%28xrp+OR+ripple%29+crypto+sourcelang%3Aenglish&mode=TimelineTone&format=json&startdatetime=20260729000000&enddatetime=20261026235959",
   "fetched_at": "2026-11-27T21:53:35.859767+00:00"
+ },
+ {
+  "coin": "solana",
+  "mode": "TimelineTone",
+  "start": "2026-01-30",
+  "end": "2026-04-29",
+  "file": "solana_timelinetone_20260130_20260429.json",
+  "status": 200,
+  "bytes": 4520,
+  "sha256": "9b21780737109910abc5983bd4421b33eae726880f153e18749fad7519d26e14",
+  "url": "https://api.gdeltproject.org/api/v2/doc/doc?query=solana+crypto+sourcelang%3Aenglish&mode=TimelineTone&format=json&startdatetime=20260130000000&enddatetime=20260429235959",
+  "fetched_at": "2026-11-27T22:15:45.702187+00:00"
+ },
+ {
+  "coin": "ripple",
+  "mode": "TimelineTone",
+  "start": "2026-01-30",
+  "end": "2026-04-29",
+  "file": "ripple_timelinetone_20260130_20260429.json",
+  "status": 200,
+  "bytes": 4531,
+  "sha256": "6af1e35f31eb152a730b6afa91527c44133ecfd92114aa9b8155da10e737f903",
+  "url": "https://api.gdeltproject.org/api/v2/doc/doc?query=%28xrp+OR+ripple%29+crypto+sourcelang%3Aenglish&mode=TimelineTone&format=json&startdatetime=20260130000000&enddatetime=20260429235959",
+  "fetched_at": "2026-11-27T22:16:10.118840+00:00"
+ },
+ {
+  "coin": "binancecoin",
+  "mode": "TimelineVolRaw",
+  "start": "2026-10-27",
+  "end": "2026-11-10",
+  "file": "binancecoin_timelinevolraw_20261027_20261110.json",
+  "status": 200,
+  "bytes": 670,
+  "sha256": "0042dae3f8c7d42a453804624a5569a0753de39ff8099e4bd34e759203c0bbe5",
+  "url": "https://api.gdeltproject.org/api/v2/doc/doc?query=%28%22binance+coin%22+OR+bnb%29+sourcelang%3Aenglish&mode=TimelineVolRaw&format=json&startdatetime=20261027000000&enddatetime=20261110235959",
+  "fetched_at": "2026-11-27T22:25:19.853113+00:00"
  }
 ]

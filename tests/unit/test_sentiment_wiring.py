@@ -93,3 +93,23 @@ def test_mood_panel_only_for_crypto_snapshots_with_gdelt_numbers() -> None:
         ("2026-11-08", 0.5, 8.0),
     ]
     assert panel["last_known_day"] == "2026-11-08"
+
+
+def test_mood_charts_have_distinct_element_ids() -> None:
+    import re
+
+    from arena.site.shaping import mood_panel
+
+    q = fixture_crypto().generate_questions(B, ASOF)[0]
+    ctx = {
+        "gdelt": {
+            "last_known_day": "d",
+            "tone": [["2026-11-07", 1.0]],
+            "count": [["2026-11-07", 2]],
+        }
+    }
+    panel = mood_panel(q, ctx)
+    assert panel is not None
+    ids = re.findall(r'id="([^"]+)"', str(panel["tone_svg"]) + str(panel["count_svg"]))
+    assert len(ids) == len(set(ids)) == 8
+    assert not any(i.startswith("qc-t-") or i.startswith("qc-d-") for i in ids)  # the price chart's

@@ -276,11 +276,17 @@ def mood_panel(q: Question, ctx: dict[str, Any]) -> dict[str, Any] | None:
         return None
     parts = {
         "tone_svg": series_svg(
-            ChartData("Average news tone", "tone", [("tone", tone)], None, None, td)
+            ChartData("Average news tone", "tone", [("tone", tone)], None, None, td, "-tone")
         ),
         "count_svg": series_svg(
             ChartData(
-                "Matching articles per day", "articles", [("articles", count)], None, None, td
+                "Matching articles per day",
+                "articles",
+                [("articles", count)],
+                None,
+                None,
+                td,
+                "-count",
             )
         ),
     }

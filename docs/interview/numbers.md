@@ -431,7 +431,7 @@ Source: `evals/results/lab-sentiment.json`; card `docs/lab/sentiment.md`
 | ml / up | 305 | 0.25 |
 | questions / bigmove | 1220 | - |
 | questions / up | 565 | - |
-| sentiment / bigmove | 1000 | 0.2412 |
+| sentiment / bigmove | 1000 | 0.2407 |
 | sentiment / up | 305 | 0.2592 |
 
 ### Numeric grounding of model rationales

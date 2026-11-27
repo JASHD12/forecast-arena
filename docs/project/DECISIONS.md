@@ -1472,3 +1472,10 @@ and evidence requirements. Do not backfill historical ML forecasts.
 ## Sentiment forecaster: no live wiring before the backtest result, 2026-11-27 (T373)
 - The pre-registration (`lab/prereg/sentiment.md`) keeps `sentiment` off unless H-SE1 is met, and even then a launch needs a dry run and the owner's OK. Wiring a flag, a fitted-model artefact and a daily GDELT snapshot into the morning job touches about ten places (SPEC, config, wiring, health, site lists, `morning.yml`) and would be dead code if the result is negative. So T373 delivers the forecaster module, its as-of GDELT context builder and tests; the live registration is done only if the pre-registered result justifies it.
 - Questions without usable GDELT numbers (a day with no articles, or a day in an unrecorded chunk) are skipped for every arm, so the arms are scored on identical questions; the card shows how many were skipped.
+
+## Result of the sentiment backtest (T374), 2026-11-27
+- **Run.** `scripts/run_sentiment_backtest.py` on 50 of 50 recorded GDELT chunks and the 365-day CoinGecko history; result `evals/results/lab-sentiment.json`, card `docs/lab/sentiment.md`; the pre-registration hash is in the result.
+- **H-SE1 (big move) not met.** 1,000 scored questions (above the 800 minimum). Brier 0.2407 for the news-tone model against 0.2372 for `ml`: difference +0.0035, 95% day-block interval [-0.0005, +0.0077], which includes zero, and the point estimate is worse. It is better than the base rate (-0.0166) only because `ml`'s probability is one of its inputs.
+- **H-SE2 (direction) consistent with the null, but inconclusive.** 305 scored questions (below 800): Brier 0.2592 against 0.25 for a flat 50%, difference +0.0092 [-0.0017, +0.0207].
+- **About 18% of the big-move test questions had no usable GDELT numbers** (a day without matching articles or without a tone) and are not scored for any arm.
+- **Decision by the pre-registered rule: `sentiment` stays off and is not registered live.** No change to any live forecaster (I8). The `ARENA_SENTIMENT` archive is optional and off; if the owner switches it on, 60 days of archived aggregates would allow a fresh-days check.

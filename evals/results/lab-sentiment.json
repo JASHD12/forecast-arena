@@ -2,11 +2,11 @@
   "kind": "evaluation",
   "experiment": "sentiment",
   "title": "News tone (GDELT) as a crypto forecaster: sentiment-gdelt-r1 against ml",
-  "created_at": "2026-11-27T22:27:41.263926+00:00",
+  "created_at": "2026-11-27T22:28:26.481660+00:00",
   "why": "Sentiment from news and social media is a common feature in forecasting products; this is the pre-registered test of whether it adds anything for crypto. (gdelt-doc-api)",
   "prereg_sha256": "5bccbf95323300646686558af39943709f7539e6ce22cbdd2d5f58643b0aa474",
   "dataset_sha256": {
-    "gdelt_manifest": "18546a00af15a88bf54962b842bb07e99f95d4e644d91e9ec736a4eb49403404",
+    "gdelt_manifest": "f45bb8e08d8126acd45260772a736881c62c1a62f3bcd54d0fe4e0608e801986",
     "coingecko_bitcoin": "304b9b369fe12166aae65f775aaca0b4923cb1b6bcb5a4c22ce6cbf9d061cc30",
     "coingecko_ethereum": "3c268c849100abee18d12da566dba125753e9a2414cb049194ea61923c140ddf",
     "coingecko_solana": "0eef1d9c6a6494fd0cbddde1292af6ec9964ac3aa9f292cbfc492e9bd4346ba1",
@@ -14,7 +14,7 @@
     "coingecko_binancecoin": "0353bd4d6c7af3cc3ce14d2bfd94dc34a68c52ce18a097bb8b136e7adca4ef48"
   },
   "artefacts": {
-    "gdelt_chunks": "49 of 50 recorded"
+    "gdelt_chunks": "50 of 50 recorded"
   },
   "metrics": {
     "questions / bigmove": {
@@ -24,7 +24,7 @@
     },
     "sentiment / bigmove": {
       "n": 1000,
-      "brier": 0.2412
+      "brier": 0.2407
     },
     "ml / bigmove": {
       "n": 1000,
@@ -65,9 +65,9 @@
       "a": "sentiment",
       "b": "ml",
       "split": "bigmove",
-      "diff": 0.00392,
-      "lo": 0.00007,
-      "hi": 0.00813,
+      "diff": 0.00349,
+      "lo": -0.00046,
+      "hi": 0.00766,
       "n": 1000,
       "days": 200
     },
@@ -75,9 +75,9 @@
       "a": "sentiment",
       "b": "base_rate",
       "split": "bigmove",
-      "diff": -0.0162,
-      "lo": -0.02519,
-      "hi": -0.0076,
+      "diff": -0.01663,
+      "lo": -0.02554,
+      "hi": -0.00818,
       "n": 1000,
       "days": 200
     },
@@ -85,9 +85,9 @@
       "a": "sentiment",
       "b": "always_0.5",
       "split": "bigmove",
-      "diff": -0.00883,
-      "lo": -0.01689,
-      "hi": -0.00075,
+      "diff": -0.00926,
+      "lo": -0.01741,
+      "hi": -0.00113,
       "n": 1000,
       "days": 200
     },
@@ -120,7 +120,7 @@
   "limits": [
     "CoinGecko's demo history is 365 days, so there is no held-out year (stated in the pre-registration); the test period is the last part of one year.",
     "GDELT counts per day are small for these queries (single or double digits for most days), so the tone is a noisy feature.",
-    "49 of 50 GDELT history chunks were recorded; days in missing chunks have no features and are not scored for any arm.",
+    "50 of 50 GDELT history chunks were recorded; days in missing chunks have no features and are not scored for any arm.",
     "Many test questions have no usable GDELT numbers (a day without matching articles has no tone, or its chunk was not recorded): see the 'questions' rows. Those are not scored for any arm, so the comparison is on the days with news only.",
     "No claim about prediction of price direction beyond this period, and no advice."
   ],

@@ -586,5 +586,17 @@
   "sha256": "0042dae3f8c7d42a453804624a5569a0753de39ff8099e4bd34e759203c0bbe5",
   "url": "https://api.gdeltproject.org/api/v2/doc/doc?query=%28%22binance+coin%22+OR+bnb%29+sourcelang%3Aenglish&mode=TimelineVolRaw&format=json&startdatetime=20261027000000&enddatetime=20261110235959",
   "fetched_at": "2026-11-27T22:25:19.853113+00:00"
+ },
+ {
+  "coin": "binancecoin",
+  "mode": "TimelineTone",
+  "start": "2025-11-01",
+  "end": "2026-01-29",
+  "file": "binancecoin_timelinetone_20251101_20260129.json",
+  "status": 200,
+  "bytes": 4475,
+  "sha256": "c9c29c5ca451b2c7ac419cd00c4cd8ae11b181efca30aad8b7137f8d69f7238e",
+  "url": "https://api.gdeltproject.org/api/v2/doc/doc?query=%28%22binance+coin%22+OR+bnb%29+sourcelang%3Aenglish&mode=TimelineTone&format=json&startdatetime=20251101000000&enddatetime=20260129235959",
+  "fetched_at": "2026-11-27T22:27:50.960571+00:00"
  }
 ]

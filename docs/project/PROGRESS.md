@@ -18,10 +18,10 @@ move older "Done log" lines to `docs/progress-archive.md`.
 
 ## In progress
 
-- **Part 1, crypto sentiment forecaster (Phase 23, branch `claude/elegant-noether-e5b2qq`, no PR yet).** Owner decisions 2026-11-27: GDELT only, no Reddit (H44 closed), no X.
-  - Done: T370 research and pre-registration; T371 GDELT source (fixture from the owner's Mac, history recorded by the `gdelt-record` workflow, 41 of 50 chunks committed, last 9 being fetched); T372 model, ONNX export and parity (2.0e-5); T373 forecaster module and the `ARENA_SENTIMENT` hook that archives GDELT aggregates in the crypto morning context (off); T374 backtest code and a result on 41 chunks; T376 Crowd mood panel, Methods row, explainer 12, README line.
-  - Left: commit the last GDELT chunks and re-run `python scripts/run_sentiment_backtest.py` (result and card are regenerated); `make check`; T375 (open model against Claude labels) needs a headline recording and the owner's OK for the paid run; live registration of `sentiment` only if the pre-registered result justifies it; open the PR when the owner asks.
-  - The panel is not covered by `make a11y` (the e2e site has no crypto page); it reuses the markup of the existing chart section.
+- **Part 1, crypto sentiment forecaster (Phase 23, branch `claude/elegant-noether-e5b2qq`, no PR yet): built and evaluated.** Owner decisions 2026-11-27: GDELT only, no Reddit (H44 closed), no X.
+  - Result: H-SE1 not met (news tone does not beat `ml` on big moves: +0.0035 [-0.0005, +0.0077] over 1,000 questions); direction inconclusive (305 questions). `sentiment` stays off. See DECISIONS 2026-11-27 and `docs/lab/sentiment.md`.
+  - T370-T374 and T376 done; T375 (open model against Claude labels, needs a headline recording and the owner's OK for about US$0.03) not started. The `ARENA_SENTIMENT` archive of GDELT aggregates is off.
+  - Open the single Part 1 PR only when the owner asks; the owner merges it before Part 2.
 
 ## Open risks and surprises
 

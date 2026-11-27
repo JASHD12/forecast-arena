@@ -1,0 +1,38 @@
+name: gdelt-titles-record
+
+# T375: record one real GDELT article-list response (titles, outlets, URLs and times only) from a
+# GitHub runner, as the fixture for the headline parser. No secrets, writes no ledger, pushes
+# nothing; the body is printed in the log and uploaded as an artifact. By hand or when this file
+# or its script is pushed to the sentiment branch.
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - claude/elegant-noether-e5b2qq
+    paths:
+      - .github/workflows/gdelt-titles-record.yml
+      - scripts/record_gdelt_titles.py
+
+permissions:
+  contents: read
+
+jobs:
+  record:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Record one article list
+        run: python scripts/record_gdelt_titles.py gdelt_titles
+      - name: Show it
+        run: |
+          echo "::group::artlist.json"; cat gdelt_titles/artlist.json; echo; echo "::endgroup::"
+          cat gdelt_titles/provenance.json
+      - uses: actions/upload-artifact@v7
+        with:
+          name: gdelt-titles
+          path: gdelt_titles

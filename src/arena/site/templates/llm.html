@@ -15,6 +15,13 @@
 <thead><tr><th scope="col">Forecaster</th><th scope="col" class="num">Forecasts</th><th scope="col" class="num">Parse failures</th><th scope="col" class="num">Rate</th><th scope="col" class="num">Other skips</th></tr></thead>
 <tbody>{% for p in parse %}<tr><th scope="row">{{ fname(p.forecaster_id) }}</th><td class="num">{{ p.forecasts }}</td><td class="num">{{ p.parse_failures }}</td><td class="num">{{ "%.1f%%"|format(100 * p.failure_rate) if p.failure_rate is not none else "–" }}</td><td class="num">{{ p.other_skips }}</td></tr>{% endfor %}</tbody></table></div>{% else %}<p class="empty">No AI forecasts yet.</p>{% endif %}
 
+<h2>Tool calls per answer</h2>
+<p class="note">How often each forecaster actually used its tools, per topic, counted over answers that were written (the traces hold tool names and sizes, never text). A forecaster without tools, such as <code>llm_context</code>, is the control and shows zero. This table only reports; nothing about a forecaster changes because of it.</p>
+{% if tool_rows %}<div class="table-scroll" tabindex="0" role="region" aria-label="Tool calls per answer"><table>
+<thead><tr><th scope="col">Forecaster</th><th scope="col">Topic</th><th scope="col" class="num">Answers</th><th scope="col" class="num">Without any tool call</th><th scope="col" class="num">Tool calls</th><th scope="col" class="num">Per answer</th><th scope="col">Tools used</th></tr></thead>
+<tbody>{% for r in tool_rows %}<tr><th scope="row">{{ fname(r.forecaster_id) }}</th><td>{{ r.topic }}</td><td class="num">{{ r.answers }}</td><td class="num">{{ r.without_tools }}</td><td class="num">{{ r.tool_calls }}</td><td class="num">{{ "%.2f"|format(r.mean_calls) }}</td><td>{% for name, n in r.by_tool %}<code>{{ name }}</code> {{ n }}{% if not loop.last %}, {% endif %}{% else %}–{% endfor %}</td></tr>{% endfor %}</tbody></table></div>
+{% else %}<p class="empty">No answers with traces yet.</p>{% endif %}
+
 <h2>Calls per day</h2>
 {% if rows %}<div class="table-scroll" tabindex="0" role="region" aria-label="Model calls per day"><table>
 <thead><tr><th scope="col">Day</th><th scope="col">Forecaster</th><th scope="col">Model</th><th scope="col" class="num">Calls</th><th scope="col" class="num">Repairs</th><th scope="col" class="num">Errors</th><th scope="col" class="num">Tokens in / out</th><th scope="col" class="num">Latency p50 / p95</th><th scope="col" class="num">Est. cost</th></tr></thead>

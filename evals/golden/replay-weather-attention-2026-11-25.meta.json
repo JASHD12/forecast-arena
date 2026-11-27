@@ -1,0 +1,17 @@
+{
+ "file": "replay-weather-attention-2026-11-25.jsonl",
+ "sha256": "4bd18abc3c0bf65560959ed464eaf2fe003575ff8d617765f36242036f68fd0a",
+ "label": "replay of live days",
+ "kind": "evaluation set, never a live score (I4); never tune on it (I8)",
+ "topics": [
+  "attention",
+  "weather"
+ ],
+ "until_batch_day": "2026-11-25",
+ "items": 232,
+ "items_per_topic": {
+  "attention": 80,
+  "weather": 152
+ },
+ "dropped": {}
+}

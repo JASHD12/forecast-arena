@@ -10,6 +10,7 @@ from __future__ import annotations
 import json
 import math
 from collections import defaultdict
+from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import date
 from typing import Any
@@ -139,3 +140,57 @@ def totals(rows: list[UsageRow]) -> dict[str, Any]:
         "cost_usd": sum(known) if known else None,
         "unpriced": sum(1 for r in rows if r.cost_usd is None),
     }
+
+
+@dataclass(frozen=True)
+class ToolUseRow:
+    """How the answers of one forecaster on one topic used tools (from the stored traces)."""
+
+    forecaster_id: str
+    topic: str
+    answers: int
+    without_tools: int
+    tool_calls: int
+    by_tool: tuple[tuple[str, int], ...]
+
+    @property
+    def mean_calls(self) -> float:
+        """Tool calls per answer."""
+        return self.tool_calls / self.answers if self.answers else 0.0
+
+
+def tool_use_rows(traces: Iterable[dict[str, Any]]) -> list[ToolUseRow]:
+    """Tool calls per answer, per forecaster and topic: only traces whose forecast was written.
+
+    A forecaster without tools (`llm_context`) shows as zero calls: that is the control. The
+    topic is the first part of the question id. No behaviour changes; this keeps the finding that
+    the agent seldom uses its tools visible (T380).
+    """
+    answers: dict[tuple[str, str], int] = defaultdict(int)
+    bare: dict[tuple[str, str], int] = defaultdict(int)
+    calls: dict[tuple[str, str], int] = defaultdict(int)
+    tools: dict[tuple[str, str], dict[str, int]] = defaultdict(lambda: defaultdict(int))
+    for t in traces:
+        if t.get("outcome") != "forecast":
+            continue
+        key = (str(t.get("forecaster_id", "")), str(t.get("question_id", "")).split("-")[0])
+        used = [str(c.get("tool", "?")) for c in t.get("tool_calls") or []]
+        answers[key] += 1
+        calls[key] += len(used)
+        bare[key] += 0 if used else 1
+        for name in used:
+            tools[key][name] += 1
+    return sorted(
+        (
+            ToolUseRow(
+                fid,
+                topic,
+                n,
+                bare[(fid, topic)],
+                calls[(fid, topic)],
+                tuple(sorted(tools[(fid, topic)].items(), key=lambda kv: (-kv[1], kv[0]))),
+            )
+            for (fid, topic), n in answers.items()
+        ),
+        key=lambda r: (r.forecaster_id, r.topic),
+    )

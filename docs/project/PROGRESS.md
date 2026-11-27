@@ -18,7 +18,10 @@ move older "Done log" lines to `docs/progress-archive.md`.
 
 ## In progress
 
-Nothing. See the session summary above and `python scripts/status.py`.
+- **Part 1, crypto sentiment forecaster (Phase 23, branch `claude/elegant-noether-e5b2qq`, no PR yet).** Owner decisions 2026-11-27: GDELT only, no Reddit (H44 closed), no X.
+  - Done: T370 research and pre-registration; T371 GDELT source (fixture from the owner's Mac, history recorded by the `gdelt-record` workflow, 41 of 50 chunks committed, last 9 being fetched); T372 model, ONNX export and parity (2.0e-5); T373 forecaster module and the `ARENA_SENTIMENT` hook that archives GDELT aggregates in the crypto morning context (off); T374 backtest code and a result on 41 chunks; T376 Crowd mood panel, Methods row, explainer 12, README line.
+  - Left: commit the last GDELT chunks and re-run `python scripts/run_sentiment_backtest.py` (result and card are regenerated); `make check`; T375 (open model against Claude labels) needs a headline recording and the owner's OK for the paid run; live registration of `sentiment` only if the pre-registered result justifies it; open the PR when the owner asks.
+  - The panel is not covered by `make a11y` (the e2e site has no crypto page); it reuses the markup of the existing chart section.
 
 ## Open risks and surprises
 

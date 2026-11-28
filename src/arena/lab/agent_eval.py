@@ -321,6 +321,13 @@ def build(res: dict[str, Any], experiment: str, *, run_id: str | None = None) ->
             if e.extra_notes and res["metrics"][a].get("json_valid_first_try") is not None
         ],
         *(_skills_loaded_notes(res, e.arms) if e.extra_notes else []),
+        *[
+            f"{a}: {res['metrics'][a]['skips']['budget_exhausted']} of {res['metrics'][a]['n']} questions "
+            f"were skipped because the run's own token cap ({res['caps']['max_tokens']:,}) was used "
+            "up by the arms before it: a setting of this run, not a property of the forecaster."
+            for a in e.arms
+            if e.extra_notes and res["metrics"][a].get("skips", {}).get("budget_exhausted")
+        ],
         "Cost is the run's recorded tokens at the list price of the model, per arm; this result carries "
         f"the cost of {', '.join(e.own_arms)}.",
         "Brier of the arms that answered fewer questions is on their answered items only; paired "

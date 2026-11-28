@@ -188,6 +188,13 @@ def eval_ml_probs(obj: Ctx, golden: Path, out: Path) -> None:
 )
 @click.option("--limit", type=int, default=None, help="Stratified seeded sample size.")
 @click.option(
+    "--per-topic",
+    type=int,
+    default=None,
+    help="Instead of --limit: this many questions per topic (seeded, spread over batch days), "
+    "drawn from the questions that have an --ml-probs probability when given (Tier C).",
+)
+@click.option(
     "--ml-probs",
     type=click.Path(exists=True, path_type=Path),
     default=None,
@@ -202,6 +209,7 @@ def eval_run(
     golden: Path,
     variants: tuple[str, ...],
     limit: int | None,
+    per_topic: int | None,
     ml_probs: Path | None,
     fake: bool,
     max_tokens: int,
@@ -219,12 +227,15 @@ def eval_run(
         EvalCaps,
         run,
         sample,
+        sample_per_topic,
     )
     from arena.forecasters.selfconsistency import K as SC_K
     from arena.llm.client import FakeLLM, LLMClient
 
     items, sha = load(golden)
-    items = sample(items, limit)
+    if per_topic is not None and limit is not None:
+        click.echo("refused: use either --limit or --per-topic", err=True)
+        sys.exit(2)
     probs: dict[str, float] | None = None
     if ml_probs is not None:
         doc = json.loads(ml_probs.read_text(encoding="utf-8"))
@@ -232,6 +243,10 @@ def eval_run(
             click.echo("refused: the ml probabilities were built for another golden set", err=True)
             sys.exit(2)
         probs = {k: float(v) for k, v in doc["probabilities"].items()}
+    if per_topic is not None:
+        items = sample_per_topic(items, per_topic, only=None if probs is None else set(probs))
+    else:
+        items = sample(items, limit)
     if "agent_analyst" in variants and probs is None:
         click.echo("refused: agent_analyst needs --ml-probs (replayed ml probabilities)", err=True)
         sys.exit(2)

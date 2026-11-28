@@ -13,7 +13,7 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-BUDGET_LIMIT_USD = 2.50  # owner decision 2026-11-28 (was 2.00 since 2026-11-21)
+BUDGET_LIMIT_USD = 3.00  # owner decision 2026-11-28 (2.00 from 2026-11-21, 2.50 earlier that day)
 
 
 class LabResult(BaseModel):

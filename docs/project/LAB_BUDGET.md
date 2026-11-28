@@ -1,6 +1,6 @@
 # Lab budget
 
-Hard limit for all paid lab runs together: **US$2.50** (owner decision 2026-11-28; it was US$2.00 from 2026-11-21). The table is the record; `scripts/lab_budget.py`
+Hard limit for all paid lab runs together: **US$3.00** (owner decision 2026-11-28: US$2.50 in the morning for the r2/r3 evaluation, then US$3.00 for Tier C; it was US$2.00 from 2026-11-21). The table is the record; `scripts/lab_budget.py`
 sums the `cost_usd` of `evals/results/lab-*.json` and fails `make check` if the total is above the limit or the table is stale.
 
 | Run | Date | Workflow run id | Tokens | US$ | Running total |
@@ -17,3 +17,4 @@ sums the `cost_usd` of `evals/results/lab-*.json` and fails `make check` if the 
 | llm-eval, committee r2 only (agent_committee on the 90 November items; the agent_skills arm reused from the first run) | 2026-11-26 | 45905311845 | 1,003,169 | 0.18 | 1.68 |
 | llm-eval Tier A: agent_analyst and raw llm_context on the 90 November items (estimate was 0.13) | 2026-11-28 | 46146533142 | 935,475 | 0.13 | 1.81 |
 | llm-eval Tier B: raw llm_context on the 186 October items, second test of the calibration map (estimate was 0.09) | 2026-11-28 | 46161529335 | 541,785 | 0.10 | 1.91 |
+| llm-eval four arms on the 90 November items: agent, agent_quant r2, agent_skills r2, agent_committee r3 (token cap 3.5M used up during the committee arm: 12 questions skipped by the cap; estimate was 0.45) | 2026-11-28 | 46162162189 | 3,500,064 | 0.49 | 2.40 |

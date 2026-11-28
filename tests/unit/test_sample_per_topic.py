@@ -15,9 +15,8 @@ from arena.evals.run import sample_per_topic, topic_of
 ROOT = Path(__file__).parents[2]
 GOLDEN = ROOT / "evals/golden/replay-weather-attention-2026-11-25.jsonl"
 ITEMS, SHA = load(GOLDEN)
-PROBS = json.loads(
-    (ROOT / "evals/golden/replay-weather-attention-2026-11-25.ml-probs.json").read_text()
-)
+PROBS_FILE = ROOT / "evals/golden/replay-weather-attention-2026-11-25.ml-probs.json"
+PROBS = json.loads(PROBS_FILE.read_text())
 
 
 def _topics(sub) -> Counter:

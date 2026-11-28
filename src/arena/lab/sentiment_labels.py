@@ -70,6 +70,43 @@ def artlist_params(
     }
 
 
+RETRY_PAUSES = (60.0, 120.0)
+
+
+def fetch_titles(
+    get: Callable[[Mapping[str, str]], object],
+    coins: Sequence[str],
+    *,
+    pause: float = G.REQUEST_PAUSE,
+    retry_pauses: Sequence[float] = RETRY_PAUSES,
+    sleep: Callable[[float], None] = lambda _s: None,
+    retry_on: tuple[type[BaseException], ...] = (Exception,),
+) -> tuple[dict[str, list[str]], list[str]]:
+    """Fetch each coin's headline list, waiting and retrying a failed coin (GDELT limits hard).
+
+    `get` takes the request parameters and returns the parsed JSON. A coin is retried after each
+    pause in `retry_pauses`; one that still fails is named in the second return value. Only titles
+    are kept (S7). Nothing is invented for a coin that failed (I6).
+    """
+    by_coin: dict[str, list[str]] = {}
+    failed: list[str] = []
+    for i, coin in enumerate(coins):
+        if i:
+            sleep(pause)
+        last = ""
+        for attempt in range(len(retry_pauses) + 1):
+            if attempt:
+                sleep(retry_pauses[attempt - 1])
+            try:
+                by_coin[coin] = [t for t, _ in parse_titles(get(artlist_params(coin)))]
+                break
+            except (LabelError, ValueError, *retry_on) as exc:  # type: ignore[misc]
+                last = f"{coin}: {type(exc).__name__}"
+        else:
+            failed.append(last)
+    return by_coin, failed
+
+
 def sample_titles(
     titles_by_coin: Mapping[str, Sequence[str]], per_coin: int = PER_COIN, seed: int = SEED
 ) -> list[tuple[str, str]]:

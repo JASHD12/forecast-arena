@@ -1,0 +1,155 @@
+{
+  "kind": "evaluation",
+  "experiment": "analyst-and-calibration",
+  "title": "agent_analyst (starts from the ml forecast) and a calibrated llm_context",
+  "created_at": "2026-11-28T12:59:38.401898+00:00",
+  "why": "Starting an LLM from the classical model's forecast and recalibrating a hedging model's probabilities are the two cheapest ways companies try to make an LLM forecaster competitive. (anthropic-evals)",
+  "prereg_sha256": "db92267674a3e8aa0edf50def37f2f6fadf0af61d40af8ac8f2da94299a3f4da",
+  "dataset_sha256": {
+    "november": "fd31d14b6c5123b30e1c95c18063b28dd41718414af7826d1de02da48801ceac",
+    "october": "29939ca9268558fc6e153e3859fa57924536d00ed5530a83808d26a8bdcf8194",
+    "ml_probs_november": "046adf0d299381dfb613bb6ee7f0dcde37869ac727a18e00cf9175f3bfa19f99",
+    "ml_probs_october": "0d21abd5f0c2cd802c4ffdfd7f2b64340a2f999841ea6a3b69f827ec32f95f74",
+    "calibration_labels": "35951fd9faf547c678538f381a359b435cd9baa2d47f553562c9eede8255f667",
+    "calibration_train": "74cff093e1507ce0b7c541602dbe29be9357dc250202242ccdd26a433e42aac4"
+  },
+  "artefacts": {
+    "eval_run_november": "eval-20261128T125938",
+    "eval_run_october": "eval-20261128T155637",
+    "agent_arm_reused_from": "eval-20261126T195707",
+    "calibration_map": "a=1.5656, b=0.257455, n_train=1198",
+    "skills_r1_cost_per_1k_answered": "1.3928"
+  },
+  "metrics": {
+    "agent_analyst / November": {
+      "n": 90,
+      "asked": 90,
+      "brier": 0.1257,
+      "log_score": 0.409,
+      "ece": 0.1144,
+      "cost_usd_per_1k": 0.9755,
+      "cost_usd_per_1k_answered": 0.9755
+    },
+    "llm_context (raw) / November": {
+      "n": 90,
+      "asked": 90,
+      "brier": 0.1374,
+      "log_score": 0.4345,
+      "ece": 0.1124,
+      "cost_usd_per_1k": 0.4977,
+      "cost_usd_per_1k_answered": 0.4977
+    },
+    "llm_context_cal (map, no tokens) / November": {
+      "n": 90,
+      "brier": 0.1287,
+      "log_score": 0.4013,
+      "ece": 0.0588
+    },
+    "ml (replayed) / November": {
+      "n": 90,
+      "brier": 0.1352,
+      "log_score": 0.4376,
+      "ece": 0.1741
+    },
+    "agent (reused run) / November": {
+      "n": 90,
+      "brier": 0.1302,
+      "log_score": 0.4178,
+      "ece": 0.1009
+    },
+    "base_rate / November": {
+      "n": 90,
+      "brier": 0.203
+    },
+    "llm_context (raw) / October": {
+      "n": 186,
+      "asked": 186,
+      "brier": 0.1968,
+      "log_score": 0.5711,
+      "ece": 0.0697,
+      "cost_usd_per_1k": 0.554,
+      "cost_usd_per_1k_answered": 0.554
+    },
+    "llm_context_cal (map, no tokens) / October": {
+      "n": 186,
+      "brier": 0.1943,
+      "log_score": 0.5634,
+      "ece": 0.0609
+    },
+    "ml (replayed) / October": {
+      "n": 186,
+      "brier": 0.1814,
+      "log_score": 0.5219,
+      "ece": 0.1177
+    },
+    "base_rate / October": {
+      "n": 186,
+      "brier": 0.2255
+    }
+  },
+  "paired": [
+    {
+      "a": "agent_analyst",
+      "b": "ml",
+      "split": "November",
+      "diff": -0.0095,
+      "lo": -0.0168,
+      "hi": -0.0025,
+      "n": 90,
+      "days": 15
+    },
+    {
+      "a": "agent_analyst",
+      "b": "agent",
+      "split": "November",
+      "diff": -0.0045,
+      "lo": -0.0408,
+      "hi": 0.033,
+      "n": 90,
+      "days": 15
+    },
+    {
+      "a": "agent_analyst",
+      "b": "llm_context",
+      "split": "November",
+      "diff": -0.0117,
+      "lo": -0.0503,
+      "hi": 0.0284,
+      "n": 90,
+      "days": 15
+    },
+    {
+      "a": "llm_context_cal",
+      "b": "llm_context",
+      "split": "November",
+      "diff": -0.0086,
+      "lo": -0.024,
+      "hi": 0.0139,
+      "n": 90,
+      "days": 15
+    },
+    {
+      "a": "llm_context_cal",
+      "b": "llm_context",
+      "split": "October",
+      "diff": -0.0026,
+      "lo": -0.0162,
+      "hi": 0.012,
+      "n": 186,
+      "days": 31
+    }
+  ],
+  "cost_usd": 0.23563,
+  "notes": [
+    "November: run eval-20261128T125938 of llm-eval.yml on power-2026-11a.jsonl (90 questions); October: run eval-20261128T155637 on power-2026-10.jsonl (186 questions). The agent arm is reused from run eval-20261126T195707 (same golden file, hash checked).",
+    "`ml` is the replayed walk-forward probability of the production power model (`evals/golden/ml-probs-*.json`), not the live forecaster. `llm_context_cal` is the raw answers through the fixed map fitted once on lab training questions of 2019 to June 2026; none of the November or October questions is in that training set.",
+    "Versions: agent_analyst `claude-haiku-5-5|prompt-v1-c34fe4efced0|tools-4|out-1024|analyst-r1`; llm_context `claude-haiku-5-5|prompt-v1-b60acd4b5b85|out-1024`.",
+    "Paired differences are Brier(first) minus Brier(second) with day-block 95% intervals on the questions both answered; negative means the first is better."
+  ],
+  "limits": [
+    "Electricity only (the one topic a replay can reproduce), 90 and 186 questions from 15 and 31 days; the six questions of a day are correlated, so intervals are day-block intervals.",
+    "One run, one sample of the model's answers; a repeat could differ. The November set had been used before for other arms (three comparisons here, no multiplicity correction).",
+    "Replayed `ml`, not the live model; weather, Wikipedia, currencies and crypto are judged only on live days."
+  ],
+  "card": "docs/lab/analyst-and-calibration.md"
+}

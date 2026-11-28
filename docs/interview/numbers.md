@@ -225,6 +225,25 @@ Source: `evals/results/eval-20261126T224957.json`
 | Forecaster | Model | n | Answered | Brier | Base rate, same items | Valid JSON first try | Repair rate | Cost (USD) | Output tokens |
 |---|---|---|---|---|---|---|---|---|---|
 | agent_committee | claude-haiku-5-5 | 90 | 87 | 0.1351 | 0.2043 | 69% | 32% | 0.1809 | 201411 |
+
+### Run `eval-20261128T125938` (90 items; caps 720 requests, 1000000 tokens)
+
+Source: `evals/results/eval-20261128T125938.json`
+
+| Forecaster | Model | n | Answered | Brier | Base rate, same items | Valid JSON first try | Repair rate | Cost (USD) | Output tokens |
+|---|---|---|---|---|---|---|---|---|---|
+| agent_analyst | claude-haiku-5-5 | 90 | 90 | 0.1257 | 0.2030 | 100% | 0% | 0.0878 | 47944 |
+| llm_context | claude-haiku-5-5 | 90 | 90 | 0.1374 | 0.2030 | 100% | 0% | 0.0448 | 49649 |
+
+Paired Brier difference: agent_analyst - llm_context: -0.0117 [-0.0503, +0.0284] on 90 items
+
+### Run `eval-20261128T155637` (186 items; caps 372 requests, 700000 tokens)
+
+Source: `evals/results/eval-20261128T155637.json`
+
+| Forecaster | Model | n | Answered | Brier | Base rate, same items | Valid JSON first try | Repair rate | Cost (USD) | Output tokens |
+|---|---|---|---|---|---|---|---|---|---|
+| llm_context | claude-haiku-5-5 | 186 | 186 | 0.1968 | 0.2255 | 99% | 1% | 0.1030 | 122166 |
 <!-- evals:end -->
 
 <!-- lab:start -->
@@ -723,6 +742,31 @@ Source: `evals/results/lab-vectordb.json`; card `docs/lab/vectordb.md`
 |---|---|---|---|---|---|
 | dense_numpy | 143 | 0.3731 | 0.5065 | 0.2126 | 39.94 |
 | dense_qdrant | 143 | 0.3731 | 0.5065 | 0.2126 | 96.04 |
+
+### agent_analyst (starts from the ml forecast) and a calibrated llm_context
+
+Source: `evals/results/lab-analyst-and-calibration.json`; card `docs/lab/analyst-and-calibration.md`
+
+| Arm | Questions | Brier | Log score | ECE | US$ per 1,000 | US$ per 1,000 answered |
+|---|---|---|---|---|---|---|
+| agent (reused run) / November | 90 | 0.1302 | 0.4178 | 0.1009 | - | - |
+| agent_analyst / November | 90 | 0.1257 | 0.409 | 0.1144 | 0.9755 | 0.9755 |
+| base_rate / November | 90 | 0.203 | - | - | - | - |
+| base_rate / October | 186 | 0.2255 | - | - | - | - |
+| llm_context (raw) / November | 90 | 0.1374 | 0.4345 | 0.1124 | 0.4977 | 0.4977 |
+| llm_context (raw) / October | 186 | 0.1968 | 0.5711 | 0.0697 | 0.554 | 0.554 |
+| llm_context_cal (map, no tokens) / November | 90 | 0.1287 | 0.4013 | 0.0588 | - | - |
+| llm_context_cal (map, no tokens) / October | 186 | 0.1943 | 0.5634 | 0.0609 | - | - |
+| ml (replayed) / November | 90 | 0.1352 | 0.4376 | 0.1741 | - | - |
+| ml (replayed) / October | 186 | 0.1814 | 0.5219 | 0.1177 | - | - |
+
+Paired Brier differences (95% day-block interval):
+
+- agent_analyst minus ml (November, n=90): -0.0095 [-0.0168, -0.0025]
+- agent_analyst minus agent (November, n=90): -0.0045 [-0.0408, +0.0330]
+- agent_analyst minus llm_context (November, n=90): -0.0117 [-0.0503, +0.0284]
+- llm_context_cal minus llm_context (November, n=90): -0.0086 [-0.0240, +0.0139]
+- llm_context_cal minus llm_context (October, n=186): -0.0026 [-0.0162, +0.0120]
 <!-- lab:end -->
 
 <!-- standings:start -->

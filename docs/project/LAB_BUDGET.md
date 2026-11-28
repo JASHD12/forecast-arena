@@ -1,6 +1,6 @@
 # Lab budget
 
-Hard limit for all paid lab runs together: **US$2.00** (owner decision 2026-11-21). The table is the record; `scripts/lab_budget.py`
+Hard limit for all paid lab runs together: **US$2.50** (owner decision 2026-11-28; it was US$2.00 from 2026-11-21). The table is the record; `scripts/lab_budget.py`
 sums the `cost_usd` of `evals/results/lab-*.json` and fails `make check` if the total is above the limit or the table is stale.
 
 | Run | Date | Workflow run id | Tokens | US$ | Running total |
@@ -15,3 +15,5 @@ sums the `cost_usd` of `evals/results/lab-*.json` and fails `make check` if the 
 | lab-judge second judge (Claude Sonnet 5.5, the 30 labelled items, 30 of 30 scored; estimate was 0.22) | 2026-11-23 | 45258529928 | 49,479 | 0.13 | 1.09 |
 | llm-eval on the 90 November items: agent, agent_quant, agent_skills, agent_committee (one run, all arms answered or skipped by their own rules; estimate was 0.45-0.55) | 2026-11-26 | 45883972017 | 2,956,832 | 0.41 | 1.50 |
 | llm-eval, committee r2 only (agent_committee on the 90 November items; the agent_skills arm reused from the first run) | 2026-11-26 | 45905311845 | 1,003,169 | 0.18 | 1.68 |
+| llm-eval Tier A: agent_analyst and raw llm_context on the 90 November items (estimate was 0.13) | 2026-11-28 | 46146533142 | 935,475 | 0.13 | 1.81 |
+| llm-eval Tier B: raw llm_context on the 186 October items, second test of the calibration map (estimate was 0.09) | 2026-11-28 | 46161529335 | 541,785 | 0.10 | 1.91 |

@@ -26,7 +26,7 @@
 
 **For recruiters (60 s):** [the recruiter page](https://jashd12.github.io/forecast-arena/recruiters.html) · [live site](https://jashd12.github.io/forecast-arena/) · [one-page case study (PDF)](docs/case-study.pdf) · [model cards](docs/model-cards/README.md) · [code tour](docs/CODE_TOUR.md)
 <!-- contact:start -->
-**Contact and facts:** Open to relocating anywhere in Germany · English C1 (IELTS), German A1 (learning), Hindi (native)
+**Contact and facts:** Open to relocating anywhere in Germany · English C1 (IELTS), German A1 (learning), Hindi (native) · [jashdeep188@gmail.com](mailto:jashdeep188@gmail.com)
 <!-- contact:end -->
 
 <details>

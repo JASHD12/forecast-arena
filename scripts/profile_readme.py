@@ -20,61 +20,158 @@ sys.path.insert(0, str(ROOT / "scripts"))
 
 import readme_sections as rs  # noqa: E402
 
-from arena.site.recruiters import PROOFS, load_facts  # noqa: E402
+from arena.site.recruiters import load_facts  # noqa: E402
 
 SITE = "https://jashd12.github.io/forecast-arena/"
 OUT = ROOT / "docs" / "profile" / "PROFILE_README.md"
 
 
+RAW = "https://raw.githubusercontent.com/JASHD12/forecast-arena/main/"
+REPO = "https://github.com/JASHD12/forecast-arena"
+BADGES = (
+    ("Python", "3776AB"),
+    ("Azure", "0078D4"),
+    ("GitHub_Actions", "2088FF"),
+    ("PyTorch", "EE4C2C"),
+    ("LangChain", "1C3C3C"),
+)
+# The three highlight bullets shown on the profile, picked by their opening words (the text and
+# every figure in them come from readme_sections.highlights(), never typed here: I5).
+HIGHLIGHT_KEYS = ("A classical model", "Forecasts locked")
+
+
+def cv_sections(text: str) -> dict[str, str]:
+    """Split the owner's CV text by its `## ` headings; the lead text is under the key ''."""
+    out: dict[str, list[str]] = {"": []}
+    key = ""
+    for line in text.splitlines():
+        if line.startswith("## "):
+            key = line[3:].strip()
+            out[key] = []
+        else:
+            out[key].append(line)
+    return {k: "\n".join(v).strip() for k, v in out.items()}
+
+
+def _pick(section_prefix: str, secs: dict[str, str]) -> str:
+    return next((v for k, v in secs.items() if k.startswith(section_prefix)), "")
+
+
+def _highlights() -> str:
+    bullets = [b for b in rs.highlights().splitlines() if b.startswith("- ")]
+    chosen = [b for key in HIGHLIGHT_KEYS for b in bullets if b[2:].lstrip("*").startswith(key)]
+    return "\n".join(chosen)
+
+
+def _headline() -> str:
+    """The generated result paragraph without its long caveat, then the live-record verdict."""
+    first, _, live = rs.headline().partition("\n\n")
+    verdict = live[live.index("Whether") :]
+    return first.split(" Caveat:")[0] + "\n\n**Live record:** " + verdict
+
+
+def _skill_table(skills: str) -> str:
+    rows = ["| Area | Tools |", "|---|---|"]
+    for line in skills.splitlines():
+        if line.startswith("- **") and ":**" in line:
+            area, _, tools = line[4:].partition(":**")
+            rows.append(f"| {area} | {tools.strip()} |")
+    return "\n".join(rows)
+
+
 def render() -> str:
-    """The profile README text."""
+    """The profile README text: short, open to all roles, every figure generated."""
     facts = load_facts(ROOT / "site_content")
     contact = []
+    if facts.get("email"):
+        contact.append(f"[{facts['email']}](mailto:{facts['email']})")
     if facts.get("cv_url"):
         contact.append(f"[CV (PDF)]({facts['cv_url']})")
     if facts.get("linkedin"):
         contact.append(f"[LinkedIn]({facts['linkedin']})")
-    if facts.get("email"):
-        contact.append(f"[Email]({facts['email']})")
     cv_file = ROOT / "site_content" / "profile_cv.md"
-    cv = cv_file.read_text(encoding="utf-8").strip() if cv_file.is_file() else ""
-    cv_top, _, cv_more = cv.partition("<!-- featured-project -->")
-    skills = " · ".join(skill for skill, _, _, _ in PROOFS)
+    secs = cv_sections(cv_file.read_text(encoding="utf-8")) if cv_file.is_file() else {"": ""}
+    lead, _, place = secs[""].partition("\n\n")
+    if place.strip():
+        contact.append(place.strip().removeprefix("\U0001f4cd").strip())
+    badges = " ".join(
+        f"![{n.replace('_', ' ')}](https://img.shields.io/badge/-{n}-{c}?logo={n.lower()}"
+        f"&logoColor=white)"
+        for n, c in BADGES
+    )
+    exp = _pick("Work experience", secs)
+    exp_lines = [ln for ln in exp.splitlines() if ln.startswith("**")]
     lines = [
         "# Jashdeep Singh",
         "",
-        "**Werkstudent AI / Machine Learning / Data Science (Germany)**, also open to "
-        "full-time applied ML engineering roles.",
+        "**Software engineer and M.Sc. Data Science student (Marburg, expected 2028)**, open to "
+        "Werkstudent and full-time roles in AI/ML, data science, data engineering and "
+        "software engineering in Germany.",
+        "",
+        (
+            " · ".join(
+                f"\U0001f4cd {c}" if c == contact[-1] and place.strip() else c for c in contact
+            )
+        ),
+        "",
+        badges,
+        "",
+        lead.strip(),
+        "",
+        "## What I work on",
+        "",
+        "- **Forecasting and ML evaluation:** Forecast Arena, below.",
+        "- **Data platforms and backend:** Kafka ingestion, Azure Databricks reporting, "
+        "Java/Spring Boot APIs (see Experience).",
+        "- **LLM apps and evaluation:** a LangChain document assistant, and a measured QLoRA "
+        "fine-tuning study inside Forecast Arena.",
+        "",
+        "## Featured projects",
+        "",
+        f"### [Forecast Arena]({REPO})",
+        "",
+        "A live, public benchmark: simple baselines, a classical ML model and LLM forecasters "
+        "publish probabilities for yes/no questions about tomorrow (German day-ahead "
+        "electricity, weather, Wikipedia attention, exchange rates, crypto) **before the answer "
+        "exists**, into an append-only, hash-chained ledger. When does an LLM agent beat a "
+        'classical model, and when does it not? An honest "it does not" is a valid result.',
+        "",
+        f"**[Live site]({SITE})** · **[For recruiters]({SITE}recruiters.html)** · "
+        f"**[Ask the Arena]({SITE}ask.html)** · [Source]({REPO})",
+        "",
+        f"[![Standings]({RAW}docs/img/standings.svg)]({SITE})",
+        "",
+        _headline(),
+        "",
+        _highlights(),
         "",
     ]
-    if contact:
-        lines += [" · ".join(contact), ""]
-    if cv_top.strip():  # the owner's own CV text, copied verbatim; never written by the agent (I5)
-        lines += [cv_top.strip(), ""]
+    dp = _pick("Another project", secs)
+    if dp:
+        title = next(k for k in secs if k.startswith("Another project"))
+        lines += [f"### {title.removeprefix('Another project: ')}", "", dp, ""]
     lines += [
-        "## Featured project: Forecast Arena",
+        "## Experience",
         "",
-        "A live, public benchmark: simple baselines, a classical ML model, and LLM forecasters "
-        "publish probabilities for about 30 yes/no questions a day (electricity, weather, "
-        "Wikipedia attention, exchange rates, crypto thresholds) **before the answer exists**, "
-        "into an append-only, hash-chained ledger. The research question: when does an LLM "
-        'agent beat a classical model, and when does it not? An honest "it does not" is a '
-        "valid result.",
+        "\n".join(f"- {ln}" for ln in exp_lines),
         "",
-        f"**[Live site]({SITE})** · **[Ask the Arena]({SITE}ask.html)** (free chat over the "
-        f"published record) · **[For recruiters]({SITE}recruiters.html)** · "
-        f"**[forecast-audit]({SITE}audit.html)** (offline decision-audit tool and worked case) "
-        "· [Source](https://github.com/JASHD12/forecast-arena)",
+        "<details><summary>What I did in each role</summary>",
         "",
-        rs.headline(),
+        exp,
         "",
-        "### What it shows",
+        "</details>",
         "",
-        rs.highlights(),
+        "## Skills",
         "",
-        "### Skills with the code behind them",
+        _skill_table(_pick("Technical skills", secs)),
         "",
-        skills,
+        "## Education, achievements, languages",
+        "",
+        _pick("Education", secs),
+        "",
+        _pick("Achievements", secs),
+        "",
+        "**Languages:** " + _pick("Languages", secs),
         "",
         "## How it was built",
         "",
@@ -83,8 +180,6 @@ def render() -> str:
         "any kind.",
         "",
     ]
-    if cv_more.strip():
-        lines += [cv_more.strip(), ""]
     return "\n".join(lines)
 
 

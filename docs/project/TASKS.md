@@ -370,13 +370,14 @@ Keep the first line of each task in exactly this shape; the status script parses
   - Do: section 8.7 CSV adapter, validation, pseudonyms, median rule; fixtures;
     `docs/PANEL_SETUP.md` with step-by-step instructions for the human.
   - Done when: tests cover late rows, duplicate rows, bad tokens and fewer than 3 answers.
-- [ ] T092 · Enable the human panel (live) (deps: T091, T046; needs: H06)
+- [ ] T092 · Enable the human panel (live) (deps: T091, T046; needs: H06) (2026-11-28 note: the intake code exists in `forecasters/panel.py`, but nothing reads `panel_csv_url` outside `config.py`; `wiring.py`, `morning.yml` and the catalog have no flag for it, so besides recruiting the panel (H06) the wiring and a workflow variable are still to be written)
   - Do: enable intake in the morning job.
   - Done when: a real morning run ingests panel rows, or `WAIT(until=<date>)`.
 - [!] T093 · Enable the ensemble (live) (deps: T090, T068) WAIT(until=2026-11-30)
   - 2026-11-19 (owner: yes, start 2026-11-23): nothing is left to code. The ensemble registers itself once
-    `meta/official_start.json` exists and 300 resolved common-set forecasts (60 questions answered by all
-    five members, about 12 a day) exist from the official record, using the weekly cutoff (Monday minus 2
+    `meta/official_start.json` exists and 300 resolved common-set forecasts (75 questions answered by all
+    four members of the common group, about 12 to 15 a day; this said 60 questions and five members before
+    `llm_plain` was retired on 2026-11-27) exist from the official record, using the weekly cutoff (Monday minus 2
     days). Owner action H24 sets `ARENA_OFFICIAL_START_NOT_BEFORE=2026-11-23`. Expected: official start
     2026-11-23 if 19 to 22 Nov are clean days; first ensemble forecasts in the batch of Monday 2026-11-30.
     `tests/unit/test_ensemble.py::test_live_ensemble_is_registered_last_only_with_an_official_start` covers
@@ -989,6 +990,7 @@ Rules (I8): no change to a live forecaster's prompt, threshold or version; every
 - [x] T400 · Done 2026-11-28: `agent_skills` r2: pre-registration first (`lab/prereg/agent-skills-r2.md`), the system prompt lists only the question's topic skills plus the general one, electricity skill revision 2 (matches the r2 estimate), prompts `agent_system_v7` and `graph_system_v3`, eval rows name the skills loaded (H-S3), revision `skills-r2`; the paid comparison (H-S1', H-S2', shared with H-Q6) waits for the owner's OK and lab budget (H46)
 - [x] T401 · Done 2026-11-28: `agent_committee` r3: pre-registration first (`lab/prereg/agent-committee-r3.md`), the chair's repair carries the failed reply (the skeptic's retry quotes it), prompts v2 (members cited in key_factors, topic skill text for the chair, the skeptic sees the stored data and no longer treats any gap from the estimate as a problem), revision `committee-r3`; replay retriever for the historian and structured output not done (see DECISIONS); the paid comparison (H-C1'', H-C2'', H-C5'') waits for the owner's OK and lab budget (H46)
 - [x] T402 · Done 2026-11-28: `sentiment` r2 fixes (version `sentiment-gdelt-r2`): the tone of a day with no articles (GDELT `value: 0`, count 0) is dropped so the intended skip fires, and GDELT-wide outage days are unknown instead of zero articles (`outage_days`; the morning provider passes them); the pre-registered r1 result and its backtest behaviour are unchanged and the forecaster is still not registered live; lag note `docs/lab/sentiment-lag.md` (generated): news follows crypto moves, so at the lag the as-of rule allows there is no signal
+- [x] T403 · Done 2026-11-28: the other forecasters that are not live, documented: ensemble threshold text corrected (75 questions, four members), `human_panel` never wired (note on T092), `bandit_hedge` is the owner's call (H51), `llm_local_ft` is live, and an answer of at least 99.5% or at most 0.5% shows as `>99%` / `<1%` on the question page (scoring clips to [0.01, 0.99]; the raw value stays in the ledger)
 - [!] T384 · Result of the Part 1 paid label run (T375) if it has run by then: result file, card, LAB_BUDGET row (deps: H45) BLOCKED(needs H45): the paid label run needs the owner's OK and a dispatch from `main` after the Part 2 PR is merged
 - [!] T385 · data-gated work not in any of the three PRs: weather error-model fit and SMARD vintage features after 60 days, constrained ensemble after T093, GDELT archive re-test after 60 days if `ARENA_SENTIMENT` is switched on (needs a later PR the owner approves) WAIT(until=2027-01-15)
 

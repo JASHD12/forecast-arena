@@ -231,7 +231,7 @@ curl -X POST -H "Authorization: Bearer TOKEN" -H "Accept: application/vnd.github
     the evening job done, health green, day sealed, no open incident), the record starts on 2026-11-23.
     The evening job runs late on GitHub (see H20), so one late evening can make a day unclean and move the
     start; the Status page ("Road to the official record") lists each day and its reason.
-  - Ensemble: it registers itself when 60 questions answered by all five members (about 12 a day) have
+  - Ensemble: it registers itself when 300 resolved common-set forecasts, that is 75 questions answered by all four members of the common group (`MIN_COMMON` in `scoring/boards.py`; the group had five members until `llm_plain` was retired on 2026-11-27; about 12 to 15 a day), have
     resolved in the official record, using the Monday cutoff, so its first forecasts are expected in the
     batch of Monday 2026-11-30. If the start slips, so does this by the same days.
   - How to check: Status page; `meta/official_start.json` on the `ledger` branch; then the "ensemble" row
@@ -376,4 +376,7 @@ curl -X POST -H "Authorization: Bearer TOKEN" -H "Accept: application/vnd.github
 - [ ] H50 · Optional: archive GDELT news aggregates for a fresh-days test of `sentiment` (T402)
   - Only if you want the news-tone idea tested again: GitHub > repository > Settings > Secrets and variables > Actions > Variables > New repository variable, name `ARENA_SENTIMENT`, value `1`. The morning job then archives daily tone and article counts of the five coins in the crypto context (aggregate numbers only, no article text, no secret). To stop, set it to `0`.
   - About 60 days of archive are needed before a re-test is worth running; the agent then writes a new pre-registration first. The forecaster itself stays off (it failed its pre-registered rule, and the lag note explains why).
+
+- [ ] H51 · Optional: switch on `bandit_hedge` (T293; your call, no agent work left)
+  - It blends the other forecasters by Hedge weights learned from the ledger, with no tokens. Its replay on the early live record beat the equal-weight mean of the forecasters, not the `ml` model, and it is outside the headline board and the ensemble. To switch it on: GitHub > repository > Settings > Secrets and variables > Actions > Variables > New repository variable, name `ARENA_BANDIT`, value `1` (set it to `0` to switch it off). The agent checks the next morning that it appears with its version and no skips.
 

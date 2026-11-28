@@ -175,3 +175,18 @@ def test_home_does_not_count_a_retired_forecaster_as_missing(tmp_path) -> None:
     ).read_text()
     assert "width: 55.0%" in home
     assert "did not answer this one" not in home  # llm_plain is retired, not missing
+
+
+def test_question_page_shows_extreme_answers_as_bounds_not_as_certainty(tmp_path) -> None:
+    """Scoring clips to [0.01, 0.99]; a raw 100% must not read as certainty (T403)."""
+    led = Ledger(tmp_path / "l")
+    q = question()
+    led.append(layout.questions_path(q.batch_date), [q])
+    led.append(
+        layout.forecasts_path(q.batch_date),
+        [forecast(q, "base_rate", 1.0), forecast(q, "persistence", 0.0), forecast(q, "ml", 0.61)],
+    )
+    res = build_site(led, tmp_path / "site", CLOCK, tmp_path / "none")
+    page = (res.out_dir / "questions" / f"{q.question_id}.html").read_text()
+    assert "&gt;99%" in page and "&lt;1%" in page and "61%" in page
+    assert ">100%<" not in page

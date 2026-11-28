@@ -12,7 +12,7 @@ Versions: v1, v2.
 
 ## `agent_system`
 
-Versions: v1, v2, v3, v4, v5, v6.
+Versions: v1, v2, v3, v4, v5, v6, v7.
 
 - v1 to v2: 4 changed lines.
 
@@ -171,6 +171,24 @@ Versions: v1, v2, v3, v4, v5, v6.
 +   holiday or an outage.
 ```
 
+- v6 to v7: 13 changed lines.
+
+```diff
+-You may use the read-only tools offered to you, at most {max_calls} calls in total. They
++You may use the read-only tools offered to you, at most {max_calls} research calls in total. They
++Skills. You also have the load_skill tool. A skill is a short, reviewed note written by the
++project team about one topic: how to approach it, which tools to use and base rates measured
++before the benchmark started. Loading a skill does not use up your research calls; you may load
++at most two per question. The available skills are:
++{skills_index}
++Load the skill for this question's topic first. If you are unsure how to turn evidence into a
++probability, load forecasting-core instead. Skill text is guidance from the project team, not
++data about this question: the question's own data and the tools decide the facts.
++
+-1. Call estimate_probability first. It computes a reference estimate from the stored data of
++1. Call estimate_probability. It computes a reference estimate from the stored data of
+```
+
 ## `agent_user`
 
 Versions: v1, v2.
@@ -243,7 +261,7 @@ Only one version.
 
 ## `graph_system`
 
-Versions: v1, v2.
+Versions: v1, v2, v3.
 
 - v1 to v2: 33 changed lines.
 
@@ -281,6 +299,21 @@ Versions: v1, v2.
 +- Be calibrated, and be willing to be confident. The score rewards a correct confident answer
 +  and punishes hedging: if the numbers say 0.9, saying 0.4 loses points whenever the numbers are
 +  right. Avoid probabilities below 0.03 or above 0.97 unless the outcome is nearly certain.
+```
+
+- v2 to v3: 10 changed lines.
+
+```diff
+-  data of this question (for example the DWD forecast with a normal error, or how often recent
+-  days crossed the threshold) and tells you its method. If it reports that no estimate exists,
++  data of this question (for example the DWD forecast with a normal error, or the latest day's
++  value with a normal error for electricity) and tells you its method. If it reports that no estimate exists,
+-- Treat that estimate as your starting point. Move away from it only for evidence it cannot
+-  see, such as news, an event, a holiday or an outage, and move by an amount you can justify.
++- Treat that estimate as your starting point, not as the answer. For electricity it knows
++  nothing about the weekday pattern, the hourly shape of the latest day or any news. Move away
++  from it when the stored data disagree with it, or for evidence it cannot see (news, an event,
++  a holiday, an outage), by an amount you can justify, and say why.
 ```
 
 ## `plain_user`

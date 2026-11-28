@@ -1534,3 +1534,9 @@ and evidence requirements. Do not backfill historical ML forecasts.
 - One-time H-Q5 check on the November items (estimate alone, r2 against r1): not met, the paired interval includes zero (numbers on the card). The estimate is not changed because of it (I8). The paid H-Q6 and H-Q7 runs need the owner's OK and lab budget (H46).
 - Disclosure: the author had seen r1's November aggregates and an in-sample estimate check before choosing the design, and recorded it in the pre-registration; the choice itself rests on October.
 
+## 2026-11-28 · `agent_skills` r2: smaller index, skill text matching the new estimate, loads measured (T400)
+- Context: r1 missed H-S1 (interval includes zero) and H-S2 (1.31 times against 1.30). The overrun was almost all input tokens (+3,081 per question), mostly the six-skill index and the skill text re-sent on every call; the electricity skill called the r1 estimate "a good anchor" and said nothing about the mis-specified `up_vs_today`; the harness did not save which skills were loaded (H-S3).
+- Decision: pre-registered first (`lab/prereg/agent-skills-r2.md`). The prompt lists only the question's topic skills plus `forecasting-core` (`skills.index_text(domain)`; `_system` now takes the question, optional and unused by the live agents); electricity skill revision 2 (persistence estimate, weekday tables for `up_vs_today`); prompt `agent_system_v7` for `agent_skills` and `agent_hybrid_skills`, `graph_system_v3` for `agent_graph_skills`; eval rows carry `skills_loaded` (names only). Revision `skills-r2`; pinned version snapshot updated deliberately.
+- Alternatives rejected: shortening the skills until the cost passes (tuning to the rule); turning prompt caching on for the evaluation (the live setting is off, and the registration fixes it).
+- The paid comparison (H-S1', H-S2') needs the owner's OK and lab budget (H46); the committee (T401) follows.
+

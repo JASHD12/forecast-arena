@@ -2,7 +2,7 @@
 name: electricity-day-ahead
 description: German day-ahead electricity price questions (mean, max, min, spread, evening): what drives them and how often they resolve YES
 topics: power
-revision: 1
+revision: 2
 ---
 
 ## What the data is
@@ -19,9 +19,10 @@ Questions are about the German/Luxembourg day-ahead auction price for one Europe
 
 ## How to use the tools
 
-1. Call `estimate_probability`: it blends how often recent days crossed the threshold with the last days. For `mean`, `max` and `evening` it is a good anchor; for `spread` and `min` treat it as rough.
-2. Look at the latest day's hourly profile with `get_series` (`latest_hourly`) when the estimate is near 0.5: a day that already ended far from the threshold makes persistence reliable; a day that ended close to it does not.
-3. Move away from the estimate only for a weekday or holiday effect the window does not cover, or for news about outages, interconnector limits or a gas price shock.
+1. Call `estimate_probability`: it is persistence with a normal error. It takes the latest stored day's value as the centre and the day-to-day swings in the window as the spread. It does not know the weekday pattern or the hourly shape of the latest day, and for `spread` and `min` it is rough.
+2. Check what it cannot see. The estimate names the weekday of the latest day and of the target day: use the weekday tables below, because a Saturday or Sunday target after a weekday (or a Monday after a Sunday) is the commonest reason persistence is wrong. `up_vs_today` asks whether tomorrow's mean is above today's, so the share of YES by target weekday matters more there than any level.
+3. Look at the latest day's hourly profile with `get_series` (`latest_hourly`) when the estimate is near 0.5: a day that already ended far from the threshold makes persistence reliable; a day that ended close to it does not.
+4. Move away from the estimate when the weekday or the profile disagrees with it, or for news about outages, interconnector limits or a gas price shock, and say which.
 
 ## Base rates measured up to 2026-10-31
 

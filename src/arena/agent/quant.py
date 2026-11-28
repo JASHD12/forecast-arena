@@ -195,7 +195,7 @@ class AgentAnalyst(AgentForecaster):
         return f"{super().version()}|{ANALYST_REVISION}"
 
 
-SKILLS_REVISION = "skills-r1"
+SKILLS_REVISION = "skills-r2"
 
 
 class AgentSkills(AgentQuant):
@@ -208,7 +208,7 @@ class AgentSkills(AgentQuant):
     """
 
     forecaster_id = "agent_skills"
-    prompt_versions = {"agent_system": "v5"}  # noqa: RUF012 - read-only class default
+    prompt_versions = {"agent_system": "v7"}  # noqa: RUF012 - read-only class default
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
@@ -218,8 +218,9 @@ class AgentSkills(AgentQuant):
         """The quant version plus the skills revision and the fingerprint of every skill file."""
         return f"{super().version()}|{SKILLS_REVISION}-{skills.fingerprint()}"
 
-    def _system(self) -> str:
-        return super()._system().replace("{skills_index}", skills.index_text())
+    def _system(self, q: Question | None = None) -> str:
+        domain = None if q is None else q.domain
+        return super()._system(q).replace("{skills_index}", skills.index_text(domain))
 
     def _toolbox(self, q: Question, ctx: dict[str, Any], asof: datetime, **extra: Any) -> ToolBox:
         return super()._toolbox(q, ctx, asof, skills=skills.load, **extra)
@@ -257,7 +258,7 @@ class AgentGraphSkills(_QuantSkillsTools, GraphAgentForecaster):
     """
 
     forecaster_id = "agent_graph_skills"
-    prompt_versions = {"graph_system": "v2", "graph_critique": "v2"}  # noqa: RUF012
+    prompt_versions = {"graph_system": "v3", "graph_critique": "v2"}  # noqa: RUF012
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
@@ -267,8 +268,9 @@ class AgentGraphSkills(_QuantSkillsTools, GraphAgentForecaster):
         """The graph version plus the quant and skills revisions."""
         return f"{super().version()}{self._version_suffix()}"
 
-    def _system(self) -> str:
-        return super()._system().replace("{skills_index}", skills.index_text())
+    def _system(self, q: Question | None = None) -> str:
+        domain = None if q is None else q.domain
+        return super()._system(q).replace("{skills_index}", skills.index_text(domain))
 
     def _toolbox(self, q: Question, ctx: dict[str, Any], asof: datetime, **extra: Any) -> ToolBox:
         return super()._toolbox(q, ctx, asof, **self._quant_skills_extra(q, ctx), **extra)
@@ -283,7 +285,7 @@ class AgentHybridSkills(_QuantSkillsTools, AgentHybrid):
     """
 
     forecaster_id = "agent_hybrid_skills"
-    prompt_versions = {"agent_system": "v5"}  # noqa: RUF012 - read-only class default
+    prompt_versions = {"agent_system": "v7"}  # noqa: RUF012 - read-only class default
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
@@ -293,8 +295,9 @@ class AgentHybridSkills(_QuantSkillsTools, AgentHybrid):
         """The hybrid version plus the quant and skills revisions."""
         return f"{super().version()}{self._version_suffix()}"
 
-    def _system(self) -> str:
-        return super()._system().replace("{skills_index}", skills.index_text())
+    def _system(self, q: Question | None = None) -> str:
+        domain = None if q is None else q.domain
+        return super()._system(q).replace("{skills_index}", skills.index_text(domain))
 
     def _toolbox(self, q: Question, ctx: dict[str, Any], asof: datetime, **extra: Any) -> ToolBox:
         return super()._toolbox(q, ctx, asof, **self._quant_skills_extra(q, ctx), **extra)

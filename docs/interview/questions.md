@@ -3,6 +3,41 @@
 Numbers: only those in [numbers.md](numbers.md), always with their kind (backtest,
 evaluation, live). "I don't know yet" is a good answer when the record is too short.
 
+## The 15 a German interviewer is most likely to ask
+
+Short, honest answers; the longer ones are below. German teams tend to ask about reliability, data protection and what happens in operation, not
+about tricks.
+
+1. **Why is this not just a notebook?** Because the question is "can it be trusted tomorrow": scheduled jobs, a locked ledger, tests and
+   health checks make the result repeatable by someone else.
+2. **How do you stop the model seeing the future?** An as-of gateway: every input is stamped with when it became available, and a test fails if a
+   forecaster could read later data.
+3. **What would you not claim from this?** That the AI loses or wins in general. The live record is short and every comparison says
+   "too early to tell" until its interval excludes zero.
+4. **Where did the AI lose, and why?** On weather and electricity, where the classical model turns a numerical forecast into a probability with a
+   fitted or fixed error model and the language models only read the numbers; the next step is giving the agent that error model.
+5. **What did you try that did not work?** A committee of agents, a fine-tuned small model, a calibration idea and news tone for crypto; each is
+   pre-registered, published with its interval and left switched off.
+6. **How do you control cost?** A hard daily token cap (tested to equal the workflows), a recorded skip when a call fails, cost per answered
+   question in every evaluation, and paid runs only with the owner's explicit budget.
+7. **How is personal data handled?** None is collected or shown; Wikipedia articles about people are excluded; the site sets no cookies; the
+   hosting provider's logging is stated on the privacy page.
+8. **Does this fall under the EU AI Act?** My reading, in `docs/EU_AI_ACT.md`: it is a research benchmark, not a high-risk system; a company
+   putting the electricity model into grid operation as a safety component would be in a different class and would need the high-risk duties.
+9. **What happens when a data source is down?** The question is skipped or voided with a recorded reason after a grace period; nothing is guessed.
+10. **How do you deploy and roll back?** GitHub Actions, a CI-gated stable branch, Docker and a kind cluster in CI; models are hashed artefacts
+    promoted by a weekly rule and can be rolled back by version.
+11. **Why a gradient-boosted model and not a neural network?** It won the champion/challenger comparison on a year of data; the network did not
+    beat it, and the page says so.
+12. **How do you evaluate an LLM?** A frozen golden set, paired intervals on identical questions, cost per answered question, and a rule fixed
+    before the run; the first eval caught a silent output cap.
+13. **What did you build and what did the AI coding agent build?** I specified and reviewed it; an AI coding agent wrote much of the code under
+    rules in `AGENTS.md`, with tests and CI as the check. The recruiter page says so.
+14. **What would you do with another month?** Fit the weather error model on stored forecast errors, add the archived grid-forecast vintages to the
+    electricity model, and test an agent that starts from the ML forecast.
+15. **Why should we hire a Werkstudent for this?** Because the project shows I can ship, measure honestly and say what did not work; it does not
+    replace learning a team's codebase, and I would expect to be taught that.
+
 ## The project
 
 **1. What is it, in one sentence?**

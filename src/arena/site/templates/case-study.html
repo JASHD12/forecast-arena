@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% from "macros.html" import page_head %}
+{% block content %}
+{{ page_head("Case study", "Can an AI agent beat a classical model at forecasting tomorrow?", "A one-page summary: the problem, the design, what was measured and what comes next. Research project, not advice.") }}
+<section class="card" aria-labelledby="cs-problem"><h2 id="cs-problem">The problem</h2>
+<p>Claims that an AI agent forecasts better than a plain statistical model are easy to make and hard to check: the agent can be shown the answer by accident, a good week gets quoted and a bad one forgotten, and the cost of the model calls goes unmentioned. This project asks the question as a benchmark that cannot be gamed afterwards.</p>
+</section>
+<section class="card" aria-labelledby="cs-design"><h2 id="cs-design">The design</h2>
+<ul>
+<li><strong>Every forecast is locked before the answer exists.</strong> Questions about tomorrow come from public data; forecasts go into an append-only, hash-chained ledger on a git branch, and a command re-checks that none was written after its question locked.</li>
+<li><strong>No look-ahead.</strong> Every forecaster reads data through an as-of gateway, so it sees only what had been published at forecast time.</li>
+<li><strong>A fair contest.</strong> Baselines, a gradient-boosted model with champion/challenger promotion, and several LLM agents answer the same questions; scores are Brier scores with day-block bootstrap intervals, and a difference is called supported only when its interval excludes zero.</li>
+<li><strong>Cost and honesty built in.</strong> Hard daily token caps, a recorded skip instead of a guess when a forecaster fails, pre-registered experiments and published negative results.</li>
+</ul>
+</section>
+<section class="card" aria-labelledby="cs-result"><h2 id="cs-result">What was measured</h2>
+{% if board.rows %}<p><strong>{{ "Official record" if official else "Rehearsal record" }}{% if start %} (since {{ start }}){% endif %}:</strong> {{ board.questions }} questions over {{ board.days }} day{{ "" if board.days == 1 else "s" }}, Brier score, lower is better{% if board.label %}. <strong>{{ board.label }}.</strong>{% endif %}</p>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Standings"><table>
+<thead><tr><th scope="col">Forecaster</th><th scope="col" class="num">Brier</th><th scope="col" class="num">95% interval</th></tr></thead>
+<tbody>{% for r in board.rows|sort(attribute="brier.estimate") %}<tr><th scope="row">{{ fname(r.forecaster_id) }}</th><td class="num">{{ "%.3f"|format(r.brier.estimate) }}</td><td class="num">[{{ "%.3f"|format(r.brier.low) }}, {{ "%.3f"|format(r.brier.high) }}]</td></tr>{% endfor %}</tbody></table></div>
+{% else %}<p class="empty">The live standings need resolved questions answered by every headline forecaster.</p>{% endif %}
+{% if hero %}<p><strong>Backtest, not the live record:</strong> a gradient-boosted model scores Brier {{ hero.ml }} against {{ hero.persistence }} for "same as last time" over {{ hero.days }} days of German day-ahead electricity ({{ hero.diff }} {{ hero.interval }}).</p>{% endif %}
+{% if results.committee %}<p><strong>A negative result:</strong> a committee of specialist agents did not beat one agent with skills (Brier difference {{ "%+.4f"|format(results.committee.diff) }} [{{ "%+.4f"|format(results.committee.lo) }}, {{ "%+.4f"|format(results.committee.hi) }}], {{ results.committee.n }} questions) and cost about {{ "%.1f"|format(results.committee.cost_ratio) }} times as much per question.</p>{% endif %}
+{% if results.sentiment %}<p><strong>Another:</strong> news tone from GDELT added no measurable gain to the ML model on crypto moves (backtest, Brier difference {{ "%+.4f"|format(results.sentiment.diff) }} [{{ "%+.4f"|format(results.sentiment.lo) }}, {{ "%+.4f"|format(results.sentiment.hi) }}], {{ results.sentiment.n }} questions).</p>{% endif %}
+<p class="note">{{ k.questions }} questions and {{ k.forecasts }} forecasts so far. The ML model leads on weather and electricity, where it turns a numerical forecast into a probability with a fitted or fixed error model; the AI agent is level with it on news-driven Wikipedia questions. All of it is too early to call until the official record is longer.</p>
+</section>
+<section class="card" aria-labelledby="cs-next"><h2 id="cs-next">What I would do next</h2>
+<ul>
+<li>Fit the weather error model on 60 days of stored forecast errors instead of fixed spreads, and add the archived grid-forecast vintages to the electricity model.</li>
+<li>Run the pre-registered test of an agent that starts from the ML forecast and only adjusts for news.</li>
+<li>Re-test the news-tone idea on fresh days once enough archived aggregates exist, before believing any gain.</li>
+</ul>
+</section>
+{% endblock %}

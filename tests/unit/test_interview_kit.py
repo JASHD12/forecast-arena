@@ -16,6 +16,7 @@ PROSE = (
     "system-design.md",
     "questions.md",
     "star-stories.md",
+    "stories.md",
     "cv-bullets.md",
 )
 #: Method parameters, not results: interval level and the coin-flip reference.

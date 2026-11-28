@@ -7,11 +7,18 @@
 {% if hero %}<p class="hero-result"><strong>A gradient-boosted model beats "same as last time" on German day-ahead electricity:</strong> Brier {{ hero.ml }} vs {{ hero.persistence }} over {{ hero.days }} backtest days (paired difference {{ hero.diff }} {{ hero.interval }}{% if hero.supported == "yes" %}, excludes zero{% else %}, includes zero{% endif %}). The live comparison with LLM agents is still <em>too early to tell</em>. <a href="backtests.html#card-power">Scores, intervals and limits</a>.</p>
 {% else %}<p class="hero-result">Forecast Arena compares classical models and LLM agents on forecasts published before the outcome is known.</p>{% endif %}
 {% if audit %}<p class="hero-result"><strong>A decision study you can reproduce:</strong> {{ audit.headline_en }} <a href="audit.html">See the electricity case</a>.</p>{% endif %}
-<p class="actions">{% if audit %}<a class="btn" href="audit.html">Explore the electricity case</a> {% endif %}{% if facts.cv_url %}<a class="btn" href="{{ facts.cv_url }}">Download CV (PDF)</a>{% elif facts.linkedin %}<a class="btn" href="{{ facts.linkedin }}">Contact on LinkedIn</a>{% elif facts.email %}<a class="btn" href="mailto:{{ facts.email }}">Contact by email</a>{% else %}<a class="btn btn-ghost" href="#r-five">60-second evidence tour</a>{% endif %} {% if facts.cv_url or facts.linkedin or facts.email %}<a class="btn btn-ghost" href="#r-five">60-second evidence tour</a> {% endif %}<a class="btn btn-ghost" href="{{ repo_url }}">Read the code</a></p>
+<p class="actions"><a class="btn" href="case-study.html">One-page case study</a> {% if audit %}<a class="btn btn-ghost" href="audit.html">Explore the electricity case</a> {% endif %}{% if facts.cv_url %}<a class="btn" href="{{ facts.cv_url }}">Download CV (PDF)</a>{% elif facts.linkedin %}<a class="btn" href="{{ facts.linkedin }}">Contact on LinkedIn</a>{% elif facts.email %}<a class="btn" href="mailto:{{ facts.email }}">Contact by email</a>{% else %}<a class="btn btn-ghost" href="#r-five">60-second evidence tour</a>{% endif %} {% if facts.cv_url or facts.linkedin or facts.email %}<a class="btn btn-ghost" href="#r-five">60-second evidence tour</a> {% endif %}<a class="btn btn-ghost" href="{{ repo_url }}">Read the code</a></p>
 {% if engineer and facts.linkedin and facts.cv_url %}<p class="note"><a href="{{ facts.linkedin }}">LinkedIn</a></p>{% endif %}
 </section>
 <section class="roles" aria-label="Where to look, by role">
-{% for role, why, links in roles %}<article class="card role-card"><h2>{{ role }}</h2><p>{{ why }}</p><ul class="plain">{% for label, target, is_repo in links %}<li><a href="{{ (repo_url ~ "/blob/main/" ~ target) if is_repo else target }}">{{ label }}</a></li>{% endfor %}</ul></article>
+{% for c in role_cards %}<article class="card role-card"><h2>{{ c.role }}</h2>
+<ul class="plain">
+<li><strong>What:</strong> {{ c.what }}</li>
+{% if c.number %}<li><strong>A number:</strong> {{ c.number }}</li>{% endif %}
+<li><strong>Code:</strong> <a href="{{ repo_url ~ "/blob/main/" ~ c.code[1] }}">{{ c.code[0] }}</a></li>
+</ul>
+{% if c.more %}<details class="faq"><summary>More for this role</summary><ul class="plain">{% for label, target, is_repo in c.more %}<li><a href="{{ (repo_url ~ "/blob/main/" ~ target) if is_repo else target }}">{{ label }}</a></li>{% endfor %}</ul></details>{% endif %}
+</article>
 {% endfor %}</section>
 <div class="kpis">
 <div class="kpi"><span class="kpi-n">{{ k.questions }}</span><span class="kpi-l">questions asked</span></div>
@@ -34,10 +41,6 @@
 </ol></section>
 </div>
 {% if personal %}<section class="card" aria-labelledby="r-me"><h2 id="r-me">About me</h2><div class="prose">{{ personal }}</div></section>{% endif %}
-<h2>What the postings ask for, and where to see it</h2>
-<div class="table-scroll" tabindex="0" role="region" aria-label="Skills and proof"><table class="proof">
-<thead><tr><th scope="col">Skill</th><th scope="col">In this project</th><th scope="col">See it</th><th scope="col">Code</th></tr></thead>
-<tbody>{% for skill, what, page, paths in proofs %}<tr><th scope="row">{{ skill }}</th><td>{{ what }}</td><td>{% if page %}<a href="{{ page }}">{{ page.split("#")[0]|replace(".html", "")|replace("questions/index", "question pages")|replace("_", " ") }}</a>{% else %}<span class="muted">in the code</span>{% endif %}</td><td>{% for p in paths %}<a href="{{ repo_url }}/{{ 'tree' if '.' not in p.split('/')[-1] else 'blob' }}/main/{{ p }}"><code>{{ p }}</code></a>{% if not loop.last %}<br>{% endif %}{% endfor %}</td></tr>{% endfor %}</tbody></table></div>
-<p class="note">Every row links to code that runs in CI on every push. Honest limits are on the <a href="methods.html">Methods</a> page; results that lose (for example the PyTorch network) are published like the ones that win.</p>
+<p class="note">The full table of skills and where each is proven is on the <a href="stack.html#skills">tech stack page</a>. Honest limits are on the <a href="methods.html">Methods</a> page; results that lose are published too.</p>
 <p><a class="btn btn-accent" href="{{ repo_url }}">Source code on GitHub</a></p>
 {% endblock %}

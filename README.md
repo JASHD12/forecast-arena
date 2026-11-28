@@ -1,10 +1,36 @@
 # Forecast Arena
 
-[![CI](https://github.com/JASHD12/forecast-arena/actions/workflows/ci.yml/badge.svg)](https://github.com/JASHD12/forecast-arena/actions/workflows/ci.yml)
-[![Live site](https://img.shields.io/badge/live-site-3b3fc4)](https://jashd12.github.io/forecast-arena/)
-[![Coverage](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FJASHD12%2Fforecast-arena%2Fmain%2Fdocs%2Fbadges%2Fcoverage.json)](.github/workflows/ci.yml)
-[![Tests](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FJASHD12%2Fforecast-arena%2Fmain%2Fdocs%2Fbadges%2Ftests.json)](tests)
-[![Licence: MIT](https://img.shields.io/badge/licence-MIT-informational)](LICENSE)
+**A live benchmark where an AI agent and a classical ML model forecast tomorrow, and every forecast is locked before the answer exists.**
+
+[![CI](https://github.com/JASHD12/forecast-arena/actions/workflows/ci.yml/badge.svg)](https://github.com/JASHD12/forecast-arena/actions/workflows/ci.yml)  [![Live site](https://img.shields.io/badge/live-site-3b3fc4)](https://jashd12.github.io/forecast-arena/)  [![Coverage](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FJASHD12%2Fforecast-arena%2Fmain%2Fdocs%2Fbadges%2Fcoverage.json)](.github/workflows/ci.yml)  [![Tests](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FJASHD12%2Fforecast-arena%2Fmain%2Fdocs%2Fbadges%2Ftests.json)](tests)
+
+[![Standings of the four headline forecasters](docs/img/standings.svg)](https://jashd12.github.io/forecast-arena/leaderboard.html)
+
+<!-- topcaption:start -->
+*Official record since 2026-11-23: 36 questions over 4 days; Brier score, lower is better; bars are 95% intervals. **too early to tell.** Snapshot of 2026-11-28; research project, not advice.*
+<!-- topcaption:end -->
+
+<!-- top:start -->
+- **Where the ML model wins, and why:** on weather it scores Brier 0.083 against 0.128 for the AI agent and 0.181 for the AI with data (27 questions, rehearsal and official days together); on electricity 0.151 against 0.182. The ML model turns the DWD forecast into a probability with a fixed error model; the language models only read the same forecast as numbers. Too early to tell, but that is the pattern.
+- **Where the AI agent wins:** on Wikipedia attention, a news-driven topic, the AI agent scores 0.079, ahead of the ML model's 0.088 (27 questions; the intervals overlap).
+- **One honest negative result:** a committee of specialist agents did not beat one agent with skills (Brier difference +0.0060 [-0.0036, +0.0152], 87 questions) and cost about 1.4 times as much per question; a QLoRA fine-tune of a 1.5B model was worse than the base rate (+0.0145 [+0.0021, +0.0262], 186 questions) ([committee](docs/lab/agent-committee-r2.md), [fine-tune](docs/lab/qlora-r1.md)).
+- **Pre-registered, tested, negative:** news tone from GDELT added no measurable gain to `ml` on crypto moves (Brier difference +0.0035 [-0.0005, +0.0077], 1000 questions; backtest; [card](docs/lab/sentiment.md)).
+<!-- top:end -->
+
+**What I built:**
+- **Data pipeline with an as-of gateway:** public sources only, and no forecaster can see data from after its forecast time ([`src/arena/sources/`](src/arena/sources/), [`src/arena/domains/`](src/arena/domains/)).
+- **Classical ML with champion/challenger promotion:** gradient boosting, calibration and a weekly CI-gated promotion rule ([`registry.py`](src/arena/forecasters/registry.py), [`weekly.py`](src/arena/ops/weekly.py)).
+- **LLM agents with tools, evals and cost caps:** tool-using, LangGraph and committee agents, golden-set evals, hard daily token caps ([`src/arena/agent/`](src/arena/agent/), [`src/arena/evals/`](src/arena/evals/)).
+- **A tamper-evident ledger:** append-only and hash-chained on a git branch, so a forecast written after its question locked is detectable ([`src/arena/ledger/`](src/arena/ledger/)).
+- **CI/CD and operations:** scheduled GitHub Actions, Docker, Kubernetes (kind), health checks with incident issues ([`.github/workflows/`](.github/workflows/), [`deploy/`](deploy/)).
+
+**For recruiters (60 s):** [the recruiter page](https://jashd12.github.io/forecast-arena/recruiters.html) · [live site](https://jashd12.github.io/forecast-arena/) · [one-page case study (PDF)](docs/case-study.pdf) · [model cards](docs/model-cards/README.md) · [code tour](docs/CODE_TOUR.md)
+<!-- contact:start -->
+**Contact and facts:** Open to relocating anywhere in Germany · English C1 (IELTS), German A1 (learning), Hindi (native)
+<!-- contact:end -->
+
+<details>
+<summary><strong>More: what this is, results, experiments, how it works, how to run it</strong></summary>
 
 **Can an LLM agent beat a classical ML model at forecasting tomorrow?** Forecast Arena is a
 live, public benchmark: every day, baselines, a gradient-boosted model and several LLM
@@ -111,7 +137,7 @@ make forecast-audit-demo
 <summary><strong>Tech stack</strong></summary>
 
 <!-- stack:start -->
-**Stack:** Python, typing, testing · SQL, DuckDB, Parquet, Polars · dbt · scikit-learn, calibration · LightGBM, Optuna, SHAP · PyTorch · Time-series models · MLOps: MLflow, Evidently, champion/challenger · Statistics · LLM APIs, prompts, structured output · Agents and tool use · RAG, embeddings · LangGraph · Open-weight models (llama.cpp) · LLM fine-tuning (QLoRA, PEFT, GGUF) · Hybrid retrieval and guardrails · ONNX export and serving · Vector database (Qdrant) · Cloud as code (Terraform, AWS, S3) · Observability (Prometheus, Jaeger, OpenTelemetry) · TypeScript · Retrieval-grounded chat with refusals · Decision analysis and an open-source tool · Online learning and unsupervised learning · pandas and scikit-learn Pipelines · LLM evals, tracing, OpenTelemetry · MCP · Multi-agent systems, A2A · REST and JSON APIs · Docker, Kubernetes, Airflow · CI/CD on GitHub Actions · Data integrity · Dashboards and frontend
+**Stack:** Python, typing, testing · SQL, DuckDB, Parquet, Polars · dbt · scikit-learn, calibration · LightGBM, Optuna, SHAP · PyTorch · Time-series models · MLOps: MLflow, Evidently, champion/challenger · Statistics · LLM APIs, prompts, structured output · and 23 more in the table below
 <!-- stack:end -->
 
 Airflow, kind and dbt are validated in CI; production runs on GitHub Actions.
@@ -449,3 +475,5 @@ decision logged in `docs/project/DECISIONS.md` and the agent's state in `docs/pr
 ## Licence
 
 Code: MIT (see `LICENSE`). Data attributions are listed above and on every page of the site.
+
+</details>

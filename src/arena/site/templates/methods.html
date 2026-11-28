@@ -38,6 +38,8 @@
 <tbody>{% for r in template_changelog %}<tr><td>{{ r.since }}{% if r.until != r.since %} to {{ r.until }}{% endif %}</td><td>{{ r.domain }}</td><td><code>{{ r.template }}</code></td><td>v{{ r.version }}</td><td>{{ r.note }}</td></tr>{% else %}<tr><td colspan="5" class="muted">No questions yet.</td></tr>{% endfor %}</tbody></table></div>
 <h2 id="official-start">Rehearsal and the official start</h2>
 <p>The first days are a rehearsal: results are shown but don't count towards headline scores. The official record starts automatically after five clean days in a row (a successful morning run, no failed job or health check, the day sealed), and not before a date fixed in advance, so early changes never enter it.{% if official_start %} It started on {{ official_start }}.{% endif %}</p>
+<h2 id="eu-ai-act">EU AI Act and GDPR</h2>
+<p>This is a research benchmark, not a deployed decision system. It identifies, scores and ranks no person and decides access to nothing, so it is not in any high-risk area of Annex III of the AI Act. Model-written text is labelled as AI-generated and may be wrong; every model call is logged without prompt or answer text; no personal data is collected or shown. A company that built the electricity model into grid operation as a safety component would be in a different class and would need the high-risk obligations. The reading is the author's, not legal advice: <a href="{{ repo_url }}/blob/main/docs/EU_AI_ACT.md">the full note</a>.</p>
 <h2>Limits</h2>
 <p>Git timestamps are evidence, not cryptographic proof. The public branch history, the hash chain and the GitHub Actions run logs together make silent edits detectable by anyone who has cloned the ledger branch.</p>
 <ul>{% for l in limitations %}<li>{{ l }}</li>{% endfor %}</ul>

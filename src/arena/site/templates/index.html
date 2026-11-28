@@ -15,9 +15,9 @@
 <div class="hero-copy">
 <p class="kicker"><span class="pulse" aria-hidden="true"></span> Live benchmark · AI vs classical ML vs baselines</p>
 <h1 id="hero-title">Can AI predict tomorrow better than a simple model?</h1>
-<p>Every day, statistical baselines{% if ml_live %}, a gradient-boosted ML model{% endif %} and Claude-based forecasters, including tool-using agents, each publish a probability on real questions about tomorrow. The answers are locked in a tamper-evident public ledger <strong>before</strong> the facts exist, then scored against reality.{% if not ml_live and backtest %} The ML model is proven in a one-year backtest first (right) and then joins the live board.{% endif %}</p>
-<p class="actions"><a class="btn" href="#today">See the latest forecasts</a> <a class="btn btn-ghost" href="leaderboard.html">Leaderboard</a> <a class="btn btn-ghost" href="stack.html">Tech stack</a> <a class="btn btn-ghost" href="{{ repo_url }}">{{ icon("github") }} Code</a></p>
-<p class="gloss" id="glossary"><strong>New here?</strong> <dfn>Brier score</dfn>: the average squared miss of a probability, 0 is perfect and 0.25 is what saying 50% every time scores. <dfn>Base rate</dfn>: how often the answer was YES before. <dfn>Too early to tell</dfn>: too few days of results to rank anyone reliably.</p>
+<p>Every forecast is published and locked in a public, hash-chained ledger <strong>before</strong> the answer exists, then scored against reality.</p>
+<p class="actions"><a class="btn" href="leaderboard.html">Live results</a> <a class="btn btn-ghost" href="recruiters.html">For recruiters</a></p>
+
 <p class="trust">{{ "✓ Ledger verified" if verify_ok else "✗ Ledger check failed" }} · {{ forecast_count }} forecasts published · {{ days_live }} days with questions · {% if official_start %}official since {{ official_start }}{% else %}rehearsal phase{% endif %}</p>
 </div>
 <div class="hero-side">
@@ -54,6 +54,8 @@
 <div class="kpi"><span class="kpi-n">{{ counts.resolved }}</span><span class="kpi-l">answers scored</span></div>
 {% if topics|length > 1 or not backtest %}<div class="kpi"><span class="kpi-n">{{ topics|length }}</span><span class="kpi-l">{{ "topic" if topics|length == 1 else "topics" }} live</span></div>{% else %}<div class="kpi"><span class="kpi-n">{{ backtest.days }}</span><span class="kpi-l">days replayed in the <a href="backtests.html">backtests</a></span></div>{% endif %}
 </div>
+
+<p class="gloss-below" id="glossary"><strong>New here?</strong> <dfn>Brier score</dfn>: the average squared miss of a probability, 0 is perfect and 0.25 is what saying 50% every time scores. <dfn>Base rate</dfn>: how often the answer was YES before. <dfn>Too early to tell</dfn>: too few days of results to rank anyone reliably.</p>
 
 <p class="built">Built with <span class="tag">Anthropic Claude: LLM + tool-using agent</span> <span class="tag">scikit-learn gradient boosting</span> <span class="tag">Platt calibration</span> <span class="tag">proper scoring rules</span> <span class="tag">day-block bootstrap</span> <span class="tag">MLflow</span> <span class="tag">Evidently</span> <span class="tag">permutation importance</span> <span class="tag">Diebold-Mariano</span> <span class="tag">mypy</span> <span class="tag">DuckDB SQL + Parquet</span> <span class="tag">GitHub Actions CI/CD</span> <a href="stack.html">Full tech stack →</a></p>
 

@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import json
 import re
+from collections.abc import Sequence
 from pathlib import Path
 from typing import Any
 
@@ -340,3 +341,80 @@ def hero_result(backtest: dict[str, Any] | None) -> dict[str, str] | None:
         "interval": vp["interval"],
         "supported": "yes" if vp["supported"] else "no",
     }
+
+
+#: The one code link each role card leads with (T391); the other links go under "More".
+ROLE_CODE = {
+    "AI engineering": ("The agent loop", "src/arena/agent/forecaster.py"),
+    "ML and MLOps": ("The model registry", "src/arena/forecasters/registry.py"),
+    "Data science": ("Proper scores and day-block intervals", "src/arena/scoring/stats.py"),
+}
+
+
+def role_cards(
+    roles: Sequence[tuple[str, str, Sequence[tuple[str, str, bool]]]],
+    hero: dict[str, str] | None,
+    json_change: dict[str, str] | None,
+    kpis: dict[str, Any],
+) -> list[dict[str, Any]]:
+    """Three short cards, one per role: what, one number and one code link (T391).
+
+    Every number is copied from the backtest card, the eval results or the ledger counts; with
+    no data the card shows no number rather than a guessed one (I5)."""
+    numbers = {
+        "AI engineering": (
+            f"First-try valid JSON went from {json_change['before']} to {json_change['after']} "
+            "after a frozen golden-set eval caught a silent output cap."
+            if json_change
+            else None
+        ),
+        "ML and MLOps": (
+            f'Brier {hero["ml"]} against {hero["persistence"]} for "same as last time" over '
+            f"{hero['days']} backtest days ({hero['diff']} {hero['interval']})."
+            if hero
+            else None
+        ),
+        "Data science": (
+            f"{kpis['questions']} questions and {kpis['forecasts']} forecasts, each locked before "
+            "its answer, scored with day-block bootstrap intervals."
+            if kpis
+            else None
+        ),
+    }
+    cards = []
+    for role, what, links in roles:
+        label, target = ROLE_CODE[role]
+        cards.append(
+            {
+                "role": role,
+                "what": what,
+                "number": numbers.get(role),
+                "values": {"json": json_change, "hero": hero, "kpis": kpis}.get(
+                    {"AI engineering": "json", "ML and MLOps": "hero", "Data science": "kpis"}[role]
+                ),
+                "code": (label, target),
+                "more": [x for x in links if x[1] != target],
+            }
+        )
+    return cards
+
+
+def case_results(lab_results: Sequence[Any]) -> dict[str, dict[str, Any] | None]:
+    """The two negative results of the case study, copied from committed lab results (I5)."""
+    by = {r.experiment: r for r in lab_results}
+    out: dict[str, dict[str, Any] | None] = {"committee": None, "sentiment": None}
+    c = by.get("agent-committee-r2")
+    if c is not None and c.paired:
+        p = c.paired[0]
+        m = c.metrics
+        cost = (
+            m["agent_committee / eval"]["cost_usd_per_1k"]
+            / m["agent_skills / eval"]["cost_usd_per_1k"]
+        )
+        out["committee"] = {**{k: p[k] for k in ("diff", "lo", "hi", "n")}, "cost_ratio": cost}
+    s = by.get("sentiment")
+    if s is not None:
+        p = next((x for x in s.paired if x["split"] == "bigmove" and x["b"] == "ml"), None)
+        if p is not None:
+            out["sentiment"] = {k: p[k] for k in ("diff", "lo", "hi", "n")}
+    return out

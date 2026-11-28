@@ -18,6 +18,8 @@ move older "Done log" lines to `docs/progress-archive.md`.
 
 ## In progress
 
+- **Part 3, hiring impact (Phase 25, prepared on a local branch while the Part 2 PR is open).** T390 to T393 and T395 done (README first screen with a generated chart and bullets, site first screens, case-study PDF, EU AI Act note, model cards, stories, questions); T394 waits for the paid evaluation (H46). Branch from `main` after Part 2 is merged, then open the one Part 3 PR.
+
 - **Part 2, forecaster improvements (Phase 24, branch `claude/elegant-noether-e5b2qq`, no PR yet).** T380 to T383 done (evaluation infrastructure, pre-registration, `llm_context_cal`, per-topic reporting, catalog refactor); T384 waits for H45, T385 is data-gated. Part 2 is ready for its pull request. The paid evaluation runs only after the Part 2 PR is merged and needs the owner's budget tier (H46).
 
 - **Part 1, crypto sentiment forecaster (Phase 23, branch `claude/elegant-noether-e5b2qq`, no PR yet): built and evaluated.** Owner decisions 2026-11-27: GDELT only, no Reddit (H44 closed), no X.

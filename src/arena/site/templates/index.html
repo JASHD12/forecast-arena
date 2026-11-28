@@ -55,7 +55,7 @@
 {% if topics|length > 1 or not backtest %}<div class="kpi"><span class="kpi-n">{{ topics|length }}</span><span class="kpi-l">{{ "topic" if topics|length == 1 else "topics" }} live</span></div>{% else %}<div class="kpi"><span class="kpi-n">{{ backtest.days }}</span><span class="kpi-l">days replayed in the <a href="backtests.html">backtests</a></span></div>{% endif %}
 </div>
 
-<p class="gloss" id="glossary"><strong>New here?</strong> <dfn>Brier score</dfn>: the average squared miss of a probability, 0 is perfect and 0.25 is what saying 50% every time scores. <dfn>Base rate</dfn>: how often the answer was YES before. <dfn>Too early to tell</dfn>: too few days of results to rank anyone reliably.</p>
+<p class="gloss-below" id="glossary"><strong>New here?</strong> <dfn>Brier score</dfn>: the average squared miss of a probability, 0 is perfect and 0.25 is what saying 50% every time scores. <dfn>Base rate</dfn>: how often the answer was YES before. <dfn>Too early to tell</dfn>: too few days of results to rank anyone reliably.</p>
 
 <p class="built">Built with <span class="tag">Anthropic Claude: LLM + tool-using agent</span> <span class="tag">scikit-learn gradient boosting</span> <span class="tag">Platt calibration</span> <span class="tag">proper scoring rules</span> <span class="tag">day-block bootstrap</span> <span class="tag">MLflow</span> <span class="tag">Evidently</span> <span class="tag">permutation importance</span> <span class="tag">Diebold-Mariano</span> <span class="tag">mypy</span> <span class="tag">DuckDB SQL + Parquet</span> <span class="tag">GitHub Actions CI/CD</span> <a href="stack.html">Full tech stack →</a></p>
 

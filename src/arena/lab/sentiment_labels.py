@@ -70,7 +70,7 @@ def artlist_params(
     }
 
 
-RETRY_PAUSES = (60.0, 120.0)
+RETRY_PAUSES = (120.0, 180.0, 240.0, 240.0)
 
 
 def fetch_titles(

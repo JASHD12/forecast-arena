@@ -358,3 +358,13 @@ curl -X POST -H "Authorization: Bearer TOKEN" -H "Accept: application/vnd.github
   - Applying: send the recruiter-page link with two sentences tailored to each posting, apply in volume to Werkstudent roles, and ask for referrals. A project helps an application; it does not replace one.
   - Proofread the German page (`de.html`, H17); until then it is marked as not proofread.
   - Refresh the numbers when you want fresh ones: pull the `ledger` branch, then run `python scripts/standings_snapshot.py <ledger dir>`, `python scripts/readme_sections.py`, `python scripts/model_cards.py`, `python scripts/interview_numbers.py` and `python scripts/case_study_pdf.py <ledger dir>` (or ask the agent).
+
+- [ ] H48 · Publish the new GitHub profile (T396; after the PR is merged)
+  - Profile README: regenerate nothing; copy `docs/profile/PROFILE_README.md` from `main` into `JASHD12/JASHD12/README.md` and commit (the agent cannot push to that repository).
+  - github.com/settings/profile: Bio `Software engineer · M.Sc. Data Science @ Uni Marburg · Python, Azure, Kafka, ML & LLM evaluation · building Forecast Arena`; Location `Gießen, Germany`; Website `https://jashd12.github.io/forecast-arena/`; public email: the one on your CV.
+  - Pins ("Customize your pins"): `forecast-arena` and `datapilot`; leave the 2022 repos unpinned.
+  - Repo About: `forecast-arena` description `Live benchmark: LLM agents vs a classical ML model forecasting tomorrow (electricity, weather, crypto); every forecast locked before the answer exists`, website the live site, topics `machine-learning, forecasting, llm, ai-agents, time-series, energy, mlops, python, github-actions`. `datapilot` description `Text classification and multilingual retrieval workbench: TF-IDF vs E5 embeddings, chronological evaluation`, topics `nlp, machine-learning, retrieval, python`.
+  - Optional: archive or describe TODOLIST, CHAT-ROOMS, Expense-Tracker, Crypto_Feed, QuizCMS, Driver-Drowsiness-Detection, Share-Memories (reversible).
+  - CV link: your CV PDF contains your phone number. If you want a "CV (PDF)" link, host a copy without it (for example in `JASHD12/JASHD12`) and tell the agent its https URL for `cv_url` in `site_content/recruiter_facts.json`.
+  - Check your DataPilot numbers on the live profile (6,548 reviews, macro-F1 0.6475): the new text leaves them out until they are verified in that repository.
+

@@ -598,6 +598,18 @@ def lab_sentiment_labels_run(obj: Ctx, model_dir: Path, max_tokens: int, model: 
         retry_on=(HttpError,),
     )
     sample = sl.sample_titles(by_coin)
+    # Counts only, never titles (S7): shows how thin the 7-day headline pool is per coin.
+    click.echo(
+        "SL_FETCH="
+        + json.dumps(
+            {
+                "counts": {coin: len(titles) for coin, titles in by_coin.items()},
+                "failed": failed,
+                "sampled": len(sample),
+            },
+            sort_keys=True,
+        )
+    )
     if len(sample) < sl.MIN_TITLES:
         click.echo(
             f"stopped before any paid call: {len(sample)} headlines (need {sl.MIN_TITLES}); "

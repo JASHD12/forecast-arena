@@ -120,5 +120,45 @@ def test_fetch_titles_waits_and_retries_a_failed_coin() -> None:
     by_coin, failed = sl.fetch_titles(get, ["bitcoin", "ethereum", "ripple"], sleep=slept.append)
     assert set(by_coin) == {"bitcoin", "ethereum"} and len(by_coin["ethereum"]) == 20
     assert failed == ["ripple: RuntimeError"]
-    assert calls.count("ethereum") == 3 and calls.count("ripple") == 3
-    assert 60.0 in slept and 120.0 in slept
+    assert calls.count("ethereum") == 3 and calls.count("ripple") == 5
+    assert 120.0 in slept and 180.0 in slept and 240.0 in slept
+
+
+def test_label_run_prints_counts_only_and_stops_below_the_floor(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    """Under 200 headlines: SL_FETCH shows counts (no titles) and no LLM client is built."""
+    import time
+
+    from arena.sources import http as http_mod
+
+    good = json.loads(ART.read_text("utf-8"))
+    titles = [a["title"] for a in good["articles"]]
+
+    class FakeResp:
+        def json(self) -> object:
+            return good
+
+    class FakeHttp:
+        def __init__(self, *_a: object, **_k: object) -> None:
+            pass
+
+        def get(self, _url: str, params: dict[str, str]) -> FakeResp:
+            if "xrp" in params["query"]:
+                raise http_mod.HttpError("429")
+            return FakeResp()
+
+    monkeypatch.setenv("GITHUB_ACTIONS", "true")
+    monkeypatch.setattr(http_mod, "HttpClient", FakeHttp)
+    monkeypatch.setattr(time, "sleep", lambda _s: None)
+    monkeypatch.setattr(
+        "arena.cli.lab_paid_cmds._client",
+        lambda _obj: pytest.fail("an LLM client was built before the headline floor was met"),
+    )
+    res = CliRunner().invoke(main, ["lab", "sentiment-labels-run", "--model-dir", str(tmp_path)])
+    assert res.exit_code == 1
+    line = next(ln for ln in res.output.splitlines() if ln.startswith("SL_FETCH="))
+    info = json.loads(line.removeprefix("SL_FETCH="))
+    assert info["counts"]["bitcoin"] == 20 and "ripple" not in info["counts"]
+    assert info["failed"] == ["ripple: HttpError"] and info["sampled"] < sl.MIN_TITLES
+    assert not any(t in res.output for t in titles)

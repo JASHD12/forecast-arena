@@ -1,4 +1,4 @@
-M.Sc. Data Science student with three years of software engineering experience. I use Python to compare forecasts and text classifiers on fixed test sets and document how to repeat the experiments.
+M.Sc. Data Science student and software engineer (three years): Python, Azure, data platforms, ML and LLM evaluation. I automate reporting, build APIs and CI/CD checks, and compare forecasts and text classifiers on fixed test sets, documenting how to repeat the experiments.
 
 📍 Gießen, Germany · open to relocating anywhere in Germany
 
@@ -12,20 +12,19 @@ Current coursework in forecasting and computer vision.
 ## Work experience
 
 **Software Engineer, Paytm Money** · India · Jan 2025 – Sep 2026
-- Built Java/Spring Boot services for 100K+ monthly portfolio syncs and 50K+ monthly sell and switch orders. Added retry handling to prevent duplicate orders.
-- Built Kafka ingestion and validation across 5M accounts. Investigated production issues with AWS logs and metrics.
+- Built Kafka ingestion and validation for portfolio data across 5M accounts. Investigated production issues using AWS logs and metrics.
+- Built Java and Spring Boot APIs for 100K+ monthly portfolio syncs. Worked with MySQL and Redis and contributed to microservice designs.
+- Used idempotency to prevent duplicate orders on retry. The APIs handled 50K+ mutual fund sell and switch orders per month.
 
 **Software Engineer 1, MAQ Software** · India · Nov 2023 – Nov 2024
-- Developed a Python/FastAPI service for a LangChain document assistant and evaluated its answers against the passages it retrieved.
-- Automated SQL Server-to-Power BI reporting with Azure and Databricks, saving about 15 hours per week.
+- Automated SQL Server-to-Power BI reporting with Azure Databricks, saving about 15 hours of manual work per week.
+- Built a Python and FastAPI service for a LangChain document assistant. Added automated tests and deployment checks in GitHub Actions.
 
 **Software Developer (Full-time), Advantage Club** · India · Jul 2023 – Sep 2023
-- Built React survey forms for a planned 1M+ user rollout and improved performance on lower-end devices.
+- Built React survey forms and improved responsiveness on slower devices.
 
 **Software Development Intern, Advantage Club** · India · Jan 2023 – Jun 2023
-- Integrated an HR dashboard with third-party systems and cut award email processing time by 60%.
-
-<!-- featured-project -->
+- Integrated services into an HR dashboard and cut award email processing time by 60%.
 
 ## Another project: DataPilot (text classification and retrieval, 2026)
 
@@ -34,15 +33,19 @@ Current coursework in forecasting and computer vision.
 
 ## Technical skills
 
-- **Programming:** Python, Java, C++, SQL
+- **Languages:** Python, Java, C++, SQL
+- **Cloud and data:** Microsoft Azure, Databricks, Kafka, Power BI, MySQL, Redis, AWS logs and metrics
 - **Machine learning:** scikit-learn, LightGBM, PyTorch, time-series backtesting, calibration
-- **Language models:** QLoRA, LangChain, LangGraph, retrieval, LLM evaluation
-- **Software and data:** Git, Docker, GitHub Actions, Kafka, Databricks
+- **Language models:** QLoRA, LangChain, LangGraph, retrieval-augmented generation, LLM evaluation, Claude and GPT
+- **APIs and backend:** FastAPI, REST APIs, Spring Boot, microservice designs
+- **Platform and CI/CD:** Git, GitHub Actions, Docker, Linux, Kubernetes manifest checks, API smoke tests
+- **Learning:** Windmill orchestration, infrastructure as code (IaC)
 
 ## Achievements
 
 - Codeforces Specialist, global rank 433 in Round 782 (Div. 2)
 - Amazon ML Summer School, selected from 30K+ applicants
+- CodeChef, Data Structures and Algorithms certification
 
 ## Languages
 

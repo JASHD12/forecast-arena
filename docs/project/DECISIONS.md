@@ -1504,3 +1504,15 @@ and evidence requirements. Do not backfill historical ML forecasts.
 - **EU AI Act and GDPR note** (`docs/EU_AI_ACT.md`, a Methods section): the author's reading, not legal advice; Article 50 and Annex III were read on 2026-11-27 (SOURCES). One model card per forecaster plus a data sheet, generated (`scripts/model_cards.py`, test that they are current).
 - **Interview kit:** `stories.md` (five STAR stories from the decision records and result files) and the 15 questions a German interviewer is most likely to ask; `numbers.md` now also holds the paired intervals and the standings snapshot.
 - **Not done:** the measured "AI + ML" result (T394) needs the paid evaluation of Part 2 (H46). Nothing about the candidate was invented; the owner's facts are in HUMAN_TODO H47.
+
+## 2026-11-28 · Profile README follows the new CV (T396)
+- Context: the live profile README said "M.Sc. in Data Science" (reads as completed; the CV says expected Oct 2028), and the generated draft was 8.9 KB.
+- Decision: `site_content/profile_cv.md` now holds the new CV's wording; `scripts/profile_readme.py` renders a shorter page in this order: headline, contact, one badge row, what I work on, two project cards, experience, skills table, education. The owner asked to show the CV email and to be open to all roles; phone number, visa status and LinkedIn are not shown. The email is in `site_content/recruiter_facts.json`, so it also appears in the README contact line and on the recruiters page (same owner fact, H16).
+- DataPilot figures from the live profile (6,548 reviews, macro-F1 0.6475) are not used: they cannot be checked from this repository; the CV bullets remain.
+- Alternatives rejected: a hand-written profile README (numbers would drift from the record, I5); third-party stats widgets (flaky, nothing verifiable).
+
+## 2026-11-28 · Label run: diagnose before amending (T388)
+- Context: three `lab-sentiment-labels` runs stopped before any paid call (US$0). Runs 1 and 2: HttpError for 3 of 5 coins (109 of 200 headlines). Run 3, after per-coin retries (T387): ripple failed, 132 headlines from four coins, so the 7-day pool per coin is thin and 200 may be out of reach even with all five.
+- Decision (owner, 2026-11-28): keep the pre-registered rules (7-day window, 100 per coin, floor 200). The run now prints `SL_FETCH=` (counts per coin, failed coins, sample size; no titles, S7) and waits 120, 180, 240 and 240 s between retries of a failed coin. If the counts show 200 is unreachable, the owner decides on an amendment (14-day window or a lower floor) before any paid call.
+- Alternatives rejected for now: widening to 14 days or lowering the floor to 120 without the counts (an amendment on a guess).
+

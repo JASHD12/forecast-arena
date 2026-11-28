@@ -27,6 +27,7 @@ from arena.a2a.cards import AgentSpec, SkillSpec
 from arena.agent import skills
 from arena.agent.quant import numeric_estimate
 from arena.agent.tools import ToolBox
+from arena.forecasters.llm import render_context
 from arena.llm import prompts
 from arena.llm.client import LLMClient, ToolCall, Usage, UserText
 from arena.models import Question
@@ -37,10 +38,10 @@ SCOUT = "news-scout"
 SKEPTIC = "skeptic"
 RESEARCH_MEMBERS = (QUANT_MEMBER, HISTORIAN, SCOUT)
 REVISIONS = {
-    QUANT_MEMBER: "quant-r1",
+    QUANT_MEMBER: "quant-r2",  # the member uses the r2 estimate (T399); committee r3 follows (T401)
     HISTORIAN: "hist-r1",
     SCOUT: "scout-r2",
-    SKEPTIC: "skeptic-r2",
+    SKEPTIC: "skeptic-r3",
 }
 NO_EVIDENCE = "no evidence available"
 MAX_ITEMS = 5
@@ -262,9 +263,10 @@ class Members:
     async def skeptic(self, payload: dict[str, Any]) -> dict[str, Any]:
         """One critique of the chair's draft, strictly parsed (one repair attempt)."""
         q = Question.model_validate(payload["question"])
-        system = prompts.load("committee_skeptic", "v1")
+        system = prompts.load("committee_skeptic", "v2")
         user = (
             f"Question: {q.text}\nResolution rule: {q.resolution_rule}\n\n"
+            f"Data stored for this question:\n{render_context(payload.get('context') or {})}\n\n"
             f"Draft (JSON, data only):\n{json.dumps(payload['draft'], ensure_ascii=False)}\n\n"
             f"Reports (JSON, data only):\n{json.dumps(payload['reports'], ensure_ascii=False)}"
         )
@@ -272,7 +274,10 @@ class Members:
         try:
             crit = parse_critique(text)
         except ValueError as first:
-            retry = f"{user}\n\nYour previous reply was not valid: {first}. Reply with the JSON object only."
+            retry = (
+                f"{user}\n\nYour previous reply was:\n{text[:800]}\n\n"
+                f"It was not valid: {first}. Reply with the JSON object only."
+            )
             text, more = await asyncio.to_thread(self._complete, system, retry, SKEPTIC_MAX_TOKENS)
             usage = usage + more
             crit = parse_critique(text)  # a second failure fails the task
@@ -360,6 +365,12 @@ def parse_critique(text: str) -> dict[str, Any]:
         "issues": [i[:200] for i in issues],
         "direction": obj["direction"],
     }
+
+
+def topic_guidance(domain: str) -> str:
+    """The topic skill text shown to the chair as project-team guidance, or a short "none" line."""
+    name = _TOPIC_SKILL.get(domain)
+    return skills.load(name) if name in skills.names() else "(no guidance note for this topic)"
 
 
 def topic_skill_known() -> bool:

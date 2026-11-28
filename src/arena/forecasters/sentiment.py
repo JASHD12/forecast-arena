@@ -1,7 +1,8 @@
 """`sentiment` (T373, SPEC 8): crypto questions from GDELT news tone and article volume.
 
 Experimental, flag ``ARENA_SENTIMENT`` (off), outside the headline board and the ensemble.
-Version ``sentiment-gdelt-r1``, pre-registered in ``lab/prereg/sentiment.md`` before any
+Version ``sentiment-gdelt-r2`` (r1, pre-registered and backtested, is the same model without the
+T402 fixes for empty and outage days); pre-registered in ``lab/prereg/sentiment.md`` before any
 backtest. GDELT only (no Reddit, no X; DECISIONS 2026-11-27).
 
 Per template (``bigmove``, ``up``) one L2 logistic regression (C = 1, standardised inputs) on
@@ -21,7 +22,7 @@ numbers, a missing `ml` probability or a missing model is a recorded skip, never
 from __future__ import annotations
 
 import math
-from collections.abc import Mapping, Sequence
+from collections.abc import Collection, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta
 from typing import Any
@@ -33,7 +34,7 @@ from sklearn.preprocessing import StandardScaler
 from arena.models import Forecast, Question, Skip
 from arena.sources import gdelt_tone as G
 
-VERSION = "sentiment-gdelt-r1"
+VERSION = "sentiment-gdelt-r2"  # r2 (T402): empty and outage days are not data; r1 backtest below
 TEMPLATES = ("bigmove", "up")
 FEATURES: dict[str, tuple[str, ...]] = {
     "bigmove": ("tone", "tone_chg", "vol_chg", "logit_ml"),
@@ -53,24 +54,45 @@ def logit(p: float) -> float:
     return math.log(q / (1 - q))
 
 
+def outage_days(counts: Mapping[str, Mapping[date, int]], covered: Collection[date]) -> set[date]:
+    """Covered days on which no coin has an article count: a GDELT-wide outage, not a quiet day.
+
+    The recorded outages were identical for all five coins, while a quiet day for one coin still
+    shows counts for the others (T402).
+    """
+    return {d for d in covered if not any(d in c for c in counts.values())}
+
+
 def gdelt_context(
     tone: Mapping[date, float],
     count: Mapping[date, int],
-    covered_count: set[date],
+    covered_count: Collection[date],
     asof: datetime,
+    unknown_days: Collection[date] | None = None,
 ) -> dict[str, Any] | None:
     """The aggregates known at `asof` for the morning context (no texts), or None.
 
-    `covered_count` are the days whose article counts were recorded; a covered day without an
-    entry in `count` had no matching articles (count 0), an uncovered day is unknown.
+    `covered_count` are the days whose article counts were recorded. r1 (`unknown_days` None, the
+    behaviour of the pre-registered backtest): a covered day without an entry in `count` counts
+    as 0 articles and a recorded tone is kept. r2 (`unknown_days` given, even empty): GDELT
+    reports `value: 0` with count 0 for a day without matching articles, which is not a news tone
+    of 0, so the tone of a day with no articles is dropped; and the days in `unknown_days`
+    (outages, see `outage_days`) have no count at all instead of a count of 0.
     """
     last = G.known_days(asof)
     first = last - timedelta(days=CONTEXT_DAYS - 1)
     days = [first + timedelta(days=i) for i in range(CONTEXT_DAYS)]
-    tone_rows = [[d.isoformat(), tone[d]] for d in days if d in tone]
-    count_rows = [
-        [d.isoformat(), count.get(d, 0)] for d in days if d in covered_count or d in count
-    ]
+    if unknown_days is None:
+        tone_rows = [[d.isoformat(), tone[d]] for d in days if d in tone]
+        count_rows = [
+            [d.isoformat(), count.get(d, 0)] for d in days if d in covered_count or d in count
+        ]
+    else:
+        unknown = set(unknown_days)
+        known = [d for d in days if d not in unknown and (d in covered_count or d in count)]
+        count_rows = [[d.isoformat(), count.get(d, 0)] for d in known]
+        empty = {d for d in known if count.get(d, 0) == 0}
+        tone_rows = [[d.isoformat(), tone[d]] for d in days if d in tone and d not in empty]
     if not tone_rows and not count_rows:
         return None
     return {

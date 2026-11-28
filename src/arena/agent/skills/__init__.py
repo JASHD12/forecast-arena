@@ -95,10 +95,17 @@ def load(name: str) -> str:
     return f"# Skill: {s.name} (revision {s.revision})\n\n{s.body}"
 
 
-def index_text() -> str:
-    """One line per skill for the system prompt: name, what it is for, topics."""
+def index_text(domain: str | None = None) -> str:
+    """One line per skill for the system prompt: name, what it is for, topics.
+
+    With a `domain` (the question's topic) only the skills for that topic and the general ones
+    (topics `all`) are listed, which keeps the prompt that is re-sent on every call short (r2);
+    `load` still accepts any skill name.
+    """
     return "\n".join(
-        f"- {s.name}: {s.description} (topics: {', '.join(s.topics)})" for s in _all().values()
+        f"- {s.name}: {s.description} (topics: {', '.join(s.topics)})"
+        for s in _all().values()
+        if domain is None or "all" in s.topics or domain in s.topics
     )
 
 

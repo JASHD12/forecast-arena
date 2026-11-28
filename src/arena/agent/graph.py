@@ -87,7 +87,7 @@ class GraphAgentForecaster(AgentForecaster):
             f"{rag}|out-{self.max_output_tokens}|langgraph-{lg}"
         )
 
-    def _system(self) -> str:
+    def _system(self, q: Question | None = None) -> str:
         """The graph's system prompt (variants fill in more placeholders)."""
         return prompts.load("graph_system", self._pv("graph_system")).replace(
             "{max_calls}", str(self.max_tool_calls)
@@ -108,7 +108,7 @@ class GraphAgentForecaster(AgentForecaster):
     def _graph(self, q: Question, ctx: dict[str, Any], asof: datetime, box: ToolBox) -> Any:
         from langgraph.graph import END, START, StateGraph
 
-        system = self._system()
+        system = self._system(q)
 
         def step(name: str, s: State) -> list[str]:
             return [*s.get("path", []), name]
@@ -217,7 +217,7 @@ class GraphAgentForecaster(AgentForecaster):
             except ParseError as first:
                 repair = prompts.load("repair", self._pv("repair")).replace("{error}", str(first))
                 turns = [*self._close_tool_calls(state), UserText(repair)]
-                out = self._call(self._system(), {**state, "turns": turns})
+                out = self._call(self._system(q), {**state, "turns": turns})
                 state = {**state, **out, "path": [*state["path"], "repair"]}
                 resp = out["resp"]
                 assert resp is not None

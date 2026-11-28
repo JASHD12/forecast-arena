@@ -1,7 +1,9 @@
 """T341-T343: the numeric tools, `agent_quant` and `agent_analyst`."""
 
+import itertools
 import json
-from datetime import UTC, datetime
+import statistics
+from datetime import UTC, date, datetime, timedelta
 
 import pytest
 from factories import B, forecast, question
@@ -15,15 +17,6 @@ from arena.models import Forecast
 
 ASOF = datetime(2026, 11, 12, 6, tzinfo=UTC)
 GOOD = json.dumps({"probability": 0.7, "rationale": "Estimate and evidence.", "key_factors": ["x"]})
-
-
-def _daily(values: list[float], stat: str = "mean") -> dict:
-    return {"daily": [{"day": f"2026-10-{i + 1:02d}", stat: v} for i, v in enumerate(values)]}
-
-
-def _power_q(threshold: float = 80.0, template: str = "mean_gt"):
-    q = question(template=template)
-    return q.model_copy(update={"threshold": threshold, "params": {"stat": "mean"}})
 
 
 def test_normal_probability_matches_known_values_and_rejects_bad_input() -> None:
@@ -57,25 +50,93 @@ def test_toolbox_calculator_and_estimate_run_inside_the_call_limit() -> None:
     )[1]
 
 
-def test_power_estimate_uses_only_the_stored_window_and_clips() -> None:
-    q = _power_q(80.0)
-    ctx = _daily([70, 75, 85, 90, 95, 100, 105, 110, 90, 95])  # all but three above 80
-    out = quant.power_estimate(q, ctx)
-    assert out["inputs"]["days_in_window"] == 10
-    assert out["inputs"]["share_window"] == 0.8 and out["inputs"]["latest_day_crossed"] is True
-    assert out["probability"] == pytest.approx((0.8 + 1.0 + 1.0) / 3, abs=1e-3)
-    low = quant.power_estimate(q, _daily([10.0] * 10))
-    assert low["probability"] == 0.05  # clipped, never 0
-    with pytest.raises(ValueError):
-        quant.power_estimate(q, _daily([90, 91, 92]))  # too little history
-
-
-def test_power_estimate_respects_the_less_than_comparator() -> None:
-    q = question(template="min_lt").model_copy(
-        update={"threshold": 0.0, "comparator": "lt", "params": {"stat": "min"}}
+def _power_q(threshold: float = 80.0, template: str = "mean_gt", comparator: str = "gt"):
+    q = question(template=template)
+    return q.model_copy(
+        update={"threshold": threshold, "comparator": comparator, "params": {"stat": "mean"}}
     )
-    out = quant.power_estimate(q, _daily([-5.0, 3.0, -1.0, 2.0, -2.0, 4.0, 5.0, 1.0], "min"))
-    assert out["inputs"]["share_window"] == 0.375 and out["inputs"]["latest_day_crossed"] is False
+
+
+def _days(values: list[float], stat: str = "mean", start: date = date(2026, 10, 1)) -> dict:
+    return {
+        "daily": [
+            {"day": (start + timedelta(days=i)).isoformat(), stat: v} for i, v in enumerate(values)
+        ]
+    }
+
+
+def test_power_estimate_is_persistence_with_a_normal_error_and_clips() -> None:
+    values = [70, 75, 85, 90, 95, 100, 105, 110, 90, 95]
+    q = _power_q(80.0)
+    q = q.model_copy(update={"target_date": date(2026, 10, 11)})  # the day after the last day
+    out = quant.power_estimate(q, _days(values))
+    diffs = [b - a for a, b in itertools.pairwise(values)]
+    sd = statistics.pstdev(diffs)
+    assert out["inputs"]["latest_day_value"] == 95 and out["inputs"]["days_ahead"] == 1
+    assert out["probability"] == pytest.approx(
+        round(min(0.95, normal_probability(95, sd, 80.0, "gt")), 3), abs=1e-3
+    )
+    assert out["inputs"]["distance_in_sd"] == pytest.approx((80.0 - 95) / sd, abs=1e-3)
+    flat = quant.power_estimate(q, _days([10.0, 10.2] * 5))
+    assert flat["probability"] == 0.05  # clipped, never 0
+    with pytest.raises(ValueError):
+        quant.power_estimate(q, _days([90, 91, 92]))  # too little history
+
+
+def test_power_estimate_grows_less_sure_with_days_ahead_and_is_monotone_in_distance() -> None:
+    values = [80, 90, 70, 100, 85, 95, 60, 90, 80, 75]
+    near = _power_q(90.0).model_copy(update={"target_date": date(2026, 10, 11)})
+    far = near.model_copy(update={"target_date": date(2026, 10, 13)})
+    p_near = quant.power_estimate(near, _days(values))["probability"]
+    p_far = quant.power_estimate(far, _days(values))["probability"]
+    assert quant.power_estimate(far, _days(values))["inputs"]["days_ahead"] == 3
+    assert abs(p_far - 0.5) < abs(p_near - 0.5)  # more spread, closer to a coin flip
+    probs = [
+        quant.power_estimate(near.model_copy(update={"threshold": t}), _days(values))["probability"]
+        for t in (40.0, 60.0, 80.0, 100.0, 120.0)
+    ]
+    assert probs == sorted(probs, reverse=True)  # a higher threshold is never likelier
+
+
+def test_power_estimate_respects_the_less_than_comparator_and_names_the_weekdays() -> None:
+    q = _power_q(0.0, "min_lt", "lt").model_copy(
+        update={"params": {"stat": "min"}, "target_date": date(2026, 10, 9)}
+    )
+    values = [-5.0, 3.0, -1.0, 2.0, -2.0, 4.0, 5.0, 1.0]
+    out = quant.power_estimate(q, _days(values, "min"))
+    gt = quant.power_estimate(q.model_copy(update={"comparator": "gt"}), _days(values, "min"))
+    assert out["probability"] == pytest.approx(1 - gt["probability"], abs=0.01)
+    assert out["inputs"]["latest_day"] == "2026-10-08"
+    assert out["inputs"]["latest_day_weekday"] == "Thursday"
+    assert out["inputs"]["target_weekday"] == "Friday"
+
+
+def test_up_vs_today_models_the_change_not_the_level() -> None:
+    """r1 compared the latest day with itself ("latest day crossed" was always false)."""
+    start = date(2026, 10, 5)  # a Monday
+    # level rises on every Monday and falls on every other day: weekday pattern in the changes
+    values = []
+    level = 100.0
+    for i in range(21):
+        day = start + timedelta(days=i)
+        level += 30.0 if day.weekday() == 0 else -5.0
+        values.append(level)
+    ctx = _days(values, "mean", start)
+    last = start + timedelta(days=len(values) - 1)  # a Sunday
+    q = _power_q(0.0, "up_vs_today").model_copy(
+        update={"params": {"stat": "mean", "reference_mean": values[-1]}, "threshold": None,
+                "target_date": last + timedelta(days=1)}  # a Monday
+    )  # fmt: skip
+    mon = quant.power_estimate(q, ctx)
+    to_monday = _days(values[:15], "mean", start)  # the last stored day is a Monday
+    tue_q = q.model_copy(update={"target_date": start + timedelta(days=15)})  # the Tuesday after
+    tue = quant.power_estimate(tue_q, to_monday)
+    assert (
+        mon["inputs"]["same_weekday_changes"] == 2 and mon["inputs"]["target_weekday"] == "Monday"
+    )
+    assert mon["inputs"]["mean_change_same_weekday"] == 30.0
+    assert mon["probability"] > 0.8 and tue["probability"] < 0.5
+    assert mon["probability"] > tue["probability"]
 
 
 def test_weather_estimate_is_the_ml_rule_and_other_topics_have_none() -> None:
@@ -105,12 +166,12 @@ class _Ml:
 
 def test_agent_quant_gets_its_own_prompt_tools_and_version() -> None:
     q = _power_q()
-    ctx = _daily([90.0] * 10)
+    ctx = _days([90.0, 91.0] * 5)
     fake = FakeLLM([tool_reply(ToolCall("c1", "estimate_probability", {})), GOOD])
     f = quant.AgentQuant(fake)
     out = f.forecast(q, ctx, ASOF)
     assert isinstance(out, Forecast) and out.forecaster_id == "agent_quant"
-    assert "estimate_probability first" in fake.calls[0][0]  # the v3 system prompt
+    assert "starting point, not as the answer" in fake.calls[0][0]  # the v6 system prompt
     assert out.forecaster_version.endswith(quant.QUANT_REVISION)
     sent = next(t for t in fake.calls[1][1] if isinstance(t, ToolResults)).results[0][1]
     assert json.loads(sent)["data"]["probability"] == 0.95

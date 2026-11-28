@@ -154,3 +154,44 @@ def test_wiring_registers_agent_skills_only_when_switched_on(tmp_path) -> None:
     ids = [f.forecaster_id for f in on]
     assert ids.index("agent_skills") == ids.index("agent") + 1
     assert "agent_skills" in expected_forecasters(s) and "agent_skills" not in COMMON_GROUP
+
+
+def test_the_index_lists_only_the_questions_topic_and_the_general_skill() -> None:
+    power = skills.index_text("power")
+    assert "- electricity-day-ahead:" in power and "- forecasting-core:" in power
+    assert "weather-dwd-mosmix" not in power and "crypto-moves" not in power
+    assert skills.index_text("nonsense").count("\n") == 0  # only forecasting-core
+    full = skills.index_text()
+    assert all(f"- {n}:" in full for n in skills.names())  # no domain: every skill, as in r1
+    assert len(power) < len(full) // 2
+
+
+def test_the_skills_prompt_carries_the_topic_index_and_the_r2_estimate_wording() -> None:
+    q = question().model_copy(update={"threshold": 80.0, "params": {"stat": "mean"}})
+    ctx = {"daily": [{"day": f"2026-10-{i + 1:02d}", "mean": 90.0} for i in range(10)]}
+    fake = FakeLLM([GOOD])
+    quant.AgentSkills(fake).forecast(q, ctx, ASOF)
+    system = fake.calls[0][0]
+    assert "- electricity-day-ahead:" in system and "weather-dwd-mosmix" not in system
+    assert "not as the answer" in system and "how often recent days crossed" not in system
+    assert "research calls" in system and "{skills_index}" not in system
+
+
+def test_the_electricity_skill_matches_the_r2_estimate() -> None:
+    body = skills.get("electricity-day-ahead").body
+    assert "good anchor" not in body and "persistence with a normal error" in body
+    assert "up_vs_today" in body and skills.get("electricity-day-ahead").revision == 2
+
+
+def test_eval_rows_name_the_loaded_skills_and_nothing_else() -> None:
+    from arena.evals.run import skills_loaded
+
+    trace = {
+        "tool_calls": [
+            {"tool": "load_skill", "args": {"name": "forecasting-core"}, "ok": True},
+            {"tool": "estimate_probability", "args": {}, "ok": True},
+            {"tool": "load_skill", "args": {"name": "nope"}, "ok": False},
+        ]
+    }
+    assert skills_loaded(trace) == ["forecasting-core"]
+    assert skills_loaded(None) == [] and skills_loaded({}) == []

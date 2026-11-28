@@ -106,8 +106,9 @@ class AgentForecaster:
         kw.update(extra)
         return ToolBox(ctx, asof, **kw)
 
-    def _system(self) -> str:
-        """The system prompt of this forecaster (variants fill in more placeholders)."""
+    def _system(self, q: Question | None = None) -> str:
+        """The system prompt of this forecaster (variants fill in more placeholders; `q` is the
+        question being forecast, used by variants that tailor the prompt to its topic)."""
         return prompts.load("agent_system", self._pv("agent_system")).replace(
             "{max_calls}", str(self.max_tool_calls)
         )
@@ -159,7 +160,7 @@ class AgentForecaster:
         if self.sample is not None and q.question_id not in self.sample:
             return self._skip(q, "not_sampled", "not in today's LLM sample", asof)
         box = self._toolbox(q, ctx, asof)
-        system = self._system()
+        system = self._system(q)
         turns: list[Turn] = [UserText(self._user_prompt(q, ctx, asof))]
         usage = Usage()
         try:

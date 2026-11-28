@@ -26,7 +26,6 @@ SITE = "https://jashd12.github.io/forecast-arena/"
 OUT = ROOT / "docs" / "profile" / "PROFILE_README.md"
 
 
-RAW = "https://raw.githubusercontent.com/JASHD12/forecast-arena/main/"
 REPO = "https://github.com/JASHD12/forecast-arena"
 BADGES = (
     ("Python", "3776AB"),
@@ -139,7 +138,7 @@ def render() -> str:
         f"**[Live site]({SITE})** · **[For recruiters]({SITE}recruiters.html)** · "
         f"**[Ask the Arena]({SITE}ask.html)** · [Source]({REPO})",
         "",
-        f"[![Standings]({RAW}docs/img/standings.svg)]({SITE})",
+        f"[![Standings]({SITE}standings.svg)]({SITE})",
         "",
         _headline(),
         "",

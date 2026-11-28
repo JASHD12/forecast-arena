@@ -1522,3 +1522,8 @@ and evidence requirements. Do not backfill historical ML forecasts.
 - Not changed: the README bullets still come from the dated snapshot (run `scripts/standings_snapshot.py` and `scripts/readme_sections.py` to refresh); a workflow that pushes README changes to `main` is not pre-approved (CLAUDE.md), so this stays a manual step.
 - Until the next Pages deploy of `main` the README image URL answers 404.
 
+## 2026-11-28 · A dry run cannot measure tokens; `only` input for the morning dry run (T398)
+- Context: the T279 launch check was written as "dry run measures runner time and tokens". `ops/wiring.py` gives dry runs no LLM client (their manifests never reach the ledger, so usage could not be counted against the caps), so every API forecaster skips with `model_missing`; tokens can only be measured on a live day. A dry run only works between 00:00 UTC (the batch is today's UTC date) and the first live seal.
+- Decision: `morning.yml` gets a choice input `only` that, like `experimental`, applies only when `dry_run` is true (a test pins the guard on all seven flags), so one forecaster's install, model download and index build can be checked alone. The launch of `agent_hybrid` is then one live day with the flag set by the owner, after the daily token and request headroom (300,000 tokens, 100 requests) was read from the ledger runs; its coverage, skips and parse failures are checked the next morning. The SPEC timing table is corrected to the cron in `morning.yml`.
+- Alternatives rejected: a new "measure" mode that spends tokens on a throwaway ledger (spends money outside the caps' accounting); switching the flag on first and measuring live without a headroom check (a cap hit would put `budget_exhausted` skips on the core forecasters).
+

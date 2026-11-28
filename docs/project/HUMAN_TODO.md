@@ -368,3 +368,8 @@ curl -X POST -H "Authorization: Bearer TOKEN" -H "Accept: application/vnd.github
   - CV link: your CV PDF contains your phone number. If you want a "CV (PDF)" link, host a copy without it (for example in `JASHD12/JASHD12`) and tell the agent its https URL for `cv_url` in `site_content/recruiter_facts.json`.
   - Check your DataPilot numbers on the live profile (6,548 reviews, macro-F1 0.6475): the new text leaves them out until they are verified in that repository.
 
+- [ ] H49 · Launch `agent_hybrid` (T398; after the PR is merged)
+  - Agent first (no action from you): a dry run at about 00:05 UTC (`gh workflow run morning.yml --ref main -f dry_run=true -f only=agent_hybrid`; the run will look red because the health check reads the unsealed real checkout, the agent reads the morning step's log line), and a headroom check of the last three days' token and request use on the `ledger` branch. The agent writes the result under this item.
+  - You, once the agent says the headroom is enough: GitHub > repository > Settings > Secrets and variables > Actions > Variables > New repository variable, name `ARENA_AGENT_HYBRID`, value `1`. To undo it, set the value to `0`.
+  - The agent checks the next morning: coverage, skips, parse failures, no `budget_exhausted` skips on the core forecasters, the version string.
+

@@ -96,15 +96,17 @@ because scheduled workflows can start late):
 
 The times below are the intended times. GitHub Actions can start scheduled runs hours
 late (on 2026-11-13 by about 8 hours), so each job is scheduled many times and a gate
-(`arena schedule due`, T180) lets the first run that has work do it: morning hourly from
-00:15 to 08:15 (work until the batch is sealed or the lock passes), evening hourly from
+(`arena schedule due`, T180) lets the first run that has work do it: morning three slots an
+hour (minutes 07, 27, 47) from 19:00 UTC the evening before to 08:47 (the batch is always
+today's UTC date, so a slot before 00:00 finds yesterday's batch sealed and stops; the work
+runs from 00:00 until the batch is sealed or the lock passes), evening hourly from
 16:00 to 23:00 (until the next batch's questions exist), players at 08:40, 09:00 and
 09:15 (only from 08:30 until the lock), resolve every 3 hours (no gate; idempotent).
 
 | Time | Job | What happens |
 |---|---|---|
 | 18:00, 19:30 (day before) | evening | Publish the next batch's questions (template version 2, T160), push, rebuild site. No forecasts. |
-| 05:30, 07:00 | morning | Generate questions for any domain the evening job did not cover (template version 1), snapshot as-of inputs, run all forecasters, append, seal, push, rebuild site. |
+| from 00:00 (first slot that starts; usually 02:30 to 07:00) | morning | Generate questions for any domain the evening job did not cover (template version 1), snapshot as-of inputs, run all forecasters, append, seal, push, rebuild site. |
 | 09:00, 09:15 | players | Write the public players' forecasts from the form CSV (T161). |
 | 09:30 | (lock) | Batch lock time for every question created that morning. |
 | 12:30, 16:30, 20:30, 03:30 | resolve | Resolve whatever has become resolvable, seal finished days, rescore, rebuild and deploy the site, run health checks. |

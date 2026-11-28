@@ -6,9 +6,8 @@ off. `agent_skills` and `agent_committee` build on this estimate and get their o
 
 ## Why (what the first evaluation and a code read showed)
 
-On the 90 November power questions `agent_quant` r1 scored Brier 0.1369 against 0.1302 for `agent` (paired difference -0.0067 in
-favour of `agent`, interval [-0.0213, +0.0083] in the other direction's sign convention of `docs/lab/agent-skills.md`, no benefit
-shown). A read of `src/arena/agent/quant.py` and the stored answers found three causes:
+On the 90 November power questions `agent_quant` r1 scored Brier 0.1369 against 0.1302 for `agent`: `agent` was better by 0.0067 on average,
+with a 95% day-block interval for that difference of [-0.0213, +0.0083] (it includes zero), so no benefit of the tools was shown. A read of `src/arena/agent/quant.py` and the stored answers found three causes:
 
 1. The r1 reference estimate is weak. It averages the share of stored days over a threshold that is by construction a median of the same
    window (so one third of the estimate is about 0.5), the share over the last 7 days, and a binary "latest day crossed". It has no

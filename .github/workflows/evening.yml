@@ -76,7 +76,7 @@ jobs:
       ARENA_LEDGER_REMOTE: https://github.com/${{ github.repository }}.git
       ARENA_DOMAINS: ${{ vars.ARENA_DOMAINS || 'power,weather,attention,markets,crypto' }}  # T045e: crypto live (owner, 2026-11-22)
       ARENA_COINGECKO_API_KEY: ${{ secrets.ARENA_COINGECKO_API_KEY }}  # sent only to api.coingecko.com (T045e)
-      ARENA_LLM_MAX_TOKENS_PER_DAY: ${{ vars.ARENA_LLM_MAX_TOKENS_PER_DAY || '300000' }}  # same cap as morning.yml; shown on the Status page (evening makes no LLM calls)
+      ARENA_LLM_MAX_TOKENS_PER_DAY: ${{ vars.ARENA_LLM_MAX_TOKENS_PER_DAY || '500000' }}  # same cap as morning.yml; shown on the Status page (evening makes no LLM calls)
       ARENA_OFFICIAL_START_NOT_BEFORE: ${{ vars.ARENA_OFFICIAL_START_NOT_BEFORE || '2099-12-31' }}
     steps:
       - uses: actions/checkout@v7

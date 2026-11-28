@@ -10,7 +10,7 @@ from arena.config import Settings
 def test_defaults() -> None:
     s = Settings.from_env({})
     assert s.llm_max_requests_per_day == 100
-    assert s.llm_max_tokens_per_day == 300_000
+    assert s.llm_max_tokens_per_day == 500_000
     assert s.llm_max_output_tokens == 400
     assert s.agent_max_tool_calls == 4
     assert s.llm_questions_per_domain == 3

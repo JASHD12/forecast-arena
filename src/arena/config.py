@@ -56,7 +56,7 @@ class Settings(BaseModel):
     llm_effort: Literal["low", "medium", "high", "xhigh", "max"] | None = None
     llm_questions_per_domain: int = Field(3, ge=0)
     llm_max_requests_per_day: int = Field(100, ge=0)
-    llm_max_tokens_per_day: int = Field(300_000, ge=0)  # the production cap (owner, 2026-11-21)
+    llm_max_tokens_per_day: int = Field(500_000, ge=0)  # production cap (owner, 2026-11-28)
     llm_max_output_tokens: int = Field(400, ge=1)
     #: T190: automatic prompt caching (Anthropic); changes cost, never the answer.
     llm_cache: bool = False

@@ -48,6 +48,7 @@ move older "Done log" lines to `docs/progress-archive.md`.
   output, not acted on (S11).
 
 ## Done log
+- 2026-11-28: T279 dry run (run 46087721346) clean but could not measure tokens (dry runs make no Claude calls); `agent_skills` goes live as an experiment by owner decision with a 500,000-token daily cap (one PR); check its first live morning run the next day.
 - 2026-11-24: the morning batch was missed (GitHub started the first scheduled run at 09:52 UTC, after the lock); nothing written late. agent_hybrid dry run could not measure (past the lock), flag stays off. Home and leaderboard now show rehearsal standings with a note until the first official questions resolve.
 - T328 second judge (Sonnet, US$0.134): kappa 0.75-0.80 with the first judge; stale README/site text refreshed (official record started 2026-11-23); branch `claude/judge-second` waits for the agent_hybrid dry run (2026-11-24 00:05 UTC) before the single PR is opened.
 - T279 first live measurement (2026-11-23 morning run): sealed 08:02 UTC, 21 min run, llm_local_ft 15 forecasts, 199,608 of 300,000 tokens, health all pass, official start 2026-11-23; agent_hybrid still off.

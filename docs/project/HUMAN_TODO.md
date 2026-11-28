@@ -287,7 +287,7 @@ curl -X POST -H "Authorization: Bearer TOKEN" -H "Accept: application/vnd.github
     (b) first calibrate on the GGUF itself: the agent adds a manual `lab-eval.yml` run that scores the validation and test sets with the GGUF
     on a free runner (a few hours, no API key), refits Platt on validation only and pins that (new version string); (c) do not go live yet.
     The agent recommends (b), then (a).
-  - Also, if you ever set the repository variable `ARENA_LLM_MAX_TOKENS_PER_DAY`, change it to `300000`.
+  - Also, if you ever set the repository variable `ARENA_LLM_MAX_TOKENS_PER_DAY`, it overrides the workflow default: it must be `500000` (since 2026-11-28) or deleted, otherwise `agent_skills` is cut off by the old cap.
 
 - [ ] H33 · Mac smoke run for the monthly retrain (needed for T281a), and later the launchd schedule
   - Needs your MacBook Air (M5, 16 GB). The agent cannot reach it from the cloud, so it will give you one script to run; send back the printed

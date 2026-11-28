@@ -140,6 +140,16 @@ def test_other_agents_do_not_offer_skills_and_keep_their_versions() -> None:
     assert "{skills_index}" not in quant.AgentSkills(FakeLLM([GOOD]))._system()
 
 
+def test_morning_workflow_runs_agent_skills_by_default_and_the_variable_can_switch_it_off() -> None:
+    import re
+    from pathlib import Path
+
+    flow = (Path(__file__).parents[2] / ".github/workflows/morning.yml").read_text()
+    line = next(ln for ln in flow.splitlines() if ln.strip().startswith("ARENA_AGENT_SKILLS:"))
+    assert "vars.ARENA_AGENT_SKILLS || '1'" in line  # owner decision 2026-11-28 (DECISIONS)
+    assert re.search(r"ARENA_LLM_MAX_TOKENS_PER_DAY \|\| '500000'", flow)
+
+
 def test_wiring_registers_agent_skills_only_when_switched_on(tmp_path) -> None:
     from arena.config import Settings
     from arena.ledger import Ledger

@@ -589,18 +589,14 @@ def lab_sentiment_labels_run(obj: Ctx, model_dir: Path, max_tokens: int, model: 
 
     _refuse_outside_actions()
     http = HttpClient(obj.settings.user_agent())
-    by_coin: dict[str, list[str]] = {}
-    failed: list[str] = []
-    for i, coin in enumerate(G.QUERIES):
-        if i:
-            import time
+    import time
 
-            time.sleep(G.REQUEST_PAUSE)
-        try:
-            resp = http.get(G.BASE, sl.artlist_params(coin))
-            by_coin[coin] = [t for t, _ in sl.parse_titles(resp.json())]
-        except (HttpError, sl.LabelError, ValueError) as exc:
-            failed.append(f"{coin}: {type(exc).__name__}")
+    by_coin, failed = sl.fetch_titles(
+        lambda params: http.get(G.BASE, params).json(),
+        list(G.QUERIES),
+        sleep=time.sleep,
+        retry_on=(HttpError,),
+    )
     sample = sl.sample_titles(by_coin)
     if len(sample) < sl.MIN_TITLES:
         click.echo(

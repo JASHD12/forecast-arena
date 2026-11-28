@@ -101,3 +101,24 @@ def test_the_paid_command_is_refused_outside_actions(
     monkeypatch.delenv("GITHUB_ACTIONS", raising=False)
     res = CliRunner().invoke(main, ["lab", "sentiment-labels-run", "--model-dir", str(tmp_path)])
     assert res.exit_code == 2
+
+
+def test_fetch_titles_waits_and_retries_a_failed_coin() -> None:
+    good = json.loads(ART.read_text("utf-8"))
+    calls: list[str] = []
+    slept: list[float] = []
+
+    def get(params: dict[str, str] | object) -> object:
+        coin = next(c for c, q in sl.G.QUERIES.items() if q == params["query"])  # type: ignore[index]
+        calls.append(coin)
+        if coin == "ethereum" and calls.count("ethereum") < 3:
+            raise RuntimeError("429")
+        if coin == "ripple":
+            raise RuntimeError("429")
+        return good
+
+    by_coin, failed = sl.fetch_titles(get, ["bitcoin", "ethereum", "ripple"], sleep=slept.append)
+    assert set(by_coin) == {"bitcoin", "ethereum"} and len(by_coin["ethereum"]) == 20
+    assert failed == ["ripple: RuntimeError"]
+    assert calls.count("ethereum") == 3 and calls.count("ripple") == 3
+    assert 60.0 in slept and 120.0 in slept

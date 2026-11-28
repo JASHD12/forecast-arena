@@ -380,3 +380,7 @@ curl -X POST -H "Authorization: Bearer TOKEN" -H "Accept: application/vnd.github
 - [ ] H51 · Optional: switch on `bandit_hedge` (T293; your call, no agent work left)
   - It blends the other forecasters by Hedge weights learned from the ledger, with no tokens. Its replay on the early live record beat the equal-weight mean of the forecasters, not the `ml` model, and it is outside the headline board and the ensemble. To switch it on: GitHub > repository > Settings > Secrets and variables > Actions > Variables > New repository variable, name `ARENA_BANDIT`, value `1` (set it to `0` to switch it off). The agent checks the next morning that it appears with its version and no skips.
 
+- [ ] H52 · Decide PR #65 (`agent_skills` r2 live) now that r2 is evaluated (T405)
+  - Result (`docs/lab/agent-skills-r2.md`): H-S1' not met (Brier difference to `agent_quant` r2 -0.0014, interval includes zero), H-S2' met (cost 1.18 times, limit 1.30). By the pre-registered rule it stays off. Merging PR #65 is your explicit override of that rule (as you did for r1), and from the first live morning run the r2 version string is frozen (I8).
+  - Options: (a) merge #65 as it is (launch r2, experimental, outside the headline board, 500,000-token cap); (b) close #65 and keep `agent_skills` off; (c) merge #65 with `ARENA_AGENT_SKILLS` set to `0` in the repository variables (cap change only). The agent does not change the flag.
+

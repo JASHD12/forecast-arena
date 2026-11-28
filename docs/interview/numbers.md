@@ -244,6 +244,19 @@ Source: `evals/results/eval-20261128T155637.json`
 | Forecaster | Model | n | Answered | Brier | Base rate, same items | Valid JSON first try | Repair rate | Cost (USD) | Output tokens |
 |---|---|---|---|---|---|---|---|---|---|
 | llm_context | claude-haiku-5-5 | 186 | 186 | 0.1968 | 0.2255 | 99% | 1% | 0.1030 | 122166 |
+
+### Run `eval-20261128T162658` (90 items; caps 2430 requests, 3500000 tokens)
+
+Source: `evals/results/eval-20261128T162658.json`
+
+| Forecaster | Model | n | Answered | Brier | Base rate, same items | Valid JSON first try | Repair rate | Cost (USD) | Output tokens |
+|---|---|---|---|---|---|---|---|---|---|
+| agent | claude-haiku-5-5 | 90 | 90 | 0.1305 | 0.2030 | 99% | 1% | 0.0565 | 51571 |
+| agent_committee | claude-haiku-5-5 | 90 | 66 | 0.1391 | 0.1833 | 95% | 3% | 0.2101 | 203250 |
+| agent_quant | claude-haiku-5-5 | 90 | 90 | 0.1259 | 0.2030 | 94% | 6% | 0.1046 | 53150 |
+| agent_skills | claude-haiku-5-5 | 90 | 90 | 0.1245 | 0.2030 | 100% | 0% | 0.1230 | 52552 |
+
+Paired Brier difference: agent - agent_quant: +0.0046 [-0.0127, +0.0210] on 90 items; agent - agent_skills: +0.0060 [-0.0097, +0.0245] on 90 items; agent - agent_committee: -0.0047 [-0.0319, +0.0184] on 66 items; agent_quant - agent_skills: +0.0014 [-0.0058, +0.0088] on 90 items; agent_quant - agent_committee: -0.0048 [-0.0157, +0.0071] on 66 items; agent_skills - agent_committee: -0.0047 [-0.0190, +0.0077] on 66 items
 <!-- evals:end -->
 
 <!-- lab:start -->
@@ -767,6 +780,49 @@ Paired Brier differences (95% day-block interval):
 - agent_analyst minus llm_context (November, n=90): -0.0117 [-0.0503, +0.0284]
 - llm_context_cal minus llm_context (November, n=90): -0.0086 [-0.0240, +0.0139]
 - llm_context_cal minus llm_context (October, n=186): -0.0026 [-0.0162, +0.0120]
+
+### agent_committee r3: working repairs, topic guidance for the chair, a skeptic that sees the data
+
+Source: `evals/results/lab-agent-committee-r3.json`; card `None`
+
+| Arm | Questions | Brier | Log score | ECE | US$ per 1,000 | US$ per 1,000 answered |
+|---|---|---|---|---|---|---|
+| agent_committee / eval | 66 | 0.1391 | 0.4345 | 0.0827 | 2.3347 | 3.1837 |
+| agent_skills / eval | 90 | 0.1245 | 0.4003 | 0.0692 | 1.3671 | 1.3671 |
+| agent_skills / same items as agent_committee | 66 | 0.1344 | - | - | - | - |
+| base_rate / eval | 66 | 0.1833 | - | - | - | - |
+
+Paired Brier differences (95% day-block interval):
+
+- agent_committee minus agent_skills (eval, n=66): +0.0047 [-0.0077, +0.0190]
+
+### agent_quant r2: a better reference estimate and a prompt that may move away from it
+
+Source: `evals/results/lab-agent-quant-r2.json`; card `None`
+
+| Arm | Questions | Brier | Log score | ECE | US$ per 1,000 | US$ per 1,000 answered |
+|---|---|---|---|---|---|---|
+| agent / eval | 90 | 0.1305 | 0.4158 | 0.0979 | 0.6275 | 0.6275 |
+| agent_quant / eval | 90 | 0.1259 | 0.4009 | 0.097 | 1.162 | 1.162 |
+| base_rate / eval | 90 | 0.203 | - | - | - | - |
+
+Paired Brier differences (95% day-block interval):
+
+- agent_quant minus agent (eval, n=90): -0.0046 [-0.0210, +0.0127]
+
+### agent_skills r2: topic-only skills index and skill text matching the new estimate
+
+Source: `evals/results/lab-agent-skills-r2.json`; card `None`
+
+| Arm | Questions | Brier | Log score | ECE | US$ per 1,000 | US$ per 1,000 answered |
+|---|---|---|---|---|---|---|
+| agent_quant / eval | 90 | 0.1259 | 0.4009 | 0.097 | 1.162 | 1.162 |
+| agent_skills / eval | 90 | 0.1245 | 0.4003 | 0.0692 | 1.3671 | 1.3671 |
+| base_rate / eval | 90 | 0.203 | - | - | - | - |
+
+Paired Brier differences (95% day-block interval):
+
+- agent_skills minus agent_quant (eval, n=90): -0.0014 [-0.0088, +0.0058]
 <!-- lab:end -->
 
 <!-- standings:start -->

@@ -261,3 +261,18 @@ def test_the_r2_r3_notes_report_first_try_validity_and_the_skills_loaded() -> No
     assert "agent_skills skills loaded" in notes and "forecasting-core 1/2" in notes
     old = " ".join(ae.build(run, "agent-skills").notes)
     assert "first try" not in old and "skills loaded" not in old  # earlier results are unchanged
+
+
+def test_the_committed_r2_r3_results_are_what_the_builder_makes_from_the_stored_run() -> None:
+    root = Path("evals/results")
+    run = root / "eval-20261128T162658.json"
+    if not run.is_file():
+        return
+    res = json.loads(run.read_text())
+    total = 0.0
+    for exp in ("agent-quant-r2", "agent-skills-r2", "agent-committee-r3"):
+        built = ae.build(res, exp)
+        stored = LabResult.model_validate(json.loads((root / f"lab-{exp}.json").read_text()))
+        assert stored == built
+        total += stored.cost_usd
+    assert round(total, 4) == round(sum(m["cost_usd"] for m in res["metrics"].values()), 4)

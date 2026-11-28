@@ -6,6 +6,12 @@
 <p>A production-style forecasting system: live data pipelines, classical ML and LLMs side by side, proper scoring and uncertainty, MLOps, and a tamper-evident public record. Everything below is in the <a href="{{ repo_url }}">open-source repository</a>.</p>
 </section>
 
+<h2 id="skills">What the postings ask for, and where to see it</h2>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Skills and proof"><table class="proof">
+<thead><tr><th scope="col">Skill</th><th scope="col">In this project</th><th scope="col">See it</th><th scope="col">Code</th></tr></thead>
+<tbody>{% for skill, what, page, paths in proofs %}<tr><th scope="row">{{ skill }}</th><td>{{ what }}</td><td>{% if page %}<a href="{{ page }}">{{ page.split("#")[0]|replace(".html", "")|replace("questions/index", "question pages")|replace("_", " ") }}</a>{% else %}<span class="muted">in the code</span>{% endif %}</td><td>{% for p in paths %}<a href="{{ repo_url }}/{{ 'tree' if '.' not in p.split('/')[-1] else 'blob' }}/main/{{ p }}"><code>{{ p }}</code></a>{% if not loop.last %}<br>{% endif %}{% endfor %}</td></tr>{% endfor %}</tbody></table></div>
+<p class="note">Every row links to code that runs in CI on every push. Honest limits are on the <a href="methods.html">Methods</a> page; results that lose (for example the PyTorch network) are published like the ones that win.</p>
+
 <h2>Architecture</h2>
 {% include "_arch.html" %}
 <h2>Forecasters and models</h2>

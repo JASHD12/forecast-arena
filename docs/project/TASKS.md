@@ -982,3 +982,15 @@ Rules (I8): no change to a live forecaster's prompt, threshold or version; every
 - [!] T384 · Result of the Part 1 paid label run (T375) if it has run by then: result file, card, LAB_BUDGET row (deps: H45) BLOCKED(needs H45): the paid label run needs the owner's OK and a dispatch from `main` after the Part 2 PR is merged
 - [!] T385 · data-gated work not in any of the three PRs: weather error-model fit and SMARD vintage features after 60 days, constrained ensemble after T093, GDELT archive re-test after 60 days if `ARENA_SENTIMENT` is switched on (needs a later PR the owner approves) WAIT(until=2027-01-15)
 
+
+
+## Phase 25 - Hiring impact for German Werkstudent roles in AI, ML and data science (hand-off plan Part 3, one PR)
+
+Part 3 is mostly subtraction and storytelling; no new technology is added. Everything quoted is computed from the ledger snapshot or the committed result files (I5); no candidate fact is invented (S12).
+
+- [x] T390 · README first screen: one-line pitch, generated standings chart (`docs/img/standings.svg`), generated result bullets, "What I built", recruiter link and contact line from `recruiter_facts.json`; the rest behind one `<details>` block; tests for the first 30 lines
+- [x] T391 · Site first screens: shorter home hero (one sentence, two buttons), three role cards on the recruiter page (what, a number, a code link) with the skills table moved to the stack page, German cards, the one-page case study page and PDF, walkthrough script
+- [x] T392 · EU AI Act and GDPR note (`docs/EU_AI_ACT.md`, Methods section) with sources read and dated; one model card per forecaster plus a data sheet, generated (`scripts/model_cards.py`)
+- [x] T393 · Interview kit: five STAR stories (`docs/interview/stories.md`), the 15 questions a German interviewer is most likely to ask, refreshed generated numbers
+- [!] T394 · The measured "AI + ML" result (the `agent_analyst` evaluation of Part 2) in the README, stories and case study - BLOCKED(needs H46): the paid evaluation needs the owner's budget tier and a dispatch from `main` after the Part 2 PR is merged
+- [x] T395 · Owner actions in HUMAN_TODO (H47): repository About, recruiter facts, walkthrough video, CV, applications

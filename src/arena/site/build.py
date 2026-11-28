@@ -84,7 +84,14 @@ from arena.site.ops_status import (
 )
 from arena.site.participation import participants, sample_links
 from arena.site.profiles import profile
-from arena.site.recruiters import PROOFS, ROLE_PATHS, hero_result, load_facts
+from arena.site.recruiters import (
+    PROOFS,
+    ROLE_PATHS,
+    case_results,
+    hero_result,
+    load_facts,
+    role_cards,
+)
 from arena.site.shaping import (
     _question_chart,
     _rows,
@@ -327,6 +334,7 @@ def build_site(
             "Tech stack",
             {
                 "libraries": library_versions(),
+                "proofs": PROOFS,
                 "live": live_versions(rec),
                 "weekly": weekly_summaries(ledger)[:1],
             },
@@ -424,6 +432,12 @@ def build_site(
             {
                 "page_lang": "de",
                 "audit": audit_case,
+                "role_cards": role_cards(
+                    ROLE_PATHS,
+                    hero_result(headline_backtest(models_dir)),
+                    json_validity_change(eval_runs(evals_dir)),
+                    {"questions": len(rec.questions), "forecasts": len(rec.forecasts)},
+                ),
                 "k": {
                     "questions": len(rec.questions),
                     "forecasts": len(rec.forecasts),
@@ -434,11 +448,15 @@ def build_site(
         "recruiters.html": (
             "For recruiters",
             {
-                "proofs": PROOFS,
                 "personal": read_content("recruiters.md"),
                 "facts": load_facts(content),
                 "audit": audit_case,
-                "roles": ROLE_PATHS,
+                "role_cards": role_cards(
+                    ROLE_PATHS,
+                    hero_result(headline_backtest(models_dir)),
+                    json_validity_change(eval_runs(evals_dir)),
+                    {"questions": len(rec.questions), "forecasts": len(rec.forecasts)},
+                ),
                 "hero": hero_result(headline_backtest(models_dir)),
                 "backtest": headline_backtest(models_dir),
                 "json_change": json_validity_change(eval_runs(evals_dir)),
@@ -448,6 +466,17 @@ def build_site(
                     "forecasters": len({f.forecaster_id for f in rec.forecasts}),
                     "days": len({q.batch_date for q in rec.questions.values()}),
                 },
+            },
+        ),
+        "case-study.html": (
+            "Case study",
+            {
+                "board": headline[0] if headline[0].rows else rehearsal_boards[0],
+                "official": bool(headline[0].rows),
+                "start": start_s,
+                "hero": hero_result(headline_backtest(models_dir)),
+                "results": case_results(lab_all),
+                "k": {"questions": len(rec.questions), "forecasts": len(rec.forecasts)},
             },
         ),
         "forecasters/index.html": ("Forecasters", {"profiles": profiles}),

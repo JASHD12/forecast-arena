@@ -263,8 +263,93 @@ def audit() -> str:
     )
 
 
+def _standings() -> dict:
+    return json.loads((ROOT / "docs" / "data" / "standings.json").read_text(encoding="utf-8"))
+
+
+def _row(board: dict, fid: str) -> dict:
+    return next(r for r in board["rows"] if r["id"] == fid)
+
+
+def _lab(name: str) -> dict:
+    return json.loads((ROOT / "evals" / "results" / f"lab-{name}.json").read_text(encoding="utf-8"))
+
+
+def contact() -> str:
+    """The contact line: only facts the owner put in `site_content/recruiter_facts.json` (H16)."""
+    path = ROOT / "site_content" / "recruiter_facts.json"
+    facts = json.loads(path.read_text(encoding="utf-8")) if path.is_file() else {}
+    parts = [facts[k] for k in ("city", "availability", "languages") if facts.get(k)]
+    links = []
+    if facts.get("linkedin"):
+        links.append(f"[LinkedIn]({facts['linkedin']})")
+    if facts.get("cv_url"):
+        links.append(f"[CV]({facts['cv_url']})")
+    if facts.get("email"):
+        links.append(f"[{facts['email']}](mailto:{facts['email']})")
+    line = " · ".join([*parts, *links])
+    return f"**Contact and facts:** {line}" if line else ""
+
+
+def top_caption() -> str:
+    """The line under the standings chart, from the committed snapshot."""
+    s = _standings()
+    b = s["official"]
+    label = f" **{b['label']}.**" if b["label"] else ""
+    return (
+        f"*Official record since {s['official_start']}: {b['questions']} questions over "
+        f"{s['official_days']} days; Brier score, lower is better; bars are 95% intervals."
+        f"{label} Snapshot of {s['generated_on']}; research project, not advice.*"
+    )
+
+
+def top() -> str:
+    """Three result bullets (where ML wins, where the agent wins, one negative result) and the
+    news-tone result, all from `docs/data/standings.json` and the committed lab results (I5)."""
+    s = _standings()
+    w, p, a = (s["topics_all_days"][k] for k in ("weather", "power", "attention"))
+    wml, wag, wcx = (_row(w, f) for f in ("ml", "agent", "llm_context"))
+    pml, pag = _row(p, "ml"), _row(p, "agent")
+    aag, aml = _row(a, "agent"), _row(a, "ml")
+    rank = "ahead of" if aag["brier"] < aml["brier"] else "behind"
+    c = _lab("agent-committee-r2")["paired"][0]
+    cm = _lab("agent-committee-r2")["metrics"]
+    cost = (
+        cm["agent_committee / eval"]["cost_usd_per_1k"]
+        / cm["agent_skills / eval"]["cost_usd_per_1k"]
+    )
+    qp = next(x for x in _lab("qlora-r1")["paired"] if x["b"] == "base_rate")
+    sent = _lab("sentiment")
+    sp = next(x for x in sent["paired"] if x["split"] == "bigmove" and x["b"] == "ml")
+    lines = [
+        f"- **Where the ML model wins, and why:** on weather it scores Brier {wml['brier']:.3f} "
+        f"against {wag['brier']:.3f} for the AI agent and {wcx['brier']:.3f} for the AI with data "
+        f"({w['questions']} questions, rehearsal and official days together); on electricity "
+        f"{pml['brier']:.3f} against {pag['brier']:.3f}. The ML model turns the DWD forecast into "
+        "a probability with a fixed error model; the language models only read the same forecast "
+        "as numbers. Too early to tell, but that is the pattern.",
+        f"- **Where the AI agent wins:** on Wikipedia attention, a news-driven topic, the AI agent "
+        f"scores {aag['brier']:.3f}, {rank} the ML model's {aml['brier']:.3f} "
+        f"({a['questions']} questions; the intervals overlap).",
+        f"- **One honest negative result:** a committee of specialist agents did not beat one "
+        f"agent with skills (Brier difference {c['diff']:+.4f} [{c['lo']:+.4f}, {c['hi']:+.4f}], "
+        f"{c['n']} questions) and cost about {cost:.1f} times as much per question; a QLoRA "
+        f"fine-tune of a 1.5B model was worse than the base rate ({qp['diff']:+.4f} "
+        f"[{qp['lo']:+.4f}, {qp['hi']:+.4f}], {qp['n']} questions) ([committee]"
+        "(docs/lab/agent-committee-r2.md), [fine-tune](docs/lab/qlora-r1.md)).",
+        f"- **Pre-registered, tested, negative:** news tone from GDELT added no measurable gain "
+        f"to `ml` on crypto moves (Brier difference {sp['diff']:+.4f} "
+        f"[{sp['lo']:+.4f}, {sp['hi']:+.4f}], {sp['n']} questions; backtest; "
+        "[card](docs/lab/sentiment.md)).",
+    ]
+    return "\n".join(lines)
+
+
 def stack() -> str:
-    return "**Stack:** " + " · ".join(skill for skill, _, _, _ in PROOFS)
+    """One line with the ten core items; the full table follows in the README (T390)."""
+    names = [skill for skill, _, _, _ in PROOFS]
+    more = f" · and {len(names) - 10} more in the table below" if len(names) > 10 else ""
+    return "**Stack:** " + " · ".join(names[:10]) + more
 
 
 def skills() -> str:
@@ -277,6 +362,9 @@ def skills() -> str:
 
 def render(readme: str) -> str:
     blocks = (
+        ("top", top()),
+        ("topcaption", top_caption()),
+        ("contact", contact()),
         ("headline", headline()),
         ("highlights", highlights()),
         ("lab", lab()),

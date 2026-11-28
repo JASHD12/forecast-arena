@@ -1,0 +1,620 @@
+{
+ "generated_on": "2026-11-28",
+ "official_start": "2026-11-23",
+ "official_days": 4,
+ "group": [
+  "base_rate",
+  "ml",
+  "llm_context",
+  "agent"
+ ],
+ "official": {
+  "label": "too early to tell",
+  "questions": 36,
+  "days": 4,
+  "rows": [
+   {
+    "id": "ml",
+    "name": "ML model",
+    "n": 36,
+    "brier": 0.1843,
+    "lo": 0.1265,
+    "hi": 0.2401,
+    "vs_base": {
+     "diff": -0.0416,
+     "lo": -0.1118,
+     "hi": 0.0286
+    }
+   },
+   {
+    "id": "llm_context",
+    "name": "AI with data",
+    "n": 36,
+    "brier": 0.205,
+    "lo": 0.1343,
+    "hi": 0.2582,
+    "vs_base": {
+     "diff": -0.021,
+     "lo": -0.0901,
+     "hi": 0.0284
+    }
+   },
+   {
+    "id": "agent",
+    "name": "AI agent with tools",
+    "n": 36,
+    "brier": 0.2058,
+    "lo": 0.1236,
+    "hi": 0.2704,
+    "vs_base": {
+     "diff": -0.0202,
+     "lo": -0.1008,
+     "hi": 0.0374
+    }
+   },
+   {
+    "id": "base_rate",
+    "name": "Base rate",
+    "n": 36,
+    "brier": 0.2259,
+    "lo": 0.2105,
+    "hi": 0.2453,
+    "vs_base": null
+   }
+  ]
+ },
+ "topics_official": {
+  "attention": {
+   "label": "too early to tell",
+   "questions": 6,
+   "days": 2,
+   "rows": [
+    {
+     "id": "agent",
+     "name": "AI agent with tools",
+     "n": 6,
+     "brier": 0.1383,
+     "lo": 0.0559,
+     "hi": 0.2206,
+     "vs_base": {
+      "diff": -0.1117,
+      "lo": -0.1941,
+      "hi": -0.0294
+     }
+    },
+    {
+     "id": "llm_context",
+     "name": "AI with data",
+     "n": 6,
+     "brier": 0.1468,
+     "lo": 0.0656,
+     "hi": 0.2279,
+     "vs_base": {
+      "diff": -0.1032,
+      "lo": -0.1844,
+      "hi": -0.0221
+     }
+    },
+    {
+     "id": "ml",
+     "name": "ML model",
+     "n": 6,
+     "brier": 0.1475,
+     "lo": 0.0197,
+     "hi": 0.2754,
+     "vs_base": {
+      "diff": -0.1025,
+      "lo": -0.2303,
+      "hi": 0.0254
+     }
+    },
+    {
+     "id": "base_rate",
+     "name": "Base rate",
+     "n": 6,
+     "brier": 0.25,
+     "lo": 0.25,
+     "hi": 0.25,
+     "vs_base": null
+    }
+   ]
+  },
+  "crypto": {
+   "label": "too early to tell",
+   "questions": 6,
+   "days": 2,
+   "rows": [
+    {
+     "id": "base_rate",
+     "name": "Base rate",
+     "n": 6,
+     "brier": 0.2491,
+     "lo": 0.2403,
+     "hi": 0.258,
+     "vs_base": null
+    },
+    {
+     "id": "agent",
+     "name": "AI agent with tools",
+     "n": 6,
+     "brier": 0.263,
+     "lo": 0.1319,
+     "hi": 0.3942,
+     "vs_base": {
+      "diff": 0.0139,
+      "lo": -0.1084,
+      "hi": 0.1362
+     }
+    },
+    {
+     "id": "ml",
+     "name": "ML model",
+     "n": 6,
+     "brier": 0.2804,
+     "lo": 0.1646,
+     "hi": 0.3963,
+     "vs_base": {
+      "diff": 0.0313,
+      "lo": -0.0757,
+      "hi": 0.1383
+     }
+    },
+    {
+     "id": "llm_context",
+     "name": "AI with data",
+     "n": 6,
+     "brier": 0.2819,
+     "lo": 0.1628,
+     "hi": 0.401,
+     "vs_base": {
+      "diff": 0.0328,
+      "lo": -0.0775,
+      "hi": 0.143
+     }
+    }
+   ]
+  },
+  "markets": {
+   "label": "too early to tell",
+   "questions": 9,
+   "days": 3,
+   "rows": [
+    {
+     "id": "ml",
+     "name": "ML model",
+     "n": 9,
+     "brier": 0.2424,
+     "lo": 0.2305,
+     "hi": 0.2599,
+     "vs_base": {
+      "diff": -0.0512,
+      "lo": -0.0656,
+      "hi": -0.034
+     }
+    },
+    {
+     "id": "llm_context",
+     "name": "AI with data",
+     "n": 9,
+     "brier": 0.2601,
+     "lo": 0.1955,
+     "hi": 0.3144,
+     "vs_base": {
+      "diff": -0.0335,
+      "lo": -0.0752,
+      "hi": 0.0183
+     }
+    },
+    {
+     "id": "agent",
+     "name": "AI agent with tools",
+     "n": 9,
+     "brier": 0.2806,
+     "lo": 0.2078,
+     "hi": 0.3336,
+     "vs_base": {
+      "diff": -0.013,
+      "lo": -0.0629,
+      "hi": 0.0196
+     }
+    },
+    {
+     "id": "base_rate",
+     "name": "Base rate",
+     "n": 9,
+     "brier": 0.2936,
+     "lo": 0.2707,
+     "hi": 0.314,
+     "vs_base": null
+    }
+   ]
+  },
+  "power": {
+   "label": "too early to tell",
+   "questions": 9,
+   "days": 3,
+   "rows": [
+    {
+     "id": "base_rate",
+     "name": "Base rate",
+     "n": 9,
+     "brier": 0.1796,
+     "lo": 0.1391,
+     "hi": 0.2147,
+     "vs_base": null
+    },
+    {
+     "id": "ml",
+     "name": "ML model",
+     "n": 9,
+     "brier": 0.1872,
+     "lo": 0.0958,
+     "hi": 0.2914,
+     "vs_base": {
+      "diff": 0.0077,
+      "lo": -0.1189,
+      "hi": 0.1066
+     }
+    },
+    {
+     "id": "llm_context",
+     "name": "AI with data",
+     "n": 9,
+     "brier": 0.2179,
+     "lo": 0.0786,
+     "hi": 0.3132,
+     "vs_base": {
+      "diff": 0.0384,
+      "lo": -0.1063,
+      "hi": 0.1741
+     }
+    },
+    {
+     "id": "agent",
+     "name": "AI agent with tools",
+     "n": 9,
+     "brier": 0.2228,
+     "lo": 0.0481,
+     "hi": 0.3143,
+     "vs_base": {
+      "diff": 0.0432,
+      "lo": -0.1367,
+      "hi": 0.1668
+     }
+    }
+   ]
+  },
+  "weather": {
+   "label": "too early to tell",
+   "questions": 6,
+   "days": 2,
+   "rows": [
+    {
+     "id": "ml",
+     "name": "ML model",
+     "n": 6,
+     "brier": 0.0335,
+     "lo": 0.0067,
+     "hi": 0.0602,
+     "vs_base": {
+      "diff": -0.1132,
+      "lo": -0.1262,
+      "hi": -0.1002
+     }
+    },
+    {
+     "id": "agent",
+     "name": "AI agent with tools",
+     "n": 6,
+     "brier": 0.0781,
+     "lo": 0.0486,
+     "hi": 0.1075,
+     "vs_base": {
+      "diff": -0.0686,
+      "lo": -0.0842,
+      "hi": -0.0529
+     }
+    },
+    {
+     "id": "llm_context",
+     "name": "AI with data",
+     "n": 6,
+     "brier": 0.0841,
+     "lo": 0.0741,
+     "hi": 0.094,
+     "vs_base": {
+      "diff": -0.0626,
+      "lo": -0.0863,
+      "hi": -0.0388
+     }
+    },
+    {
+     "id": "base_rate",
+     "name": "Base rate",
+     "n": 6,
+     "brier": 0.1467,
+     "lo": 0.1329,
+     "hi": 0.1604,
+     "vs_base": null
+    }
+   ]
+  }
+ },
+ "topics_all_days": {
+  "attention": {
+   "label": "too early to tell",
+   "questions": 27,
+   "days": 9,
+   "rows": [
+    {
+     "id": "agent",
+     "name": "AI agent with tools",
+     "n": 27,
+     "brier": 0.0785,
+     "lo": 0.04,
+     "hi": 0.1204,
+     "vs_base": {
+      "diff": -0.1715,
+      "lo": -0.21,
+      "hi": -0.1296
+     }
+    },
+    {
+     "id": "llm_context",
+     "name": "AI with data",
+     "n": 27,
+     "brier": 0.0878,
+     "lo": 0.0473,
+     "hi": 0.1335,
+     "vs_base": {
+      "diff": -0.1622,
+      "lo": -0.2027,
+      "hi": -0.1165
+     }
+    },
+    {
+     "id": "ml",
+     "name": "ML model",
+     "n": 27,
+     "brier": 0.0884,
+     "lo": 0.0241,
+     "hi": 0.159,
+     "vs_base": {
+      "diff": -0.1616,
+      "lo": -0.2259,
+      "hi": -0.091
+     }
+    },
+    {
+     "id": "base_rate",
+     "name": "Base rate",
+     "n": 27,
+     "brier": 0.25,
+     "lo": 0.25,
+     "hi": 0.25,
+     "vs_base": null
+    }
+   ]
+  },
+  "crypto": {
+   "label": "too early to tell",
+   "questions": 6,
+   "days": 2,
+   "rows": [
+    {
+     "id": "base_rate",
+     "name": "Base rate",
+     "n": 6,
+     "brier": 0.2491,
+     "lo": 0.2403,
+     "hi": 0.258,
+     "vs_base": null
+    },
+    {
+     "id": "agent",
+     "name": "AI agent with tools",
+     "n": 6,
+     "brier": 0.263,
+     "lo": 0.1319,
+     "hi": 0.3942,
+     "vs_base": {
+      "diff": 0.0139,
+      "lo": -0.1084,
+      "hi": 0.1362
+     }
+    },
+    {
+     "id": "ml",
+     "name": "ML model",
+     "n": 6,
+     "brier": 0.2804,
+     "lo": 0.1646,
+     "hi": 0.3963,
+     "vs_base": {
+      "diff": 0.0313,
+      "lo": -0.0757,
+      "hi": 0.1383
+     }
+    },
+    {
+     "id": "llm_context",
+     "name": "AI with data",
+     "n": 6,
+     "brier": 0.2819,
+     "lo": 0.1628,
+     "hi": 0.401,
+     "vs_base": {
+      "diff": 0.0328,
+      "lo": -0.0775,
+      "hi": 0.143
+     }
+    }
+   ]
+  },
+  "markets": {
+   "label": "too early to tell",
+   "questions": 23,
+   "days": 8,
+   "rows": [
+    {
+     "id": "ml",
+     "name": "ML model",
+     "n": 23,
+     "brier": 0.2444,
+     "lo": 0.2332,
+     "hi": 0.2554,
+     "vs_base": {
+      "diff": -0.0202,
+      "lo": -0.0586,
+      "hi": 0.0227
+     }
+    },
+    {
+     "id": "base_rate",
+     "name": "Base rate",
+     "n": 23,
+     "brier": 0.2646,
+     "lo": 0.2304,
+     "hi": 0.2974,
+     "vs_base": null
+    },
+    {
+     "id": "llm_context",
+     "name": "AI with data",
+     "n": 23,
+     "brier": 0.269,
+     "lo": 0.2404,
+     "hi": 0.2941,
+     "vs_base": {
+      "diff": 0.0044,
+      "lo": -0.0336,
+      "hi": 0.0403
+     }
+    },
+    {
+     "id": "agent",
+     "name": "AI agent with tools",
+     "n": 23,
+     "brier": 0.2744,
+     "lo": 0.247,
+     "hi": 0.3001,
+     "vs_base": {
+      "diff": 0.0098,
+      "lo": -0.021,
+      "hi": 0.0369
+     }
+    }
+   ]
+  },
+  "power": {
+   "label": "too early to tell",
+   "questions": 24,
+   "days": 8,
+   "rows": [
+    {
+     "id": "ml",
+     "name": "ML model",
+     "n": 24,
+     "brier": 0.1508,
+     "lo": 0.0984,
+     "hi": 0.2086,
+     "vs_base": {
+      "diff": -0.1329,
+      "lo": -0.2386,
+      "hi": -0.0301
+     }
+    },
+    {
+     "id": "llm_context",
+     "name": "AI with data",
+     "n": 24,
+     "brier": 0.1747,
+     "lo": 0.0986,
+     "hi": 0.2498,
+     "vs_base": {
+      "diff": -0.1091,
+      "lo": -0.2279,
+      "hi": 0.0161
+     }
+    },
+    {
+     "id": "agent",
+     "name": "AI agent with tools",
+     "n": 24,
+     "brier": 0.1822,
+     "lo": 0.0968,
+     "hi": 0.2692,
+     "vs_base": {
+      "diff": -0.1016,
+      "lo": -0.2145,
+      "hi": 0.0197
+     }
+    },
+    {
+     "id": "base_rate",
+     "name": "Base rate",
+     "n": 24,
+     "brier": 0.2837,
+     "lo": 0.2179,
+     "hi": 0.3606,
+     "vs_base": null
+    }
+   ]
+  },
+  "weather": {
+   "label": "too early to tell",
+   "questions": 27,
+   "days": 9,
+   "rows": [
+    {
+     "id": "ml",
+     "name": "ML model",
+     "n": 27,
+     "brier": 0.0829,
+     "lo": 0.0474,
+     "hi": 0.1159,
+     "vs_base": {
+      "diff": -0.1655,
+      "lo": -0.2355,
+      "hi": -0.1013
+     }
+    },
+    {
+     "id": "agent",
+     "name": "AI agent with tools",
+     "n": 27,
+     "brier": 0.1283,
+     "lo": 0.0777,
+     "hi": 0.1848,
+     "vs_base": {
+      "diff": -0.1202,
+      "lo": -0.1852,
+      "hi": -0.0763
+     }
+    },
+    {
+     "id": "llm_context",
+     "name": "AI with data",
+     "n": 27,
+     "brier": 0.1807,
+     "lo": 0.1146,
+     "hi": 0.2495,
+     "vs_base": {
+      "diff": -0.0678,
+      "lo": -0.1153,
+      "hi": -0.0241
+     }
+    },
+    {
+     "id": "base_rate",
+     "name": "Base rate",
+     "n": 27,
+     "brier": 0.2485,
+     "lo": 0.1814,
+     "hi": 0.3171,
+     "vs_base": null
+    }
+   ]
+  }
+ }
+}

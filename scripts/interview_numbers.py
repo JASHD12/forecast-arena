@@ -114,8 +114,49 @@ def lab() -> str:
         rows.append("|---|" + "---|" * len(cols))
         for arm, m in sorted(r.metrics.items()):
             rows.append(f"| {arm} | " + " | ".join(str(m.get(c, "-")) for c in cols) + " |")
+        pairs = [
+            f"- {p['a']} minus {p['b']} ({p.get('split', 'all')}, n={p['n']}): {p['diff']:+.4f} "
+            f"[{p['lo']:+.4f}, {p['hi']:+.4f}]"
+            for p in r.paired
+        ]
         parts.append(
             f"### {r.title}\n\nSource: `evals/results/lab-{r.experiment}.json`; card `{r.card}`\n\n"
+            + "\n".join(rows)
+            + (
+                "\n\nPaired Brier differences (95% day-block interval):\n\n" + "\n".join(pairs)
+                if pairs
+                else ""
+            )
+        )
+    return "\n\n".join(parts)
+
+
+def standings() -> str:
+    """The committed standings snapshot (`docs/data/standings.json`): every figure is copied."""
+    snap = json.loads((ROOT / "docs" / "data" / "standings.json").read_text(encoding="utf-8"))
+    parts = [
+        f"## Standings snapshot of {snap['generated_on']} (`docs/data/standings.json`)",
+        f"Official record since {snap['official_start']}, {snap['official_days']} days. "
+        "Brier, 95% interval and the difference to the base rate.",
+    ]
+    boards = [("Official, overall", snap["official"])] + [
+        (f"All days, {k}", v) for k, v in snap["topics_all_days"].items()
+    ]
+    for title, b in boards:
+        rows = ["| Forecaster | n | Brier | 95% interval | vs base rate |", "|---|---|---|---|---|"]
+        for r in b["rows"]:
+            vs = r["vs_base"]
+            d = (
+                "reference"
+                if vs is None
+                else f"{vs['diff']:+.4f} [{vs['lo']:+.4f}, {vs['hi']:+.4f}]"
+            )
+            rows.append(
+                f"| {r['id']} | {r['n']} | {r['brier']:.4f} | "
+                f"[{r['lo']:.4f}, {r['hi']:.4f}] | {d} |"
+            )
+        parts.append(
+            f"### {title} ({b['questions']} questions, {b['label'] or 'no label'})\n\n"
             + "\n".join(rows)
         )
     return "\n\n".join(parts)
@@ -160,6 +201,7 @@ def render(old: str, ledger: Path | None) -> str:
                 block("backtests", backtests()),
                 block("evals", evals()),
                 block("lab", lab()),
+                block("standings", standings()),
                 block("live", live_body),
             ]
         )

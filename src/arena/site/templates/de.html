@@ -12,6 +12,21 @@
 <p>{{ audit.headline_de }} Die Kosten sind angenommen (Fehlalarm {{ "%g"|format(audit.false_cost) }}, verpasstes Ereignis {{ "%g"|format(audit.miss_cost) }}), die Fälle sind ein historischer Nachlauf und keine Live-Ergebnisse. <a href="audit.html">Der Fall auf Englisch, mit Daten und Code</a>.</p>
 </section>
 {% endif %}
+<section class="roles" aria-label="Drei Rollen">
+<h2>Wo man je nach Rolle hinschauen kann</h2>
+{% for c in role_cards %}<article class="card role-card">
+{% if c.role == "AI engineering" %}<h3>KI- und LLM-Entwicklung</h3>
+<ul class="plain"><li><strong>Was:</strong> LLM- und Agenten-Prognosen mit Budget, Tracing und einer Evaluation, die einen echten Fehler gefunden hat.</li>
+{% if c.values %}<li><strong>Eine Zahl:</strong> Erste Antwort als gültiges JSON: {{ c.values.before }} → {{ c.values.after }}, nachdem eine eingefrorene Testmenge eine stille Ausgabegrenze aufgedeckt hat.</li>{% endif %}
+{% elif c.role == "ML and MLOps" %}<h3>ML und MLOps</h3>
+<ul class="plain"><li><strong>Was:</strong> Wöchentliches Nachtrainieren, Beförderung nach Regel, gehashte Modell-Artefakte, CI-geprüfte Releases.</li>
+{% if c.values %}<li><strong>Eine Zahl:</strong> Brier {{ c.values.ml }} gegenüber {{ c.values.persistence }} für „morgen wie heute“ über {{ c.values.days }} Backtest-Tage ({{ c.values.diff }} {{ c.values.interval }}).</li>{% endif %}
+{% else %}<h3>Data Science</h3>
+<ul class="plain"><li><strong>Was:</strong> Proper Scores, Day-Block-Intervalle und ein ehrlicher Vergleich mit der Basisrate.</li>
+{% if c.values %}<li><strong>Eine Zahl:</strong> {{ c.values.questions }} Fragen und {{ c.values.forecasts }} Prognosen, jeweils vor der Antwort gesperrt, bewertet mit Day-Block-Bootstrap-Intervallen.</li>{% endif %}
+{% endif %}<li><strong>Code:</strong> <a href="{{ repo_url ~ "/blob/main/" ~ c.code[1] }}">{{ c.code[0] }}</a> (englisch)</li></ul>
+</article>
+{% endfor %}</section>
 <section class="card" aria-labelledby="de-was"><h2 id="de-was">Worum es geht</h2>
 <p>Jeden Abend veröffentlicht das System Ja/Nein-Fragen über die nächsten Tage aus öffentlichen Daten, zunächst zu den deutschen Day-Ahead-Strompreisen (Bundesnetzagentur, SMARD). Beispiel: „Liegt der durchschnittliche Strompreis morgen über 80 €/MWh?“ Am nächsten Morgen geben mehrere Prognosemodelle jeweils eine Wahrscheinlichkeit ab, <strong>bevor</strong> die Antwort feststeht. Am nächsten Tag kommen die echten Daten, jede Prognose wird bewertet, und diese Website zeigt die Ergebnisse.</p>
 </section>

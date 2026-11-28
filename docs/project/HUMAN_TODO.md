@@ -349,3 +349,12 @@ curl -X POST -H "Authorization: Bearer TOKEN" -H "Accept: application/vnd.github
 - [ ] H46 · Choose the budget tier for the Part 2 paid evaluation (T381, `lab/prereg/analyst-and-calibration.md`)
   - The lab budget has US$0.32 left. Tier A (about US$0.13): `agent_analyst` and `llm_context` on the 90 November power questions. Tier B (about US$0.10 more): `llm_context` on the 186 October questions. Tier C (about US$0.40 more): `agent_quant`, `agent_skills` and `agent_analyst` on 120 weather and Wikipedia replay questions. The Part 1 label comparison (H45, at most about US$0.10) uses the same budget.
   - Reply with the tier and, for B or C, the new total lab budget (for example "tier A" or "tier A, B and C, lab budget US$2.50"). The agent then dispatches `llm-eval` from `main` once per tier, after the Part 2 pull request is merged. Nothing is spent before your reply.
+
+- [ ] H47 · Hiring-impact actions only you can do (Part 3 of the hand-off plan)
+  - Repository About (gear icon next to "About"): description "Live benchmark: AI agents vs a classical ML model forecasting tomorrow, every forecast locked before the answer exists"; website `https://jashd12.github.io/forecast-arena/`; topics `machine-learning`, `llm`, `ai-agents`, `forecasting`, `mlops`, `data-science`, `python`, `langgraph`, `time-series`. Pin the repository on your profile and publish the profile README (H42).
+  - Fill `site_content/recruiter_facts.json` (H16): degree, university, semester, hours per week, start date, English and German level, city, LinkedIn, CV link. Without them the pages cannot show what a Werkstudent posting filters on (enrolment, hours, start). The agent never invents these.
+  - Record the two-minute walkthrough from `docs/interview/walkthrough.md` and send the link.
+  - CV: put the project in the first third of page one, three lines, one number, a link to the recruiter page; the same on LinkedIn (Featured).
+  - Applying: send the recruiter-page link with two sentences tailored to each posting, apply in volume to Werkstudent roles, and ask for referrals. A project helps an application; it does not replace one.
+  - Proofread the German page (`de.html`, H17); until then it is marked as not proofread.
+  - Refresh the numbers when you want fresh ones: pull the `ledger` branch, then run `python scripts/standings_snapshot.py <ledger dir>`, `python scripts/readme_sections.py`, `python scripts/model_cards.py`, `python scripts/interview_numbers.py` and `python scripts/case_study_pdf.py <ledger dir>` (or ask the agent).

@@ -20,6 +20,7 @@ def test_empty_ledger_builds_every_page(tmp_path) -> None:
         "audit.html",
         "backtests.html",
         "calibration.html",
+        "case-study.html",
         "data.html",
         "de.html",
         "evals.html",

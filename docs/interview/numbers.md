@@ -241,6 +241,10 @@ Source: `evals/results/lab-agent-committee.json`; card `None`
 | agent_skills / same items as agent_committee | 37 | 0.1289 | - | - | - |
 | base_rate / eval | 37 | 0.1908 | - | - | - |
 
+Paired Brier differences (95% day-block interval):
+
+- agent_committee minus agent_skills (eval, n=37): +0.0181 [+0.0034, +0.0334]
+
 ### Ask the Arena: tiered chat over the published record
 
 Source: `evals/results/lab-ask-arena.json`; card `docs/lab/ask-arena.md`
@@ -279,6 +283,12 @@ Source: `evals/results/lab-calibration.json`; card `docs/lab/calibration.md`
 | isotonic | 1470 | 0.193 | 0.0562 |
 | platt | 1470 | 0.1921 | 0.0546 |
 
+Paired Brier differences (95% day-block interval):
+
+- platt minus identity (all, n=1470): -0.0015 [-0.0034, +0.0005]
+- isotonic minus identity (all, n=1470): -0.0006 [-0.0035, +0.0025]
+- beta minus identity (all, n=1470): -0.0013 [-0.0032, +0.0007]
+
 ### Conformal price bands: coverage by month
 
 Source: `evals/results/lab-conformal.json`; card `docs/lab/conformal.md`
@@ -315,6 +325,12 @@ Source: `evals/results/lab-routing.json`; card `docs/lab/routing.md`
 | ml | 276 | 0.1663 |
 | router (primary: pair, delta 0.15, gamma 0.10) | 276 | 0.1802 |
 
+Paired Brier differences (95% day-block interval):
+
+- router (primary) minus claude (llm_context) (test_all, n=276): +0.0000 [+0.0000, +0.0000]
+- router (primary) minus ml (test_all, n=276): +0.0139 [-0.0166, +0.0433]
+- router (primary) minus base_rate (test_all, n=276): -0.0379 [-0.0590, -0.0158]
+
 ### DPO preference tuning of Qwen2.5-1.5B on replayed power questions
 
 Source: `evals/results/lab-dpo-r1.json`; card `docs/lab/dpo-r1.md`
@@ -336,6 +352,27 @@ Source: `evals/results/lab-dpo-r1.json`; card `docs/lab/dpo-r1.md`
 | qlora_1_5b / test_all | 276 | 0.2378 | 0.6683 | 0.0687 |
 | qlora_1_5b / test_nov | 90 | 0.233 | 0.6586 | 0.1175 |
 | qlora_1_5b / test_oct | 186 | 0.24 | 0.6729 | 0.0902 |
+
+Paired Brier differences (95% day-block interval):
+
+- dpo_1_5b minus base_1_5b (test_oct, n=186): -0.0107 [-0.0161, -0.0043]
+- dpo_1_5b minus qlora_1_5b (test_oct, n=186): -0.0017 [-0.0037, +0.0007]
+- dpo_1_5b minus base_rate (test_oct, n=186): +0.0128 [+0.0008, +0.0244]
+- dpo_1_5b minus ml (test_oct, n=186): +0.0569 [+0.0110, +0.0981]
+- qlora_1_5b minus base_rate (test_oct, n=186): +0.0145 [+0.0021, +0.0262]
+- ml minus base_rate (test_oct, n=186): -0.0441 [-0.0878, +0.0019]
+- dpo_1_5b minus base_1_5b (test_nov, n=90): -0.0157 [-0.0244, -0.0074]
+- dpo_1_5b minus qlora_1_5b (test_nov, n=90): -0.0010 [-0.0035, +0.0023]
+- dpo_1_5b minus base_rate (test_nov, n=90): +0.0291 [-0.0037, +0.0580]
+- dpo_1_5b minus ml (test_nov, n=90): +0.0969 [+0.0245, +0.1455]
+- qlora_1_5b minus base_rate (test_nov, n=90): +0.0301 [-0.0039, +0.0603]
+- ml minus base_rate (test_nov, n=90): -0.0678 [-0.1162, -0.0022]
+- dpo_1_5b minus base_1_5b (test_all, n=276): -0.0123 [-0.0168, -0.0075]
+- dpo_1_5b minus qlora_1_5b (test_all, n=276): -0.0015 [-0.0032, +0.0005]
+- dpo_1_5b minus base_rate (test_all, n=276): +0.0181 [+0.0054, +0.0311]
+- dpo_1_5b minus ml (test_all, n=276): +0.0700 [+0.0344, +0.1040]
+- qlora_1_5b minus base_rate (test_all, n=276): +0.0196 [+0.0069, +0.0332]
+- ml minus base_rate (test_all, n=276): -0.0518 [-0.0851, -0.0166]
 
 ### Distillation from Claude into Qwen2.5-1.5B (soft-label QLoRA)
 
@@ -362,6 +399,36 @@ Source: `evals/results/lab-distill-r1.json`; card `docs/lab/distill-r1.md`
 | qlora_1_5b / test_nov | 90 | 0.233 | 0.6586 | 0.1175 |
 | qlora_1_5b / test_oct | 186 | 0.24 | 0.6729 | 0.0902 |
 
+Paired Brier differences (95% day-block interval):
+
+- distill_1_5b minus base_1_5b (test_oct, n=186): -0.0128 [-0.0177, -0.0075]
+- distill_1_5b minus qlora_1_5b (test_oct, n=186): -0.0037 [-0.0078, +0.0003]
+- distill_1_5b minus claude_teacher (test_oct, n=186): +0.0353 [+0.0150, +0.0546]
+- distill_1_5b minus base_rate (test_oct, n=186): +0.0108 [-0.0015, +0.0228]
+- distill_1_5b minus ml (test_oct, n=186): +0.0549 [+0.0088, +0.0962]
+- claude_teacher minus base_rate (test_oct, n=186): -0.0246 [-0.0493, +0.0012]
+- claude_teacher minus ml (test_oct, n=186): +0.0195 [-0.0213, +0.0604]
+- qlora_1_5b minus base_rate (test_oct, n=186): +0.0145 [+0.0021, +0.0262]
+- ml minus base_rate (test_oct, n=186): -0.0441 [-0.0878, +0.0019]
+- distill_1_5b minus base_1_5b (test_nov, n=90): -0.0107 [-0.0166, -0.0052]
+- distill_1_5b minus qlora_1_5b (test_nov, n=90): +0.0040 [-0.0002, +0.0084]
+- distill_1_5b minus claude_teacher (test_nov, n=90): +0.0997 [+0.0540, +0.1357]
+- distill_1_5b minus base_rate (test_nov, n=90): +0.0341 [+0.0002, +0.0647]
+- distill_1_5b minus ml (test_nov, n=90): +0.1019 [+0.0287, +0.1527]
+- claude_teacher minus base_rate (test_nov, n=90): -0.0656 [-0.0995, -0.0303]
+- claude_teacher minus ml (test_nov, n=90): +0.0022 [-0.0417, +0.0490]
+- qlora_1_5b minus base_rate (test_nov, n=90): +0.0301 [-0.0039, +0.0603]
+- ml minus base_rate (test_nov, n=90): -0.0678 [-0.1162, -0.0022]
+- distill_1_5b minus base_1_5b (test_all, n=276): -0.0121 [-0.0156, -0.0084]
+- distill_1_5b minus qlora_1_5b (test_all, n=276): -0.0012 [-0.0046, +0.0019]
+- distill_1_5b minus claude_teacher (test_all, n=276): +0.0563 [+0.0352, +0.0766]
+- distill_1_5b minus base_rate (test_all, n=276): +0.0184 [+0.0055, +0.0321]
+- distill_1_5b minus ml (test_all, n=276): +0.0702 [+0.0339, +0.1048]
+- claude_teacher minus base_rate (test_all, n=276): -0.0379 [-0.0590, -0.0158]
+- claude_teacher minus ml (test_all, n=276): +0.0139 [-0.0166, +0.0433]
+- qlora_1_5b minus base_rate (test_all, n=276): +0.0196 [+0.0069, +0.0332]
+- ml minus base_rate (test_all, n=276): -0.0518 [-0.0851, -0.0166]
+
 ### Forecasting skills for the tool-using agent
 
 Source: `evals/results/lab-agent-skills.json`; card `None`
@@ -372,6 +439,10 @@ Source: `evals/results/lab-agent-skills.json`; card `None`
 | agent_quant / eval | 90 | 0.1369 | 0.4331 | 0.0796 | 1.0608 |
 | agent_skills / eval | 90 | 0.1279 | 0.4091 | 0.1057 | 1.3928 |
 | base_rate / eval | 90 | 0.203 | - | - | - |
+
+Paired Brier differences (95% day-block interval):
+
+- agent_skills minus agent_quant (eval, n=90): -0.0090 [-0.0204, +0.0028]
 
 ### Guardrails and red-team suite for untrusted tool and news text
 
@@ -434,6 +505,14 @@ Source: `evals/results/lab-sentiment.json`; card `docs/lab/sentiment.md`
 | sentiment / bigmove | 1000 | 0.2407 |
 | sentiment / up | 305 | 0.2592 |
 
+Paired Brier differences (95% day-block interval):
+
+- sentiment minus ml (bigmove, n=1000): +0.0035 [-0.0005, +0.0077]
+- sentiment minus base_rate (bigmove, n=1000): -0.0166 [-0.0255, -0.0082]
+- sentiment minus always_0.5 (bigmove, n=1000): -0.0093 [-0.0174, -0.0011]
+- sentiment minus base_rate (up, n=305): +0.0063 [-0.0031, +0.0164]
+- sentiment minus always_0.5 (up, n=305): +0.0092 [-0.0016, +0.0207]
+
 ### Numeric grounding of model rationales
 
 Source: `evals/results/lab-grounding.json`; card `docs/lab/grounding.md`
@@ -465,6 +544,18 @@ Source: `evals/results/lab-prompt-opt.json`; card `docs/lab/prompt-opt.md`
 | winner / test_nov | 90 | 0.2539 | 0.701 | 0.0794 |
 | winner / test_oct | 186 | 0.2564 | 0.7063 | 0.107 |
 
+Paired Brier differences (95% day-block interval):
+
+- winner minus baseline (test_oct, n=186): -0.0060 [-0.0131, +0.0015]
+- winner minus base_rate (test_oct, n=186): +0.0309 [+0.0186, +0.0422]
+- winner minus ml (test_oct, n=186): +0.0750 [+0.0288, +0.1170]
+- winner minus baseline (test_nov, n=90): -0.0109 [-0.0204, -0.0014]
+- winner minus base_rate (test_nov, n=90): +0.0509 [+0.0263, +0.0738]
+- winner minus ml (test_nov, n=90): +0.1188 [+0.0549, +0.1636]
+- winner minus baseline (test_all, n=276): -0.0076 [-0.0135, -0.0017]
+- winner minus base_rate (test_all, n=276): +0.0375 [+0.0267, +0.0488]
+- winner minus ml (test_all, n=276): +0.0893 [+0.0537, +0.1236]
+
 ### Online learning of which forecaster to trust (Hedge and Thompson sampling)
 
 Source: `evals/results/lab-bandit.json`; card `docs/lab/bandit.md`
@@ -481,6 +572,12 @@ Source: `evals/results/lab-bandit.json`; card `docs/lab/bandit.md`
 | ml | 131 | 0.107 |
 | thompson | 131 | 0.1482 |
 
+Paired Brier differences (95% day-block interval):
+
+- hedge minus equal_mean (all, n=131): -0.0257 [-0.0363, -0.0098]
+- hedge minus ml (all, n=131): +0.0221 [-0.0011, +0.0407]
+- hedge minus thompson (all, n=131): -0.0191 [-0.0370, -0.0075]
+
 ### Price-regime clustering (k-means) as a feature for the next day's mean price
 
 Source: `evals/results/lab-regimes.json`; card `docs/lab/regimes.md`
@@ -489,6 +586,10 @@ Source: `evals/results/lab-regimes.json`; card `docs/lab/regimes.md`
 |---|---|
 | with_regime | 365 |
 | without_regime | 365 |
+
+Paired Brier differences (95% day-block interval):
+
+- with_regime minus without_regime (test, n=365): -0.0218 [-0.1611, +0.1073]
 
 ### QLoRA fine-tune of Qwen2.5-1.5B on replayed power questions
 
@@ -518,6 +619,42 @@ Source: `evals/results/lab-qlora-r1.json`; card `docs/lab/qlora-r1.md`
 | qlora_1_5b / test_nov | 90 | 0.233 | 0.6586 | 0.1175 |
 | qlora_1_5b / test_oct | 186 | 0.24 | 0.6729 | 0.0902 |
 
+Paired Brier differences (95% day-block interval):
+
+- qlora_1_5b minus base_1_5b (test_oct, n=186): -0.0090 [-0.0148, -0.0028]
+- qlora_1_5b minus base_rate (test_oct, n=186): +0.0145 [+0.0021, +0.0262]
+- qlora_1_5b minus ml (test_oct, n=186): +0.0586 [+0.0121, +0.1001]
+- lora_0_5b minus base_0_5b (test_oct, n=186): -0.0202 [-0.0294, -0.0110]
+- lora_0_5b minus base_rate (test_oct, n=186): +0.0053 [-0.0132, +0.0230]
+- lora_0_5b minus qlora_1_5b (test_oct, n=186): -0.0092 [-0.0176, -0.0012]
+- ml minus base_rate (test_oct, n=186): -0.0441 [-0.0878, +0.0019]
+- gguf_q4 minus qlora_1_5b (test_oct, n=186): +0.0074 [+0.0008, +0.0137]
+- gguf_q4 minus base_1_5b (test_oct, n=186): -0.0017 [-0.0047, +0.0018]
+- gguf_q4 minus base_rate (test_oct, n=186): +0.0219 [+0.0066, +0.0359]
+- gguf_q4 minus ml (test_oct, n=186): +0.0660 [+0.0201, +0.1077]
+- qlora_1_5b minus base_1_5b (test_nov, n=90): -0.0147 [-0.0221, -0.0079]
+- qlora_1_5b minus base_rate (test_nov, n=90): +0.0301 [-0.0039, +0.0603]
+- qlora_1_5b minus ml (test_nov, n=90): +0.0979 [+0.0244, +0.1469]
+- lora_0_5b minus base_0_5b (test_nov, n=90): -0.0252 [-0.0371, -0.0140]
+- lora_0_5b minus base_rate (test_nov, n=90): +0.0232 [-0.0176, +0.0592]
+- lora_0_5b minus qlora_1_5b (test_nov, n=90): -0.0068 [-0.0161, +0.0012]
+- ml minus base_rate (test_nov, n=90): -0.0678 [-0.1162, -0.0022]
+- gguf_q4 minus qlora_1_5b (test_nov, n=90): +0.0143 [+0.0079, +0.0209]
+- gguf_q4 minus base_1_5b (test_nov, n=90): -0.0004 [-0.0054, +0.0055]
+- gguf_q4 minus base_rate (test_nov, n=90): +0.0443 [+0.0127, +0.0714]
+- gguf_q4 minus ml (test_nov, n=90): +0.1121 [+0.0374, +0.1643]
+- qlora_1_5b minus base_1_5b (test_all, n=276): -0.0109 [-0.0154, -0.0062]
+- qlora_1_5b minus base_rate (test_all, n=276): +0.0196 [+0.0069, +0.0332]
+- qlora_1_5b minus ml (test_all, n=276): +0.0714 [+0.0354, +0.1061]
+- lora_0_5b minus base_0_5b (test_all, n=276): -0.0218 [-0.0289, -0.0144]
+- lora_0_5b minus base_rate (test_all, n=276): +0.0111 [-0.0055, +0.0288]
+- lora_0_5b minus qlora_1_5b (test_all, n=276): -0.0085 [-0.0146, -0.0022]
+- ml minus base_rate (test_all, n=276): -0.0518 [-0.0851, -0.0166]
+- gguf_q4 minus qlora_1_5b (test_all, n=276): +0.0096 [+0.0048, +0.0142]
+- gguf_q4 minus base_1_5b (test_all, n=276): -0.0013 [-0.0039, +0.0015]
+- gguf_q4 minus base_rate (test_all, n=276): +0.0292 [+0.0160, +0.0427]
+- gguf_q4 minus ml (test_all, n=276): +0.0810 [+0.0435, +0.1163]
+
 ### Retrieval: dense vs BM25 vs hybrid with reranking
 
 Source: `evals/results/lab-retrieval-hybrid.json`; card `docs/lab/retrieval-hybrid.md`
@@ -539,6 +676,11 @@ Source: `evals/results/lab-stacking.json`; card `docs/lab/stacking.md`
 | ml | 32 | 0.1077 |
 | stacking | 32 | 0.0987 |
 
+Paired Brier differences (95% day-block interval):
+
+- stacking minus equal_mean (all, n=32): -0.0735 [-0.1130, -0.0662]
+- stacking minus ml (all, n=32): -0.0091 [-0.0450, -0.0024]
+
 ### The committee, version r2 (output budget and reply parsing fixed), against one agent with skills
 
 Source: `evals/results/lab-agent-committee-r2.json`; card `None`
@@ -549,6 +691,10 @@ Source: `evals/results/lab-agent-committee-r2.json`; card `None`
 | agent_skills / eval | 90 | 0.1279 | 0.4091 | 0.1057 | 1.3928 |
 | agent_skills / same items as agent_committee | 87 | 0.1291 | - | - | - |
 | base_rate / eval | 87 | 0.2043 | - | - | - |
+
+Paired Brier differences (95% day-block interval):
+
+- agent_committee minus agent_skills (eval, n=87): +0.0060 [-0.0036, +0.0152]
 
 ### Two LLM judges compared (not human calibration)
 
@@ -578,6 +724,66 @@ Source: `evals/results/lab-vectordb.json`; card `docs/lab/vectordb.md`
 | dense_numpy | 143 | 0.3731 | 0.5065 | 0.2126 | 39.94 |
 | dense_qdrant | 143 | 0.3731 | 0.5065 | 0.2126 | 96.04 |
 <!-- lab:end -->
+
+<!-- standings:start -->
+## Standings snapshot of 2026-11-28 (`docs/data/standings.json`)
+
+Official record since 2026-11-23, 4 days. Brier, 95% interval and the difference to the base rate.
+
+### Official, overall (36 questions, too early to tell)
+
+| Forecaster | n | Brier | 95% interval | vs base rate |
+|---|---|---|---|---|
+| ml | 36 | 0.1843 | [0.1265, 0.2401] | -0.0416 [-0.1118, +0.0286] |
+| llm_context | 36 | 0.2050 | [0.1343, 0.2582] | -0.0210 [-0.0901, +0.0284] |
+| agent | 36 | 0.2058 | [0.1236, 0.2704] | -0.0202 [-0.1008, +0.0374] |
+| base_rate | 36 | 0.2259 | [0.2105, 0.2453] | reference |
+
+### All days, attention (27 questions, too early to tell)
+
+| Forecaster | n | Brier | 95% interval | vs base rate |
+|---|---|---|---|---|
+| agent | 27 | 0.0785 | [0.0400, 0.1204] | -0.1715 [-0.2100, -0.1296] |
+| llm_context | 27 | 0.0878 | [0.0473, 0.1335] | -0.1622 [-0.2027, -0.1165] |
+| ml | 27 | 0.0884 | [0.0241, 0.1590] | -0.1616 [-0.2259, -0.0910] |
+| base_rate | 27 | 0.2500 | [0.2500, 0.2500] | reference |
+
+### All days, crypto (6 questions, too early to tell)
+
+| Forecaster | n | Brier | 95% interval | vs base rate |
+|---|---|---|---|---|
+| base_rate | 6 | 0.2491 | [0.2403, 0.2580] | reference |
+| agent | 6 | 0.2630 | [0.1319, 0.3942] | +0.0139 [-0.1084, +0.1362] |
+| ml | 6 | 0.2804 | [0.1646, 0.3963] | +0.0313 [-0.0757, +0.1383] |
+| llm_context | 6 | 0.2819 | [0.1628, 0.4010] | +0.0328 [-0.0775, +0.1430] |
+
+### All days, markets (23 questions, too early to tell)
+
+| Forecaster | n | Brier | 95% interval | vs base rate |
+|---|---|---|---|---|
+| ml | 23 | 0.2444 | [0.2332, 0.2554] | -0.0202 [-0.0586, +0.0227] |
+| base_rate | 23 | 0.2646 | [0.2304, 0.2974] | reference |
+| llm_context | 23 | 0.2690 | [0.2404, 0.2941] | +0.0044 [-0.0336, +0.0403] |
+| agent | 23 | 0.2744 | [0.2470, 0.3001] | +0.0098 [-0.0210, +0.0369] |
+
+### All days, power (24 questions, too early to tell)
+
+| Forecaster | n | Brier | 95% interval | vs base rate |
+|---|---|---|---|---|
+| ml | 24 | 0.1508 | [0.0984, 0.2086] | -0.1329 [-0.2386, -0.0301] |
+| llm_context | 24 | 0.1747 | [0.0986, 0.2498] | -0.1091 [-0.2279, +0.0161] |
+| agent | 24 | 0.1822 | [0.0968, 0.2692] | -0.1016 [-0.2145, +0.0197] |
+| base_rate | 24 | 0.2837 | [0.2179, 0.3606] | reference |
+
+### All days, weather (27 questions, too early to tell)
+
+| Forecaster | n | Brier | 95% interval | vs base rate |
+|---|---|---|---|---|
+| ml | 27 | 0.0829 | [0.0474, 0.1159] | -0.1655 [-0.2355, -0.1013] |
+| agent | 27 | 0.1283 | [0.0777, 0.1848] | -0.1202 [-0.1852, -0.0763] |
+| llm_context | 27 | 0.1807 | [0.1146, 0.2495] | -0.0678 [-0.1153, -0.0241] |
+| base_rate | 27 | 0.2485 | [0.1814, 0.3171] | reference |
+<!-- standings:end -->
 
 <!-- live:start -->
 ## Live record (ledger commit fa353ef 2026-11-13T16:40:44+00:00)

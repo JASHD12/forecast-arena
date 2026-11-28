@@ -56,7 +56,7 @@ seal was committed before that batch's lock (`arena/ledger/gitcheck.py`).
 | 2.6 Boring infrastructure | GitHub Actions, GitHub Pages and files on a branch; no servers to keep alive. | .github/workflows/, site/build.py (static pages, no JavaScript) |
 | 2.7 Hard budget caps on LLM usage | Daily request and token caps and a per-call output cap, counted across all runs of a UTC day from the provider's own usage figures. | llm/budget.py (checked before every call), forecasters/llm.py and agent/forecaster.py (budget_exhausted skips) |
 | 2.8 Not advice, no personal data | Research-only disclaimer on every page; person articles are excluded from the attention domain; the human panel is pseudonymous. | site/templates/base.html, domains/attention.py (Wikidata check, fails closed), forecasters/panel.py |
-| 2.9 Pre-registered official start | The official record starts the day after the first run of 5 consecutive clean days; the date is written once and never changed; headline scores use only official days. | scoring/boards.py and site/build.py (headline = official record only); the clean-day streak and the one-time write are task T035 (done: the start was written once, on the ledger branch, as meta/official_start.json) |
+| 2.9 Pre-registered official start | The official record starts the day after the first run of 5 consecutive clean days; the date is written once and never changed; headline scores use only official days. | scoring/boards.py and site/build.py (headline = official record only); ops/official.py (the clean-day streak and the one-time write; the start was written once, on the ledger branch, as meta/official_start.json) |
 
 ## Forecasters and what they see
 

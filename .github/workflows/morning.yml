@@ -25,9 +25,22 @@ on:
         type: boolean
         default: false
       experimental:
-        description: "Dry runs only (T279): switch the experimental agent_hybrid, agent_quant, agent_analyst, agent_skills, agent_graph_skills, agent_hybrid_skills and agent_committee forecasters on to measure runner time and tokens"
+        description: "Dry runs only (T279): switch the experimental agent_hybrid, agent_quant, agent_analyst, agent_skills, agent_graph_skills, agent_hybrid_skills and agent_committee forecasters on to measure runner time, installs and the index build (a dry run has no LLM client, so no tokens; T398)"
         type: boolean
         default: false
+      only:
+        description: "Dry runs only (T398): switch on just this one experimental forecaster (measures install, model download and index build; a dry run has no LLM client, so it cannot measure tokens). Ignored unless dry_run is true"
+        type: choice
+        options:
+          - ""
+          - agent_hybrid
+          - agent_quant
+          - agent_analyst
+          - agent_skills
+          - agent_graph_skills
+          - agent_hybrid_skills
+          - agent_committee
+        default: ""
 
 permissions:
   contents: read
@@ -106,13 +119,13 @@ jobs:
       ARENA_BANDIT: ${{ vars.ARENA_BANDIT || '0' }}  # T293: bandit_hedge (learned blend of the other forecasters); off until the owner decides
       ARENA_LLM_CONTEXT_CAL: ${{ vars.ARENA_LLM_CONTEXT_CAL || '0' }}  # T382: llm_context_cal (llm_context's answers through a fixed logit map, no tokens); off until its pre-registered test (lab/prereg/analyst-and-calibration.md) is run
       ARENA_SENTIMENT: ${{ vars.ARENA_SENTIMENT || '0' }}  # T373: archive GDELT news-tone aggregates of the five coins in the crypto morning context (no forecaster yet, no secret); off until the owner decides
-      ARENA_AGENT_HYBRID: ${{ (inputs.experimental && inputs.dry_run) && '1' || vars.ARENA_AGENT_HYBRID || '0' }}  # T274: agent_hybrid (hybrid retrieval + guards); switched on at launch (T279)
-      ARENA_AGENT_QUANT: ${{ (inputs.experimental && inputs.dry_run) && '1' || vars.ARENA_AGENT_QUANT || '0' }}  # T342: agent_quant (calculator and reference estimate); off until its evaluation passes (T345)
-      ARENA_AGENT_ANALYST: ${{ (inputs.experimental && inputs.dry_run) && '1' || vars.ARENA_AGENT_ANALYST || '0' }}  # T343: agent_analyst (starts from the ml forecast); off until its evaluation passes (T345)
-      ARENA_AGENT_SKILLS: ${{ (inputs.experimental && inputs.dry_run) && '1' || vars.ARENA_AGENT_SKILLS || '1' }}  # T353/T356: agent_skills (agent_quant plus load_skill); live as an experiment by owner decision 2026-11-28 although its pre-registered rule was not met; set the repository variable to 0 to switch it off
-      ARENA_AGENT_GRAPH_SKILLS: ${{ (inputs.experimental && inputs.dry_run) && '1' || vars.ARENA_AGENT_GRAPH_SKILLS || '0' }}  # T357: agent_graph_skills (agent_graph plus the estimate, calculator and load_skill); off until agent_skills passes its evaluation
-      ARENA_AGENT_HYBRID_SKILLS: ${{ (inputs.experimental && inputs.dry_run) && '1' || vars.ARENA_AGENT_HYBRID_SKILLS || '0' }}  # T358: agent_hybrid_skills (agent_hybrid plus the estimate, calculator and load_skill); off until agent_skills passes its evaluation
-      ARENA_AGENT_COMMITTEE: ${{ (inputs.experimental && inputs.dry_run) && '1' || vars.ARENA_AGENT_COMMITTEE || '0' }}  # T363: agent_committee (specialist agents over A2A); off until its evaluation passes (T367)
+      ARENA_AGENT_HYBRID: ${{ (inputs.dry_run && (inputs.experimental || inputs.only == 'agent_hybrid')) && '1' || vars.ARENA_AGENT_HYBRID || '0' }}  # T274: agent_hybrid (hybrid retrieval + guards); switched on at launch (T279)
+      ARENA_AGENT_QUANT: ${{ (inputs.dry_run && (inputs.experimental || inputs.only == 'agent_quant')) && '1' || vars.ARENA_AGENT_QUANT || '0' }}  # T342: agent_quant (calculator and reference estimate); off until its evaluation passes (T345)
+      ARENA_AGENT_ANALYST: ${{ (inputs.dry_run && (inputs.experimental || inputs.only == 'agent_analyst')) && '1' || vars.ARENA_AGENT_ANALYST || '0' }}  # T343: agent_analyst (starts from the ml forecast); off until its evaluation passes (T345)
+      ARENA_AGENT_SKILLS: ${{ (inputs.dry_run && (inputs.experimental || inputs.only == 'agent_skills')) && '1' || vars.ARENA_AGENT_SKILLS || '1' }}  # T353/T356: agent_skills (agent_quant plus load_skill); live as an experiment by owner decision 2026-11-28 although its pre-registered rule was not met; set the repository variable to 0 to switch it off
+      ARENA_AGENT_GRAPH_SKILLS: ${{ (inputs.dry_run && (inputs.experimental || inputs.only == 'agent_graph_skills')) && '1' || vars.ARENA_AGENT_GRAPH_SKILLS || '0' }}  # T357: agent_graph_skills (agent_graph plus the estimate, calculator and load_skill); off until agent_skills passes its evaluation
+      ARENA_AGENT_HYBRID_SKILLS: ${{ (inputs.dry_run && (inputs.experimental || inputs.only == 'agent_hybrid_skills')) && '1' || vars.ARENA_AGENT_HYBRID_SKILLS || '0' }}  # T358: agent_hybrid_skills (agent_hybrid plus the estimate, calculator and load_skill); off until agent_skills passes its evaluation
+      ARENA_AGENT_COMMITTEE: ${{ (inputs.dry_run && (inputs.experimental || inputs.only == 'agent_committee')) && '1' || vars.ARENA_AGENT_COMMITTEE || '0' }}  # T363: agent_committee (specialist agents over A2A); off until its evaluation passes (T367)
       ARENA_AGENT_RAG: ${{ vars.ARENA_AGENT_RAG || '1' }}  # T120: similar-past-questions tool (local embeddings, no API cost)
       OMP_NUM_THREADS: "2"
     steps:

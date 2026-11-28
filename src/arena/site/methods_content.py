@@ -72,8 +72,8 @@ PRINCIPLES: tuple[tuple[str, str, str, str], ...] = (
         "Pre-registered official start",
         "The official record starts the day after the first run of 5 consecutive clean days; "
         "the date is written once and never changed; headline scores use only official days.",
-        "scoring/boards.py and site/build.py (headline = official record only); the clean-day "
-        "streak and the one-time write are task T035 (done: the start was written once, on the "
+        "scoring/boards.py and site/build.py (headline = official record only); ops/official.py "
+        "(the clean-day streak and the one-time write; the start was written once, on the "
         "ledger branch, as meta/official_start.json)",
     ),
 )

@@ -107,6 +107,9 @@ def test_five_days_offline(tmp_path) -> None:
     assert check_site(site.out_dir) == []
     home = (site.out_dir / "index.html").read_text()
     assert "base_rate" in home and "not advice" in home and "SMARD.de" in home
+    # the README's standings chart is served from the site, so it is rebuilt with it
+    svg = site.out_dir / "standings.svg"
+    assert svg.is_file() and svg.read_text(encoding="utf-8").lstrip().startswith("<svg")
     traces = [
         json.loads(x)
         for rel in led.list_files("agent_traces")

@@ -174,7 +174,7 @@ def gdelt_news(
     fails has no `gdelt` entry today and the reason is recorded (I6). Only aggregate numbers
     are kept, never article text (S7).
     """
-    from arena.forecasters.sentiment import gdelt_context
+    from arena.forecasters.sentiment import gdelt_context, outage_days
     from arena.sources.gdelt_tone import GdeltClient, GdeltError
     from arena.sources.http import HttpError
 
@@ -190,11 +190,14 @@ def gdelt_news(
         except (GdeltError, HttpError) as exc:
             skip(f"crypto/gdelt/{coin}: {type(exc).__name__}: {str(exc)[:120]}")
 
+    # a day without counts for every fetched coin is a GDELT outage, not a quiet day (T402)
+    outages = outage_days({c: n.count for c, n in fetched.items()}, covered) if fetched else set()
+
     def provider(coin: str, asof: datetime) -> dict[str, Any] | None:
         news = fetched.get(coin)
         if news is None:
             return None
-        return gdelt_context(news.tone, news.count, covered, asof)
+        return gdelt_context(news.tone, news.count, covered, asof, unknown_days=outages)
 
     return provider
 

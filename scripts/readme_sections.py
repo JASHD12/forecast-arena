@@ -230,11 +230,12 @@ def lab() -> str:
     rows.append("")
     rows.append(
         "Live experimental forecasters: the QLoRA-tuned model (running since the first morning "
-        "after 2026-11-22, with its fixed pre-registered expectations). Built and switched off "
-        "until their pre-registered launch checks pass: an agent with hybrid retrieval and "
-        "guards, agents with a calculator, an ML-forecast reviewer and forecasting skills (also "
-        "on the LangGraph and hybrid agents), and a committee of specialist agents over the A2A "
-        "protocol. The "
+        "after 2026-11-22, with its fixed pre-registered expectations). Built and switched off; "
+        "each launches only if its pre-registered check passes. Evaluated so far and not "
+        "launched: the calculator agent (no gain), the skills agent (missed its rule) and the "
+        "committee of specialist agents over the A2A protocol (failed its rule). Still to be "
+        "evaluated: an agent with hybrid retrieval and guards, the ML-forecast reviewer, and "
+        "the skills variants of the LangGraph and hybrid agents. The "
         "cascade router was **not built**: its pre-registered rule saved no paid calls (the "
         "routing card has the numbers). None of them enters the headline board. Details: "
         "[Lab page](https://jashd12.github.io/"
@@ -297,9 +298,10 @@ def top_caption() -> str:
     b = s["official"]
     label = f" **{b['label']}.**" if b["label"] else ""
     return (
-        f"*Official record since {s['official_start']}: {b['questions']} questions over "
-        f"{s['official_days']} days; Brier score, lower is better; bars are 95% intervals."
-        f"{label} Snapshot of {s['generated_on']}; research project, not advice.*"
+        f"*Chart: the live official record since {s['official_start']}, rebuilt daily with the "
+        "site; Brier score, lower is better; bars are 95% intervals. The comparisons below are a "
+        f"snapshot of {s['generated_on']} ({b['questions']} official questions over "
+        f"{s['official_days']} days;{label or ' no label'}); research project, not advice.*"
     )
 
 

@@ -198,6 +198,7 @@ def run(
         for it in items:
             with scope(name, it.question.question_id, f.prompt_version):
                 r = f.forecast(it.question, it.context, it.asof)
+            loaded = skills_loaded(getattr(f, "traces", {}).get(it.question.question_id))
             rows.append(
                 {
                     "variant": name,
@@ -208,6 +209,12 @@ def run(
                     "skip": None if isinstance(r, Forecast) else r.reason_code,
                     # why a call failed (provider error text), so a result file names its cause
                     "detail": None if isinstance(r, Forecast) else str(r.detail)[:300],
+                    # names only, no tool text: which skills the model loaded (H-S3, T400)
+                    **(
+                        {"skills_loaded": loaded}
+                        if "load_skill" in {t.name for t in getattr(f, "tools", ())}
+                        else {}
+                    ),
                 }
             )
     started = clock.now()
@@ -225,6 +232,12 @@ def run(
         "paired_by_topic": paired_by_topic(rows, list(clients)),
         "rows": rows,
     }
+
+
+def skills_loaded(trace: Mapping[str, Any] | None) -> list[str]:
+    """The skill names a question's agent loaded (from its compact trace; names only)."""
+    calls = (trace or {}).get("tool_calls", [])
+    return [str(c["args"]["name"]) for c in calls if c.get("tool") == "load_skill" and c.get("ok")]
 
 
 def topic_of(question_id: str) -> str:

@@ -256,7 +256,8 @@ SIMILAR_SPEC = ToolSpec(
 ESTIMATE_SPEC = ToolSpec(
     "estimate_probability",
     "A reference probability for this question computed from its stored data only (for example "
-    "the DWD forecast with a normal error, or how often recent days crossed the threshold), "
+    "the DWD forecast with a normal error, or the latest day's value with a normal error for "
+    "electricity), "
     "with the method and inputs. Takes no arguments. Returns an error if the topic has no "
     "reference model.",
     {"type": "object", "properties": {}, "additionalProperties": False},

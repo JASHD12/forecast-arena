@@ -4,10 +4,10 @@
 
 [![CI](https://github.com/JASHD12/forecast-arena/actions/workflows/ci.yml/badge.svg)](https://github.com/JASHD12/forecast-arena/actions/workflows/ci.yml)  [![Live site](https://img.shields.io/badge/live-site-3b3fc4)](https://jashd12.github.io/forecast-arena/)  [![Coverage](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FJASHD12%2Fforecast-arena%2Fmain%2Fdocs%2Fbadges%2Fcoverage.json)](.github/workflows/ci.yml)  [![Tests](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FJASHD12%2Fforecast-arena%2Fmain%2Fdocs%2Fbadges%2Ftests.json)](tests)
 
-[![Standings of the four headline forecasters](docs/img/standings.svg)](https://jashd12.github.io/forecast-arena/leaderboard.html)
+[![Standings of the four headline forecasters](https://jashd12.github.io/forecast-arena/standings.svg)](https://jashd12.github.io/forecast-arena/leaderboard.html)
 
 <!-- topcaption:start -->
-*Official record since 2026-11-23: 36 questions over 4 days; Brier score, lower is better; bars are 95% intervals. **too early to tell.** Snapshot of 2026-11-28; research project, not advice.*
+*Chart: the live official record since 2026-11-23, rebuilt daily with the site; Brier score, lower is better; bars are 95% intervals. The comparisons below are a snapshot of 2026-11-28 (36 official questions over 4 days; **too early to tell.**); research project, not advice.*
 <!-- topcaption:end -->
 
 <!-- top:start -->
@@ -42,7 +42,7 @@ append-only, hash-chained ledger. When the data arrives, every forecast is score
 |---|---|
 | **Live since** | 13 November 2026, about 30 to 43 questions a day on five topics: electricity, weather, Wikipedia attention, exchange rates and, since 23 November 2026, crypto prices (forecasting exercise only, no trading, data from CoinGecko); crypto joins the overall boards after 30 days |
 | **Status** | the **official record started on 23 November 2026** (five clean days in a row, then the owner's fixed start date); days before that are rehearsal and are shown but do not count towards headline scores |
-| **Who forecasts** | base rate, persistence, a gradient-boosted ML model, Claude (with data, with tools, as a LangGraph agent; a question-only variant was retired on 2026-11-27), an open 1.5B model on CPU, and an experimental QLoRA-tuned model; further agent variants (calculator, skills, hybrid retrieval, a committee over A2A) are built and switched off until their pre-registered evaluations pass |
+| **Who forecasts** | base rate, persistence, a gradient-boosted ML model, Claude (with data, with tools, as a LangGraph agent; a question-only variant was retired on 2026-11-27), an open 1.5B model on CPU, and an experimental QLoRA-tuned model; further agent variants are built and switched off; the calculator, skills and committee agents were evaluated against their pre-registered rules and not launched, the rest wait for theirs |
 | **Honest so far** | the ML model beats the baselines in backtest; whether an LLM agent beats it live is too early to tell; the fine-tuned model is live as an experiment and, measured on 276 frozen test questions, has no edge over its untuned base (the 4-bit export lost the gain; the [evaluation card](docs/lab/qlora-r1.md) says why); the skills and committee agents missed their pre-registered rules on the November replay ([skills](docs/lab/agent-skills.md), [committee](docs/lab/agent-committee.md)) and stay off |
 
 <!-- headline:start -->
@@ -118,7 +118,7 @@ Each technique is tried against the project's baselines on questions it never sa
 | Cost routing with the simpler ml-first rule on fresh days | pre-registered 2026-11-23 (lab/prereg/routing-ml-only.md); evaluated after 2026-12-24 | - |
 | In-browser model tier for Ask the Arena: real-browser test | built and opt-in; tested with a fake engine only, a real-browser test is still open | - |
 
-Live experimental forecasters: the QLoRA-tuned model (running since the first morning after 2026-11-22, with its fixed pre-registered expectations). Built and switched off until their pre-registered launch checks pass: an agent with hybrid retrieval and guards, agents with a calculator, an ML-forecast reviewer and forecasting skills (also on the LangGraph and hybrid agents), and a committee of specialist agents over the A2A protocol. The cascade router was **not built**: its pre-registered rule saved no paid calls (the routing card has the numbers). None of them enters the headline board. Details: [Lab page](https://jashd12.github.io/forecast-arena/lab.html), [what I measured about LLMs](https://jashd12.github.io/forecast-arena/llm-engineering.html), [explainer](docs/explainers/06-experiments-lab.md).
+Live experimental forecasters: the QLoRA-tuned model (running since the first morning after 2026-11-22, with its fixed pre-registered expectations). Built and switched off; each launches only if its pre-registered check passes. Evaluated so far and not launched: the calculator agent (no gain), the skills agent (missed its rule) and the committee of specialist agents over the A2A protocol (failed its rule). Still to be evaluated: an agent with hybrid retrieval and guards, the ML-forecast reviewer, and the skills variants of the LangGraph and hybrid agents. The cascade router was **not built**: its pre-registered rule saved no paid calls (the routing card has the numbers). None of them enters the headline board. Details: [Lab page](https://jashd12.github.io/forecast-arena/lab.html), [what I measured about LLMs](https://jashd12.github.io/forecast-arena/llm-engineering.html), [explainer](docs/explainers/06-experiments-lab.md).
 <!-- lab:end -->
 
 ## An open-source tool from this project
@@ -215,7 +215,7 @@ All numbers below are **backtests**: past days replayed through the production c
 | pandas and scikit-learn Pipelines | DataFrame views proved equal to the leaderboard, a ColumnTransformer + LogisticRegression stacking pipeline replayed walk-forward | `src/arena/analytics/frames.py`<br>`src/arena/lab/stacking_study.py` |
 | LLM evals, tracing, OpenTelemetry | Frozen golden set, prompt A/B, JSON validity and cost; one span per model call, exported as OTLP/JSON with the OpenTelemetry GenAI attribute names | `src/arena/evals`<br>`src/arena/llm/tracing.py`<br>`src/arena/llm/otlp.py` |
 | MCP | Read-only MCP server so AI assistants can query the benchmark | `src/arena/mcp_server.py` |
-| Multi-agent systems, A2A | A committee of specialist agents that talk over the A2A protocol (official SDK, in-process transport) and a read-only A2A agent for the benchmark itself, kept separate from MCP (agent-to-tool); experimental, off until its pre-registered evaluation | `src/arena/a2a`<br>`src/arena/agent/committee.py`<br>`tests/unit/test_agent_committee.py` |
+| Multi-agent systems, A2A | A committee of specialist agents that talk over the A2A protocol (official SDK, in-process transport) and a read-only A2A agent for the benchmark itself, kept separate from MCP (agent-to-tool); experimental, off: its pre-registered evaluation found no benefit | `src/arena/a2a`<br>`src/arena/agent/committee.py`<br>`tests/unit/test_agent_committee.py` |
 | REST and JSON APIs | FastAPI service and a static JSON API with schemas generated from pydantic models | `src/arena/api/app.py`<br>`src/arena/site/api.py` |
 | Docker, Kubernetes, Airflow | Image built and API smoke-tested in CI; manifests applied to a kind cluster; DAGs parsed by Airflow (validated in CI, not hosted) | `Dockerfile`<br>`deploy/k8s`<br>`orchestration/airflow` |
 | CI/CD on GitHub Actions | Scheduled jobs, promotion to a stable branch after green CI, incident issues | `.github/workflows` |

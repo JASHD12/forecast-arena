@@ -214,8 +214,8 @@ def test_quant_and_analyst_variants_run_in_the_fake_gate(tmp_path) -> None:
     (path,) = tmp_path.glob("fake-*.json")
     res = json.loads(path.read_text())
     assert set(res["metrics"]) == {"agent", "agent_quant", "agent_analyst", "agent_skills"}
-    assert "skills-r1-" in res["versions"]["agent_skills"]
-    assert res["versions"]["agent_quant"].endswith("quant-r1")
+    assert "skills-r2-" in res["versions"]["agent_skills"]
+    assert res["versions"]["agent_quant"].endswith("quant-r2")
     assert res["versions"]["agent_analyst"].endswith("analyst-r1")
     assert res["versions"]["agent"] not in (res["versions"]["agent_quant"],)
 
@@ -256,7 +256,7 @@ def test_committee_variant_runs_in_the_fake_gate_without_ml_and_with_no_news(tmp
     res = json.loads(path.read_text())
     m = res["metrics"]["agent_committee"]
     assert m["answered"] == 4 and m["skips"] == {}
-    assert "committee-r2" in res["versions"]["agent_committee"]
+    assert "committee-r3" in res["versions"]["agent_committee"]
     # scout (no news backend: no model call), chair draft, skeptic, chair final = 3 calls per item
     assert m["calls"] == 12
 

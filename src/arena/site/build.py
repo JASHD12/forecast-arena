@@ -122,6 +122,7 @@ from arena.site.shaping import (
     template_changelog,
     version_changelog,
 )
+from arena.site.standings import build_snapshot, render_svg
 from arena.site.titles import FORECASTER_NAMES, domain_name, forecaster_name, plain_title
 from arena.site.toc import FOLD_PAGES, TOC_PAGES, add_toc, mark_fold
 from arena.site.topics import topic
@@ -507,6 +508,9 @@ def build_site(
     (tmp / "topics").mkdir()
     (tmp / "data").mkdir(exist_ok=True)
     write_otlp(all_spans, tmp / "data" / "otlp")
+    if rec.scored:  # the README's standings chart is this file, so it is as fresh as the site
+        snap = build_snapshot(rec.scored, start, clock.now().date())
+        (tmp / "standings.svg").write_text(render_svg(snap), encoding="utf-8")
     (tmp / "data" / "game.json").write_text(game_payload + "\n", encoding="utf-8")
     pages["data.html"] = (
         "Open data & SQL",

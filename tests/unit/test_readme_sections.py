@@ -31,7 +31,7 @@ def test_readme_screenshots_exist_and_are_labelled() -> None:
     top = text[: text.index("<details>")]
     for must in (
         "A live benchmark where an AI agent and a classical ML model forecast tomorrow",
-        "docs/img/standings.svg",
+        "forecast-arena/standings.svg",
         "<!-- top:start -->",
         "<!-- topcaption:start -->",
         "60 s",
@@ -100,7 +100,7 @@ def test_first_30_lines_answer_role_result_what_i_built_and_contact() -> None:
     lines = (ROOT / "README.md").read_text(encoding="utf-8").splitlines()[:30]
     head = "\n".join(lines)
     assert lines[0] == "# Forecast Arena"
-    assert "docs/img/standings.svg" in head
+    assert "forecast-arena/standings.svg" in head
     bullets = [ln for ln in lines if ln.startswith("- **") and "Brier" in ln]
     assert len(bullets) >= 3, "three generated result bullets with their numbers"
     assert "**What I built:**" in head and "**For recruiters (60 s):**" in head

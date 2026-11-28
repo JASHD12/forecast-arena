@@ -16,7 +16,7 @@ from __future__ import annotations
 
 import random
 from collections import Counter
-from collections.abc import Callable, Mapping, Sequence
+from collections.abc import Callable, Collection, Mapping, Sequence
 from dataclasses import dataclass
 from typing import Any
 
@@ -145,6 +145,37 @@ def sample(items: Sequence[GoldenItem], limit: int | None, seed: int = 0) -> lis
         for t in sorted(by_t):
             if by_t[t] and len(out) < limit:
                 out.append(by_t[t].pop())
+    return sorted(out, key=lambda i: i.question.question_id)
+
+
+def sample_per_topic(
+    items: Sequence[GoldenItem],
+    per_topic: int,
+    seed: int = 0,
+    *,
+    only: Collection[str] | None = None,
+) -> list[GoldenItem]:
+    """`per_topic` questions of every topic, seeded and spread round-robin across batch days.
+
+    `only` restricts the pool to those question ids (for example the questions that have a live
+    `ml` forecast). A topic with fewer questions than `per_topic` contributes all of them.
+    """
+    pool = [i for i in items if only is None or i.question.question_id in only]
+    rng = random.Random(seed)
+    out: list[GoldenItem] = []
+    for topic in sorted({topic_of(i.question.question_id) for i in pool}):
+        by_day: dict[Any, list[GoldenItem]] = {}
+        for it in sorted(pool, key=lambda i: i.question.question_id):
+            if topic_of(it.question.question_id) == topic:
+                by_day.setdefault(it.question.batch_date, []).append(it)
+        for lst in by_day.values():
+            rng.shuffle(lst)
+        taken: list[GoldenItem] = []
+        while len(taken) < per_topic and any(by_day.values()):
+            for day in sorted(by_day):
+                if by_day[day] and len(taken) < per_topic:
+                    taken.append(by_day[day].pop())
+        out.extend(taken)
     return sorted(out, key=lambda i: i.question.question_id)
 
 

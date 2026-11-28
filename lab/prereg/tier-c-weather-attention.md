@@ -32,8 +32,7 @@ tokens of the electricity runs plus 15%; a question skipped because the cap ran 
 
 ## Hypotheses (per topic; paired day-block 95% intervals on the questions both arms answered)
 
-Confirmatory, nine tests (three arms against `ml` and three against `agent`, on two topics, counted as the families below; no multiplicity
-correction, stated):
+Confirmatory, six tests (H-T1 on two topics, H-T2 on three arms, H-T3 once; H-T4 is a cost check); no multiplicity correction, stated:
 
 - **H-T1**: on weather and on attention, `agent_analyst` is not worse than `ml` (the interval of Brier(analyst) minus Brier(ml) is not
   entirely above zero).
@@ -46,7 +45,7 @@ correction, stated):
 
 Tier C alone launches nothing and switches nothing off: it is a replay and informs the live comparison (`lab/prereg/live-agents-comparison.md`),
 which decides. All results are published with intervals, sample sizes and per-topic tables, negative ones included. One run, once. Limits:
-60 questions per topic from 11 days (the questions of a day are correlated, so intervals resample whole days); replayed tools only; the
+60 questions per topic from 9 batch days (the draw is deterministic and was computed before any model call; the questions of a day are correlated, so intervals resample whole days); replayed tools only; the
 questions were seen by the live forecasters (their live answers exist), but no arm here was tuned on them.
 
 ## Cost

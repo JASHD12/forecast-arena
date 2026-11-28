@@ -1,6 +1,6 @@
 # Lab budget
 
-Hard limit for all paid lab runs together: **US$2.50** (owner decision 2026-11-28; it was US$2.00 from 2026-11-21). The table is the record; `scripts/lab_budget.py`
+Hard limit for all paid lab runs together: **US$3.00** (owner decision 2026-11-28: US$2.50 in the morning for the r2/r3 evaluation, then US$3.00 for Tier C; it was US$2.00 from 2026-11-21). The table is the record; `scripts/lab_budget.py`
 sums the `cost_usd` of `evals/results/lab-*.json` and fails `make check` if the total is above the limit or the table is stale.
 
 | Run | Date | Workflow run id | Tokens | US$ | Running total |

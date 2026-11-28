@@ -14,13 +14,17 @@ on:
         options:
           - power-2026-10.jsonl
           - power-2026-11a.jsonl
+          - replay-weather-attention-2026-11-25.jsonl
         default: power-2026-10.jsonl
       variants:
         description: "T355: comma-separated variants that replace the default list (llm_plain, llm_context, agent, agent_quant, agent_analyst, agent_skills, agent_committee); empty keeps the boolean inputs below"
         default: ""
       limit:
-        description: "Golden questions to sample (stratified, seeded)"
+        description: "Golden questions to sample (stratified, seeded); ignored when per_topic is set"
         default: "24"
+      per_topic:
+        description: "T406 (Tier C): questions per topic of the replay set (seeded, spread over batch days, only questions with a live ml forecast); empty uses limit"
+        default: ""
       max_tokens:
         description: "Hard token cap for this run"
         default: "60000"
@@ -98,6 +102,7 @@ jobs:
       - name: Run the evaluation
         env:
           LIMIT: ${{ inputs.limit }}
+          PER_TOPIC: ${{ inputs.per_topic }}
           MAX_TOKENS: ${{ inputs.max_tokens }}
           LOCAL: ${{ inputs.local }}
           AGENT: ${{ inputs.agent }}
@@ -111,6 +116,7 @@ jobs:
           # the replayed ml probabilities belong to one golden set (T386): pick the matching file
           case "$GOLDEN" in
             power-2026-11a.jsonl) MLPROBS=evals/golden/ml-probs-power-11a.json ;;
+            replay-weather-attention-2026-11-25.jsonl) MLPROBS=evals/golden/replay-weather-attention-2026-11-25.ml-probs.json ;;
             *) MLPROBS=evals/golden/ml-probs-power.json ;;
           esac
           if [ -n "$VARIANTS" ]; then
@@ -131,8 +137,15 @@ jobs:
             if [ "$SKILLS" = "true" ]; then variants="$variants --variant agent_skills"; fi
             if [ "$SC" = "true" ]; then variants="$variants --variant llm_context_sc5"; fi
           fi
+          if [ -n "$PER_TOPIC" ]; then
+            # Tier C: the subset is drawn from the questions that have a live ml forecast
+            sizing="--per-topic $PER_TOPIC"
+            case "$variants" in *--ml-probs*) ;; *) variants="$variants --ml-probs $MLPROBS" ;; esac
+          else
+            sizing="--limit $LIMIT"
+          fi
           .venv/bin/arena eval run --golden "evals/golden/$GOLDEN" \
-            --limit "$LIMIT" --max-tokens "$MAX_TOKENS" $variants | tee eval.log
+            $sizing --max-tokens "$MAX_TOKENS" $variants | tee eval.log
           { echo "## LLM evaluation (not the live record)"; echo '```'; cat eval.log; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
       - name: Print the result (the log is how the agent reads it back)
         run: |

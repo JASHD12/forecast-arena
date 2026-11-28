@@ -1511,3 +1511,8 @@ and evidence requirements. Do not backfill historical ML forecasts.
 - DataPilot figures from the live profile (6,548 reviews, macro-F1 0.6475) are not used: they cannot be checked from this repository; the CV bullets remain.
 - Alternatives rejected: a hand-written profile README (numbers would drift from the record, I5); third-party stats widgets (flaky, nothing verifiable).
 
+## 2026-11-28 · Label run: diagnose before amending (T388)
+- Context: three `lab-sentiment-labels` runs stopped before any paid call (US$0). Runs 1 and 2: HttpError for 3 of 5 coins (109 of 200 headlines). Run 3, after per-coin retries (T387): ripple failed, 132 headlines from four coins, so the 7-day pool per coin is thin and 200 may be out of reach even with all five.
+- Decision (owner, 2026-11-28): keep the pre-registered rules (7-day window, 100 per coin, floor 200). The run now prints `SL_FETCH=` (counts per coin, failed coins, sample size; no titles, S7) and waits 120, 180, 240 and 240 s between retries of a failed coin. If the counts show 200 is unreachable, the owner decides on an amendment (14-day window or a lower floor) before any paid call.
+- Alternatives rejected for now: widening to 14 days or lowering the floor to 120 without the counts (an amendment on a guess).
+

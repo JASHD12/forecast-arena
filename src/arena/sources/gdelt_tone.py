@@ -7,7 +7,9 @@ a real response recorded in tests/fixtures/gdelt/, see its provenance.json):
 - ``mode=TimelineVolRaw&format=json`` returns the same shape with ``"series": "Article Count"``
   and ``{"date", "value": <articles>, "norm": <all articles monitored that day>}``;
 - ``startdatetime``/``enddatetime`` are ``YYYYMMDDHHMMSS``; a range over a week gives daily
-  steps; days without matching articles are simply absent (never filled here, I6);
+  steps; a day without matching articles is usually absent, but GDELT also returns ``value: 0``
+  with a count of 0 for some of them (T402: that is "no articles", not a news tone of 0, see
+  ``arena.forecasters.sentiment.gdelt_context``); nothing is filled here (I6);
 - one request every 5 seconds is the documented limit.
 
 As-of rule (lab/prereg/sentiment.md): the value of UTC day X counts as known from X+1 12:00 UTC

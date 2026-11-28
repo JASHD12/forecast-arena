@@ -373,3 +373,7 @@ curl -X POST -H "Authorization: Bearer TOKEN" -H "Accept: application/vnd.github
   - You, once the agent says the headroom is enough: GitHub > repository > Settings > Secrets and variables > Actions > Variables > New repository variable, name `ARENA_AGENT_HYBRID`, value `1`. To undo it, set the value to `0`.
   - The agent checks the next morning: coverage, skips, parse failures, no `budget_exhausted` skips on the core forecasters, the version string.
 
+- [ ] H50 · Optional: archive GDELT news aggregates for a fresh-days test of `sentiment` (T402)
+  - Only if you want the news-tone idea tested again: GitHub > repository > Settings > Secrets and variables > Actions > Variables > New repository variable, name `ARENA_SENTIMENT`, value `1`. The morning job then archives daily tone and article counts of the five coins in the crypto context (aggregate numbers only, no article text, no secret). To stop, set it to `0`.
+  - About 60 days of archive are needed before a re-test is worth running; the agent then writes a new pre-registration first. The forecaster itself stays off (it failed its pre-registered rule, and the lag note explains why).
+

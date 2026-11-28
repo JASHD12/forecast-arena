@@ -108,6 +108,11 @@ jobs:
           VARIANTS: ${{ inputs.variants }}
         run: |
           set -o pipefail
+          # the replayed ml probabilities belong to one golden set (T386): pick the matching file
+          case "$GOLDEN" in
+            power-2026-11a.jsonl) MLPROBS=evals/golden/ml-probs-power-11a.json ;;
+            *) MLPROBS=evals/golden/ml-probs-power.json ;;
+          esac
           if [ -n "$VARIANTS" ]; then
             # T355: an explicit list replaces the defaults; only known names are accepted
             if ! printf '%s' "$VARIANTS" | grep -Eq '^(llm_plain|llm_context|agent|agent_quant|agent_analyst|agent_skills|agent_committee)(,(llm_plain|llm_context|agent|agent_quant|agent_analyst|agent_skills|agent_committee))*$'; then
@@ -116,13 +121,13 @@ jobs:
             variants=""
             for v in $(printf '%s' "$VARIANTS" | tr ',' ' '); do variants="$variants --variant $v"; done
             case ",$VARIANTS," in
-              *,agent_analyst,*) variants="$variants --ml-probs evals/golden/ml-probs-power.json" ;;
+              *,agent_analyst,*) variants="$variants --ml-probs $MLPROBS" ;;
             esac
           else
             variants="--variant llm_plain --variant llm_context"
             if [ "$LOCAL" = "true" ]; then variants="$variants --variant llm_local"; fi
             if [ "$AGENT" = "true" ]; then variants="$variants --variant agent"; fi
-            if [ "$QUANT" = "true" ]; then variants="$variants --variant agent_quant --variant agent_analyst --ml-probs evals/golden/ml-probs-power.json"; fi
+            if [ "$QUANT" = "true" ]; then variants="$variants --variant agent_quant --variant agent_analyst --ml-probs $MLPROBS"; fi
             if [ "$SKILLS" = "true" ]; then variants="$variants --variant agent_skills"; fi
             if [ "$SC" = "true" ]; then variants="$variants --variant llm_context_sc5"; fi
           fi

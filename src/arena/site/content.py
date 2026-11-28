@@ -117,5 +117,5 @@ STACK_LIBRARIES = (
 
 TEMPLATE_VERSION_NOTES = {
     1: "published on the morning of the batch day",
-    2: "published the evening before the batch day (T160); same text and lock",
+    2: "published the evening before the batch day; same text and lock",
 }

@@ -205,7 +205,8 @@ PROOFS: tuple[tuple[str, str, str, tuple[str, ...]], ...] = (
         "Multi-agent systems, A2A",
         "A committee of specialist agents that talk over the A2A protocol (official SDK, "
         "in-process transport) and a read-only A2A agent for the benchmark itself, kept "
-        "separate from MCP (agent-to-tool); experimental, off until its pre-registered evaluation",
+        "separate from MCP (agent-to-tool); experimental, off: its pre-registered evaluation "
+        "found no benefit",
         "",
         ("src/arena/a2a", "src/arena/agent/committee.py", "tests/unit/test_agent_committee.py"),
     ),

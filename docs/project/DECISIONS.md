@@ -1516,3 +1516,9 @@ and evidence requirements. Do not backfill historical ML forecasts.
 - Decision (owner, 2026-11-28): keep the pre-registered rules (7-day window, 100 per coin, floor 200). The run now prints `SL_FETCH=` (counts per coin, failed coins, sample size; no titles, S7) and waits 120, 180, 240 and 240 s between retries of a failed coin. If the counts show 200 is unreachable, the owner decides on an amendment (14-day window or a lower floor) before any paid call.
 - Alternatives rejected for now: widening to 14 days or lowering the floor to 120 without the counts (an amendment on a guess).
 
+## 2026-11-28 · Stale text on the README and the site (T397)
+- Context: the README standings picture and caption were a committed snapshot (36 questions) while the live site had moved on (45); nothing refreshed it. Three agent evaluations (calculator, skills, committee) are decided, but several pages still said "switched off until their pre-registered evaluations pass"; the stack page said the committee evaluation was still to come; the Methods page showed internal task ids.
+- Decision: the site build writes `standings.svg` (same `build_snapshot` and `render_svg` as the committed snapshot), and the README image points at the published site, so the chart is as fresh as the site. The README caption now says the chart is live and that the comparisons below it are a dated snapshot with their own question count. Agent status text names what was evaluated and not launched; no hand-typed figures were added (I5). The committed `docs/data/standings.json` and the snapshot script remain for the README bullets.
+- Not changed: the README bullets still come from the dated snapshot (run `scripts/standings_snapshot.py` and `scripts/readme_sections.py` to refresh); a workflow that pushes README changes to `main` is not pre-approved (CLAUDE.md), so this stays a manual step.
+- Until the next Pages deploy of `main` the README image URL answers 404.
+

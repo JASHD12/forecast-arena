@@ -22,7 +22,7 @@ A live, public benchmark: simple baselines, a classical ML model and LLM forecas
 
 **[Live site](https://jashd12.github.io/forecast-arena/)** · **[For recruiters](https://jashd12.github.io/forecast-arena/recruiters.html)** · **[Ask the Arena](https://jashd12.github.io/forecast-arena/ask.html)** · [Source](https://github.com/JASHD12/forecast-arena)
 
-[![Standings](https://raw.githubusercontent.com/JASHD12/forecast-arena/main/docs/img/standings.svg)](https://jashd12.github.io/forecast-arena/)
+[![Standings](https://jashd12.github.io/forecast-arena/standings.svg)](https://jashd12.github.io/forecast-arena/)
 
 **Result so far (backtest, not the live record):** over 365 days of German day-ahead electricity, the gradient-boosted model scores Brier 0.1930 against 0.2205 for "same as last time" and 0.2466 for the base rate (lower is better; always saying 50% scores 0.25). Paired difference to persistence: -0.0275 [-0.0378, -0.0162], supported.
 

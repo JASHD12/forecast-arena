@@ -171,11 +171,80 @@ def lab_card_cmd(result: Path) -> None:
     click.echo(f"card -> {out}")
 
 
+@lab.command("analyst-eval")
+@click.argument("november_run", type=click.Path(exists=True, path_type=Path))
+@click.argument("october_run", type=click.Path(exists=True, path_type=Path))
+@click.option("--reference-run", type=click.Path(exists=True, path_type=Path), required=True)
+@click.option(
+    "--ml-probs-november",
+    type=click.Path(exists=True, path_type=Path),
+    default=Path("evals/golden/ml-probs-power-11a.json"),
+)
+@click.option(
+    "--ml-probs-october",
+    type=click.Path(exists=True, path_type=Path),
+    default=Path("evals/golden/ml-probs-power.json"),
+)
+@click.option(
+    "--skills-result",
+    type=click.Path(exists=True, path_type=Path),
+    default=Path("evals/results/lab-agent-skills.json"),
+    help="The agent_skills r1 result whose cost per answered question H-A3 compares with.",
+)
+@click.option("--out", type=click.Path(path_type=Path), default=None)
+def lab_analyst_eval(
+    november_run: Path,
+    october_run: Path,
+    reference_run: Path,
+    ml_probs_november: Path,
+    ml_probs_october: Path,
+    skills_result: Path,
+    out: Path | None,
+) -> None:
+    """Lab result of agent_analyst and the calibrated llm_context from three stored eval files."""
+    import json
+
+    from arena.forecasters.llm_context_cal import load_map
+    from arena.lab import analyst_eval as ae
+
+    def read(p: Path) -> dict:
+        return json.loads(p.read_text(encoding="utf-8"))
+
+    cal = load_map()
+    if cal is None:
+        raise click.ClickException("the calibration map artefact is missing")
+    skills = read(skills_result)["metrics"]["agent_skills / eval"]
+    r = ae.build(
+        read(november_run),
+        read(october_run),
+        read(reference_run),
+        read(ml_probs_november),
+        read(ml_probs_october),
+        cal,
+        float(skills.get("cost_usd_per_1k_answered") or skills["cost_usd_per_1k"]),
+    )
+    path = out or Path("evals/results/lab-analyst-and-calibration.json")
+    path.write_text(r.model_dump_json(indent=2) + "\n", encoding="utf-8")
+    click.echo(f"wrote {path}")
+    for v in ae.verdicts(r):
+        state = "PASS" if v["passed"] else "NOT MET"
+        click.echo(f"{v['rule']}: {state} - {v['text']}")
+
+
 @lab.command("agent-eval")
 @click.argument("eval_run", type=click.Path(exists=True, path_type=Path))
 @click.option(
     "--experiment",
-    type=click.Choice(["agent-skills", "agent-committee", "agent-committee-r2"]),
+    type=click.Choice(
+        [
+            "agent-skills",
+            "agent-committee",
+            "agent-committee-r2",
+            "agent-quant-r2",
+            "agent-skills-r2",
+            "agent-committee-r3",
+        ]
+    ),
     required=True,
 )
 @click.option(

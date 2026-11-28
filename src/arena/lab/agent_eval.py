@@ -32,6 +32,7 @@ class Experiment:
     rule_names: tuple[str, str]
     note: str
     own_arms: tuple[str, ...] = ()  # arms whose cost this result carries (none counted twice)
+    extra_notes: bool = False  # first-try validity, repairs and skills loaded (the r2/r3 results)
 
 
 EXPERIMENTS = {
@@ -83,6 +84,61 @@ EXPERIMENTS = {
         "reused on the same golden file. The replay has no news backend and no retriever, so this "
         "still tests a reduced committee.",
         ("agent_committee",),
+    ),
+    "agent-quant-r2": Experiment(
+        "agent-quant-r2",
+        "agent_quant r2: a better reference estimate and a prompt that may move away from it",
+        "Giving an LLM agent a numeric tool and a statistical reference is how companies make "
+        "tool-using forecasters less hedgy; the question is whether the r2 estimate and prompt "
+        "fix what r1 got wrong. (anthropic-tool-use)",
+        "lab/prereg/agent-quant-r2.md",
+        ("agent", "agent_quant"),
+        "agent_quant",
+        "agent",
+        1.75,
+        ("H-Q6", "H-Q7"),
+        "agent_quant r2 uses the persistence estimate (`quant-r2`) and prompt `agent_system_v6`; "
+        "agent is the live prompt with replay tools. The replayed ml probabilities were not "
+        "passed to the arms (the workflow passes them only when agent_analyst is in the run; "
+        "the agent never called get_ml_forecast in 588 stored traces).",
+        ("agent", "agent_quant"),
+        True,
+    ),
+    "agent-skills-r2": Experiment(
+        "agent-skills-r2",
+        "agent_skills r2: topic-only skills index and skill text matching the new estimate",
+        "Progressive disclosure of short, reviewed skill notes is how Anthropic and others "
+        "package domain know-how for agents without growing every prompt; this is the "
+        "re-test after the cost and anchoring defects of the first version. (anthropic-skills)",
+        "lab/prereg/agent-skills-r2.md",
+        ("agent_quant", "agent_skills"),
+        "agent_skills",
+        "agent_quant",
+        1.3,
+        ("H-S1'", "H-S2'"),
+        "agent_skills r2 is agent_quant r2 plus load_skill with a topic-only index (prompt "
+        "`agent_system_v7`, skills revision 2). The replayed ml probabilities were not passed "
+        "to the arms (see the agent_quant r2 result).",
+        ("agent_skills",),  # agent and agent_quant are counted in the agent-quant-r2 result
+        True,
+    ),
+    "agent-committee-r3": Experiment(
+        "agent-committee-r3",
+        "agent_committee r3: working repairs, topic guidance for the chair, a skeptic that sees the data",
+        "Multi-agent systems and the A2A protocol are how companies split a job between "
+        "specialised agents; this is the re-test after the defects found in r2. (a2a-protocol)",
+        "lab/prereg/agent-committee-r3.md",
+        ("agent_skills", "agent_committee"),
+        "agent_committee",
+        "agent_skills",
+        2.5,
+        ("H-C1''", "H-C2''"),
+        "r3 carries the failed reply in the chair's repair, cites members in key_factors, gives "
+        "the chair the topic skill text and the skeptic the stored data. The replay still has no "
+        "news backend and no retriever (a reduced committee), and the replayed ml probabilities "
+        "were not passed to the arms.",
+        ("agent_committee",),
+        True,
     ),
 }
 
@@ -151,6 +207,22 @@ def _pair(res: dict[str, Any], new: str, ref: str) -> dict[str, Any] | None:
                 "days": p["days"],
             }
     return None
+
+
+def _skills_loaded_notes(res: dict[str, Any], arms: tuple[str, ...]) -> list[str]:
+    """H-S3: how often each skill was loaded, from the rows that carry `skills_loaded` (T400)."""
+    out: list[str] = []
+    for arm in arms:
+        rows = [r for r in res.get("rows", []) if r["variant"] == arm and "skills_loaded" in r]
+        if not rows:
+            continue
+        counts: dict[str, int] = {}
+        for r in rows:
+            for name in dict.fromkeys(r["skills_loaded"]):
+                counts[name] = counts.get(name, 0) + 1
+        loaded = ", ".join(f"{n} {c}/{len(rows)}" for n, c in sorted(counts.items())) or "none"
+        out.append(f"{arm} skills loaded (questions that loaded each skill): {loaded}.")
+    return out
 
 
 def build(res: dict[str, Any], experiment: str, *, run_id: str | None = None) -> LabResult:
@@ -242,6 +314,13 @@ def build(res: dict[str, Any], experiment: str, *, run_id: str | None = None) ->
             for a in e.arms
             if res["metrics"][a]["answered"] < res["metrics"][a]["n"]
         ],
+        *[
+            f"{a}: {100 * res['metrics'][a]['json_valid_first_try']:.1f}% of answers were valid JSON "
+            f"on the first try, repair rate {100 * res['metrics'][a]['repair_rate']:.1f}%."
+            for a in e.arms
+            if e.extra_notes and res["metrics"][a].get("json_valid_first_try") is not None
+        ],
+        *(_skills_loaded_notes(res, e.arms) if e.extra_notes else []),
         "Cost is the run's recorded tokens at the list price of the model, per arm; this result carries "
         f"the cost of {', '.join(e.own_arms)}.",
         "Brier of the arms that answered fewer questions is on their answered items only; paired "
@@ -273,11 +352,11 @@ def verdicts(r: LabResult) -> list[dict[str, Any]]:
     e = EXPERIMENTS[r.experiment]
     new, ref = r.metrics[f"{e.new} / eval"], r.metrics[f"{e.ref} / eval"]
     out: list[dict[str, Any]] = []
-    if r.experiment == "agent-committee-r2":  # H-C5: the fix worked (mechanical)
+    if r.experiment in ("agent-committee-r2", "agent-committee-r3"):  # H-C5: answered share
         asked, got = int(str(new.get("asked") or new["n"])), int(str(new["n"]))
         out.append(
             {
-                "rule": "H-C5",
+                "rule": "H-C5''" if r.experiment == "agent-committee-r3" else "H-C5",
                 "passed": got >= 0.9 * asked,
                 "text": f"the committee answered {got} of {asked} questions; the rule needs at least 90%.",
             }

@@ -1,6 +1,7 @@
 {
  "lab_commands": [
   "agent-eval",
+  "analyst-eval",
   "anomaly",
   "ask",
   "bandit",

@@ -114,6 +114,7 @@ Each technique is tried against the project's baselines on questions it never sa
 | Two LLM judges compared (not human calibration) | evaluated (not a live score) | [docs/lab/judge-llm.md](docs/lab/judge-llm.md) |
 | Unsupervised data-anomaly detection on price windows (Isolation Forest) | evaluated (not a live score) | [docs/lab/anomaly.md](docs/lab/anomaly.md) |
 | Vector database: Qdrant against brute-force dense search | evaluated (not a live score) | [docs/lab/vectordb.md](docs/lab/vectordb.md) |
+| agent_analyst (starts from the ml forecast) and a calibrated llm_context | evaluated (not a live score) | [docs/lab/analyst-and-calibration.md](docs/lab/analyst-and-calibration.md) |
 | Agreement of the LLM judge with human labels | waits for 30 human labels; until then the judge scores are an uncalibrated ranking | - |
 | Cost routing with the simpler ml-first rule on fresh days | pre-registered 2026-11-23 (lab/prereg/routing-ml-only.md); evaluated after 2026-12-24 | - |
 | In-browser model tier for Ask the Arena: real-browser test | built and opt-in; tested with a fake engine only, a real-browser test is still open | - |

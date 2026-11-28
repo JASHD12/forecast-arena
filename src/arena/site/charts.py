@@ -11,6 +11,8 @@ from typing import Any
 
 from markupsafe import Markup
 
+from arena.forecasters.catalog import RACE_AI
+from arena.forecasters.catalog import SERIES_SLOTS as _CATALOG_SLOTS
 from arena.scoring.stats import Bin
 
 SIZE = 240
@@ -72,46 +74,11 @@ def reliability_svg(name: str, bins: Sequence[Bin]) -> Markup:
 
 #: Fixed colour per forecaster (identity, never rank). Categorical slots validated with the
 #: dataviz palette script (light and dark); the base rate is the neutral reference line.
-SERIES_SLOTS = {
-    "ml": 1,
-    "llm_plain": 2,
-    "llm_context": 3,
-    "agent": 4,
-    "persistence": 5,
-    "ensemble": 6,
-    "human_panel": 7,
-    "agent_graph": 8,
-    "llm_local": 6,  # shares the ensemble slot until T134 adds a validated ninth colour
-    "llm_local_ft": 9,  # experimental forecasters (Phase 15): own colours, see DECISIONS
-    "llm_router": 10,
-    "agent_hybrid": 11,
-    "bandit_hedge": 12,
-    "agent_quant": 13,
-    "agent_analyst": 14,
-    "agent_skills": 15,
-    "agent_graph_skills": 16,
-    "agent_hybrid_skills": 17,
-    "agent_committee": 18,
-}
+SERIES_SLOTS = _CATALOG_SLOTS
 RACE_MIN_DAYS = 7  # a line chart over fewer days is noise, not a race
 RACE_WIDE = (700, 300, (16, 220, 34, 44))  # viewBox width, height, pad (top, right, bottom, left)
 RACE_NARROW = (360, 300, (16, 12, 34, 40))  # phones: text in viewBox units stays readable
-AI_FORECASTERS = (
-    "llm_plain",
-    "llm_context",
-    "agent",
-    "agent_graph",
-    "llm_local",
-    "llm_local_ft",
-    "llm_router",
-    "agent_hybrid",
-    "agent_quant",
-    "agent_analyst",
-    "agent_skills",
-    "agent_graph_skills",
-    "agent_hybrid_skills",
-    "agent_committee",
-)
+AI_FORECASTERS = RACE_AI
 RACE_LABEL_CHARS = 20  # longest name drawn next to a line (the legend has the full name)
 HIGHLIGHT = ("ml", "base_rate")
 

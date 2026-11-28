@@ -89,6 +89,8 @@ class Settings(BaseModel):
     llm_local: bool = False
     #: T271: run `llm_local_ft`, the QLoRA-fine-tuned model (needs the pin in lab/artefacts).
     llm_local_ft: bool = False
+    #: T382: run `llm_context_cal`, `llm_context`'s answers through a fixed logit map (no tokens).
+    llm_context_cal: bool = False
     #: T293: run `bandit_hedge`, online learning of which forecaster to trust (peers only).
     bandit: bool = False
     #: T373: archive GDELT news-tone aggregates in the crypto morning context (SPEC 7.6); the

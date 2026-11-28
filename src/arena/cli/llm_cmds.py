@@ -44,12 +44,38 @@ def llm_smoke(obj: Ctx) -> None:
 
 
 @eval_group.command("build")
-@click.option("--first", type=click.DateTime(["%Y-%m-%d"]), required=True)
-@click.option("--last", type=click.DateTime(["%Y-%m-%d"]), required=True)
+@click.option("--first", type=click.DateTime(["%Y-%m-%d"]), default=None)
+@click.option("--last", type=click.DateTime(["%Y-%m-%d"]), default=None)
 @click.option("--out", type=click.Path(path_type=Path), required=True)
+@click.option(
+    "--from-ledger",
+    is_flag=True,
+    help="Freeze live days from the ledger (morning snapshots + resolutions) instead of SMARD.",
+)
+@click.option("--topics", default="weather,attention", help="With --from-ledger: comma list.")
+@click.option(
+    "--until",
+    type=click.DateTime(["%Y-%m-%d"]),
+    default=None,
+    help="With --from-ledger: last batch day.",
+)
 @click.pass_obj
-def eval_build(obj: Ctx, first: object, last: object, out: Path) -> None:
-    """Freeze a golden set of power questions from the SMARD cache (ARENA_CACHE_DIR)."""
+def eval_build(
+    obj: Ctx,
+    first: object,
+    last: object,
+    out: Path,
+    from_ledger: bool,
+    topics: str,
+    until: object,
+) -> None:
+    """Freeze a golden set: power questions from the SMARD cache (ARENA_CACHE_DIR), or, with
+    --from-ledger, live days of other topics (labelled "replay of live days", evaluation only)."""
+    if from_ledger:
+        _build_from_ledger(obj, topics, until, out)
+        return
+    if first is None or last is None:
+        raise click.UsageError("--first and --last are required without --from-ledger")
     from arena.domains.power import PowerDomain
     from arena.domains.power_history import HISTORY_START, PRICE_KEY, PowerHistory
     from arena.evals.golden import build, dump
@@ -62,6 +88,81 @@ def eval_build(obj: Ctx, first: object, last: object, out: Path) -> None:
     items = build(PowerDomain(store), f, la, obj.clock.now())
     sha = dump(items, out)
     click.echo(f"golden set: {len(items)} items, {f} to {la}, sha256 {sha} -> {out}")
+
+
+def _build_from_ledger(obj: Ctx, topics: str, until: object, out: Path) -> None:
+    import json
+
+    from arena.evals import from_ledger as fl
+    from arena.evals.golden import dump
+
+    if until is None:
+        raise click.UsageError("--until is required with --from-ledger")
+    day = until.date()  # type: ignore[attr-defined]
+    names = [t.strip() for t in topics.split(",") if t.strip()]
+    build = fl.build_from_ledger(obj.ledger, names, day)
+    if not build.items:
+        raise click.ClickException("no resolved question with a morning snapshot: nothing frozen")
+    sha = dump(build.items, out)
+    ml_path = out.with_suffix(".ml-probs.json")
+    ml_path.write_text(
+        json.dumps(
+            {
+                "golden": out.name,
+                "golden_sha256": sha,
+                "kind": "live",
+                "note": "the live ml forecast of each question's morning, read from the ledger; "
+                "not a replay, but the questions are past days (evaluation only)",
+                "probabilities": dict(sorted(build.ml.items())),
+            },
+            indent=1,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    sidecar = out.with_suffix(".meta.json")
+    sidecar.write_text(
+        json.dumps(fl.meta(build, names, day, sha, out.name), indent=1) + "\n", encoding="utf-8"
+    )
+    click.echo(
+        f"{fl.LABEL}: {len(build.items)} items, sha256 {sha} -> {out} (dropped: {build.dropped})"
+    )
+
+
+@eval_group.command("ml-probs")
+@click.option(
+    "--golden",
+    type=click.Path(exists=True, path_type=Path),
+    required=True,
+    help="Frozen golden set.",
+)
+@click.option("--out", type=click.Path(path_type=Path), required=True)
+@click.pass_obj
+def eval_ml_probs(obj: Ctx, golden: Path, out: Path) -> None:
+    """Replay the production `ml` power model over a golden set (SMARD cache; a replay, I4)."""
+    from arena.backtest import power as bt
+    from arena.domains.power import PowerDomain
+    from arena.domains.power_history import HISTORY_START, PRICE_KEY, PowerHistory
+    from arena.evals import ml_probs as mp
+    from arena.sources.http import HttpClient
+    from arena.sources.smard import SmardClient
+
+    first, last = mp.batch_range(golden)
+    client = SmardClient(HttpClient(obj.settings.user_agent()), cache_dir=obj.settings.cache_dir)
+    store = PowerHistory(client).store([PRICE_KEY], HISTORY_START, last + timedelta(days=3))
+    run_id = f"mlprobs-{first.isoformat()}-{last.isoformat()}"
+    res = bt.run(PowerDomain(store), first, last, run_id=run_id)
+    note = (
+        f"ml probabilities from a walk-forward replay of the production power model over the "
+        f"batch days {first} to {last} (data known before each morning, expanding-window "
+        f"retraining), for the frozen golden set {golden.name}; replay, not live (I4)"
+    )
+    payload = mp.build_payload(golden, res.records, note)
+    mp.write(payload, out)
+    n = len(payload["probabilities"])
+    click.echo(
+        f"ml probabilities: {n} questions, golden sha256 {payload['golden_sha256']} -> {out}"
+    )
 
 
 @eval_group.command("run")

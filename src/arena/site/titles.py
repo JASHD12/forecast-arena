@@ -11,32 +11,12 @@ from __future__ import annotations
 
 from datetime import date
 
+from arena.forecasters.catalog import FORECASTER_NAMES
 from arena.models import Question
 
-#: Friendly names for forecasters and domains (display only; ids stay in tables and data).
-FORECASTER_NAMES = {
-    "base_rate": "Base rate",
-    "persistence": "Same as last time",
-    "ml": "ML model",
-    "llm_plain": "AI, question only (retired)",
-    "llm_context": "AI with data",
-    "agent": "AI agent with tools",
-    "agent_graph": "AI agent (LangGraph)",
-    "llm_local": "Open model (CPU)",
-    "llm_local_ft": "Fine-tuned open model (experimental)",
-    "llm_router": "Cascade router (experimental)",
-    "agent_hybrid": "AI agent, hybrid retrieval (experimental)",
-    "agent_quant": "AI agent with a calculator (experimental)",
-    "agent_analyst": "AI analyst reviewing the ML model (experimental)",
-    "agent_skills": "AI agent with skills (experimental)",
-    "agent_graph_skills": "AI agent (LangGraph) with skills (experimental)",
-    "agent_hybrid_skills": "AI agent, hybrid retrieval, with skills (experimental)",
-    "agent_committee": "AI committee of specialist agents (experimental)",
-    "sentiment": "News-tone model for crypto (experimental, backtest only)",
-    "bandit_hedge": "Learned blend of forecasters (experimental)",
-    "ensemble": "Ensemble",
-    "human_panel": "Human panel",
-}
+__all__ = ["FORECASTER_NAMES"]
+
+#: Friendly names for forecasters (derived from the catalog) and domains (display only).
 DOMAIN_NAMES = {
     "power": "Electricity",
     "weather": "Weather",

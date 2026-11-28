@@ -222,8 +222,40 @@ def run(
         "versions": versions,
         "metrics": metrics(rows, items, tracer),
         "paired": paired(rows, list(clients)),
+        "paired_by_topic": paired_by_topic(rows, list(clients)),
         "rows": rows,
     }
+
+
+def topic_of(question_id: str) -> str:
+    """The topic of a question: the first part of its id (`power-...`, `weather-...`)."""
+    return question_id.split("-")[0]
+
+
+def _by_topic(
+    mine: Sequence[dict[str, Any]], base: Mapping[str, float | None]
+) -> dict[str, dict[str, Any]]:
+    """Per topic: questions, answers, Brier, and the base rate's Brier on the same answers."""
+    out: dict[str, dict[str, Any]] = {}
+    for topic in sorted({topic_of(r["question_id"]) for r in mine}):
+        rs = [r for r in mine if topic_of(r["question_id"]) == topic]
+        ok = [r for r in rs if r["probability"] is not None]
+        ref: list[tuple[dict[str, Any], float]] = []
+        for r in ok:
+            b0 = base.get(r["question_id"])
+            if b0 is not None:
+                ref.append((r, b0))
+        out[topic] = {
+            "n": len(rs),
+            "answered": len(ok),
+            "brier": brier([r["probability"] for r in ok], [r["outcome"] for r in ok])
+            if ok
+            else None,
+            "base_rate_brier_same_items": brier([x for _, x in ref], [r["outcome"] for r, _ in ref])
+            if ref
+            else None,
+        }
+    return out
 
 
 def metrics(
@@ -271,8 +303,24 @@ def metrics(
             "cache_read_tokens": cr,
             "cache_write_tokens": cw,
             "cost_usd": None if price is None else (billed_in * price[0] + outp * price[1]) / 1e6,
+            "cost_usd_per_answered": None
+            if price is None or not ok
+            else (billed_in * price[0] + outp * price[1]) / 1e6 / len(ok),
             "model": spans[0].model if spans else None,
+            "by_topic": _by_topic(mine, base),
         }
+    return out
+
+
+def paired_by_topic(rows: Sequence[dict[str, Any]], names: Sequence[str]) -> list[dict[str, Any]]:
+    """`paired`, separately for each topic present (only when there is more than one topic)."""
+    topics = sorted({topic_of(r["question_id"]) for r in rows})
+    if len(topics) < 2:
+        return []
+    out = []
+    for topic in topics:
+        sub = [r for r in rows if topic_of(r["question_id"]) == topic]
+        out += [{**p, "topic": topic} for p in paired(sub, names)]
     return out
 
 

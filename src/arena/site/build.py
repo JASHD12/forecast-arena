@@ -66,6 +66,7 @@ from arena.site.llm_obs import (
     CACHE_READ_MULT,
     PRICE_SOURCE,
     load_spans,
+    tool_use_rows,
     totals,
     traces_by_question,
     usage_rows,
@@ -399,6 +400,9 @@ def build_site(
                 "cache_read_mult": CACHE_READ_MULT,
                 "otlp_files": otlp_files,
                 "parse": parse_failures(rec),
+                "tool_rows": tool_use_rows(
+                    t for ts in traces_by_question(ledger).values() for t in ts
+                ),
             },
         ),
         "evals.html": ("LLM evals", {"runs": eval_runs(evals_dir)}),

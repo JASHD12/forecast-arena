@@ -1,0 +1,64 @@
+name: lab-sentiment-labels
+
+# T375: rate 500 current crypto headlines with a small open model (free, on the runner) and with Claude
+# (paid), and measure the agreement (lab/prereg/sentiment-labels.md). Pre-registered before this
+# workflow existed. Paid, manual, capped, no ledger write, no deploy (S8). Needs the owner's OK
+# (HUMAN_TODO H45); dispatch from main only (the job refuses any other branch). Headlines are scored
+# in memory and discarded: the log has counts and agreement only. The result is one line in the log
+# (`SL_RESULT=`), which the agent reads back.
+
+on:
+  workflow_dispatch:
+    inputs:
+      max_tokens:
+        description: "Hard token cap for this run"
+        default: "400000"
+      model:
+        description: "Claude model id instead of the configured one (for example the Haiku id); empty = configured"
+        default: ""
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lab-sentiment-labels
+  cancel-in-progress: false
+
+jobs:
+  run:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      ARENA_CONTACT: ${{ vars.ARENA_CONTACT }}
+      ARENA_LLM_PROVIDER: ${{ vars.ARENA_LLM_PROVIDER }}
+      ARENA_LLM_MODEL: ${{ vars.ARENA_LLM_MODEL }}
+      ARENA_LLM_EFFORT: ${{ vars.ARENA_LLM_EFFORT || 'low' }}
+      ARENA_LLM_MAX_OUTPUT_TOKENS: ${{ vars.ARENA_LLM_MAX_OUTPUT_TOKENS || '1024' }}
+      ARENA_LLM_BASE_URL: ${{ vars.ARENA_LLM_BASE_URL }}
+      ARENA_LLM_API_KEY: ${{ secrets.ARENA_LLM_API_KEY }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements/*.txt
+      - name: Install pinned dependencies
+        run: make setup
+      - name: Install the open-model export tools and export the pinned model to ONNX
+        run: |
+          .venv/bin/pip install -r requirements/sentiment-export.txt
+          .venv/bin/python scripts/export_sentiment_onnx.py sentiment_onnx
+      - name: Run
+        env:
+          MAX_TOKENS: ${{ inputs.max_tokens }}
+          CLAUDE_MODEL: ${{ inputs.model }}
+        run: |
+          set -o pipefail
+          ARGS=(--model-dir sentiment_onnx --max-tokens "$MAX_TOKENS")
+          if [ -n "$CLAUDE_MODEL" ]; then ARGS+=(--model "$CLAUDE_MODEL"); fi
+          .venv/bin/arena lab sentiment-labels-run "${ARGS[@]}" | tee run.log
+          { echo "## lab-sentiment-labels (not the live record)"; echo '```'; head -c 3000 run.log; echo '```'; } >> "$GITHUB_STEP_SUMMARY"

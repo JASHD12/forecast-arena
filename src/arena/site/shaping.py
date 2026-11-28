@@ -18,6 +18,7 @@ from typing import Any
 
 from markupsafe import Markup
 
+from arena.forecasters.catalog import DISPLAY_ORDER
 from arena.ledger import Ledger, layout
 from arena.models import Question, RunManifest
 from arena.scoring.core import Scored, clip, excluded
@@ -211,27 +212,7 @@ def _rows(
                 "overdue": now is not None and q.resolve_after < now,
             }
         )
-    order = [
-        "base_rate",
-        "persistence",
-        "ml",
-        "llm_plain",
-        "llm_context",
-        "llm_local",
-        "agent",
-        "agent_graph",
-        "llm_local_ft",
-        "llm_router",
-        "agent_hybrid",
-        "agent_quant",
-        "agent_analyst",
-        "agent_skills",
-        "agent_graph_skills",
-        "agent_hybrid_skills",
-        "agent_committee",
-        "bandit_hedge",
-    ]
-    ordered = [f for f in order if f in fids] + sorted(fids - set(order))
+    ordered = [f for f in DISPLAY_ORDER if f in fids] + sorted(fids - set(DISPLAY_ORDER))
     return rows, ordered
 
 

@@ -1,57 +1,48 @@
-"""CLI commands of the experiments lab that run offline on the committed files (T254, T246b)."""
+"""The `arena lab` commands survive the split of lab_cmds.py (T383), and cards regenerate (CLI)."""
+
+from __future__ import annotations
 
 import json
+import shutil
 from pathlib import Path
 
+import pytest
 from click.testing import CliRunner
 
-from arena.cli import main
+from arena.cli import lab, main
+
+ROOT = Path(__file__).parents[2]
+SNAP = json.loads((ROOT / "tests/fixtures/lab_commands_snapshot.json").read_text("utf-8"))
 
 
-def run(*args: str, cwd: Path | None = None):
-    return CliRunner().invoke(main, list(args), catch_exceptions=False)
+def test_the_command_set_is_unchanged_by_the_split() -> None:
+    assert sorted(lab.commands) == SNAP["lab_commands"]
+    groups = {k: sorted(v.commands) for k, v in lab.commands.items() if hasattr(v, "commands")}
+    assert groups == SNAP["groups"]
 
 
-def test_ask_answers_with_a_citation_and_refuses_out_of_scope(tmp_path: Path) -> None:
-    ok = run("--ledger-dir", str(tmp_path), "lab", "ask", "At what time is the daily lock?")
-    assert ok.exit_code == 0 and "docs/" in ok.output and "[" in ok.output
-    no = run("--ledger-dir", str(tmp_path), "lab", "ask", "How do I bake sourdough bread?")
-    assert no.exit_code == 0 and "Not in the documents" in no.output
+@pytest.mark.parametrize("name", SNAP["lab_commands"])
+def test_every_lab_command_answers_help(name: str) -> None:
+    res = CliRunner().invoke(main, ["lab", name, "--help"])
+    assert res.exit_code == 0 and "Usage" in res.output
 
 
-def test_docs_eval_writes_a_valid_result_file(tmp_path: Path) -> None:
-    out = tmp_path / "lab-docs.json"
-    res = run("--ledger-dir", str(tmp_path), "lab", "docs-eval", "--out", str(out))
-    assert res.exit_code == 0
-    data = json.loads(out.read_text())
-    assert data["kind"] == "evaluation" and data["metrics"]["docs_assistant"]["answerable"] >= 20
-
-
-def test_ft_calibrate_merges_shards_and_fits_platt_on_validation_only(tmp_path: Path) -> None:
-    """Synthetic margins for every committed validation and test row; two shards."""
-    from arena.lab import dataset as ds
-    from arena.lab import ft_gguf as fg
-
-    rows = [
-        r
-        for name in fg.SPLITS
-        for r in ds.read_split(Path("lab/data/forecast-sft") / f"{name}.jsonl.gz")
-    ]
-    margins = {r.id: (0.5 if r.outcome else -0.5) for r in rows}
-    parts = []
-    for i in range(2):
-        p = tmp_path / f"m{i}.json"
-        p.write_text(
-            json.dumps(
-                fg.shard(sorted(margins.items()), i, 2)
-                and dict(fg.shard(sorted(margins.items()), i, 2))
-            )
-        )
-        parts.append(str(p))
-    out = tmp_path / "all.json"
-    res = run("--ledger-dir", str(tmp_path), "lab", "ft-calibrate", *parts, "--out", str(out))
-    assert res.exit_code == 0
-    line = next(x for x in res.output.splitlines() if x.startswith("FT_CALIBRATION_JSON="))
-    cal = json.loads(line.split("=", 1)[1])
-    assert set(cal["splits"]) == {"val", "test_oct", "test_nov"} and cal["platt_new"][0] > 0
-    assert len(json.loads(out.read_text())) == len(rows)
+def test_lab_card_regenerates_every_committed_card_byte_for_byte(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    results = sorted((ROOT / "evals/results").glob("lab-*.json"))
+    assert results
+    checked = 0
+    for res_path in results:
+        card = json.loads(res_path.read_text("utf-8")).get("card")
+        if not card or not (ROOT / card).is_file():
+            continue
+        work = tmp_path / res_path.stem
+        (work / "docs/lab").mkdir(parents=True)
+        shutil.copy(res_path, work / res_path.name)
+        monkeypatch.chdir(work)
+        out = CliRunner().invoke(main, ["lab", "card", res_path.name])
+        assert out.exit_code == 0, out.output
+        assert (work / card).read_text("utf-8") == (ROOT / card).read_text("utf-8"), card
+        checked += 1
+    assert checked >= 10

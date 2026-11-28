@@ -59,8 +59,8 @@ def test_scoring_modules_import_without_pytorch() -> None:
         "import sys; sys.modules['torch'] = None\n"
         "from arena.lab import ft_gguf, dataset, artefacts, ft_runtime\n"
         "assert ft_gguf.shard(list(range(5)), 1, 2) == [1, 3]\n"
-        "from arena.cli import lab_cmds\n"
-        "assert len(lab_cmds._ft_rows()) == 828\n"
+        "from arena.cli import lab_ft\n"
+        "assert len(lab_ft._ft_rows()) == 828\n"
     )
     res = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True)
     assert res.returncode == 0, res.stderr[-500:]

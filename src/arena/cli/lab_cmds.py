@@ -235,7 +235,16 @@ def lab_analyst_eval(
 @click.argument("eval_run", type=click.Path(exists=True, path_type=Path))
 @click.option(
     "--experiment",
-    type=click.Choice(["agent-skills", "agent-committee", "agent-committee-r2"]),
+    type=click.Choice(
+        [
+            "agent-skills",
+            "agent-committee",
+            "agent-committee-r2",
+            "agent-quant-r2",
+            "agent-skills-r2",
+            "agent-committee-r3",
+        ]
+    ),
     required=True,
 )
 @click.option(

@@ -185,3 +185,79 @@ def test_reference_arm_is_reused_only_on_the_same_golden_file_and_pairs_are_reco
         ]["passed"]
         is False
     )
+
+
+def _four_arm_run() -> dict:
+    run = _run(committee_diff=-0.02, committee_cost=0.2)
+    run["paired"] = [
+        {
+            "a": "agent",
+            "b": "agent_quant",
+            "diff": 0.01,
+            "lo": 0.002,
+            "hi": 0.018,
+            "n": 90,
+            "days": 15,
+        },
+        {
+            "a": "agent_quant",
+            "b": "agent_skills",
+            "diff": 0.01,
+            "lo": 0.002,
+            "hi": 0.018,
+            "n": 90,
+            "days": 15,
+        },
+        {
+            "a": "agent_skills",
+            "b": "agent_committee",
+            "diff": 0.02,
+            "lo": 0.01,
+            "hi": 0.03,
+            "n": 90,
+            "days": 15,
+        },
+    ]
+    for arm in ("agent_skills", "agent_committee"):
+        run["metrics"][arm].update(json_valid_first_try=0.9, repair_rate=0.1)
+    run["rows"] = [
+        {
+            "variant": "agent_skills",
+            "question_id": "a",
+            "probability": 0.6,
+            "outcome": 1,
+            "skills_loaded": ["forecasting-core", "forecasting-core"],
+        },
+        {
+            "variant": "agent_skills",
+            "question_id": "b",
+            "probability": 0.4,
+            "outcome": 0,
+            "skills_loaded": [],
+        },
+    ]
+    return run
+
+
+def test_the_r2_r3_results_carry_each_cost_once_and_the_new_rule_names() -> None:
+    run = _four_arm_run()
+    q = ae.build(run, "agent-quant-r2")
+    s = ae.build(run, "agent-skills-r2")
+    c = ae.build(run, "agent-committee-r3")
+    total = sum(m["cost_usd"] for m in run["metrics"].values())
+    assert q.cost_usd + s.cost_usd + c.cost_usd == total  # nothing counted twice or dropped
+    assert [v["rule"] for v in ae.verdicts(q)] == ["H-Q6", "H-Q7"]
+    assert [v["rule"] for v in ae.verdicts(s)] == ["H-S1'", "H-S2'"]
+    assert [v["rule"] for v in ae.verdicts(c)] == ["H-C5''", "H-C1''", "H-C2''"]
+    (p,) = q.paired
+    assert (p["a"], p["b"]) == ("agent_quant", "agent") and p["diff"] == -0.01
+    assert ae.verdicts(q)[1]["passed"] is True  # 0.08 / 0.05 = 1.6 <= 1.75
+
+
+def test_the_r2_r3_notes_report_first_try_validity_and_the_skills_loaded() -> None:
+    run = _four_arm_run()
+    notes = " ".join(ae.build(run, "agent-skills-r2").notes)
+    assert "90.0% of answers were valid JSON on the first try, repair rate 10.0%" in notes
+    assert "agent_skills skills loaded" in notes and "forecasting-core 1/2" in notes
+    old = " ".join(ae.build(run, "agent-skills").notes)
+    assert "first try" not in old and "skills loaded" not in old  # earlier results are unchanged

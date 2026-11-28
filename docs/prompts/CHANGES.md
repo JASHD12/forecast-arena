@@ -197,21 +197,50 @@ Versions: v1, v2.
 
 ## `committee_brief`
 
-Versions: v1.
+Versions: v1, v2.
 
-Only one version.
+- v1 to v2: 3 changed lines.
+
+```diff
++Guidance from the project team for this topic (a reviewed note, not data about this question):
++{guidance}
++
+```
 
 ## `committee_chair`
 
-Versions: v1.
+Versions: v1, v2.
 
-Only one version.
+- v1 to v2: 11 changed lines.
+
+```diff
+-1. Start from the quant-analyst's estimate when it exists. Move away from it only for evidence it
+-   cannot see, and by an amount you can justify. Without an estimate, use the data in the question
++1. Start from the quant-analyst's estimate when it exists, but it is a statistical reference, not the
++   answer: it knows nothing about the weekday pattern or the hourly shape of the latest day. Move
++   away from it when the stored data or the project-team guidance say it is wrong, or for evidence
++   it cannot see, and by an amount you can justify. Without an estimate, use the data in the question
+-4. Name the members you relied on in the rationale (for example "quant-analyst 0.81, news-scout
+-   neutral"). Do not cite a member that reported nothing.
++4. Name the members you relied on in key_factors, not in the rationale (for example
++   "quant-analyst 0.81", "news-scout neutral"); keep the rationale within its word limit. Do not
++   cite a member that reported nothing.
+```
 
 ## `committee_final`
 
-Versions: v1.
+Versions: v1, v2.
 
-Only one version.
+- v1 to v2: 6 changed lines.
+
+```diff
++
++Guidance from the project team for this topic (a reviewed note, not data about this question):
++{guidance}
+-is right, and say in the rationale which issue you accepted or why you kept the draft. A critique
++is right. Say in key_factors which issue you accepted or why you kept the draft; keep the rationale
++within its word limit. A critique
+```
 
 ## `committee_scout`
 
@@ -221,9 +250,18 @@ Only one version.
 
 ## `committee_skeptic`
 
-Versions: v1.
+Versions: v1, v2.
 
-Only one version.
+- v1 to v2: 6 changed lines.
+
+```diff
+-2. Is it consistent with the reference estimate from the quant-analyst, or does it say what evidence
+-   moved it away? An unexplained gap is a problem.
++2. Check the draft against the stored data of the question (given to you below): the latest value
++   against the threshold, the weekday of the target day, the hourly shape of the latest day. A gap
++   from the quant-analyst's estimate is a problem only when the data do not support it; the
++   estimate is a statistical reference and can be wrong.
+```
 
 ## `context_user`
 

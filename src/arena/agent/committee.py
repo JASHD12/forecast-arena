@@ -38,6 +38,7 @@ from arena.agent.committee_members import (
     SKEPTIC,
     Members,
     member_specs,
+    topic_guidance,
 )
 from arena.agent.forecaster import AgentForecaster
 from arena.agent.hybrid import GUARD_VERSION, _guard
@@ -45,11 +46,11 @@ from arena.agent.tools import ToolBox
 from arena.forecasters.llm import render_context
 from arena.llm import prompts
 from arena.llm.budget import BudgetExhausted
-from arena.llm.client import LLMClient, LLMError, Usage, UserText
+from arena.llm.client import AssistantTurn, LLMClient, LLMError, Usage, UserText
 from arena.llm.parse import Answer, ParseError, parse_answer
 from arena.models import Forecast, Question, Skip
 
-COMMITTEE_REVISION = "committee-r2"
+COMMITTEE_REVISION = "committee-r3"
 MEMBER_TIMEOUT = 90.0
 COMMITTEE_TIMEOUT = 300.0
 MIN_RESEARCH_MEMBERS = 2
@@ -67,7 +68,13 @@ class AgentCommittee(AgentForecaster):
         "committee_skeptic",
         "repair",
     )
-    prompt_versions = {"repair": "v2"}  # noqa: RUF012 - read-only class default
+    prompt_versions = {  # noqa: RUF012 - read-only class default
+        "repair": "v2",
+        "committee_chair": "v2",
+        "committee_brief": "v2",
+        "committee_final": "v2",
+        "committee_skeptic": "v2",
+    }
 
     def __init__(self, client: LLMClient | None, **kw: Any) -> None:
         kw.setdefault("prompt_version", "v1")
@@ -195,6 +202,7 @@ class AgentCommittee(AgentForecaster):
                 "question": payload["question"],
                 "draft": {"probability": draft.probability, "rationale": draft.rationale},
                 "reports": reports,
+                "context": ctx,
             }
             crit = await hub.client(SKEPTIC).ask(skeptic_in)
             run.calls[SKEPTIC] = crit
@@ -233,6 +241,7 @@ class AgentCommittee(AgentForecaster):
             .replace("{question}", q.text)
             .replace("{rule}", q.resolution_rule)
             .replace("{context}", render_context(ctx))
+            .replace("{guidance}", topic_guidance(q.domain))
         )
         for key, value in blocks.items():
             text = text.replace("{" + key + "}", value)
@@ -253,7 +262,8 @@ class AgentCommittee(AgentForecaster):
             resp = await asyncio.to_thread(
                 self.client.complete,
                 system,
-                [UserText(user), UserText(repair)],
+                # the failed reply goes first, so "your previous answer" refers to something (r3)
+                [UserText(user), AssistantTurn(resp), UserText(repair)],
                 max_tokens=self.max_output_tokens,
             )
             run.usage = run.usage + resp.usage

@@ -1540,3 +1540,9 @@ and evidence requirements. Do not backfill historical ML forecasts.
 - Alternatives rejected: shortening the skills until the cost passes (tuning to the rule); turning prompt caching on for the evaluation (the live setting is off, and the registration fixes it).
 - The paid comparison (H-S1', H-S2') needs the owner's OK and lab budget (H46); the committee (T401) follows.
 
+## 2026-11-28 · `agent_committee` r3: repairs that work, a fair comparison, a skeptic that sees the data (T401)
+- Context: r2 answered 87 of 90 and scored +0.0060 [-0.0036, +0.0152] against `agent_skills` (H-C1 not met) at 1.44 times the cost. The chair's repair omitted the failed reply, so 32% of chair calls needed a repair that referred to nothing; the prompts asked for member names in an 80-word rationale; the committee never saw skill text although its comparison arm does; the skeptic never saw the stored data.
+- Decision: pre-registered first (`lab/prereg/agent-committee-r3.md`). The chair's repair now sends the failed reply as an assistant turn; the skeptic's retry quotes its previous reply; prompts v2 for chair, brief, final and skeptic; the topic skill text goes to the chair as project-team guidance; the skeptic gets the rendered stored data. Revision `committee-r3` (members `quant-r2,hist-r1,scout-r2,skeptic-r3`).
+- Not done, on purpose: structured outputs for the chair (the adapter's schema is the answer schema for the whole client and is switched by `ARENA_LLM_STRUCTURED` for every arm, so it is an evaluation-wide setting, not a committee change) and a replay retriever for the historian (needs the embedding model in the eval workflow). Both are stated on the pre-registration as limits.
+- The paid comparison needs the owner's OK and lab budget (H46).
+

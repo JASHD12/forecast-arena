@@ -246,8 +246,8 @@ def test_trace_has_calls_and_sizes_but_no_article_text() -> None:
 def test_version_names_every_member_the_protocol_the_sdk_and_the_skill_fingerprint() -> None:
     v = _agent(Script()).version()
     for part in (
-        "committee-r2",
-        "quant-r2,hist-r1,scout-r2,skeptic-r2",
+        "committee-r3",
+        "quant-r2,hist-r1,scout-r2,skeptic-r3",
         "a2a-1.0",
         "sdk-1.3.1",
         "guards-r1",
@@ -261,7 +261,7 @@ def test_agent_cards_of_the_members_are_valid() -> None:
 
     for name, spec in _agent(Script()).agent_specs().items():
         assert validate_card(build_card(spec, f"http://{name}.invalid/")) == []
-        assert spec.version.endswith("|committee-r2|sdk-1.3.1")
+        assert spec.version.endswith("|committee-r3|sdk-1.3.1")
 
 
 def test_parse_critique_is_strict() -> None:
@@ -312,3 +312,63 @@ def test_r2_gives_the_model_members_the_full_output_budget() -> None:
     ).forecast(_q(), CTX, ASOF)
     assert isinstance(out, Forecast)
     assert seen.count(1024) >= 2  # the scout and the skeptic
+
+
+class _Recording(Script):
+    """A script that also keeps every chair call's full turns and a sequence of skeptic replies."""
+
+    def __init__(self, skeptic_replies: list[str] | None = None, **over: Any) -> None:
+        super().__init__(**over)
+        self.chair_turns: list[Any] = []
+        self.skeptic_replies = skeptic_replies or []
+
+    def __call__(self, system: str, turns: Any, tools: Any) -> Any:
+        if "chair of" in system:
+            self.chair_turns.append(list(turns))
+        if "skeptic of" in system and self.skeptic_replies:
+            self.seen.append(("skeptic", turns[0].text))
+            return self.skeptic_replies.pop(0)
+        return super().__call__(system, turns, tools)
+
+
+def test_the_chairs_repair_carries_the_failed_reply() -> None:
+    from arena.llm.client import AssistantTurn, UserText
+
+    s = _Recording(chair=["this is not json", json.dumps(DRAFT), json.dumps(FINAL)])
+    out = _agent(s).forecast(_q(), CTX, ASOF)
+    assert isinstance(out, Forecast) and out.meta["committee"]["repairs"] == ["draft"]
+    first, repair = s.chair_turns[0], s.chair_turns[1]
+    assert len(first) == 1 and [type(t) for t in repair] == [UserText, AssistantTurn, UserText]
+    assert repair[1].response.text == "this is not json"
+    assert "could not be parsed" in repair[2].text
+
+
+def test_the_skeptics_retry_quotes_its_previous_reply() -> None:
+    s = _Recording(skeptic_replies=["maybe, I think", json.dumps(CRIT)])
+    out = _agent(s).forecast(_q(), CTX, ASOF)
+    assert isinstance(out, Forecast)
+    first, retry = [u for r, u in s.seen if r == "skeptic"]
+    assert "Your previous reply was:\nmaybe, I think" in retry and "not valid" in retry
+    assert "Your previous reply" not in first
+
+
+def test_the_skeptic_sees_the_stored_data_and_the_chair_the_topic_guidance() -> None:
+    s = _Recording()
+    _agent(s).forecast(_q(), CTX, ASOF)
+    skeptic_user = next(u for r, u in s.seen if r == "skeptic")
+    assert "Data stored for this question:" in skeptic_user and "2026-10-10" in skeptic_user
+    brief = next(u for r, u in s.seen if r == "chair")
+    assert "Guidance from the project team" in brief and "Skill: electricity-day-ahead" in brief
+    assert "{guidance}" not in brief
+
+
+def test_the_v2_prompts_no_longer_ask_for_member_names_in_the_rationale() -> None:
+    from arena.llm import prompts
+
+    chair = prompts.load("committee_chair", "v2")
+    assert (
+        "key_factors, not in the rationale" in chair and "relied on in the rationale" not in chair
+    )
+    assert "Say in key_factors" in prompts.load("committee_final", "v2")
+    assert "stored data of the question" in prompts.load("committee_skeptic", "v2")
+    assert "unexplained gap is a problem" not in prompts.load("committee_skeptic", "v2")

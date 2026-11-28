@@ -1,7 +1,7 @@
 {
  "agent": "fake-model-1|prompt-v1-c431eac3ad4a|tools-4|out-400",
  "agent_analyst": "fake-model-1|prompt-v1-c34fe4efced0|tools-4|out-400|analyst-r1",
- "agent_committee": "fake-model-1|prompt-a752bbec04d4|committee-r2|members-quant-r2,hist-r1,scout-r2,skeptic-r2|a2a-1.0|sdk-1.3.1|guards-r1|skills-9fd4d88f|out-400",
+ "agent_committee": "fake-model-1|prompt-3b248ce29015|committee-r3|members-quant-r2,hist-r1,scout-r2,skeptic-r3|a2a-1.0|sdk-1.3.1|guards-r1|skills-9fd4d88f|out-400",
  "agent_graph": "fake-model-1|graph-prompt-v1-628a9b20284f|tools-4|out-400|langgraph-1.2.21",
  "agent_graph_skills": "fake-model-1|graph-prompt-v1-a07f6cd67e71|tools-4|out-400|langgraph-1.2.21|quant-r2|skills-r2-9fd4d88f",
  "agent_quant": "fake-model-1|prompt-v1-c645565dffa4|tools-4|out-400|quant-r2",

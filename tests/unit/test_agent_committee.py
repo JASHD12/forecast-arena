@@ -247,7 +247,7 @@ def test_version_names_every_member_the_protocol_the_sdk_and_the_skill_fingerpri
     v = _agent(Script()).version()
     for part in (
         "committee-r2",
-        "quant-r1,hist-r1,scout-r2,skeptic-r2",
+        "quant-r2,hist-r1,scout-r2,skeptic-r2",
         "a2a-1.0",
         "sdk-1.3.1",
         "guards-r1",

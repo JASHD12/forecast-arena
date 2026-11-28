@@ -37,7 +37,7 @@ SCOUT = "news-scout"
 SKEPTIC = "skeptic"
 RESEARCH_MEMBERS = (QUANT_MEMBER, HISTORIAN, SCOUT)
 REVISIONS = {
-    QUANT_MEMBER: "quant-r1",
+    QUANT_MEMBER: "quant-r2",  # the member uses the r2 estimate (T399); committee r3 follows (T401)
     HISTORIAN: "hist-r1",
     SCOUT: "scout-r2",
     SKEPTIC: "skeptic-r2",

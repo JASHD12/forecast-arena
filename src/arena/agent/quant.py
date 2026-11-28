@@ -18,14 +18,19 @@ prompt and the tools differ, and both differences are visible in the version str
 The reference estimate for weather is the `ml` weather rule itself (a fixed normal error around
 the stored DWD forecast), so on weather a numerate agent can at best match `ml`; that is stated in
 the pre-registration (`lab/prereg/llm-quant-tools.md`). For electricity it is a simple, documented
-blend of how often recent days crossed the threshold. Other topics have no reference model and
+persistence with a normal error (r2; the r1 blend of share-of-days was replaced, see
+`lab/prereg/agent-quant-r2.md`). Other topics have no reference model and
 the tool says so (a visible tool error, never a made-up number).
 """
 
 from __future__ import annotations
 
+import calendar
 from collections.abc import Mapping
-from datetime import datetime
+from datetime import date, datetime
+from itertools import pairwise
+from math import sqrt
+from statistics import mean, pstdev
 from typing import Any
 
 from arena.agent import skills
@@ -38,61 +43,101 @@ from arena.agent.tools import (
     SIMILAR_SPEC,
     TOOL_SPECS,
     ToolBox,
+    normal_probability,
     skill_spec,
 )
 from arena.forecasters.ml_weather import GUST_SIGMA, TMAX_SIGMA, TMIN_SIGMA, WeatherRules
 from arena.models import Question
 
-QUANT_REVISION = "quant-r1"
+QUANT_REVISION = "quant-r2"
 ANALYST_REVISION = "analyst-r1"
 MIN_HISTORY_DAYS = 7
 ESTIMATE_CLIP = (0.05, 0.95)
-RECENT_DAYS = 7
 
 
-def _hit(value: float, comparator: str, threshold: float) -> bool:
-    """The question's comparison, as the resolver applies it."""
-    if comparator == "gt":
-        return value > threshold
-    if comparator == "ge":
-        return value >= threshold
-    return value < threshold
+def _daily_values(q: Question, ctx: Mapping[str, Any]) -> tuple[list[date], list[float]]:
+    """The stored days that carry the question's statistic, oldest first."""
+    stat = str(q.params.get("stat", ""))
+    rows = [d for d in ctx.get("daily", []) if stat in d and "day" in d]
+    if len(rows) < MIN_HISTORY_DAYS:
+        raise ValueError("not enough stored history for a reference estimate")
+    return [date.fromisoformat(str(d["day"])) for d in rows], [float(d[stat]) for d in rows]
+
+
+def _day_to_day_sd(values: list[float]) -> float:
+    """Population sd of the day-to-day changes, floored so a flat window cannot divide by zero."""
+    diffs = [b - a for a, b in pairwise(values)]
+    return max(pstdev(diffs), 1e-6 * (1.0 + abs(values[-1])))
+
+
+def _clip(p: float) -> float:
+    return min(ESTIMATE_CLIP[1], max(ESTIMATE_CLIP[0], p))
 
 
 def power_estimate(q: Question, ctx: Mapping[str, Any]) -> dict[str, Any]:
-    """How often recent days crossed the question's threshold, blended with the latest day.
+    """Persistence with a normal error: the latest stored day's value as the centre (r2).
 
-    estimate = mean of (share over the stored window, share over the last 7 days, 1 if the
-    latest day crossed else 0), clipped to [0.05, 0.95]. Simple on purpose: a reference point
-    for the model to adjust, not a competitor to the gradient-boosted `ml` model.
+    For the threshold templates: centre = the latest stored day's value of the statistic,
+    sd = the sd of the day-to-day changes in the stored window times sqrt(days ahead), probability
+    through `normal_probability`, clipped to [0.05, 0.95]. For `up_vs_today`: the normal tail of
+    the mean change seen on the same weekday as the target day. Pre-registered in
+    `lab/prereg/agent-quant-r2.md`; the r1 estimate (share of days over a median threshold) is gone.
     """
+    days, values = _daily_values(q, ctx)
     stat = str(q.params.get("stat", ""))
-    threshold = float(q.params["reference_mean"]) if q.template == "up_vs_today" else q.threshold
-    daily = [d for d in ctx.get("daily", []) if stat in d]
-    if threshold is None or len(daily) < MIN_HISTORY_DAYS:
-        raise ValueError("not enough stored history for a reference estimate")
-    values = [float(d[stat]) for d in daily]
-    hits = [_hit(v, q.comparator, float(threshold)) for v in values]
-    share_all = sum(hits) / len(hits)
-    recent = hits[-RECENT_DAYS:]
-    share_recent = sum(recent) / len(recent)
-    last = 1.0 if hits[-1] else 0.0
-    p = min(ESTIMATE_CLIP[1], max(ESTIMATE_CLIP[0], (share_all + share_recent + last) / 3))
+    ahead = max(1, (q.target_date - days[-1]).days)
+    sd = _day_to_day_sd(values)
+    common = {
+        "statistic": stat,
+        "days_in_window": len(values),
+        "latest_day": days[-1].isoformat(),
+        "latest_day_weekday": calendar.day_name[days[-1].weekday()],
+        "latest_day_value": values[-1],
+        "target_day": q.target_date.isoformat(),
+        "target_weekday": calendar.day_name[q.target_date.weekday()],
+        "days_ahead": ahead,
+        "day_to_day_sd": round(sd, 3),
+    }
+    if q.template == "up_vs_today":
+        changes = [
+            (day, b - a)
+            for day, a, b in zip(days[1:], values, values[1:], strict=False)
+            if day.weekday() == q.target_date.weekday()
+        ]
+        mean_change = mean(c for _, c in changes) if changes and ahead == 1 else 0.0
+        p = _clip(normal_probability(mean_change, sd * sqrt(ahead), 0.0, "gt"))
+        return {
+            "probability": round(p, 3),
+            "method": (
+                "normal tail of the day-to-day change of the daily mean: centre = the mean "
+                "change seen on the same weekday as the target day in the stored window (0 if "
+                "none), sd = sd of all day-to-day changes; clipped to 0.05-0.95"
+            ),
+            "inputs": {
+                **common,
+                "mean_change_same_weekday": round(mean_change, 3),
+                "same_weekday_changes": len(changes),
+            },
+        }
+    if q.threshold is None:
+        raise ValueError("this question has no numeric threshold")
+    threshold = float(q.threshold)
+    direction = "lt" if q.comparator == "lt" else "gt"
+    sd_k = sd * sqrt(ahead)
+    p = _clip(normal_probability(values[-1], sd_k, threshold, direction))
     return {
         "probability": round(p, 3),
         "method": (
-            "mean of: share of stored days that crossed the threshold, share of the last 7 "
-            "days, and whether the latest day crossed it; clipped to 0.05-0.95"
+            "persistence with a normal error: the latest stored day's value is the centre, "
+            "the sd of the day-to-day changes in the stored window (times the square root of the "
+            "days ahead) is the spread; clipped to 0.05-0.95. It does not know the weekday "
+            "pattern, the hourly shape of the latest day or any news"
         ),
         "inputs": {
-            "statistic": stat,
+            **common,
             "comparator": q.comparator,
-            "threshold": float(threshold),
-            "days_in_window": len(values),
-            "share_window": round(share_all, 3),
-            "share_last_7_days": round(share_recent, 3),
-            "latest_day_value": values[-1],
-            "latest_day_crossed": bool(hits[-1]),
+            "threshold": threshold,
+            "distance_in_sd": round((threshold - values[-1]) / sd_k, 3),
         },
     }
 
@@ -124,7 +169,7 @@ class AgentQuant(AgentForecaster):
     """`agent_quant`: the agent plus a reference estimate and a probability calculator."""
 
     forecaster_id = "agent_quant"
-    prompt_versions = {"agent_system": "v3"}  # noqa: RUF012 - read-only class default
+    prompt_versions = {"agent_system": "v6"}  # noqa: RUF012 - read-only class default
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
